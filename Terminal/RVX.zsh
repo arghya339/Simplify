@@ -14,6 +14,42 @@ BLUE=$(tput setaf 4)
 WHITE=$(tput setaf 7)
 RESET=$(tput sgr0)
 
+: '
+# --- defining basic ANSI colors using tput command ---
+Color Forground_Command Background_Command
+Black tput setaf 0 tput setab 0
+Red tput setaf 1 tput setab 1
+Green tput setaf 2 tput setab 2
+Yellow tput setaf 3 tput setab 3
+Blue tput setaf 4 tput setab 4
+White tput setaf 7 tput setab 7
+Reset tput sgr0
+
+Color Bright_Command
+Bright-Red tput setaf 9
+Bright-Green tput setaf 10
+Bright-Yellow tput setaf 11
+Bright-Blue tput setaf 12
+Bright-White tput setaf 15
+
+Format Command
+Bold tput bold
+Dim tput dim
+Underline tput smul tput rmul
+Blinking tput blink
+
+Examples
+FG_Green=$(tput setaf 2)
+BG_White=$(tput setab 7)
+Bold=$(tput bold)
+Reset=$(tput sgr0)
+
+echo "${FG_Green}This is green text${Reset}"
+echo "${BG_White}This is a white background${Reset}"
+echo "${FG_Green}${BG_White}This is green text on white background${Reset}"
+echo "${Bold}${FG_Green}${BG_White}This is bold green text on white background${Reset}"
+'
+
 # Construct the eye shape using string concatenation
 eye=$(cat <<'EOF'
   ______  __                       __ __  ______           
@@ -402,6 +438,50 @@ function Write_ColoredPrompt {
   read -r input
   printf "%s" "$input"
 }
+
+: '
+# --- Zsh supports ANSI escape codes for terminal text formatting ---
+Color Forground_Color_Code Background_Color_Code
+Black 30 40
+Red 31 41
+Green 32 42
+Yellow 33 43
+Blue 34 44
+Magenta 35 45
+Cyan 36 46
+White 37 47
+
+Black(Gray)_Background_Code 48
+Default_background_Code 49
+
+Color Bright_Color_Code
+Bright-Black(Gray) 90
+Bright-Red 91
+Bright-Green 92
+Bright-Yellow 93
+Bright-Blue 94
+Bright-Magenta 95
+Bright-Cyan 96
+Bright-White 97
+
+Text_Format Code
+Reset/Normal 0
+Bold/Strong 1
+Faint/Dim 2
+Italic 3
+Underline 4
+Blink(slow) 5
+Blink(rapid) 6
+Inverse/Reverse 7
+Hidden(invisible) 8
+Strikethrough 9
+
+Examples
+echo "\e[32mThis is green text\e[0m"
+echo "\e[47mThis is a white background\e[0m"
+echo "\e[32;47mThis is green text on white background\e[0m"
+echo "\e[1;32;47mThis is bold green text on white background\e[0m"
+'
 
 # Download RVX_dl Python script for dynamically download stock apk from GitHub
 if [[ ! -f "$Simplify/RVX_dl.py" ]]; then
