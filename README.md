@@ -51,7 +51,7 @@ A Simple Cross Platform Automated ReVanced Shell Script for Patching apk
   - Open `Termux` and run the script with the following command:
    
   ```
-  wget "https://raw.githubusercontent.com/arghya339/Simplify/refs/heads/main/Termux/RVX.sh" -O "$HOME/RVX.sh"
+  curl -o "$HOME/RVX.sh" "https://raw.githubusercontent.com/arghya339/Simplify/refs/heads/main/Termux/RVX.sh" && clear
   ```
 
   ```
