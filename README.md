@@ -48,7 +48,7 @@ A Simple Cross Platform Automated ReVanced Shell Script for Patching apk
   ```
 
 - Android
-  - Open `Termux` and run the script with the following command:
+  - Open [Termux](https://github.com/termux/termux-app/releases) and run the script with the following command:
    
   ```
   curl -o "$HOME/RVX.sh" "https://raw.githubusercontent.com/arghya339/Simplify/refs/heads/main/Termux/RVX.sh" && clear
