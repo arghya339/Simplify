@@ -80,6 +80,8 @@ Android
 
 ![image](docs/images/Result.png)
 
+![image](docs/images/Result_Android.png)
+
 ## Disclaimer
 - This script is for educational purposes only. 
 - Modifying and reinstalling APKs can be risky and may violate app terms of service or legal regulations. 
