@@ -183,10 +183,10 @@ foreach ($dependency in @("choco", "java", "jdk", "android-sdk", "python"<#, "7z
                   winget install AdoptOpenJDK.OpenJDK.8 --accept-source-agreements --silent --force
                   # winget already set Oracle.JDK.17 Path in System Environment Variable as C:\Program Files\AdoptOpenJDK\jdk-8.0.292.10-hotspot\bin
                   # so remove a this specific path from the system's environment variable using PowerShell
-                  $path = [Environment]::GetEnvironmentVariable("Path", "Machine")
-                  $path = $path -replace [Regex]::Escape("C:\Program Files\AdoptOpenJDK\jdk-8.0.292.10-hotspot\bin") + ";", ""
-                  $path = $path -replace [Regex]::Escape("C:\Program Files\AdoptOpenJDK\jdk-8.0.292.10-hotspot\bin"), ""
-                  [Environment]::SetEnvironmentVariable("Path", $path, "Machine")
+                  #$path = [Environment]::GetEnvironmentVariable("Path", "Machine")
+                  #$path = $path -replace [Regex]::Escape("C:\Program Files\AdoptOpenJDK\jdk-8.0.292.10-hotspot\bin") + ";", ""
+                  #$path = $path -replace [Regex]::Escape("C:\Program Files\AdoptOpenJDK\jdk-8.0.292.10-hotspot\bin"), ""
+                  #[Environment]::SetEnvironmentVariable("Path", $path, "Machine")
                 }
               "android-sdk" {
                   Write-Host "[!]" -ForegroundColor Yellow "Installing Android SDK using Chocolatey..."
