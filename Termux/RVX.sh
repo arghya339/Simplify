@@ -352,7 +352,7 @@ sed -i '/allow-external-apps/s/# //' "$HOME/.termux/termux.properties"
 # Ensure aapt2 exist in $Simplify directory if not download it & save as aapt2
 if [ ! -f "$Simplify/aapt2" ]; then
   echo "${running} Downloading Custom aapt2 binary for compile apk.."
-  wget "https://github.com/decipher3114/binaries/releases/download/v1.0/aapt2_$arch" -O "$Simplify/aapt2" 2>&1 | grep -E 'binaries|100%|saved'
+  wget "https://github.com/arghya339/aapt2/releases/download/all/aapt2_$arch" -O "$Simplify/aapt2" 2>&1 | grep -E 'binaries|100%|saved'
   chmod +x "$Simplify/aapt2" && "$Simplify/aapt2" version
 else
   echo "${good} Custom aapt2 bin already exist in $Simplify dir."
