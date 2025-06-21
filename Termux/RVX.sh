@@ -169,8 +169,8 @@ patch_reddit() {
   fi
 }
 
-if [ $Android -ge 8 ]; then
-  # --- YouTube ---
+# --- Build YouTube ---
+build_yt() {
   getVersion "com.google.android.youtube"
   #pkgVersion="$pkgVersion"
   pkgVersion="20.21.37"
@@ -213,8 +213,10 @@ if [ $Android -ge 8 ]; then
         *) echo -e "$info Invalid choice! YouTube RVX Sharing skipped." ;;
     esac
   fi
-  
-  # --- YouTube Music ---
+}
+
+# --- build YT Music ---
+build_yt_music() {
   getVersion "com.google.android.apps.youtube.music"
   #pkgVersion="$pkgVersion"
   pkgVersion="8.18.51"
@@ -257,31 +259,54 @@ if [ $Android -ge 8 ]; then
         *) echo -e "$info Invalid choice! YouTube Music RVX Sharing skipped." ;;
     esac
   fi
+}
+
+if [ $Android -ge 8 ]; then
+  echo -e "[?] ${Yellow}Do you want to Patch YouTube RVX app? [Y/n] ${Reset}\c" && read opt
+  case $opt in
+    y*|Y*|"") build_yt ;;  # Call the build yt function
+    n*|N*) echo -e "$notice YouTube RVX Patching skipped by User!" ;;
+    *) echo -e "$info Invalid choice! YouTube RVX Patching skipped." ;;
+  esac
+
+  echo -e "[?] ${Yellow}Do you want to Patch YT Music RVX app? [Y/n] ${Reset}\c" && read opt
+  case $opt in
+    y*|Y*|"") build_yt_music ;;  # Call the build yt music function
+    n*|N*) echo -e "$notice YT Music RVX Patching skipped by User!" ;;
+    *) echo -e "$info Invalid choice! YT Music RVX Patching skipped." ;;
+  esac
 fi
 
 # --- Reddit ---
 if [ $Android -ge 9 ]; then
-  getVersion "com.reddit.frontpage"
-  pkgVersion="$pkgVersion"
-  #pkgVersion="2025.12.1"
-  bash $Simplify/APKMdl.sh "com.reddit.frontpage" "$pkgVersion" "BUNDLE" "universal"  # Download stock Reddit apk from APKMirror
-  reddit_apk_path="$Download/Reddit_v${pkgVersion}-universal.apk"
-  if [ -f "$reddit_apk_path" ]; then
-    echo -e "$good ${Green}Downloaded Reddit APK found:${Reset} $reddit_apk_path"
-    echo -e "$running Patching Reddit RVX.."
-    patch_reddit "$SimplUsr/reddit-rvx_v${pkgVersion}-$arch.apk"
-  fi
-  if [ -f "$SimplUsr/reddit-rvx_v${pkgVersion}-$arch.apk" ]; then
-    echo -e "[?] ${Yellow}Do you want to install Reddit RVX app? [Y/n]${Reset} \c" && read opt
-    case $opt in
-      y*|Y*|"")
-        echo -e "$running Please Wait !! Installing Patched Reddit RVX apk.."
-        bash $Simplify/apkInstall.sh "$SimplUsr/reddit-rvx_v${pkgVersion}-$arch.apk" "reddit-rvx_v${pkgVersion}-$arch.apk" "com.reddit.frontpage" "com.reddit.launch.main.MainActivity"
-        ;;
-      n*|N*) echo -e "$notice Reddit RVX Installaion skipped!" ;;
-      *) echo -e "$info Invalid choice! Reddit RVX Installaion skipped." ;;
-    esac
-  fi
+  echo -e "[?] ${Yellow}Do you want to Patch YouTube RVX app? [Y/n] ${Reset}\c" && read opt
+  case $opt in
+    y*|Y*|"")
+      getVersion "com.reddit.frontpage"
+      pkgVersion="$pkgVersion"
+      #pkgVersion="2025.12.1"
+      bash $Simplify/APKMdl.sh "com.reddit.frontpage" "$pkgVersion" "BUNDLE" "universal"  # Download stock Reddit apk from APKMirror
+      reddit_apk_path="$Download/Reddit_v${pkgVersion}-universal.apk"
+      if [ -f "$reddit_apk_path" ]; then
+        echo -e "$good ${Green}Downloaded Reddit APK found:${Reset} $reddit_apk_path"
+        echo -e "$running Patching Reddit RVX.."
+        patch_reddit "$SimplUsr/reddit-rvx_v${pkgVersion}-$arch.apk"
+      fi
+      if [ -f "$SimplUsr/reddit-rvx_v${pkgVersion}-$arch.apk" ]; then
+        echo -e "[?] ${Yellow}Do you want to install Reddit RVX app? [Y/n]${Reset} \c" && read opt
+        case $opt in
+          y*|Y*|"")
+            echo -e "$running Please Wait !! Installing Patched Reddit RVX apk.."
+            bash $Simplify/apkInstall.sh "$SimplUsr/reddit-rvx_v${pkgVersion}-$arch.apk" "reddit-rvx_v${pkgVersion}-$arch.apk" "com.reddit.frontpage" "com.reddit.launch.main.MainActivity"
+            ;;
+            n*|N*) echo -e "$notice Reddit RVX Installaion skipped!" ;;
+            *) echo -e "$info Invalid choice! Reddit RVX Installaion skipped." ;;
+        esac
+      fi
+      ;;
+    n*|N*) echo -e "$notice Reddit RVX Patching skipped by User!" ;;
+    *) echo -e "$info Invalid choice! Reddit RVX Patching skipped." ;;
+  esac
 fi
 
 # --- YouTube Music RVX Android 7 ---
