@@ -198,7 +198,7 @@ fi
 # --- Extrct branding.zip ---
 if [ -f "$SimplUsr/branding.zip" ] && [ ! -d "$SimplUsr/branding" ]; then
   echo -e "$running Extrcting ${Red}branding.zip${Reset} to $SimplUsr dir.."
-  pv "$SimplUsr/branding.zip" | bsdtar -xof - -C "$SimplUsr/branding/" --no-same-owner --no-same-permissions
+  pv "$SimplUsr/branding.zip" | bsdtar -xof - -C "$SimplUsr/" --no-same-owner --no-same-permissions
 fi
 # --- Remove branding.zip ---
 if [ -d "$SimplUsr/branding" ] && [ -f "$SimplUsr/branding.zip" ]; then

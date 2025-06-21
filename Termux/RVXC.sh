@@ -42,7 +42,7 @@ if [ "$(su -c 'getenforce 2>/dev/null')" = "Enforcing" ]; then
   CorePatchPkg=$(su -c "pm list packages | grep com.coderstory.toolkit" 2>/dev/null)  # CorePatch packages list
   su -c "setenforce 1"  # set SELinux to Enforcing mode to block unauthorized operations
 else
-  LSPosedPkg=$$(su -c "pm list packages | grep 'org.lsposed.manager'" 2>/dev/null)  # LSPosed packages list
+  LSPosedPkg=$(su -c "pm list packages | grep 'org.lsposed.manager'" 2>/dev/null)  # LSPosed packages list
   CorePatchPkg=$(su -c "pm list packages | grep 'com.coderstory.toolkit'" 2>/dev/null)  # CorePatch packages list
 fi
 
