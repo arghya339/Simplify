@@ -225,7 +225,7 @@ APKMdl() {
     
     if [ "$Type" == "BUNDLE" ]; then
       bash $Simplify/dlGitHub.sh "REAndroid" "APKEditor" "latest" ".jar" "$Simplify"
-      APKEditor=$findFile
+      APKEditor=$(find "$Simplify" -type f -name "APKEditor-*.jar" -print -quit)
       mkdir -p "$Download/${appName}_v${VERSION}-${Arch}"
       echo -e "$running Extracting APKM content.."
       pv "$outputPath" | bsdtar -xf - -C "$Download/${appName}_v${VERSION}-${Arch}/" --include "base.apk" "split_config.${cpuAbi//-/_}.apk" "split_config.${locale}.apk" "split_config.$dpi.apk"
