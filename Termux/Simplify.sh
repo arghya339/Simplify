@@ -277,6 +277,7 @@ while true; do
     RVX|rvx)
       curl -sL --progress-bar -o "$RVX/RVX.sh" "https://raw.githubusercontent.com/arghya339/Simplify/refs/heads/main/Termux/RVX.sh" > /dev/null 2>&1
       bash "$RVX/RVX.sh"
+      sleep 3
       ;;
     RVXC|rvxc)
       if su -c "id" >/dev/null 2>&1; then
@@ -285,13 +286,14 @@ while true; do
       else
         echo -e "$notice SuperUser permission is not granted! RVX CoreLSPosed required SU permission."
       fi
+      sleep 3
       ;;
-    [Ff]*) feature ;;
-    [Bb]*) bug ;;
-    [Ss]*) support ;;
-    [Aa]*) about ;;
-    [Qq]*) break ;;
+    [Ff]*) feature && sleep 3 ;;
+    [Bb]*) bug && sleep 3 ;;
+    [Ss]*) support && sleep 3 ;;
+    [Aa]*) about && sleep 3 ;;
+    [Qq]*) clear && break ;;
     *) echo -e "$info Invalid input! Please enter RVX / RVXC / F / B / S / A / Q." && sleep 3 ;;
   esac
 done
-############################################################################################
+################################################################################################
