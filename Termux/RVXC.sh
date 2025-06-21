@@ -105,12 +105,15 @@ patch_yt() {
     -o "$outputAPK" $youtube_apk_path \
     -e "Change version code" -d "GmsCore support" \
     -e "Custom Shorts action buttons" -OiconType="round" \
-    -e "Custom branding icon for YouTube" -OappIcon="$SimplUsr/branding/youtube/launcher/google_family" \
+    -e "Custom branding icon for YouTube" -OappIcon="$SimplUsr/branding/youtube/launcher/google_family" -OchangeSplashIcon=true -OrestoreOldSplashAnimation=false \
     -e "Custom header for YouTube" -OcustomHeader="$SimplUsr/branding/youtube/header/google_family" \
     -e "Custom branding name for YouTube" -OappName="YouTube RVX" \
     -e "Hide shortcuts" -Oshorts=false \
+    -e "Visual preferences icons for YouTube" -OsettingsMenuIcon="extension" \
     -e "Overlay buttons" -OiconType=thin \
-    -e "Custom header for YouTube" -e "Force hide player buttons background" -e=MaterialYou \
+    -e "Spoof streaming data" -OuseIOSClient \
+    -e "Settings for YouTube" -OinsertPosition="@string/about_key" -OrvxSettingsLabel=RVX \
+    -e "Force hide player buttons background" -e=MaterialYou \
     -e="Return YouTube Username" --custom-aapt2-binary="$HOME/aapt2" \
     --purge $ripLib --unsigned -f | tee "$log"
 
@@ -133,6 +136,8 @@ patch_yt_music() {
     -e "Custom header for YouTube Music" -OcustomHeader="$SimplUsr/branding/music/header/google_family" \
     -e "Custom branding name for YouTube Music" -OappNameNotification="YouTube Music RVX" -OappNameLauncher="YT Music RVX" \
     -e "Dark theme" -OmaterialYou=true \
+    -e "Visual preferences icons for YouTube Music" -OsettingsMenuIcon="extension" \
+    -e "Settings for YouTube Music" -OrvxSettingsLabel="RVX" \
     -e "Custom header for YouTube Music" -e="Return YouTube Username" --custom-aapt2-binary="$HOME/aapt2" \
     --purge --unsigned -f | tee "$log"
 
