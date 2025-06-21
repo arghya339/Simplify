@@ -234,7 +234,7 @@ if [ $Android -ge 8 ]; then
         *) echo -e "$info Invalid choice! YouTube Music RVX Sharing skipped." ;;
     esac
   fi
-if
+fi
 
 # --- Reddit ---
 if [ $Android -ge 9 ]; then
