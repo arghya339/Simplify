@@ -271,7 +271,7 @@ while true; do
   clear  # Clear
   # Apply the eye color to the simplify shape and print it
   echo -e "${BoldGreen}$print_simplify${Reset}" && echo ""  # Space
-  echo -e "RVX. ReVanced Extended\nRVXC. RVX CoreLSPosed\nF. Feature request\nB. Bug report\nS. Support\nA. About\n"
+  echo -e "RVX. ReVanced Extended\nRVXC. RVX CoreLSPosed\nF. Feature request\nB. Bug report\nS. Support\nA. About\nQ. Quit\n"
   echo -n "Select Patches source: " && read source
   case $source in
     RVX|rvx)
@@ -291,7 +291,7 @@ while true; do
     [Ss]*) support ;;
     [Aa]*) about ;;
     [Qq]*) break ;;
-    *) echo -e "$info Invalid input! Please enter RVX / RVXC / F / B / S / A." && sleep 3 ;;
+    *) echo -e "$info Invalid input! Please enter RVX / RVXC / F / B / S / A / Q." && sleep 3 ;;
   esac
 done
 ############################################################################################
