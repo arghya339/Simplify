@@ -13,10 +13,10 @@ Download="/sdcard/Download"  # Download dir
 echo -e "$info ${Blue}Target device:${Reset} $model"
 
 bash $Simplify/dlGitHub.sh "inotia00" "revanced-cli" "latest" ".jar" "$RVX"
-#bash $Simplify/dlGitHub.sh "inotia00" "revanced-patches" "latest" ".rvp" "$RVX"
-ReVancedCLIJar=$findFile
+ReVancedCLIJar=$(find "$RVX" -type f -name "revanced-cli-*-all.jar" -print -quit)
 echo -e "$info ${Blue}ReVancedCLIJar:${Reset} $ReVancedCLIJar"
 
+#bash $Simplify/dlGitHub.sh "inotia00" "revanced-patches" "latest" ".rvp" "$RVX"
 bash $Simplify/dlGitHub.sh "anddea" "revanced-patches" "pre" ".rvp" "$RVX"
 PatchesRvp=$findFile
 echo -e "$info ${Blue}PatchesRvp:${Reset} $PatchesRvp"
