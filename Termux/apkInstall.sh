@@ -26,7 +26,9 @@ apkInstall() {
   
   if su -c "id" >/dev/null 2>&1; then
     su -c "cp '$outputAPK' '/data/local/tmp/$outputFileName'"
-    rm "$outputAPK"
+    if [ "$pkgName" == "com.google.android.youtube" ] || [ "$pkgName" == "com.google.android.apps.youtube.music" ]; then
+      rm "$outputAPK"
+    fi
     # Temporary Disable SELinux Enforcing during installation if it not in Permissive
     if [ "$(su -c 'getenforce 2>/dev/null')" = "Enforcing" ]; then
       su -c "setenforce 0"  # set SELinux to Permissive mode to unblock unauthorized operations
