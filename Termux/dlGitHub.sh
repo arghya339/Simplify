@@ -12,6 +12,7 @@ question="\033[93;1m[?]\033[0m"
 Green="\033[92m"
 Red="\033[91m"
 Blue="\033[94m"
+Cyan="\033[96m"
 White="\033[37m"
 Yellow="\033[93m"
 Reset="\033[0m"
@@ -54,6 +55,7 @@ dlGitHub() {
       curl -L -C - --progress-bar -o "$dir/$assetsName" "https://github.com/$owner/$repo/releases/download/v${latestReleases}/$assetsName"
       findFile="$dir/$assetsName"
     fi
+    echo -e "$info findFile: ${Cyan}$findFile${Reset}"
   else
     lastPreReleases=$(curl -s "https://api.github.com/repos/$owner/$repo/releases" | jq -r '.[].tag_name | sub("^v"; "") | select(contains("dev"))' | head -n 1 2>/dev/null)
     echo -e "$info lastPreReleases: $lastPreReleases"
@@ -74,6 +76,7 @@ dlGitHub() {
       curl -L -C - --progress-bar -o "$dir/$preAssetsName" "https://github.com/$owner/$repo/releases/download/v${lastPreReleases}/$preAssetsName"
       findFile="$dir/$preAssetsName"
     fi
+    echo -e "$info findFile: ${Cyan}$findFile${Reset}"
   fi
 }
 
