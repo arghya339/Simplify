@@ -174,11 +174,11 @@ youtube_apk_path="$Download/YouTube_v${pkgVersion}-universal.apk"
 if [ -f "$youtube_apk_path" ]; then
   echo -e "$good ${Green}Downloaded YouTube APK found:${Reset} $youtube_apk_path"
   echo -e "$running Patching YouTube RVX.."
-  patch_yt "$Simplify/youtube-rvx_v${pkgVersion}-$arch.apk"
+  patch_yt "$RVX/youtube-rvx_v${pkgVersion}-$arch.apk"
 fi
-if [ -f "$SimplUsr/youtube-rvx_v${pkgVersion}-$arch.apk" ]; then
+if [ -f "$RVX/youtube-rvx_v${pkgVersion}-$arch.apk" ]; then
   echo -e "$running Copy signature from YouTube.."
-  cs "$youtube_apk_path" "$Simplify/youtube-rvx_v${pkgVersion}-$arch.apk" "$SimplUsr/youtube-rvx-cs_v${pkgVersion}-$arch.apk"
+  cs "$youtube_apk_path" "$RVX/youtube-rvx_v${pkgVersion}-$arch.apk" "$SimplUsr/youtube-rvx-cs_v${pkgVersion}-$arch.apk"
   echo -e "$running Please Wait !! Installing Patched YouTube RVX CS apk.."
   bash $Simplify/apkInstall.sh "$SimplUsr/youtube-rvx-cs_v${pkgVersion}-$arch.apk" "youtube-rvx-cs_v${pkgVersion}-$arch.apk" "com.google.android.youtube" "com.google.android.apps.youtube.app.watchwhile.MainActivity"
 fi
@@ -193,11 +193,11 @@ yt_music_apk_path="$Download/YouTube Music_v${pkgVersion}-$arch.apk"
 if [ -f "$yt_music_apk_path" ]; then
   echo -e "${good} ${Green}Downloaded YouTube Music APK found:${Reset} $yt_music_apk_path"
   echo -e "$running Patching YouTube Music RVX.."
-  patch_yt_music "$Simplify/yt-music-rvx_v${pkgVersion}-$arch.apk"
+  patch_yt_music "$RVX/yt-music-rvx_v${pkgVersion}-$arch.apk"
 fi
-if [ -f "$SimplUsr/yt-music-rvx_v${pkgVersion}-$arch.apk" ]; then
+if [ -f "$RVX/yt-music-rvx_v${pkgVersion}-$arch.apk" ]; then
   echo -e "$running Copy signature from YouTube Music.."
-  cs "$youtube_apk_path" "$Simplify/yt-music-rvx_v${pkgVersion}-$arch.apk" "$SimplUsr/yt-music-rvx-cs_v${pkgVersion}-$arch.apk"
+  cs "$youtube_apk_path" "$RVX/yt-music-rvx_v${pkgVersion}-$arch.apk" "$SimplUsr/yt-music-rvx-cs_v${pkgVersion}-$arch.apk"
   echo -e "$running Please Wait !! Installing Patched YouTube Music RVX CS apk.."
   bash $Simplify/apkInstall.sh "$SimplUsr/yt-music-rvx-cs_v${pkgVersion}-$arch.apk" "yt-music-rvx-cs_v${pkgVersion}-$arch.apk" "com.google.android.apps.youtube.music" "com.google.android.apps.youtube.music.activities.MusicActivity"
 fi
