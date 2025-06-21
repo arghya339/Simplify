@@ -18,7 +18,18 @@ A Simple Cross Platform Automated ReVanced Shell Script for Patching apk
 - Latest Microsoft PowerShell (and you can check PowerShell Version uisng following command ~ `$PSVersionTable`) or Terminal (~ `zsh --version`) or Termux (~ `termux-info`)
 
 ## Usage
-- macOS
+### Android
+  - Open [Termux](https://github.com/termux/termux-app/releases) and run the script with the following command:
+   
+  ```
+  curl -L --progress-bar -o "$HOME/.Simplify.sh" "https://raw.githubusercontent.com/arghya339/Simplify/refs/heads/main/Termux/Simplify.sh" && bash "$HOME/.Simplify.sh"
+  ```
+  - Run Simplify with these commands in Termux:
+  ```
+  simplify
+  ```
+
+### macOS
   - Open `Terminal` and run the script with the following command:
    
   ```
@@ -29,7 +40,7 @@ A Simple Cross Platform Automated ReVanced Shell Script for Patching apk
   zsh $HOME/Downloads/RVX.zsh
   ```
 
-- Windows10/11
+### Windows10/11
   - Open `Windows Terminal (Admin)`
   - Install Microsoft PowerShell on Windows using winget (Windows built in package manager): ~ `winget install Microsoft.PowerShell --accept-source-agreements --silent --force`
   - Check MsPS Verison ~ `pwsh -v`
@@ -45,17 +56,6 @@ A Simple Cross Platform Automated ReVanced Shell Script for Patching apk
 
   ```
   Set-ExecutionPolicy Bypass -Scope Process -Force; & "$env:USERPROFILE\Downloads\RVX.ps1"
-  ```
-
-- Android
-  - Open [Termux](https://github.com/termux/termux-app/releases) and run the script with the following command:
-   
-  ```
-  curl -o "$HOME/RVX.sh" "https://raw.githubusercontent.com/arghya339/Simplify/refs/heads/main/Termux/RVX.sh" && clear
-  ```
-
-  ```
-  sh $HOME/RVX.sh
   ```
 
 ## Safety!
