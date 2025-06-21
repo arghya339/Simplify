@@ -1,5 +1,23 @@
 #!/usr/bin/bash
 
+# Colored log indicators
+good="\033[92;1m[✔]\033[0m"
+bad="\033[91;1m[✘]\033[0m"
+info="\033[94;1m[i]\033[0m"
+running="\033[37;1m[~]\033[0m"
+notice="\033[93;1m[!]\033[0m"
+question="\033[93;1m[?]\033[0m"
+
+# ANSI color code
+Green="\033[92m"
+BoldGreen="\033[92;1m"
+Red="\033[91m"
+Blue="\033[94m"
+Cyan="\033[96m"
+White="\033[37m"
+Yellow="\033[93m"
+Reset="\033[0m"
+
 # --- Global Variables ---
 Android=$(getprop ro.build.version.release)  # Get Android version
 arch=$(getprop ro.product.cpu.abi)  # Get Android arch
