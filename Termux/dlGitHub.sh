@@ -49,15 +49,19 @@ dlGitHub() {
     findFile=$(find "$dir" -type f -name "$assetsNamePattern" -print -quit)
     fileBaseName=$(basename $findFile)
     
-    if [ "$assetsName" != "$fileBaseName" ]; then
-      echo -e "$notice diffs: $assetsName ~ $fileBaseName"
-      rm $findFile
-      # downloading assets
-      if [ "$repo" == "VancedMicroG" ]; then
+    if [ "$repo" == "VancedMicroG" ]; then
+      if [ "$fileName" != "$fileBaseName" ]; then
+        echo -e "$notice diffs: $fileName ~ $fileBaseName"
+        rm $findFile
         echo -e "$running Downloading $fileName.."
         curl -L -C - --progress-bar -o "$dir/$fileName" "https://github.com/$owner/$repo/releases/download/v${latestReleases}/$assetsName"
         findFile="$dir/$fileName"
-      else
+      fi
+    else 
+      if [ "$assetsName" != "$fileBaseName" ]; then
+        echo -e "$notice diffs: $assetsName ~ $fileBaseName"
+        rm $findFile
+        # downloading assets
         echo -e "$running Downloading $assetsName.."
         if [ "$repo" == "APKEditor" ]; then
           curl -L -C - --progress-bar -o "$dir/$assetsName" "https://github.com/$owner/$repo/releases/download/V${latestReleases}/$assetsName"
