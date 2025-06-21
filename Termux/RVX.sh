@@ -279,7 +279,7 @@ fi
 
 # --- Reddit ---
 if [ $Android -ge 9 ]; then
-  echo -e "[?] ${Yellow}Do you want to Patch YouTube RVX app? [Y/n] ${Reset}\c" && read opt
+  echo -e "[?] ${Yellow}Do you want to Patch Reddit RVX app? [Y/n] ${Reset}\c" && read opt
   case $opt in
     y*|Y*|"")
       getVersion "com.reddit.frontpage"
