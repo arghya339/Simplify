@@ -1,0 +1,246 @@
+#!/usr/bin/bash
+
+# --- Colored log indicators ---
+good="\033[92;1m[✔]\033[0m"
+bad="\033[91;1m[✘]\033[0m"
+info="\033[94;1m[i]\033[0m"
+running="\033[37;1m[~]\033[0m"
+notice="\033[93;1m[!]\033[0m"
+question="\033[93;1m[?]\033[0m"
+
+Green="\033[92m"
+Red="\033[91m"
+Blue="\033[94m"
+skyBlue="\033[38;5;117m"
+Cyan="\033[96m"
+White="\033[37m"
+Yellow="\033[93m"
+Orange="\e[38;5;208m"
+Reset="\033[0m"
+
+# --- Global Variable ---
+APKM_REST_API_URL="https://www.apkmirror.com/wp-json/apkm/v1/app_exists/"
+USER_AGENT="Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Mobile Safari/537.36"  # HTML User Agent: chrome://version/
+AUTH_TOKEN="YXBpLXRvb2xib3gtZm9yLWdvb2dsZS1wbGF5OkNiVVcgQVVMZyBNRVJXIHU4M3IgS0s0SCBEbmJL"
+cloudflareDOH="https://cloudflare-dns.com/dns-query"
+cloudflareIP="1.1.1.1,1.0.0.1"
+Simplify="$HOME/Simplify"
+Download="/sdcard/Download"
+cpuAbi=$(getprop ro.product.cpu.abi)  # Get Android architecture
+locale=$(getprop persist.sys.locale | cut -d'-' -f1)  # Get System Languages
+# Function to get the DPI category based on density using getprop
+get_dpi() {
+  # Get the device screen density using 'getprop ro.sf.lcd_density'
+  density=$(getprop ro.sf.lcd_density)
+  # Check and categorize the density
+  if [ "$density" -le 160 ]; then
+    echo "mdpi"  # Medium Density
+  elif [ "$density" -le 240 ]; then
+    echo "hdpi"  # High Density
+  elif [ "$density" -le 320 ]; then
+    echo "xhdpi"  # Extra High Density
+  elif [ "$density" -le 440 ]; then
+    echo "xxhdpi"  # Extra Extra High Density
+  elif [ "$density" -gt 440 ]; then
+    echo "xxxhdpi"  # Extra Extra Extra High Density
+  else
+    echo "*dpi"
+  fi
+}
+dpi=$(get_dpi)  # Get the DPI Category
+
+APKMdl() {
+  local PKG_NAME=$1
+  local VERSION=$2
+  local TYPE=$3
+  local ARCH=$4
+  local RESPONSE_JSON
+  local html_content
+  local HTML_CONTENT
+  local final_apk_link_content
+  local FileName
+  
+  RESPONSE_JSON=$(curl -sS --doh-url "$cloudflareDOH" $APKM_REST_API_URL -A "$USER_AGENT" -H 'Accept: application/json' -H 'Content-Type: application/json' -H "Authorization: Basic $AUTH_TOKEN" -d "{\"pnames\":[\"$PKG_NAME\"]}")
+  
+  if [ $? -ne 0 ]; then
+      echo -e "$bad Error: API request failed for ${Blue}apkmirror.com${Reset}.\nTry again later..." >&2
+    return 1
+  fi
+  
+  if ! echo "$RESPONSE_JSON" | jq -e ".data[] | select(.pname == \"$PKG_NAME\") | .exists == true" > /dev/null 2>&1; then
+    echo -e "$bad Error: ${Blue}$PKG_NAME${Reset} pkgName not found on APKMirror!" >&2
+    return 1
+  fi
+  #echo "$RESPONSE_JSON" | jq -e ".data[]"  # for debug
+  appLink="https://www.apkmirror.com$(jq -r ".data[] | select(.pname == \"$PKG_NAME\") | .app.link" <<< "$RESPONSE_JSON")"
+  appLink=$(echo "$appLink" | sed 's/-android-automotive//g; s/-wear-os//g')
+  second_last_segment=$(basename "$appLink")  # chrome
+  appName=$(jq -r ".data[] | select(.pname == \"$PKG_NAME\") | .app.name" <<< "$RESPONSE_JSON")
+  appName=$(echo "$appName" | sed 's/(Android Automotive)//g; s/(Wear OS)//g' | xargs)
+  versionLink=$(jq -r ".data[] | select(.pname == \"$PKG_NAME\") | .release.link" <<< "$RESPONSE_JSON" | grep -Eo "/apk/[^\"']+" | grep "/apk/.*$second_last_segment" | head -n 1 | sed -E 's/-[0-9].*//')
+  selectedApp=$(basename "$versionLink" | sed 's/-android-automotive//g; s/-wear-os//g')  # google-chrome
+  if [ "$VERSION" != "null" ] && [ -n "$VERSION" ]; then
+    VERSION=$(echo "$VERSION" | tr '.' '-')
+    version_link="${appLink}${selectedApp}-${VERSION}-release/"
+    VERSION=$(echo "$VERSION" | tr '-' '.')
+  elif [ "$VERSION" == "null" ] || [ -z "$VERSION" ]; then
+    version_link="https://www.apkmirror.com$(jq -r ".data[] | select(.pname == \"$PKG_NAME\") | .release.link" <<< "$RESPONSE_JSON")"
+  fi
+  
+  if [ -z "$appLink" ] || [ -z $second_last_segment ] || [ -z "$appName" ] || [ -z $selectedApp ]; then
+    echo -e "$bad Error: Could not retrieve appInfo!" >&2
+    return 1
+  else
+    echo -e "$info appName: $appName \n$info appLink: ${Blue}$appLink${Reset} \n$info second_last_segment: $second_last_segment \n$info selectedApp: $selectedApp \n$info version_link: ${Blue}$version_link${Reset}\n"
+  fi
+  
+  echo -e "$running Scraping variant details from: ${Blue}$version_link${Reset}"
+  html_content=$(curl -sL --doh-url "$cloudflareDOH" -A "$USER_AGENT" -H "Referer: https://www.apkmirror.com/" "$version_link")
+  if [ $? -ne 0 ]; then
+    echo -e "$bad Error: Scraping variant info failed for ${Blue}apkmirror.com${Reset}.\nTry again later..."
+    return 1
+  fi
+  
+  variantsJson=$(echo "$html_content" | pup 'div.table-row json{}')
+  
+  Type=()
+  Arch=()
+  Link=()
+  
+  mapfile -t parsed_rows < <(echo "$variantsJson" | jq -r '.[] | select((.children | type) == "array" and (.children | length) == 5)
+    | select(
+      (.children[0].children[1].text | type) == "string" and # Type text (BUNDLE/APK)
+      (.children[1].text | type) == "string" and # Arch text
+      (.children[4].children[0].href | type) == "string" # Link href
+    )
+    | [
+        .children[0].children[1].text, # Type (BUNDLE/APK)
+        .children[1].text, # Arch
+        ("https://www.apkmirror.com" + .children[4].children[0].href) # Link
+      ] | join("\t")
+  ')
+  
+  if [ ${#parsed_rows[@]} -eq 0 ]; then
+    echo -e "$bad No valid variants found!"
+    return 1
+  fi
+  
+  # Filter variants based on both TYPE and ARCH parameters
+  selected_index=-1
+  for i in "${!parsed_rows[@]}"; do
+    IFS=$'\t' read -r type arch link <<< "${parsed_rows[$i]}"
+    if [[ "$type" == "$TYPE" ]] && [[ "$arch" == "$ARCH" ]]; then
+        Type[i]="$type"
+        Arch[i]="$arch"
+        Link[i]="$link"
+        echo -e "[$i] ${Blue}Type: $type | Arch: $arch | Link: $link${Reset}"
+        selected_index=$i
+    fi
+  done
+  
+  if [ "$found_variant" = false ]; then
+    echo -e "$bad No $TYPE variant found for architecture $ARCH!"
+    return 1
+  fi
+  
+  Type="${Type[$selected_index]}"
+  Arch="${Arch[$selected_index]}"
+  Link="${Link[$selected_index]}"
+  if [ "$Type" == "APK" ]; then
+    file_ext=".apk"
+  else
+    file_ext=".apkm"
+  fi
+  echo  # Space
+  
+  appName="${appName//[\*\\\/:\?\|<>]/}"
+  FileName="${appName}_v${VERSION}-${Arch}${file_ext}"
+  outputPath="${Download}/${FileName}" 
+  if [ ! -f "$Download/${appName}_v${VERSION}-${Arch}.apk" ] && [ ! -f "$outputPath" ]; then
+    echo -e "$running Scraping actual download button from: ${Blue}$Link${Reset}"
+    # Fetch the HTML of the download page
+    HTML_CONTENT=$(curl -sL --doh-url "$cloudflareDOH" -A "$USER_AGENT" -H "Referer: https://www.apkmirror.com/" "$Link")
+    if [ $? -ne 0 ] || [ -z "$HTML_CONTENT" ]; then
+      echo -e "$bad Error: Scraping download url failed for ${Blue}apkmirror.com${Reset}.\nTry again later..."
+      return 1
+    fi
+  
+    if [ "$Type" == "APK" ]; then
+      SHA256=$(<<<"$HTML_CONTENT" awk '/<h4>APK file hashes<\/h4>/,/<h5>Verify the file you downloaded/' | sed -n 's/.*SHA-256: *<span[^>]*>\([0-9a-fA-F]\{64\}\)<\/span.*/\1/p' | head -n1)
+    else
+      SHA256=$(<<<"$HTML_CONTENT" awk '/<h4>APK bundle file hashes<\/h4>/,/<h5>Verify the APK bundle file you downloaded/' | sed -n 's/.*SHA-256: *<span[^>]*>\([0-9a-fA-F]\{64\}\)<\/span.*/\1/p' | head -n1)
+    fi
+  
+    # This selector looks for an <a> tag with 'downloadButton' in its class list and extracts its href.
+    final_apk_link="https://www.apkmirror.com$(echo "$HTML_CONTENT" | pup -p --charset utf-8 'a.downloadButton attr{href}' 2>/dev/null)"
+    if [ -n "$final_apk_link" ]; then
+      echo -e "$running Fetching intermediate download button content from: ${Blue}$final_apk_link${Reset}"
+      final_apk_link_content=$(curl -sL --doh-url $cloudflareDOH -A "$USER_AGENT" -H "Referer: $Link" "$final_apk_link")
+      if [ $? -ne 0 ]; then
+        echo -e "$bad Error: failed to fetch content for intermediate download page ${Blue}$final_apk_link${Reset}!" >&2
+        return 1
+      fi
+      if [ -z "$final_apk_link_content" ]; then
+        echo -e "$bad Error: Fetched empty content from intermediate download page ${Blue}$final_apk_link${Reset}!" >&2
+        return 1
+      fi
+    
+      # An <a> tag with an href attribute that 'contains("here")' or similar patterns.
+      final_app_url="https://www.apkmirror.com$(echo "$final_apk_link_content" | pup -p --charset UTF-8 'a:contains("here") attr{href}' | head -1 2>/dev/null)"
+        # https://www.apkmirror.com/wp-content/themes/APKMirror/download.php?id=XXXXXXX&key=XxX 
+        # https://www.androidpolice.com/2020/07/04/how-to-download-apps-without-the-play-store-and-why-apkmirror-is-the-best-place-to-get-them/
+        # https://github.com/illogical-robot/apkmirror-public/issues
+      if [ -z "$final_app_url" ]; then
+        echo -e "$bad Error: Could not find the final download URL in the content of ${Blue}$final_apk_link${Reset} using pup!" >&2
+        return 1
+      else
+        echo -e "$good Found final download URL: ${Blue}$final_app_url${Reset}"
+      fi
+    else
+      echo -e "$bad Error: Could not find the final download button link on ${Blue}$Link${Reset}!" >&2
+      return 1
+    fi
+    echo  # Space
+    
+    echo -e "$running Attempting to download APK from: ${Blue}$final_app_url${Reset}"
+    while true; do
+      aria2c -x 16 -s 16 --continue=true --console-log-level=error --download-result=hide --summary-interval=0 -d "$Download" -o "$FileName" -U "User-Agent: $USER_AGENT" -U "Referer: $final_apk_link" --async-dns=true --async-dns-server="$cloudflareIP" "$final_app_url"
+      exitStatus=$?
+      echo  # Space
+      if [ "$exitStatus" == "0" ]; then
+        echo -e "$good Download Complete with aria2. Saved to ${Cyan}$outputPath${Reset}"
+        break
+      else
+        echo -e "$bad Download failed! retrying in 5 secons.." && sleep 5
+      fi
+    done
+    
+    sha256sum=$(sha256sum "$outputPath" | cut -d' ' -f1)
+    if [ "$sha256sum" == "$SHA256" ]; then
+      echo -e "$good Downloaded file appears in the original state."
+    else
+      echo -e "$bad Look like downloaded file appears corrupted!"
+    fi
+    echo  # Space
+    
+    if [ "$Type" == "BUNDLE" ]; then
+      bash $Simplify/dlGitHub.sh "REAndroid" "APKEditor" "latest" ".jar" "$Simplify"
+      APKEditor=$findFile
+      mkdir -p "$Download/${appName}_v${VERSION}-${Arch}"
+      echo -e "$running Extracting APKM content.."
+      pv "$outputPath" | bsdtar -xf - -C "$Download/${appName}_v${VERSION}-${Arch}/" --include "base.apk" "split_config.${cpuAbi//-/_}.apk" "split_config.${locale}.apk" "split_config.$dpi.apk"
+      rm "$outputPath"
+      echo -e "$running Merge splits apkm to standalone lite apk.."
+      $PREFIX/lib/jvm/java-21-openjdk/bin/java -jar $APKEditor m -i "$Download/${appName}_v${VERSION}-${Arch}" -o "$Download/${appName}_v${VERSION}-${Arch}.apk"
+      rm -rf "$Download/${appName}_v${VERSION}-${Arch}"
+      echo
+    fi
+  else
+    echo -e "$notice Download skiped! '${appName}_v${VERSION}-${Arch}.apk' already exist."
+    echo  # Space
+  fi
+}
+#APKMdl "com.google.android.youtube" "20.21.37" "BUNDLE" "universal"
+#APKMdl "com.google.android.apps.youtube.music" "8.18.51" "APK" "$cpuAbi"
+APKMdl "$@"  # call the function with arguments
+#########################################################################
