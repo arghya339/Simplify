@@ -37,13 +37,15 @@ dlGitHub() {
     if [ "$repo" == "VancedMicroG" ]; then
       assetsName=$(curl -s "https://api.github.com/repos/$owner/$repo/releases/latest" | jq -r --arg regex "$regex" '.assets[] | select(.name | test($regex)) | .name' 2>/dev/null)
       assetsNameWithoutExt="${assetsName%.*}"
-      assetsName="$assetsNameWithoutExt-${latestReleases}$ext"
+      fileName="$assetsNameWithoutExt-${latestReleases}$ext"
+      echo -e "$info assetsName: $fileName"
+      assetsNamePattern=$(echo "$fileName" | sed "s/$latestReleases/*/g")
     else
       assetsName=$(curl -s "https://api.github.com/repos/$owner/$repo/releases/latest" | jq -r --arg regex "$regex" '.assets[] | select(.name | test($regex)) | .name' 2>/dev/null)
+      echo -e "$info assetsName: $assetsName"
+      assetsNamePattern=$(echo "$assetsName" | sed "s/$latestReleases/*/g")
     fi
-    echo -e "$info assetsName: $assetsName"
     
-    assetsNamePattern=$(echo "$assetsName" | sed "s/$latestReleases/*/g")
     findFile=$(find "$dir" -type f -name "$assetsNamePattern" -print -quit)
     fileBaseName=$(basename $findFile)
     
@@ -51,9 +53,19 @@ dlGitHub() {
       echo -e "$notice diffs: $assetsName ~ $fileBaseName"
       rm $findFile
       # downloading assets
-      echo -e "$running Downloading $assetsName.."
-      curl -L -C - --progress-bar -o "$dir/$assetsName" "https://github.com/$owner/$repo/releases/download/v${latestReleases}/$assetsName"
-      findFile="$dir/$assetsName"
+      if [ "$repo" == "VancedMicroG" ]; then
+        echo -e "$running Downloading $fileName.."
+        curl -L -C - --progress-bar -o "$dir/$fileName" "https://github.com/$owner/$repo/releases/download/v${latestReleases}/$assetsName"
+        findFile="$dir/$fileName"
+      else
+        echo -e "$running Downloading $assetsName.."
+        if [ "$repo" == "APKEditor" ]; then
+          curl -L -C - --progress-bar -o "$dir/$assetsName" "https://github.com/$owner/$repo/releases/download/V${latestReleases}/$assetsName"
+        else
+          curl -L -C - --progress-bar -o "$dir/$assetsName" "https://github.com/$owner/$repo/releases/download/v${latestReleases}/$assetsName"
+        fi
+        findFile="$dir/$assetsName"
+      fi
     fi
     echo -e "$info findFile: ${Cyan}$findFile${Reset}"
   else
