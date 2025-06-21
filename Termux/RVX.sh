@@ -271,7 +271,6 @@ if [ $Android -eq 7 ]; then
     #bash $Simplify/APKMdl.sh "com.google.android.apps.youtube.music" "6.42.52" "APK" "$arch"  # Download stock YT Music 6.42.52 apk from APKMirror
     curl -sL "https://github.com/arghya339/Simplify/releases/download/all/com.google.android.apps.youtube.music_6.42.55-$arch.apk" --progress-bar -C - -o "$Download/YouTube Music_v6.42.55-$arch.apk"
   fi
-  fi
   if [ -f "$Download/YouTube Music_v6.42.55-$arch.apk" ]; then
     echo -e "$good ${Green}Downloaded YT Music 6.42.55 found:${Reset} $Download/YouTube\ Music_v6.42.55-$arch.apk"
     echo -e "$running Patching YT Music 6.42.55.."
