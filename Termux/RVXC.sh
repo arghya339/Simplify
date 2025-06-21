@@ -81,9 +81,11 @@ fi
 
 bash $Simplify/dlGitHub.sh "inotia00" "revanced-cli" "latest" ".jar" "$RVX"
 ReVancedCLIJar=$(find "$RVX" -type f -name "revanced-cli-*-all.jar" -print -quit)
+echo -e "$info ${Blue}ReVancedCLIJar:${Reset} $ReVancedCLIJar"
 #bash $Simplify/dlGitHub.sh "inotia00" "revanced-patches" "latest" ".rvp" "$RVX"
 bash $Simplify/dlGitHub.sh "anddea" "revanced-patches" "pre" ".rvp" "$RVX"
 PatchesRvp=$findFile
+echo -e "$info ${Blue}PatchesRvp:${Reset} $PatchesRvp"
 
 # Get compatiblePackages version from json
 getVersion() {
@@ -155,7 +157,7 @@ cs() {
 if [ -f "$RVX/patches.json" ]; then
   rm $RVX/patches.json
 fi
-$PREFIX/lib/jvm/java-21-openjdk/bin/java -jar $ReVancedCLIJar patches $PatchesRvp
+$PREFIX/lib/jvm/java-21-openjdk/bin/java -jar $ReVancedCLIJar patches -p "$RVX/patches.json" $PatchesRvp
 if [ $? == 0 ] && [ -f "$RVX/patches.json" ]; then
   echo -e "$info patches.json generated successfully."
   jq -r '.[] | .compatiblePackages // empty | .[] | {name: .name, version: .versions[-1]} | "\(.name) \(.version)"' $RVX/patches.json | sort -u | awk '{a[$1]=$2} END{for (i in a) printf "\"%s\" \"%s\"\n", i, a[i]}'

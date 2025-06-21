@@ -50,7 +50,7 @@ if [ $Android -ge 8 ]; then
   if [ -f "$RVX/patches.json" ]; then
     rm $RVX/patches.json
   fi
-  $PREFIX/lib/jvm/java-21-openjdk/bin/java -jar $ReVancedCLIJar patches $PatchesRvp
+  $PREFIX/lib/jvm/java-21-openjdk/bin/java -jar $ReVancedCLIJar patches -p "$RVX/patches.json" $PatchesRvp
   if [ $? == 0 ] && [ -f "$RVX/patches.json" ]; then
     echo -e "$info patches.json generated successfully."
     jq -r '.[] | .compatiblePackages // empty | .[] | {name: .name, version: .versions[-1]} | "\(.name) \(.version)"' $RVX/patches.json | sort -u | awk '{a[$1]=$2} END{for (i in a) printf "\"%s\" \"%s\"\n", i, a[i]}'

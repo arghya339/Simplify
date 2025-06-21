@@ -175,20 +175,11 @@ if [ ! -f "$HOME/aapt2" ]; then
   curl -sL "https://github.com/arghya339/aapt2/releases/download/all/aapt2_$arch" --progress-bar -o "$HOME/aapt2" && chmod +x "$HOME/aapt2"
 fi
 
-if [ ! -f $Simplify/dlGitHub.sh ]; then
-  echo -e "$running Downloading dlGitHub.sh.."
-  curl -L "https://raw.githubusercontent.com/arghya339/Simplify/refs/heads/main/Termux/dlGitHub.sh" --progress-bar -o $Simplify/dlGitHub.sh
-fi
+curl -L "https://raw.githubusercontent.com/arghya339/Simplify/refs/heads/main/Termux/dlGitHub.sh" --progress-bar -o $Simplify/dlGitHub.sh > /dev/null 2>&1
 
-if [ ! -f $Simplify/APKMdl.sh ]; then
-  echo -e "$running Downloading APKMdl.sh.."
-  curl -L "https://raw.githubusercontent.com/arghya339/Simplify/refs/heads/main/Termux/APKMdl.sh" --progress-bar -o $Simplify/APKMdl.sh
-fi
+curl -L "https://raw.githubusercontent.com/arghya339/Simplify/refs/heads/main/Termux/APKMdl.sh" --progress-bar -o $Simplify/APKMdl.sh  > /dev/null 2>&1
 
-if [ ! -f $Simplify/apkInstall.sh ]; then
-  echo -e "$running Downloading apkInstall.sh.."
-  curl -L "https://raw.githubusercontent.com/arghya339/Simplify/refs/heads/main/Termux/apkInstall.sh" --progress-bar -o $Simplify/apkInstall.sh
-fi
+curl -L "https://raw.githubusercontent.com/arghya339/Simplify/refs/heads/main/Termux/apkInstall.sh" --progress-bar -o $Simplify/apkInstall.sh  > /dev/null 2>&1
 
 # --- Download branding.zip ---
 if [ ! -d "$SimplUsr/branding" ] && [ ! -f "$SimplUsr/branding.zip" ]; then
