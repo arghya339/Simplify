@@ -192,7 +192,7 @@ fi
 <<comment
 getVersion "com.google.android.apps.youtube.music"
 pkgVersion="$pkgVersion"
-#pkgVersion="8.18.51"
+#pkgVersion="8.24.53"
 bash $Simplify/APKMdl.sh "com.google.android.apps.youtube.music" "$pkgVersion" "APK" "$arch"  # Download stock YouTube apk from APKMirror
 yt_music_apk_path="$Download/YouTube Music_v${pkgVersion}-$arch.apk"
 if [ -f "$yt_music_apk_path" ]; then
