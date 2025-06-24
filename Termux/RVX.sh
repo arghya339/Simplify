@@ -311,25 +311,16 @@ fi
 
 # --- YouTube Music RVX Android 7 ---
 if [ $Android -eq 7 ]; then
-  # --- Download TY Music_6.42.55.apk from GitHub ---
-  if { [ ! -f "$Download/YouTube Music_v6.42.55-$arch.apk" ] || [ ! -f "$Download/YouTube Music_v6.42.52-$arch.apk" ]; } && { [ "$arch" == "arm64-v8a" ] || [ "$arch" == "armeabi-v7a" ]; }; then
+  # --- Download TY Music_6.42.55.apk from APKMirror ---
+  if [ ! -f "$Download/YouTube Music_v6.42.55-$arch.apk" ]; then
     bash $Simplify/APKMdl.sh "com.google.android.apps.youtube.music" "6.42.55" "APK" "$arch"  # Download stock YT Music 6.42.55 apk from APKMirror
-  else
-    echo -e "$running Downloading YT Music 6.42.55 apk from github.."
-    #bash $Simplify/APKMdl.sh "com.google.android.apps.youtube.music" "6.42.52" "APK" "$arch"  # Download stock YT Music 6.42.52 apk from APKMirror
-    curl -sL "https://github.com/arghya339/Simplify/releases/download/all/com.google.android.apps.youtube.music_6.42.55-$arch.apk" --progress-bar -C - -o "$Download/YouTube Music_v6.42.55-$arch.apk"
   fi
   if [ -f "$Download/YouTube Music_v6.42.55-$arch.apk" ]; then
     echo -e "$good ${Green}Downloaded YT Music 6.42.55 found:${Reset} $Download/YouTube\ Music_v6.42.55-$arch.apk"
     echo -e "$running Patching YT Music 6.42.55.."
     patch_yt_music "$SimplUsr/yt-music-rvx_v6.42.55-$arch.apk"
   fi
-  if [ -f "$Download/YouTube Music_v6.42.52-$arch.apk" ]; then
-    echo -e "$good ${Green}Downloaded YT Music 6.42.52 found:${Reset} $Download/YouTube\ Music_v6.42.52-$arch.apk"
-    echo -e "$running Patching YT Music 6.42.52.."
-    patch_yt_music "$SimplUsr/yt-music-rvx_v6.42.52-$arch.apk"
-  fi
-  if [ -f "$SimplUsr/yt-music-rvx_v6.42.55-$arch.apk" ] || [ -f "$SimplUsr/yt-music-rvx_v6.42.52-$arch.apk" ]; then
+  if [ -f "$SimplUsr/yt-music-rvx_v6.42.55-$arch.apk" ]; then
     echo "$info VancedMicroG is used to run MicroG services without root. \nYouTube and YouTube Music won't work without it. \nIf you already have VancedMicroG, You don't need to install it."
     echo -e "[?] ${Yellow}Do you want to install VancedMicroG app? [Y/n] ${Reset}\c" && read opt
     case $opt in
@@ -344,12 +335,7 @@ if [ $Android -eq 7 ]; then
     case $opt in
       y*|Y*|"")
         echo -e "$running Please Wait !! Installing Patched YT Music RVX apk.."
-        if [ -f "$SimplUsr/yt-music-rvx_v6.42.55-$arch.apk" ]; then
-          bash $Simplify/apkInstall.sh "$SimplUsr/yt-music-rvx_v6.42.55-$arch.apk" "yt-music-rvx_v6.42.55-$arch.apk" "app.rvx.android.apps.youtube.music" "com.google.android.apps.youtube.music.activities.MusicActivity"
-        fi
-        if [ -f "$SimplUsr/yt-music-rvx_v6.42.52-$arch.apk" ]; then
-          bash $Simplify/apkInstall.sh "$SimplUsr/yt-music-rvx_v6.42.52-$arch.apk" "yt-music-rvx_v6.42.52-$arch.apk" "app.rvx.android.apps.youtube.music" "com.google.android.apps.youtube.music.activities.MusicActivity"
-        fi
+        bash $Simplify/apkInstall.sh "$SimplUsr/yt-music-rvx_v6.42.55-$arch.apk" "yt-music-rvx_v6.42.55-$arch.apk" "app.rvx.android.apps.youtube.music" "com.google.android.apps.youtube.music.activities.MusicActivity"
         ;;
       n*|N*) echo -e "$notice YT Music RVX Installaion skipped!" ;;
       *) echo -e "$info Invalid choice! YT Music RVX Installaion skipped." ;;
