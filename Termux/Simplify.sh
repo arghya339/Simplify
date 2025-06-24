@@ -169,6 +169,25 @@ if su -c "id" >/dev/null 2>&1; then
   fi
 fi
 
+# --- Shizuku Setup first time ---
+if [ ! -f "$HOME/rish" ] || [ ! -f "$HOME/rish_shizuku.dex" ]; then
+  echo -e "$info Please manually install Shizuku from Google Play Store." && sleep 1
+  termux-open-url "https://play.google.com/store/apps/details?id=moe.shizuku.privileged.api"
+  am start -n com.android.settings/.Settings\$MyDeviceInfoActivity > /dev/null 2>&1  # Open Device Info
+
+  curl -o "$HOME/rish" "https://raw.githubusercontent.com/arghya339/crdl/refs/heads/main/Termux/Shizuku/rish" &> /dev/null && chmod +x "$HOME/rish"
+  sleep 0.5 && curl -o "$HOME/rish_shizuku.dex" "https://raw.githubusercontent.com/arghya339/crdl/refs/heads/main/Termux/Shizuku/rish_shizuku.dex" > /dev/null 2>&1
+  
+  echo -e "$info Please start Shizuku by following guide." && sleep 1
+  if [ $Android -le 10 ]; then
+    am start -n com.android.settings/.Settings\$DevelopmentSettingsDashboardActivity > /dev/null 2>&1  # Open Developer options
+    termux-open-url "https://youtu.be/ZxjelegpTLA"  # YouTube/@MrPalash360: Start Shizuku using Computer
+  else
+    am start -n com.android.settings/.Settings\$WirelessDebuggingActivity > /dev/null 2>&1  # Open Wireless Debugging Settings
+    termux-open-url "https://youtu.be/YRd0FBfdntQ"  # YouTube/@MrPalash360: Start Shizuku Android 11+
+  fi
+fi
+
 # --- Download and give execute (--x) permission to AAPT2 Binary ---
 if [ ! -f "$HOME/aapt2" ]; then
   echo -e "$running Downloading aapt2 binary from GitHub.."
@@ -262,7 +281,7 @@ while true; do
   clear  # Clear
   # Apply the eye color to the simplify shape and print it
   echo -e "${BoldGreen}$print_simplify${Reset}" && echo ""  # Space
-  echo -e "RVX. ReVanced Extended\nRVXC. RVX CoreLSPosed\nF. Feature request\nB. Bug report\nS. Support\nA. About\nQ. Quit\n"
+  echo -e "RVX. ReVanced Extended\nRVXS. RVX SuperUser\nF. Feature request\nB. Bug report\nS. Support\nA. About\nQ. Quit\n"
   echo -n "Select Patches source: " && read source
   case $source in
     RVX|rvx)
@@ -270,10 +289,11 @@ while true; do
       bash "$RVX/RVX.sh"
       sleep 3
       ;;
-    RVXC|rvxc)
+    RVXS*|rvxs*)
       if su -c "id" >/dev/null 2>&1; then
-        curl -sL --progress-bar -o "$RVX/RVXC.sh" "https://raw.githubusercontent.com/arghya339/Simplify/refs/heads/main/Termux/RVXC.sh" > /dev/null 2>&1
-        bash "$RVX/RVXC.sh"
+        curl -sL --progress-bar -o "$RVX/RVXSU.sh" "https://raw.githubusercontent.com/arghya339/Simplify/refs/heads/main/Termux/RVXSU.sh" > /dev/null 2>&1
+        curl -sL -o "$Simplify/apkMount.sh" "https://raw.githubusercontent.com/arghya339/Simplify/refs/heads/main/Termux/apkMount.sh" &> /dev/null
+        bash "$RVX/RVXSU.sh"
       else
         echo -e "$notice SuperUser permission is not granted! RVX CoreLSPosed required SU permission."
       fi
@@ -284,7 +304,7 @@ while true; do
     [Ss]*) support && sleep 3 ;;
     [Aa]*) about && sleep 3 ;;
     [Qq]*) clear && break ;;
-    *) echo -e "$info Invalid input! Please enter RVX / RVXC / F / B / S / A / Q." && sleep 3 ;;
+    *) echo -e "$info Invalid input! Please enter RVX / RVXS / F / B / S / A / Q." && sleep 3 ;;
   esac
 done
 ################################################################################################

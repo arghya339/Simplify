@@ -22,6 +22,13 @@ apkInstall() {
   local outputFileName=$2
   local pkgName=$3
   local activity=$4
+  if su -c "id" >/dev/null 2>&1; then
+    local activityClass=$(su -c "pm resolve-activity --brief $pkgName" | tail -n 1)
+  elif "$HOME/rish" -c "id" >/dev/null 2>&1; then
+    local activityClass=$($HOME/rish -c "pm resolve-activity --brief $pkgName" | tail -n 1)
+  else
+    local activityClass="$pkgName/$activity"
+  fi
   local Model=$(getprop ro.product.model)
   
   if su -c "id" >/dev/null 2>&1; then
@@ -37,7 +44,7 @@ apkInstall() {
     else
       su -c "pm install -i com.android.vending '/data/local/tmp/$outputFileName'"
     fi
-    am start -n $pkgName/$activity > /dev/null 2>&1  # launch app after update
+    am start -n $activityClass &> /dev/null  # launch app after update
     if [ $? != 0 ]; then
       su -c "monkey -p $pkgName -c android.intent.category.LAUNCHER 1" > /dev/null 2>&1
     fi
@@ -46,7 +53,7 @@ apkInstall() {
     ~/rish -c "cp '$outputAPK' '/data/local/tmp/$outputFileName'" > /dev/null 2>&1  # copy apk to System dir
     ./rish -c "pm install -r -i com.android.vending '/data/local/tmp/$outputFileName'" > /dev/null 2>&1  # -r=reinstall --force-uplow=downgrade
     INSTALL_STATUS=$?  # Capture exit status of the install command
-    am start -n $pkgName/$activity > /dev/null 2>&1  # launch app after update
+    am start -n $activityClass &> /dev/null  # launch app after update
     if [ $? != 0 ]; then
       ~/rish -c "monkey -p $pkgName -c android.intent.category.LAUNCHER 1" > /dev/null 2>&1
     fi
@@ -66,7 +73,7 @@ apkInstall() {
       FALLBACK_INSTALL_STATUS=$?
     fi
     if [ "$INSTALL_STATUS" == "0" ] || [ "$FALLBACK_INSTALL_STATUS" == "0" ]; then
-      am start -n $pkgname/$activity > /dev/null 2>&1  # launch app after update
+      am start -n $activityClass &> /dev/null  # launch app after update
     else
       echo -e $notice "${Yellow}There was a problem open the app package using Termux API! Please manually install app from${Reset} Files: $Model > ${Blue}Simplify${Reset} > $outputFileName"
     fi
@@ -78,7 +85,7 @@ apkInstall() {
       FALLBACK_INSTALL_STATUS=$?
     fi
     if [ "$INSTALL_STATUS" == "0" ] || [ "$FALLBACK_INSTALL_STATUS" == "0" ]; then
-      am start -n $pkgname/$activity > /dev/null 2>&1  # launch app after update
+      am start -n $activityClass &> /dev/null  # launch app after update
     else
       echo -e $notice "${Yellow}There was a problem open the app package using Termux API! Please manually install app from${Reset} Files: $Model > ${Blue}Simplify${Reset} > $outputFileName"
     fi

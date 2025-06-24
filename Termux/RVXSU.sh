@@ -118,7 +118,7 @@ patch_yt() {
     --purge $ripLib --unsigned -f | tee "$log"
 
   if [ ! -f "$outputAPK" ] && [ -f $youtube_apk_path ]; then
-    echo "$bad Oops, YouTube Patching failed !! Logs saved to "$SimplUsr/yt-rvx-patch_log.txt". Share the Patchlog to developer."
+    echo "$bad Oops, YouTube Patching failed !! Logs saved to "$log". Share the Patchlog to developer."
     termux-open-url "https://github.com/inotia00/ReVanced_Extended/issues/new?template=bug-report.yml"
     termux-open --send "$log"
   fi
@@ -139,10 +139,10 @@ patch_yt_music() {
     -e "Visual preferences icons for YouTube Music" -OsettingsMenuIcon="extension" \
     -e "Settings for YouTube Music" -OrvxSettingsLabel="RVX" \
     -e "Custom header for YouTube Music" -e="Return YouTube Username" --custom-aapt2-binary="$HOME/aapt2" \
-    --purge --unsigned -f | tee "$log"
+    --purge --rip-lib=$arch --unsigned -f | tee "$log"
 
   if [ ! -f "$outputAPK" ] && [ -f $yt_music_apk_path ]; then
-    echo "$bad Oops, YouTube Music Patching failed !! Logs saved to "$SimplUsr/yt-rvx-patch_log.txt". Share the Patchlog to developer."
+    echo "$bad Oops, YouTube Music Patching failed !! Logs saved to "$log". Share the Patchlog to developer."
     termux-open-url "https://github.com/inotia00/ReVanced_Extended/issues/new?template=bug-report.yml"
     termux-open --send "$log"
   fi
@@ -182,17 +182,27 @@ if [ -f "$youtube_apk_path" ]; then
   patch_yt "$RVX/youtube-rvx_v${pkgVersion}-$arch.apk"
 fi
 if [ -f "$RVX/youtube-rvx_v${pkgVersion}-$arch.apk" ]; then
-  echo -e "$running Copy signature from YouTube.."
-  cs "$youtube_apk_path" "$RVX/youtube-rvx_v${pkgVersion}-$arch.apk" "$SimplUsr/youtube-rvx-cs_v${pkgVersion}-$arch.apk"
-  echo -e "$running Please Wait !! Installing Patched YouTube RVX CS apk.."
-  bash $Simplify/apkInstall.sh "$SimplUsr/youtube-rvx-cs_v${pkgVersion}-$arch.apk" "youtube-rvx-cs_v${pkgVersion}-$arch.apk" "com.google.android.youtube" "com.google.android.apps.youtube.app.watchwhile.MainActivity"
+  echo -e "[?] ${Yellow}Please select installation type - 'M' for Mount or 'I' for SU-Install or 'N' for Installation cancel. [M/i/N] ${Reset}\c" && read opt
+  case $opt in
+    I*|i*|"")
+      echo -e "$running Copy signature from YouTube.."
+      cs "$youtube_apk_path" "$RVX/youtube-rvx_v${pkgVersion}-$arch.apk" "$SimplUsr/youtube-rvx-cs_v${pkgVersion}-$arch.apk"
+      echo -e "$running Please Wait !! Installing Patched YouTube RVX CS apk.."
+      bash $Simplify/apkInstall.sh "$SimplUsr/youtube-rvx-cs_v${pkgVersion}-$arch.apk" "youtube-rvx-cs_v${pkgVersion}-$arch.apk" "com.google.android.youtube" "com.google.android.apps.youtube.app.watchwhile.MainActivity"
+      ;;
+    M*|m*)
+      echo -e "$running Please Wait !! Mounting Patched YouTube RVX apk.."
+      su -mm -c "/system/bin/sh $Simplify/apkMount.sh $youtube_apk_path $RVX/youtube-rvx_v${pkgVersion}-$arch.apk YouTube com.google.android.youtube $pkgVersion"
+      ;;
+    N*|n*) echo -e "$notice YouTube RVX Installaion skipped!" ;;
+    *) echo -e "$info Invalid choice! YouTube RVX Installaion skipped." ;;
+  esac 
 fi
 
 # --- YouTube Music ---
-<<comment
 getVersion "com.google.android.apps.youtube.music"
-pkgVersion="$pkgVersion"
-#pkgVersion="8.24.53"
+#pkgVersion="$pkgVersion"
+pkgVersion="8.24.53"
 bash $Simplify/APKMdl.sh "com.google.android.apps.youtube.music" "$pkgVersion" "APK" "$arch"  # Download stock YouTube apk from APKMirror
 yt_music_apk_path="$Download/YouTube Music_v${pkgVersion}-$arch.apk"
 if [ -f "$yt_music_apk_path" ]; then
@@ -201,10 +211,20 @@ if [ -f "$yt_music_apk_path" ]; then
   patch_yt_music "$RVX/yt-music-rvx_v${pkgVersion}-$arch.apk"
 fi
 if [ -f "$RVX/yt-music-rvx_v${pkgVersion}-$arch.apk" ]; then
+  echo -e "[?] ${Yellow}Do you want to Mount YT Music RVX apk? [Y/n] ${Reset}\c" && read opt
+  case $opt in
+    y*|Y*)
+      echo -e "$running Please Wait !! Mounting Patched YT Music RVX apk.."
+      su -mm -c "/system/bin/sh $Simplify/apkMount.sh $yt_music_apk_path $RVX/yt-music-rvx_v${pkgVersion}-$arch.apk YouTube\ Music com.google.android.apps.youtube.music $pkgVersion"
+      ;;
+    n*|N*) echo -e "$notice YT Music RVX Installaion skipped!" ;;
+    *) echo -e "$info Invalid choice! YT Music RVX Installaion skipped." ;;
+  esac
+  <<comment
   echo -e "$running Copy signature from YouTube Music.."
   cs "$youtube_apk_path" "$RVX/yt-music-rvx_v${pkgVersion}-$arch.apk" "$SimplUsr/yt-music-rvx-cs_v${pkgVersion}-$arch.apk"
   echo -e "$running Please Wait !! Installing Patched YouTube Music RVX CS apk.."
   bash $Simplify/apkInstall.sh "$SimplUsr/yt-music-rvx-cs_v${pkgVersion}-$arch.apk" "yt-music-rvx-cs_v${pkgVersion}-$arch.apk" "com.google.android.apps.youtube.music" "com.google.android.apps.youtube.music.activities.MusicActivity"
-fi
 comment
+fi
 ##############################################################################################################################
