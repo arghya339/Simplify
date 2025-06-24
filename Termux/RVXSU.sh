@@ -139,7 +139,7 @@ patch_yt_music() {
     -e "Visual preferences icons for YouTube Music" -OsettingsMenuIcon="extension" \
     -e "Settings for YouTube Music" -OrvxSettingsLabel="RVX" \
     -e "Custom header for YouTube Music" -e="Return YouTube Username" --custom-aapt2-binary="$HOME/aapt2" \
-    --purge --rip-lib=$arch --unsigned -f | tee "$log"
+    --purge --unsigned -f | tee "$log"
 
   if [ ! -f "$outputAPK" ] && [ -f $yt_music_apk_path ]; then
     echo "$bad Oops, YouTube Music Patching failed !! Logs saved to "$log". Share the Patchlog to developer."
@@ -182,7 +182,7 @@ if [ -f "$youtube_apk_path" ]; then
   patch_yt "$RVX/youtube-rvx_v${pkgVersion}-$arch.apk"
 fi
 if [ -f "$RVX/youtube-rvx_v${pkgVersion}-$arch.apk" ]; then
-  echo -e "[?] ${Yellow}Please select installation type - 'M' for Mount or 'I' for SU-Install or 'N' for Installation cancel. [M/i/N] ${Reset}\c" && read opt
+  echo -e "[?] ${Yellow}Please select installation type - 'M' for Mount or 'I' for SU-Install or 'N' for Installation cancel. [M/i/N]: ${Reset}\c" && read opt
   case $opt in
     I*|i*|"")
       echo -e "$running Copy signature from YouTube.."
@@ -213,12 +213,12 @@ if [ -f "$yt_music_apk_path" ]; then
   patch_yt_music "$RVX/yt-music-rvx_v${pkgVersion}-$arch.apk"
 fi
 if [ -f "$RVX/yt-music-rvx_v${pkgVersion}-$arch.apk" ]; then
-  echo -e "[?] ${Yellow}Do you want to Mount YT Music RVX apk? [Y/n] ${Reset}\c" && read opt
+  echo -e "[?] ${Yellow}Do you want to Mount YT Music RVX apk? [Y/n]: ${Reset}\c" && read opt
   case $opt in
     y*|Y*)
       echo -e "$running Please Wait !! Mounting Patched YT Music RVX apk.."
-      su -mm -c "/system/bin/sh $Simplify/apkMount.sh $yt_music_apk_path $RVX/yt-music-rvx_v${pkgVersion}-$arch.apk 'YouTube Music' com.google.android.apps.youtube.music $pkgVersion" &> /dev/null
-      su -mm -c "/system/bin/sh $Simplify/apkMount.sh $yt_music_apk_path $RVX/yt-music-rvx_v${pkgVersion}-$arch.apk 'YouTube Music' com.google.android.apps.youtube.music $pkgVersion" | tee "$SimplUsr/yt_music_rvx_mount_log.txt"
+      su -mm -c "/system/bin/sh $Simplify/apkMount.sh \"$yt_music_apk_path\" $RVX/yt-music-rvx_v${pkgVersion}-$arch.apk 'YouTube Music' com.google.android.apps.youtube.music $pkgVersion" &> /dev/null
+      su -mm -c "/system/bin/sh $Simplify/apkMount.sh \"$yt_music_apk_path\" $RVX/yt-music-rvx_v${pkgVersion}-$arch.apk 'YouTube Music' com.google.android.apps.youtube.music $pkgVersion" | tee "$SimplUsr/yt_music_rvx_mount_log.txt"
       rm "$RVX/yt-music-rvx_v${pkgVersion}-$arch.apk"
       ;;
     n*|N*) echo -e "$notice YT Music RVX Installaion skipped!" ;;
