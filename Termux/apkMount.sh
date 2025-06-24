@@ -186,7 +186,7 @@ EOF
   
   echo "$good Mount Successfull."
   am start -n $activityClass &> /dev/null  # Launch app using activity monitor
-  rm $patched  # remove patched.apk file
+  #rm $patched  # remove patched.apk file
 }
 
 if [ "$(getenforce 2>/dev/null)" == "Enforcing" ]; then

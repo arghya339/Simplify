@@ -194,6 +194,7 @@ if [ -f "$RVX/youtube-rvx_v${pkgVersion}-$arch.apk" ]; then
       echo -e "$running Please Wait !! Mounting Patched YouTube RVX apk.."
       su -mm -c "/system/bin/sh $Simplify/apkMount.sh $youtube_apk_path $RVX/youtube-rvx_v${pkgVersion}-$arch.apk YouTube com.google.android.youtube $pkgVersion" &> /dev/null
       su -mm -c "/system/bin/sh $Simplify/apkMount.sh $youtube_apk_path $RVX/youtube-rvx_v${pkgVersion}-$arch.apk YouTube com.google.android.youtube $pkgVersion" | tee "$SimplUsr/yt_rvx_mount_log.txt"
+      rm "$RVX/youtube-rvx_v${pkgVersion}-$arch.apk"
       ;;
     N*|n*) echo -e "$notice YouTube RVX Installaion skipped!" ;;
     *) echo -e "$info Invalid choice! YouTube RVX Installaion skipped." ;;
@@ -216,8 +217,9 @@ if [ -f "$RVX/yt-music-rvx_v${pkgVersion}-$arch.apk" ]; then
   case $opt in
     y*|Y*)
       echo -e "$running Please Wait !! Mounting Patched YT Music RVX apk.."
-      su -mm -c "/system/bin/sh $Simplify/apkMount.sh $yt_music_apk_path $RVX/yt-music-rvx_v${pkgVersion}-$arch.apk YouTube\ Music com.google.android.apps.youtube.music $pkgVersion" &> /dev/null
-      su -mm -c "/system/bin/sh $Simplify/apkMount.sh $yt_music_apk_path $RVX/yt-music-rvx_v${pkgVersion}-$arch.apk YouTube\ Music com.google.android.apps.youtube.music $pkgVersion" | tee "$SimplUsr/yt_music_rvx_mount_log.txt"
+      su -mm -c "/system/bin/sh $Simplify/apkMount.sh $yt_music_apk_path $RVX/yt-music-rvx_v${pkgVersion}-$arch.apk 'YouTube Music' com.google.android.apps.youtube.music $pkgVersion" &> /dev/null
+      su -mm -c "/system/bin/sh $Simplify/apkMount.sh $yt_music_apk_path $RVX/yt-music-rvx_v${pkgVersion}-$arch.apk 'YouTube Music' com.google.android.apps.youtube.music $pkgVersion" | tee "$SimplUsr/yt_music_rvx_mount_log.txt"
+      rm "$RVX/yt-music-rvx_v${pkgVersion}-$arch.apk"
       ;;
     n*|N*) echo -e "$notice YT Music RVX Installaion skipped!" ;;
     *) echo -e "$info Invalid choice! YT Music RVX Installaion skipped." ;;
