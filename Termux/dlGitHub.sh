@@ -66,7 +66,11 @@ dlGitHub() {
         if [ "$repo" == "APKEditor" ]; then
           curl -L -C - --progress-bar -o "$dir/$assetsName" "https://github.com/$owner/$repo/releases/download/V${latestReleases}/$assetsName"
         else
-          curl -L -C - --progress-bar -o "$dir/$assetsName" "https://github.com/$owner/$repo/releases/download/v${latestReleases}/$assetsName"
+          if [ "$repo" == "revanced-cli" ]; then
+            aria2c -x 16 -s 16 --console-log-level=error --summary-interval=0 --download-result=hide -c -o "$assetsName" -d "$dir" "https://github.com/$owner/$repo/releases/download/v${latestReleases}/$assetsName"
+          else
+            curl -L -C - --progress-bar -o "$dir/$assetsName" "https://github.com/$owner/$repo/releases/download/v${latestReleases}/$assetsName"
+          fi
         fi
         findFile="$dir/$assetsName"
       fi
@@ -86,7 +90,7 @@ dlGitHub() {
     
     if [ "$preAssetsName" != "$preFileBaseName" ]; then
       echo -e "$notice diffs: $preAssetsName ~ $preFileBaseName"
-      rm $findPreFile
+      rm $findFile
       # downloading assets
       echo -e "$running Downloading $preAssetsName.."
       curl -L -C - --progress-bar -o "$dir/$preAssetsName" "https://github.com/$owner/$repo/releases/download/v${lastPreReleases}/$preAssetsName"
