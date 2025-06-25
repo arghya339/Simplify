@@ -36,26 +36,29 @@ else
   return 1
 fi
 
-if [ "$(su -c 'getenforce 2>/dev/null')" = "Enforcing" ]; then
-  su -c "setenforce 0"  # set SELinux to Permissive mode to unblock unauthorized operations
-  LSPosedPkg=$(su -c "pm list packages | grep org.lsposed.manager" 2>/dev/null)  # LSPosed packages list
-  CorePatchPkg=$(su -c "pm list packages | grep com.coderstory.toolkit" 2>/dev/null)  # CorePatch packages list
-  su -c "setenforce 1"  # set SELinux to Enforcing mode to block unauthorized operations
-else
-  LSPosedPkg=$(su -c "pm list packages | grep 'org.lsposed.manager'" 2>/dev/null)  # LSPosed packages list
-  CorePatchPkg=$(su -c "pm list packages | grep 'com.coderstory.toolkit'" 2>/dev/null)  # CorePatch packages list
-fi
+# --- Check if CorePatch Installed ---
+checkCoreLSPosed() {
+  if [ "$(su -c 'getenforce 2>/dev/null')" = "Enforcing" ]; then
+    su -c "setenforce 0"  # set SELinux to Permissive mode to unblock unauthorized operations
+    LSPosedPkg=$(su -c "pm list packages | grep org.lsposed.manager" 2>/dev/null)  # LSPosed packages list
+    CorePatchPkg=$(su -c "pm list packages | grep com.coderstory.toolkit" 2>/dev/null)  # CorePatch packages list
+    su -c "setenforce 1"  # set SELinux to Enforcing mode to block unauthorized operations
+  else
+    LSPosedPkg=$(su -c "pm list packages | grep 'org.lsposed.manager'" 2>/dev/null)  # LSPosed packages list
+    CorePatchPkg=$(su -c "pm list packages | grep 'com.coderstory.toolkit'" 2>/dev/null)  # CorePatch packages list
+  fi
 
-if [ -z $LSPosedPkg ]; then
-  echo -e "$info Please install LSPosed Manager by flashing LSPosed Zyzisk Module from Magisk. Then try again!"
-  termux-open-url "https://github.com/JingMatrix/LSPosed/releases"
-  return 1
-fi
-if [ -z $CorePatchPkg ]; then
-  echo -e "$info Please install and Enable CorePatch LSPosed Module in System Framework. Then try again!"
-  termux-open-url "https://github.com/LSPosed/CorePatch/releases"
-  return 1
-fi
+  if [ -z $LSPosedPkg ]; then
+    echo -e "$info Please install LSPosed Manager by flashing LSPosed Zyzisk Module from Magisk. Then try again!"
+    termux-open-url "https://github.com/JingMatrix/LSPosed/releases"
+    return 1
+  fi
+  if [ -z $CorePatchPkg ]; then
+    echo -e "$info Please install and Enable CorePatch LSPosed Module in System Framework. Then try again!"
+    termux-open-url "https://github.com/LSPosed/CorePatch/releases"
+    return 1
+  fi
+}
 
 echo -e "$info ${Blue}Target device:${Reset} $model ($serial)"
 
@@ -185,6 +188,7 @@ if [ -f "$RVX/youtube-rvx_v${pkgVersion}-$arch.apk" ]; then
   echo -e "[?] ${Yellow}Please select installation type - 'M' for Mount or 'I' for SU-Install or 'N' for Installation cancel. [M/i/N]: ${Reset}\c" && read opt
   case $opt in
     I*|i*|"")
+      checkCoreLSPosed  # Call the check core patch functions
       echo -e "$running Copy signature from YouTube.."
       cs "$youtube_apk_path" "$RVX/youtube-rvx_v${pkgVersion}-$arch.apk" "$SimplUsr/youtube-rvx-cs_v${pkgVersion}-$arch.apk"
       echo -e "$running Please Wait !! Installing Patched YouTube RVX CS apk.."
@@ -314,4 +318,4 @@ if [ $Android -eq 6 ] || [ $Android -eq 7 ]; then
     esac
   fi
 fi
-##############################################################################################################################
+############################################################################
