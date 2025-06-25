@@ -89,15 +89,10 @@ getVersion() {
 
 #  --- Patch Apps ---
 patch_app() {
-  local stock_apk_path=$1
-  local outputAPK=$3
-  local log=$4
-  local appName=$5
-  shift 5  # Shift to get patches arguments
 
   $PREFIX/lib/jvm/java-21-openjdk/bin/java -jar $ReVancedCLIJar patch -p $PatchesRvp \
     -o "$outputAPK" $stock_apk_path \
-    "$@" \
+    "${patches_args[@]}" \
     -e "Change version code" -OversionCode="2147483647" -e "Disable Pairip license check" -e "Predictive back gesture" -e "Remove share targets" \
     --custom-aapt2-binary="$HOME/aapt2" \
     --purge $ripLib -f | tee "$log"
@@ -110,7 +105,7 @@ patch_app() {
 }
 
 # --- Collect the enable/disable patches name with options in arrays ---
-yt_patches_args=(
+patches_args=(
 # enable patches with their options
   -e "GmsCore support" -O gmsCoreVendorGroupId="com.mgoogle"
   -e "Custom branding" -O appName="YouTube RV" -O iconPath="$SimplUsr/branding/youtube/launcher/google_family"
@@ -123,15 +118,18 @@ yt_patches_args=(
 
 # --- Build YouTube ---
 build_yt() {
+  appName="YouTube"
   getVersion "com.google.android.youtube"
   pkgVersion="$pkgVersion"
   #pkgVersion="20.12.46"
   bash $Simplify/APKMdl.sh "com.google.android.youtube" "$pkgVersion" "BUNDLE" "universal"  # Download stock YouTube apk from APKMirror
-  youtube_apk_path="$Download/YouTube_v${pkgVersion}-universal.apk"
-  if [ -f "$youtube_apk_path" ]; then
-    echo -e "$good ${Green}Downloaded YouTube APK found:${Reset} $youtube_apk_path"
+  stock_apk_path="$Download/YouTube_v${pkgVersion}-universal.apk"
+  log="$SimplUsr/yt-rv-patch_log.txt"
+  outputAPK="$SimplUsr/youtube-rv_v${pkgVersion}-$arch.apk"
+  if [ -f "$stock_apk_path" ]; then
+    echo -e "$good ${Green}Downloaded YouTube APK found:${Reset} $stock_apk_path"
     echo -e "$running Patching YouTube RVX.."
-    patch_app "$youtube_apk_path" "$SimplUsr/youtube-rv_v${pkgVersion}-$arch.apk" "$SimplUsr/yt-rv-patch_log.txt" "YouTube" "${yt_patches_args[@]}"
+    patch_app
   fi
   if [ -f "$SimplUsr/youtube-rv_v${pkgVersion}-$arch.apk" ]; then
     echo -e "$info VancedMicroG is used to run MicroG services without root. \nYouTube and YouTube Music won't work without it. \nIf you already have VancedMicroG, You don't need to install it."
@@ -167,7 +165,7 @@ build_yt() {
   fi
 }
 
-spotify_patches_args=(
+patches_args=(
   -e "Change lyrics provider"
   -e "Custom theme"
   -e "Change package name" -OpackageName="com.spotify.music"
@@ -177,6 +175,7 @@ spotify_patches_args=(
 
 # --- Build Spotify ---
 build_spotify() {
+  appName="Spotify"
   if [ $Android -ne 7 ]; then
     getVersion "com.spotify.music"
     #pkgVersion="$pkgVersion"
@@ -192,11 +191,13 @@ build_spotify() {
       curl -L --progress-bar -C - -o "$Download/Spotify_v${pkgVersion}-universal.apk" "https://github.com/arghya339/apk-me/releases/download/SpotifyRV_v9.0.28.630-5.16.0/spotify-revanced_v8.6.98.900-5.21.0-5-all.apk"
     fi
   fi
-  spotify_apk_path="$Download/Spotify_v${pkgVersion}-universal.apk"
-  if [ -f "$spotify_apk_path" ]; then
-    echo -e "$good ${Green}Downloaded Spotify APK found:${Reset} $spotify_apk_path"
+  stock_apk_path="$Download/Spotify_v${pkgVersion}-universal.apk"
+  log="$SimplUsr/spotify-rv-patch_log.txt"
+  outputAPK="$SimplUsr/spotify-rv_v${pkgVersion}-$arch.apk"
+  if [ -f "$stock_apk_path" ]; then
+    echo -e "$good ${Green}Downloaded Spotify APK found:${Reset} $stock_apk_path"
     echo -e "$running Patching Spotify RVX.."
-    patch_app "$spotify_apk_path" "$SimplUsr/spotify-rv_v${pkgVersion}-$arch.apk" "$SimplUsr/spotify-rv-patch_log.txt" "Spotify" "${spotify_patches_args[@]}"
+    patch_app
   fi
   if [ -f "$SimplUsr/spotify-rv_v${pkgVersion}-$arch.apk" ]; then
     echo -e "[?] ${Yellow}Do you want to install Spotify RV app? [Y/n] ${Reset}\c" && read opt
