@@ -115,7 +115,7 @@ yt_patches_args=(
   -e "GmsCore support" -OgmsCoreVendorGroupId="com.mgoogle"
   -e "Custom branding" -OappName="YouTube RV" -OiconPath="$SimplUsr/branding/youtube/launcher/google_family"
   -e "Change header" -Oheader="$SimplUsr/branding/youtube/header/google_family"
-  -e "Change package name" -OackageName="app.revanced.android.youtube"
+  -e "Change package name" -OpackageName="app.revanced.android.youtube"
   
   # disable patches
   -d "Announcements"
@@ -170,7 +170,7 @@ build_yt() {
 spotify_patches_args=(
   -e "Change lyrics provider"
   -e "Custom theme"
-  -e "Change package name" -OackageName="com.spotify.music"
+  -e "Change package name" -OpackageName="com.spotify.music"
   
   -d "Hide Create button"
 )
