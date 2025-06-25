@@ -90,14 +90,14 @@ getVersion() {
 #  --- Patch Apps ---
 patch_app() {
   local stock_apk_path=$1
-  local patches=$2
   local outputAPK=$3
   local log=$4
   local appName=$5
-  
+  shift 5  # Shift to get patches arguments
+
   $PREFIX/lib/jvm/java-21-openjdk/bin/java -jar $ReVancedCLIJar patch -p $PatchesRvp \
     -o "$outputAPK" $stock_apk_path \
-    "$patches" \
+    "$@" \
     -e "Change version code" -OversionCode="2147483647" -e "Disable Pairip license check" -e "Predictive back gesture" -e "Remove share targets" \
     --custom-aapt2-binary="$HOME/aapt2" \
     --purge $ripLib -f | tee "$log"
@@ -131,7 +131,7 @@ build_yt() {
   if [ -f "$youtube_apk_path" ]; then
     echo -e "$good ${Green}Downloaded YouTube APK found:${Reset} $youtube_apk_path"
     echo -e "$running Patching YouTube RVX.."
-    patch_app "$youtube_apk_path" \"${yt_patches_args[@]}\" "$SimplUsr/youtube-rv_v${pkgVersion}-$arch.apk" "$SimplUsr/yt-rv-patch_log.txt" "YouTube"
+    patch_app "$youtube_apk_path" "$SimplUsr/youtube-rv_v${pkgVersion}-$arch.apk" "$SimplUsr/yt-rv-patch_log.txt" "YouTube" "${yt_patches_args[@]}"
   fi
   if [ -f "$SimplUsr/youtube-rv_v${pkgVersion}-$arch.apk" ]; then
     echo -e "$info VancedMicroG is used to run MicroG services without root. \nYouTube and YouTube Music won't work without it. \nIf you already have VancedMicroG, You don't need to install it."
@@ -196,7 +196,7 @@ build_spotify() {
   if [ -f "$spotify_apk_path" ]; then
     echo -e "$good ${Green}Downloaded Spotify APK found:${Reset} $spotify_apk_path"
     echo -e "$running Patching Spotify RVX.."
-    patch_app "$spotify_apk_path" "${spotify_patches_args[@]}" "$SimplUsr/spotify-rv_v${pkgVersion}-$arch.apk" "$SimplUsr/spotify-rv-patch_log.txt" "Spotify"
+    patch_app "$spotify_apk_path" "$SimplUsr/spotify-rv_v${pkgVersion}-$arch.apk" "$SimplUsr/spotify-rv-patch_log.txt" "Spotify" "${spotify_patches_args[@]}"
   fi
   if [ -f "$SimplUsr/spotify-rv_v${pkgVersion}-$arch.apk" ]; then
     echo -e "[?] ${Yellow}Do you want to install Spotify RV app? [Y/n] ${Reset}\c" && read opt
