@@ -94,7 +94,8 @@ patch_app() {
   local outputAPK=$3
   local log=$4
   local appName=$5
-  
+  echo "$info DEBUG - patches: '$patches'"
+
   $PREFIX/lib/jvm/java-21-openjdk/bin/java -jar $ReVancedCLIJar patch -p $PatchesRvp \
     -o "$outputAPK" $stock_apk_path \
     "$patches" \
