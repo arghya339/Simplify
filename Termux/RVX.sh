@@ -387,12 +387,12 @@ if [ $Android -eq 5 ] || [ $Android -eq 6 ]; then
   fi
 fi
 
-# --- RVX Android 6-7 ---
+# --- YouTube RVX Android 6-7 ---
 if [ $Android -eq 6 ] || [ $Android -eq 7 ]; then
   PatchesRvp=$(find "$RVX" -type f -name "patches-*.rvp" -print -quit)
   rm $PatchesRvp
   bash $Simplify/dlGitHub.sh "kitadai31" "revanced-patches-android6-7" "latest" ".rvp" "$RVX"
-  PatchesRvp=$findFile
+  PatchesRvp=$(find "$RVX" -type f -name "patches-*.rvp" -print -quit)
   
   bash $Simplify/APKMdl.sh "com.google.android.youtube" "17.34.36" "BUNDLE" "universal"  # Download stock YouTube 17.34.36 apk from APKMirror
   youtube_apk_path="$Download/YouTube_v17.34.36-universal.apk"
@@ -401,6 +401,7 @@ if [ $Android -eq 6 ] || [ $Android -eq 7 ]; then
     echo -e "$running Patching YouTube RVX.."
     patch_yt "$SimplUsr/youtube-rvx_v17.34.36-$arch.apk"
   fi
+  rm $PatchesRvp
   if [ -f "$SimplUsr/youtube-rvx_v17.34.36-$arch.apk" ]; then
     echo -e "$info VancedMicroG is used to run MicroG services without root. \nYouTube and YouTube Music won't work without it. \nIf you already have VancedMicroG, You don't need to install it."
     echo -e "[?] ${Yellow}Do you want to install VancedMicroG app? [Y/n]${Reset} \c" && read opt

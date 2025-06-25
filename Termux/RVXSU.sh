@@ -231,4 +231,87 @@ if [ -f "$RVX/yt-music-rvx_v${pkgVersion}-$arch.apk" ]; then
   bash $Simplify/apkInstall.sh "$SimplUsr/yt-music-rvx-cs_v${pkgVersion}-$arch.apk" "yt-music-rvx-cs_v${pkgVersion}-$arch.apk" "com.google.android.apps.youtube.music" "com.google.android.apps.youtube.music.activities.MusicActivity"
 comment
 fi
+
+# --- YouTube Music RVX Android 7 ---
+if [ $Android -eq 7 ]; then
+  # --- Download TY Music_6.42.55.apk from APKMirror ---
+  if [ ! -f "$Download/YouTube Music_v6.42.55-$arch.apk" ]; then
+    bash $Simplify/APKMdl.sh "com.google.android.apps.youtube.music" "6.42.55" "APK" "$arch"
+  fi
+  if [ -f "$Download/YouTube Music_v6.42.55-$arch.apk" ]; then
+    echo -e "$good ${Green}Downloaded YT Music 6.42.55 found:${Reset} $Download/YouTube\ Music_v6.42.55-$arch.apk"
+    echo -e "$running Patching YT Music 6.42.55.."
+    patch_yt_music "$RVX/yt-music-rvx_v6.42.55-$arch.apk"
+  fi
+  if [ -f "$RVX/yt-music-rvx_v6.42.55-$arch.apk" ]; then
+    echo -e "[?] ${Yellow}Do you want to Mount YT Music RVX apk? [Y/n]: ${Reset}\c" && read opt
+    case $opt in
+      y*|Y*|"")
+        echo -e "$running Please Wait !! Mounting Patched YT Music RVX apk.."
+        su -mm -c "/system/bin/sh $Simplify/apkMount.sh \"$Download/YouTube Music_v6.42.55-$arch.apk\" $RVX/yt-music-rvx_v6.42.55-$arch.apk 'YouTube Music' com.google.android.apps.youtube.music 6.42.55" &> /dev/null
+        su -mm -c "/system/bin/sh $Simplify/apkMount.sh \"$Download/YouTube Music_v6.42.55-$arch.apk\" $RVX/yt-music-rvx_v6.42.55-$arch.apk 'YouTube Music' com.google.android.apps.youtube.music 6.42.55" | tee "$SimplUsr/yt_music_rvx_mount_log.txt"
+        rm "$RVX/yt-music-rvx_v6.42.55-$arch.apk"
+        ;;
+      n*|N*) echo -e "$notice YT Music RVX Installaion skipped!" ;;
+      *) echo -e "$info Invalid choice! YT Music RVX Installaion skipped." ;;
+    esac
+  fi
+fi
+
+# --- YouTube Music RVX Android 5 and 6 ---
+if [ $Android -eq 5 ] || [ $Android -eq 6 ]; then
+  # --- Download TY Music_6.20.51.apk from APKMirror ---
+  if [ ! -f "$Download/YouTube Music_v6.20.51-$arch.apk" ]; then
+    echo -e "$running Download YT Music 6.20.51 apk from APKMirror.."
+    bash $Simplify/APKMdl.sh "com.google.android.apps.youtube.music" "6.20.51" "APK" "$arch"  # Download stock YT Music 6.20.51 apk from APKMirror
+  fi
+  if [ -f "$Download/YouTube Music_v6.20.51-$arch.apk" ]; then
+    echo -e "$good ${Green}YT Music 6.20.51 found:${Reset} $Download/YouTube\ Music_v6.20.51-$arch.apk."
+    echo -e "$running Patching YT Music RVX 6.20.51.."
+    patch_yt_music "$RVX/yt-music-rvx_v6.20.51-$arch.apk"
+  fi
+  if [ -f "$RVX/yt-music-rvx_v6.20.51-$arch.apk" ]; then
+    echo -e "[?] ${Yellow}Do you want to Mount YT Music RVX apk? [Y/n]: ${Reset}\c" && read opt
+    case $opt in
+      y*|Y*|"")
+        echo -e "$running Please Wait !! Mounting Patched YT Music RVX apk.."
+        su -mm -c "/system/bin/sh $Simplify/apkMount.sh \"$Download/YouTube Music_v6.20.51-$arch.apk\" $RVX/yt-music-rvx_v6.20.51-$arch.apk 'YouTube Music' com.google.android.apps.youtube.music 6.20.51" &> /dev/null
+        su -mm -c "/system/bin/sh $Simplify/apkMount.sh \"$Download/YouTube Music_v6.20.51-$arch.apk\" $RVX/yt-music-rvx_v6.20.51-$arch.apk 'YouTube Music' com.google.android.apps.youtube.music 6.20.51" | tee "$SimplUsr/yt_music_rvx_mount_log.txt"
+        rm "$RVX/yt-music-rvx_v6.20.51-$arch.apk"
+        ;;
+      n*|N*) echo -e "$notice YT Music RVX Installaion skipped!" ;;
+      *) echo -e "$info Invalid choice! YT Music RVX Installaion skipped." ;;
+    esac
+  fi
+fi
+
+# --- YouTube RVX Android 6-7 ---
+if [ $Android -eq 6 ] || [ $Android -eq 7 ]; then
+  PatchesRvp=$(find "$RVX" -type f -name "patches-*.rvp" -print -quit)
+  rm $PatchesRvp
+  bash $Simplify/dlGitHub.sh "kitadai31" "revanced-patches-android6-7" "latest" ".rvp" "$RVX"
+  PatchesRvp=$(find "$RVX" -type f -name "patches-*.rvp" -print -quit)
+  
+  bash $Simplify/APKMdl.sh "com.google.android.youtube" "17.34.36" "BUNDLE" "universal"  # Download stock YouTube 17.34.36 apk from APKMirror
+  youtube_apk_path="$Download/YouTube_v17.34.36-universal.apk"
+  if [ -f "$youtube_apk_path" ]; then
+    echo -e "$good ${Green}Downloaded YouTube APK found:${Reset} $youtube_apk_path"
+    echo -e "$running Patching YouTube RVX.."
+    patch_yt "$RVX/youtube-rvx_v17.34.36-$arch.apk"
+  fi
+  rm $PatchesRvp
+  if [ -f "$RVX/youtube-rvx_v17.34.36-$arch.apk" ]; then
+    echo -e "[?] ${Yellow}Do you want to Mount YouTube RVX app? [Y/n]: ${Reset}\c" && read opt
+    case $opt in
+      y*|Y*|"")
+        echo -e "$running Please Wait !! Mounting Patched YouTube RVX apk.."
+        su -mm -c "/system/bin/sh $Simplify/apkMount.sh $youtube_apk_path $RVX/youtube-rvx_v17.34.36-$arch.apk YouTube com.google.android.youtube 17.34.36" &> /dev/null
+        su -mm -c "/system/bin/sh $Simplify/apkMount.sh $youtube_apk_path $RVX/youtube-rvx_v17.34.36-$arch.apk YouTube com.google.android.youtube 17.34.36" | tee "$SimplUsr/yt_rvx_mount_log.txt"
+        rm "$RVX/youtube-rvx_v17.34.36-$arch.apk"
+        ;;
+      n*|N*) echo -e "$notice YouTube RVX Installaion skipped!" ;;
+      *) echo -e "$info Invalid choice! YouTube RVX Installaion skipped." ;;
+    esac
+  fi
+fi
 ##############################################################################################################################
