@@ -119,8 +119,9 @@ outdatedPKG=$(apt list --upgradable 2>/dev/null)  # list of outdated pkg
 installedPKG=$(pkg list-installed 2>/dev/null)  # list of installed pkg
 SimplUsr="/sdcard/Simplify"
 Simplify="$HOME/Simplify"
+RV="$Simplify/RV"
 RVX="$Simplify/RVX"
-mkdir -p "$Simplify" "$RVX" "$SimplUsr"
+mkdir -p "$Simplify" "$RV" "$RVX" "$SimplUsr"
 Download="/sdcard/Download"
 
 # --- Checking Android Version ---
@@ -281,9 +282,14 @@ while true; do
   clear  # Clear
   # Apply the eye color to the simplify shape and print it
   echo -e "${BoldGreen}$print_simplify${Reset}" && echo ""  # Space
-  echo -e "RVX. ReVanced Extended\nRVXS. RVX SuperUser\nF. Feature request\nB. Bug report\nS. Support\nA. About\nQ. Quit\n"
+  echo -e "RV. ReVanced\nRVX. ReVanced Extended\nRVXS. RVX SuperUser\nF. Feature request\nB. Bug report\nS. Support\nA. About\nQ. Quit\n"
   echo -n "Select Patches source: " && read source
   case $source in
+    RV|rv)
+      curl -sL --progress-bar -o "$RV/RV.sh" "https://raw.githubusercontent.com/arghya339/Simplify/refs/heads/main/Termux/RV.sh" > /dev/null 2>&1
+      bash "$RV/RV.sh"
+      sleep 3
+      ;;
     RVX|rvx)
       curl -sL --progress-bar -o "$RVX/RVX.sh" "https://raw.githubusercontent.com/arghya339/Simplify/refs/heads/main/Termux/RVX.sh" > /dev/null 2>&1
       bash "$RVX/RVX.sh"
@@ -304,7 +310,7 @@ while true; do
     [Ss]*) support && sleep 3 ;;
     [Aa]*) about && sleep 3 ;;
     [Qq]*) clear && break ;;
-    *) echo -e "$info Invalid input! Please enter RVX / RVXS / F / B / S / A / Q." && sleep 3 ;;
+    *) echo -e "$info Invalid input! Please enter RV / RVX / RVXS / F / B / S / A / Q." && sleep 3 ;;
   esac
 done
 ################################################################################################
