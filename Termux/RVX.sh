@@ -57,7 +57,7 @@ all_arch="arm64-v8a armeabi-v7a x86_64 x86"  # Space-separated list instead of a
 # Generate ripLib arguments for all ABIs EXCEPT the detected one
 ripLib=""
 for current_arch in $all_arch; do
-  if [ "$current_arch" != "$arch" ]; then
+  if [ "$current_arch" != "$cpuAbi" ]; then
     if [ -z "$ripLib" ]; then
       ripLib="--rip-lib=$current_arch"  # No leading space for first item
     else
@@ -66,7 +66,7 @@ for current_arch in $all_arch; do
   fi
 done
 # Display the final ripLib arguments
-echo -e "$info ${Blue}arch:${Reset} $arch"
+echo -e "$info ${Blue}cpuAbi:${Reset} $cpuAbi"
 echo -e "$info ${Blue}ripLib:${Reset} $ripLib"
 
 # --- Generate patches.json file --- 

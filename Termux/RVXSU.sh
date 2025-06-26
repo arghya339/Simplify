@@ -18,7 +18,7 @@ Reset="\033[0m"
 
 # --- Global Veriable ---
 Android=$(getprop ro.build.version.release)  # Get Android version
-arch=$(getprop ro.product.cpu.abi)  # Get Android arch
+cpuAbi=$(getprop ro.product.cpu.abi)  # Get Android arch
 serial=$(su -c 'getprop ro.serialno')  # Get Serial Number required root
 model=$(getprop ro.product.model)  # Get Device Model
 Simplify="$HOME/Simplify"
@@ -69,7 +69,7 @@ all_arch="arm64-v8a armeabi-v7a x86_64 x86"
 # --- Generate ripLib arguments for all ABIs EXCEPT the detected one ---
 ripLib=""
 for current_arch in $all_arch; do
-  if [ "$current_arch" != "$arch" ]; then
+  if [ "$current_arch" != "$cpuAbi" ]; then
     if [ -z "$ripLib" ]; then
       ripLib="--rip-lib=$current_arch"  # No leading space for first item
     else
@@ -211,9 +211,9 @@ build_app() {
         I*|i*|"")
           checkCoreLSPosed  # Call the check core patch functions
           echo -e "$running Copy signature from $appName.."
-          cs "$youtube_apk_path" "$outputAPK" "$SimplUsr/$appName-RVX-CS_v${pkgVersion}-$arch.apk"
+          cs "$youtube_apk_path" "$outputAPK" "$SimplUsr/$appName-RVX-CS_v${pkgVersion}-$cpuAbi.apk"
           echo -e "$running Please Wait !! Installing Patched $appName RVX CS apk.."
-          bash $Simplify/apkInstall.sh "$SimplUsr/$appName-RVX-CS_v${pkgVersion}-$arch.apk" "$pkgName" ""
+          bash $Simplify/apkInstall.sh "$SimplUsr/$appName-RVX-CS_v${pkgVersion}-$cpuAbi.apk" "$pkgName" ""
           ;;
         M*|m*)
           echo -e "$running Please Wait !! Mounting Patched $appName RVX apk.."
