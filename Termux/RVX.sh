@@ -41,7 +41,7 @@ bash $Simplify/dlGitHub.sh "anddea" "revanced-patches" "pre" ".rvp" "$RVX"
 PatchesRvp=$(find "$RVX" -type f -name "patches-*.rvp" -print -quit)
 echo -e "$info ${Blue}PatchesRvp:${Reset} $PatchesRvp"
 
-if [ $Android -eq 5]; then
+if [ $Android -eq 5 ]; then
   VancedMicroG="$SimplUsr/VancedMicroG-0.2.22.212658.apk"
   if [ ! -f "$SVancedMicroG" ]; then
     curl -sL "https://github.com/TeamVanced/VancedMicroG/releases/download/v0.2.22.212658-212658001/microg.apk" --progress-bar -C - -o "$VancedMicroG"
