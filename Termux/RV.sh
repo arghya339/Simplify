@@ -307,7 +307,7 @@ while true; do
       outputAPK="$SimplUsr/tiktok-rv_v${pkgVersion}-$cpuAbi.apk"
       log="$SimplUsr/tiktok-rv-patch_log.txt"
       activityPatches="com.ss.android.ugc.aweme.main.MainActivity"
-      build_app "$pkgName" "$appName" "$pkgVersion" "$Type" "$Arch" "APKMirror" "$tiktok_apk_path" "tiktok_patches_args" "$outputAPK" "$log" "$pkgName" "$activityPatches" ""
+      build_app "$pkgName" "$appName" "$pkgVersion" "$Type" \"$Arch\" "APKMirror" "$tiktok_apk_path" "tiktok_patches_args" "$outputAPK" "$log" "$pkgName" "$activityPatches" ""
       ;;
   esac  
 done
