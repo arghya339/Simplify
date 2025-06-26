@@ -43,7 +43,6 @@ echo -e "$info ${Blue}PatchesRvp:${Reset} $PatchesRvp"
 if [ "$Android" -ge "6" ]; then
   bash $Simplify/dlGitHub.sh "inotia00" "VancedMicroG" "latest" ".apk" "$SimplUsr"
   VancedMicroG=$(find "$SimplUsr" -type f -name "microg-*.apk" -print -quit)
-  VancedMicroGBaseName=$(basename "$VancedMicroG")
   echo -e "$info ${Blue}VancedMicroG:${Reset} $VancedMicroG"
 fi
 
@@ -260,7 +259,7 @@ while true; do
       youtube_apk_path="$Download/YouTube_v${pkgVersion}-$cpuAbi.apk"
       outputAPK="$SimplUsr/youtube-rv_v${pkgVersion}-$cpuAbi.apk"
       log="$SimplUsr/yt-rv-patch_log.txt"
-      pkgPatches="app.rv.android.youtube"
+      pkgPatches="app.revanced.android.youtube"
       activityPatches="com.google.android.apps.youtube.app.watchwhile.MainActivity"
       build_app "$pkgName" "$appName" "$pkgVersion" "$Type" "$Arch" "APKMirror" "$youtube_apk_path" "yt_patches_args" "$outputAPK" "$log" "$pkgPatches" "$activityPatches" "$VancedMicroG"
       ;;
