@@ -305,6 +305,7 @@ while true; do
       log="$SimplUsr/yt-rvx-patch_log.txt"
       appName="YouTube"
       build_app "$pkgName" "$pkgVersion" "$Type" "$Arch" "$youtube_apk_path" "yt_patches_args" "$outputAPK" "$log" "$appName" "$rvxBugReportUrl"
+      ;;
     YT\ Music)
       pkgName="com.google.android.apps.youtube.music"
       pkgVersion="8.24.53"
