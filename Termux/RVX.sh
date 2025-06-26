@@ -302,13 +302,13 @@ while true; do
         pkgVersion="$pkgVersion"
       fi
       Type="APK"
-      youtube_apk_path="$Download/YouTube Music_v${pkgVersion}-$cpuAbi.apk"
+      yt_music_apk_path="$Download/YouTube Music_v${pkgVersion}-$cpuAbi.apk"
       outputAPK="$SimplUsr/yt-music-rvx_v${pkgVersion}-$cpuAbi.apk"
       log="$SimplUsr/yt-music-rvx-patch_log.txt"
       appName="YouTube Music"
       pkgPatches="app.rvx.android.apps.youtube.music"
       activityPatches="com.google.android.apps.youtube.music.activities.MusicActivity"
-      build_app "$pkgName" "$pkgVersion" "$Type" "$cpuAbi" "$youtube_apk_path" "yt_music_patches_args" "$outputAPK" "$log" "$appName" "$rvxBugReportUrl" "$pkgPatches" "$activityPatches" "$VancedMicroG"
+      build_app "$pkgName" "$pkgVersion" "$Type" "$cpuAbi" \"$yt_music_apk_path\" "yt_music_patches_args" "$outputAPK" "$log" "$appName" "$rvxBugReportUrl" "$pkgPatches" "$activityPatches" "$VancedMicroG"
       ;;
     Reddit)
       pkgName="com.reddit.frontpage"
@@ -319,12 +319,12 @@ while true; do
       fi
       Type="BUNDLE"
       Arch="universal"
-      youtube_apk_path="$Download/Reddit_v${pkgVersion}-$cpuAbi.apk"
+      reddit_apk_path="$Download/Reddit_v${pkgVersion}-$cpuAbi.apk"
       outputAPK="$SimplUsr/reddit-rvx_v${pkgVersion}-$cpuAbi.apk"
       log="$SimplUsr/reddit-rvx-patch_log.txt"
       appName="Reddit"
       activityPatches="com.reddit.launch.main.MainActivity"
-      build_app "$pkgName" "$pkgVersion" "$Type" "$Arch" "$youtube_apk_path" "reddit_patches_args" "$outputAPK" "$log" "$appName" "$rvxBugReportUrl" "$pkgName" "$activityPatches" ""
+      build_app "$pkgName" "$pkgVersion" "$Type" "$Arch" "$reddit_apk_path" "reddit_patches_args" "$outputAPK" "$log" "$appName" "$rvxBugReportUrl" "$pkgName" "$activityPatches" ""
       ;;
     "YouTube RVX v17.34.36")
       pkgName="com.google.android.youtube"
@@ -343,25 +343,25 @@ while true; do
       pkgName="com.google.android.apps.youtube.music"
       pkgVersion="6.42.55"
       Type="APK"
-      youtube_apk_path="$Download/YouTube Music_v${pkgVersion}-$cpuAbi.apk"
+      yt_music_apk_path="$Download/YouTube Music_v${pkgVersion}-$cpuAbi.apk"
       outputAPK="$SimplUsr/yt-music-rvx_v${pkgVersion}-$cpuAbi.apk"
       log="$SimplUsr/yt-music-rvx-patch_log.txt"
       appName="YouTube Music"
       pkgPatches="app.rvx.android.apps.youtube.music"
       activityPatches="com.google.android.apps.youtube.music.activities.MusicActivity"
-      build_app "$pkgName" "$pkgVersion" "$Type" "$cpuAbi" "$youtube_apk_path" "yt_music_patches_args" "$outputAPK" "$log" "$appName" "$rvxBugReportUrl" "$pkgPatches" "$activityPatches" "$VancedMicroG"
+      build_app "$pkgName" "$pkgVersion" "$Type" "$cpuAbi" \"$yt_music_apk_path\" "yt_music_patches_args" "$outputAPK" "$log" "$appName" "$rvxBugReportUrl" "$pkgPatches" "$activityPatches" "$VancedMicroG"
       ;;
     "YT Music RVX v6.20.51")
       pkgName="com.google.android.apps.youtube.music"
       pkgVersion="6.20.51"
       Type="APK"
-      youtube_apk_path="$Download/YouTube Music_v${pkgVersion}-$cpuAbi.apk"
+      yt_music_apk_path="$Download/YouTube Music_v${pkgVersion}-$cpuAbi.apk"
       outputAPK="$SimplUsr/yt-music-rvx_v${pkgVersion}-$cpuAbi.apk"
       log="$SimplUsr/yt-music-rvx-patch_log.txt"
       appName="YouTube Music"
       pkgPatches="app.rvx.android.apps.youtube.music"
       activityPatches="com.google.android.apps.youtube.music.activities.MusicActivity"
-      build_app "$pkgName" "$pkgVersion" "$Type" "$cpuAbi" "$youtube_apk_path" "yt_music_patches_args" "$outputAPK" "$log" "$appName" "$rvxBugReportUrl" "$pkgPatches" "$activityPatches" "$VancedMicroG"
+      build_app "$pkgName" "$pkgVersion" "$Type" "$cpuAbi" \"$yt_music_apk_path\" "yt_music_patches_args" "$outputAPK" "$log" "$appName" "$rvxBugReportUrl" "$pkgPatches" "$activityPatches" "$VancedMicroG"
       ;;
   esac  
 done
