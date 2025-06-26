@@ -20,7 +20,7 @@ Reset="\033[0m"
 
 # --- Global Variables ---
 Android=$(getprop ro.build.version.release)  # Get Android version
-arch=$(getprop ro.product.cpu.abi)  # Get Android arch
+cpuAbi=$(getprop ro.product.cpu.abi)  # Get Android arch
 model=$(getprop ro.product.model)  # Get Device Model
 Simplify="$HOME/Simplify"  # /data/data/com.termux/files/home/Simplify dir
 RV="$Simplify/RV"
@@ -111,7 +111,7 @@ patch_app() {
 
 # --- Collect the enable/disable patches name with options in arrays ---
 yt_patches_args=(
-# enable patches with their options
+  # enable patches with their options
   -e "GmsCore support" -O gmsCoreVendorGroupId="com.mgoogle"
   -e "Custom branding" -O appName="YouTube RV" -O iconPath="$SimplUsr/branding/youtube/launcher/google_family"
   -e "Change header" -O header="$SimplUsr/branding/youtube/header/google_family"
@@ -121,52 +121,6 @@ yt_patches_args=(
   -d "Announcements"
 )
 
-# --- Build YouTube ---
-build_yt() {
-  getVersion "com.google.android.youtube"
-  pkgVersion="$pkgVersion"
-  #pkgVersion="20.12.46"
-  bash $Simplify/APKMdl.sh "com.google.android.youtube" "$pkgVersion" "BUNDLE" "universal"  # Download stock YouTube apk from APKMirror
-  youtube_apk_path="$Download/YouTube_v${pkgVersion}-universal.apk"
-  if [ -f "$youtube_apk_path" ]; then
-    echo -e "$good ${Green}Downloaded YouTube APK found:${Reset} $youtube_apk_path"
-    echo -e "$running Patching YouTube RVX.."
-    patch_app "$youtube_apk_path" "yt_patches_args" "$SimplUsr/youtube-rv_v${pkgVersion}-$arch.apk" "$SimplUsr/yt-rv-patch_log.txt" "YouTube"  # pass the name of the array (yt_patches_args), not its contents ($yt_patches_args)
-  fi
-  if [ -f "$SimplUsr/youtube-rv_v${pkgVersion}-$arch.apk" ]; then
-    echo -e "$info VancedMicroG is used to run MicroG services without root. \nYouTube and YouTube Music won't work without it. \nIf you already have VancedMicroG, You don't need to install it."
-    echo -e "[?] ${Yellow}Do you want to install VancedMicroG app? [Y/n]${Reset} \c" && read opt
-    case $opt in
-      y*|Y*|"")
-        echo -e "$running Please Wait !! Installing VancedMicroG apk.."
-        bash $Simplify/apkInstall.sh "$VancedMicroG" "$VancedMicroGBaseName" "com.mgoogle.android.gms" "org.microg.gms.ui.SettingsActivity"
-        ;;
-      n*|N*) echo -e "$notice VancedMicroG Installaion skipped!" ;;
-      *) echo -e "$info Invalid choice! VancedMicroG Installaion skipped." ;;
-    esac
-    echo -e "[?] ${Yellow}Do you want to install YouTube RV app? [Y/n] ${Reset}\c" && read opt
-    case $opt in
-      y*|Y*|"")
-        echo -e "$running Please Wait !! Installing Patched YouTube RV apk.."
-        bash $Simplify/apkInstall.sh "$SimplUsr/youtube-rv_v${pkgVersion}-$arch.apk" "youtube-rv_v${pkgVersion}-$arch.apk" "app.rvx.android.youtube" "com.google.android.apps.youtube.app.watchwhile.MainActivity"
-        ;;
-      n*|N*) echo -e "$notice YouTube RV Installaion skipped!" ;;
-      *) echo -e "$info Invalid choice! YouTube RV Installaion skipped." ;;
-    esac
-    echo -e "[?] ${Yellow}Do you want to Share YouTube RV app? [Y/n] ${Reset}\c" && read opt
-    case $opt in
-      y*|Y*|"")
-        echo - e"$running Please Wait !! Sharing Patched YouTube RV apk.."
-        termux-open --send "$SimplUsr/youtube-rv_v${pkgVersion}-$arch.apk"
-        ;;
-      n*|N*) echo -e "$notice YouTube RV Sharing skipped!"
-        echo -e "$info Locate 'youtube-rv_v${pkgVersion}-$arch.apk' in '/sdcard/Simplify/' dir, Share it with your Friends and Family ;)"
-        ;;
-        *) echo -e "$info Invalid choice! YouTube RV Sharing skipped." ;;
-    esac
-  fi
-}
-
 spotify_patches_args=(
   -e "Change lyrics provider"
   -e "Custom theme"
@@ -175,59 +129,102 @@ spotify_patches_args=(
   -d "Hide Create button"
 )
 
-# --- Build Spotify ---
-build_spotify() {
-  if [ $Android -ne 7 ]; then
-    getVersion "com.spotify.music"
-    #pkgVersion="$pkgVersion"
-    pkgVersion="9.0.28.630"
-    if [ ! -f "$Download/Spotify_v${pkgVersion}-universal.apk" ];then
-      #bash $Simplify/APKMdl.sh "com.spotify.music" "" "BUNDLE" "universal"  # Download stock Spotify apk from APKMirror
-      curl -L --progress-bar -C - -o "$Download/Spotify_v${pkgVersion}-universal.apk" "https://github.com/arghya339/apk-me/releases/download/SpotifyRV_v9.0.28.630-5.16.0/Spotify_v9.0.28.630-125833530-arm64-v8a.apk"
-    fi
+tiktok_patches_args=(
+  -e "SIM spoof"
+  -e "Change package name" -OackageName="com.zhiliaoapp.musically"
+)
+
+# --- Build App ---
+build_app() {
+  # local variables
+  local pkgName=$1
+  local appName=$2
+  local pkgVersion=$3
+  local Type=$4
+  local Arch=$5
+  local web=$6
+  local stock_apk_path=$7
+  local appPatchesArgs=$8
+  local outputAPK=$9
+  local fileName=$(basename $outputAPK)
+  local log=$10
+  local pkgPatches=$11
+  local activityPatches=$12
+  local VancedMicroG=$13
+  
+
+  if [ "$web" == "APKMirror" ]; then
+    bash $Simplify/APKMdl.sh "$pkgName" "$pkgVersion" "$Type" "$Arch"  # Download stock apk from APKMirror
   else
-    pkgVersion="8.6.98.900"
-    if [ ! -f "$Download/Spotify_v${pkgVersion}-universal.apk" ]; then
-      #https://spotify.uptodown.com/android/descargar/4283531
-      curl -L --progress-bar -C - -o "$Download/Spotify_v${pkgVersion}-universal.apk" "https://github.com/arghya339/apk-me/releases/download/SpotifyRV_v9.0.28.630-5.16.0/spotify-revanced_v8.6.98.900-5.21.0-5-all.apk"
+    echo -e "$notice dlUptodown.sh not implement yeat!"
+    #bash $Simplify/dlUptodown.sh "$appName" "$pkgVersion" "$Type" "$Arch"  # Download stock apk from Uptodown
+  fi
+  
+  if [ -f "$stock_apk_path" ]; then
+    echo -e "$good ${Green}Downloaded $appName APK found:${Reset} $stock_apk_path"
+    echo -e "$running Patching $appName RVX.."
+    patch_app "$stock_apk_path" "$appPatchesArgs" "$outputAPK" "$log" "$appName" "$bugReportUrl"
+  fi
+  
+  if [ -f "$outputAPK" ]; then
+    
+    if [ $pkgName == "com.google.android.youtube" ] || [ $pkgName == "com.google.android.apps.youtube.music" ]; then
+      echo -e "$info VancedMicroG is used to run MicroG services without root. \nYouTube and YouTube Music won't work without it. \nIf you already have VancedMicroG, You don't need to install it."
+      echo -e "[?] ${Yellow}Do you want to install VancedMicroG app? [Y/n]${Reset} \c" && read opt
+      case $opt in
+        y*|Y*|"")
+          echo -e "$running Please Wait !! Installing VancedMicroG apk.."
+          bash $Simplify/apkInstall.sh "$VancedMicroG" "com.mgoogle.android.gms" "org.microg.gms.ui.SettingsActivity"
+          ;;
+        n*|N*) echo -e "$notice VancedMicroG Installaion skipped!" ;;
+        *) echo -e "$info Invalid choice! VancedMicroG Installaion skipped." ;;
+      esac
     fi
-  fi
-  spotify_apk_path="$Download/Spotify_v${pkgVersion}-universal.apk"
-  if [ -f "$spotify_apk_path" ]; then
-    echo -e "$good ${Green}Downloaded Spotify APK found:${Reset} $spotify_apk_path"
-    echo -e "$running Patching Spotify RVX.."
-    patch_app "$spotify_apk_path" "spotify_patches_args" "$SimplUsr/spotify-rv_v${pkgVersion}-$arch.apk" "$SimplUsr/spotify-rv-patch_log.txt" "Spotify"
-  fi
-  if [ -f "$SimplUsr/spotify-rv_v${pkgVersion}-$arch.apk" ]; then
-    echo -e "[?] ${Yellow}Do you want to install Spotify RV app? [Y/n] ${Reset}\c" && read opt
+
+    echo -e "[?] ${Yellow}Do you want to install $appName RVX app? [Y/n] ${Reset}\c" && read opt
     case $opt in
       y*|Y*|"")
-        echo -e "$running Please Wait !! Installing Patched Spotify RV apk.."
-        bash $Simplify/apkInstall.sh "$SimplUsr/spotify-rv_v${pkgVersion}-$arch.apk" "spotify-rv_v${pkgVersion}-$arch.apk" "com.spotify.music" "com.spotify.music.MainActivity"
+        echo -e "$running Please Wait !! Installing Patched $appName RVX apk.."
+        bash $Simplify/apkInstall.sh "$outputAPK" "$pkgPatches" "$activityPatches"
         ;;
-      n*|N*) echo -e "$notice Spotify RV Installaion skipped!" ;;
-      *) echo -e "$info Invalid choice! Spotify RV Installaion skipped." ;;
+      n*|N*) echo -e "$notice $appName RVX Installaion skipped!" ;;
+      *) echo -e "$info Invalid choice! $appName RVX Installaion skipped." ;;
     esac
-    echo -e "[?] ${Yellow}Do you want to Share Spotify RV app? [Y/n] ${Reset}\c" && read opt
+    
+    echo -e "[?] ${Yellow}Do you want to Share $appName RVX app? [Y/n] ${Reset}\c" && read opt
     case $opt in
       y*|Y*|"")
-        echo - e"$running Please Wait !! Sharing Patched Spotify RV apk.."
-        termux-open --send "$SimplUsr/spotify-rv_v${pkgVersion}-$arch.apk"
+        echo - e"$running Please Wait !! Sharing Patched $appName RVX apk.."
+        termux-open --send "$outputAPK"
         ;;
-      n*|N*) echo -e "$notice Spotify RV Sharing skipped!"
-        echo -e "$info Locate 'spotify-rv_v${pkgVersion}-$arch.apk' in '/sdcard/Simplify/' dir, Share it with your Friends and Family ;)"
+      n*|N*) echo -e "$notice $appName RVX Sharing skipped!"
+        echo -e "$info Locate '$fileName' in '/sdcard/Simplify/' dir, Share it with your Friends and Family ;)"
         ;;
-        *) echo -e "$info Invalid choice! Spotify RV Sharing skipped." ;;
+        *) echo -e "$info Invalid choice! $appName RVX Sharing skipped." ;;
     esac
+  
   fi
 }
 
 # Define the array
-apps=(
-  Quit
-  YouTube
-  Spotify
-)
+if [ $Android -ge 5 ]; then
+  apps=(
+    Quit
+    YouTube
+    Spotify
+    TikTok
+  )
+elif [ $Android -eq 7 ]; then
+  apps=(
+    Quit
+    Spotify
+  )
+elif [ $Android -eq 5 ]; then
+  apps=(
+    Quit
+    TikTok
+  )
+fi
 
 while true; do
   # Display the list
@@ -250,8 +247,68 @@ while true; do
   fi
 
   case ${apps[$idx]} in
-    YouTube) build_yt ;;
-    Spotify) build_spotify ;;
+    YouTube)
+      pkgName="com.google.android.youtube"
+      appName="YouTube"
+      #pkgVersion="20.13.41"
+      if [ -z "$pkgVersion" ]; then
+        getVersion "$pkgName"
+        pkgVersion="$pkgVersion"
+      fi
+      Type="BUNDLE"
+      Arch="universal"
+      youtube_apk_path="$Download/YouTube_v${pkgVersion}-$cpuAbi.apk"
+      outputAPK="$SimplUsr/youtube-rv_v${pkgVersion}-$cpuAbi.apk"
+      log="$SimplUsr/yt-rv-patch_log.txt"
+      pkgPatches="app.rv.android.youtube"
+      activityPatches="com.google.android.apps.youtube.app.watchwhile.MainActivity"
+      build_app "$pkgName" "$appName" "$pkgVersion" "$Type" "$Arch" "APKMirror" "$youtube_apk_path" "yt_patches_args" "$outputAPK" "$log" "$pkgPatches" "$activityPatches" "$VancedMicroG"
+      ;;
+    Spotify)
+      pkgName="com.spotify.music"
+      appName="Spotify"
+      if [ $Android -eq 7 ]; then
+        pkgVersion="8.6.98.900"
+        Type="xapk"
+        Arch="armeabi-v7a, x86, arm64-v8a, x86_64"
+        if [ ! -f "$Download/Spotify_v${pkgVersion}-$Arch.apk" ]; then
+          curl -L --progress-bar -C - -o "$Download/Spotify_v${pkgVersion}-$Arch.apk" "https://github.com/arghya339/apk-me/releases/download/SpotifyRV_v9.0.28.630-5.16.0/spotify-revanced_v8.6.98.900-5.21.0-5-all.apk"  # https://spotify.en.uptodown.com/android/download/4283531
+        fi
+        spotify_apk_path="$Download/Spotify_v${pkgVersion}-$Arch.apk"
+      elif [ $Android -ge 8 ]; then
+        pkgVersion="9.0.28.630"
+        if [ -z "$pkgVersion" ]; then
+          getVersion "$pkgName"
+          pkgVersion="$pkgVersion"
+        fi
+        Type="apk"
+        Arch="armeabi-v7a, arm64-v8a, x86_64"
+        if [ ! -f "$Download/Spotify_v${pkgVersion}-$cpuAbi.apk" ];then
+          curl -L --progress-bar -C - -o "$Download/Spotify_v${pkgVersion}-$cpuAbi.apk" "https://github.com/arghya339/apk-me/releases/download/SpotifyRV_v9.0.28.630-5.16.0/Spotify_v9.0.28.630-125833530-${cpuAbi}.apk"
+        fi
+        spotify_apk_path="$Download/Spotify_v${pkgVersion}-$cpuAbi.apk"
+      fi
+      outputAPK="$SimplUsr/spotify-rv_v${pkgVersion}-$cpuAbi.apk"
+      log="$SimplUsr/spotify-rv-patch_log.txt"
+      activityPatches="com.spotify.music.MainActivity"
+      build_app "$pkgName" "$appName" "$pkgVersion" "$Type" "$Arch" "Uptodown" "$spotify_apk_path" "spotify_patches_args" "$outputAPK" "$log" "$pkgName" "$activityPatches" ""
+      ;;
+    TikTok)
+      pkgName="com.zhiliaoapp.musically"
+      appName="TikTok"
+      #pkgVersion="36.5.4"
+      if [ -z "$pkgVersion" ]; then
+        getVersion "$pkgName"
+        pkgVersion="$pkgVersion"
+      fi
+      Type="BUNDLE"
+      Arch="arm64-v8a + armeabi-v7a"
+      tiktok_apk_path="$Download/TikTok_v${pkgVersion}-$cpuAbi.apk"
+      outputAPK="$SimplUsr/tiktok-rv_v${pkgVersion}-$cpuAbi.apk"
+      log="$SimplUsr/tiktok-rv-patch_log.txt"
+      activityPatches="com.ss.android.ugc.aweme.main.MainActivity"
+      build_app "$pkgName" "$appName" "$pkgVersion" "$Type" "$Arch" "APKMirror" "$youtube_apk_path" "yt_patches_args" "$outputAPK" "$log" "$pkgName" "$activityPatches" ""
+      ;;
   esac  
 done
-#############################
+##########################################################################################################################################################################

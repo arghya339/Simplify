@@ -156,7 +156,7 @@ APKMdl() {
   appName="${appName//[\*\\\/:\?\|<>]/}"
   FileName="${appName}_v${VERSION}-${Arch}${file_ext}"
   outputPath="${Download}/${FileName}" 
-  if [ ! -f "$Download/${appName}_v${VERSION}-${Arch}.apk" ] && [ ! -f "$outputPath" ]; then
+  if [ ! -f "$Download/${appName}_v${VERSION}-${cpuAbi}.apk" ] && [ ! -f "$outputPath" ]; then
     echo -e "$running Scraping actual download button from: ${Blue}$Link${Reset}"
     # Fetch the HTML of the download page
     HTML_CONTENT=$(curl -sL --doh-url "$cloudflareDOH" -A "$USER_AGENT" -H "Referer: https://www.apkmirror.com/" "$Link")
@@ -226,17 +226,17 @@ APKMdl() {
     if [ "$Type" == "BUNDLE" ]; then
       bash $Simplify/dlGitHub.sh "REAndroid" "APKEditor" "latest" ".jar" "$Simplify"
       APKEditor=$(find "$Simplify" -type f -name "APKEditor-*.jar" -print -quit)
-      mkdir -p "$Download/${appName}_v${VERSION}-${Arch}"
+      mkdir -p "$Download/${appName}_v${VERSION}-${cpuAbi}"
       echo -e "$running Extracting APKM content.."
-      pv "$outputPath" | bsdtar -xf - -C "$Download/${appName}_v${VERSION}-${Arch}/" --include "base.apk" "split_config.${cpuAbi//-/_}.apk" "split_config.${locale}.apk" "split_config.$dpi.apk"
+      pv "$outputPath" | bsdtar -xf - -C "$Download/${appName}_v${VERSION}-${cpuAbi}/" --include "base.apk" "split_config.${cpuAbi//-/_}.apk" "split_config.${locale}.apk" "split_config.$dpi.apk"
       rm "$outputPath"
       echo -e "$running Merge splits apkm to standalone lite apk.."
-      $PREFIX/lib/jvm/java-21-openjdk/bin/java -jar $APKEditor m -i "$Download/${appName}_v${VERSION}-${Arch}" -o "$Download/${appName}_v${VERSION}-${Arch}.apk"
-      rm -rf "$Download/${appName}_v${VERSION}-${Arch}"
+      $PREFIX/lib/jvm/java-21-openjdk/bin/java -jar $APKEditor m -i "$Download/${appName}_v${VERSION}-${cpuAbi}" -o "$Download/${appName}_v${VERSION}-${cpuAbi}.apk"
+      rm -rf "$Download/${appName}_v${VERSION}-${cpuAbi}"
       echo
     fi
   else
-    echo -e "$notice Download skiped! '${appName}_v${VERSION}-${Arch}.apk' already exist."
+    echo -e "$notice Download skiped! '${appName}_v${VERSION}-${cpuAbi}.apk' already exist."
     echo  # Space
   fi
 }

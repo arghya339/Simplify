@@ -19,9 +19,9 @@ Reset="\033[0m"
 # Install final apk
 apkInstall() {
   local outputAPK=$1
-  local outputFileName=$2
-  local pkgName=$3
-  local activity=$4
+  local outputFileName=$(basename $outputAPK)
+  local pkgName=$2
+  local activity=$3
   if su -c "id" >/dev/null 2>&1; then
     local activityClass=$(su -c "pm resolve-activity --brief $pkgName" | tail -n 1)
   elif "$HOME/rish" -c "id" >/dev/null 2>&1; then
@@ -93,4 +93,4 @@ apkInstall() {
 }
 
 apkInstall "$@"
-##########################################################################################
+##############################################################################################################################################################################################
