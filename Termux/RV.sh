@@ -296,6 +296,7 @@ while true; do
       pkgName="com.zhiliaoapp.musically"
       appName="TikTok"
       #pkgVersion="36.5.4"
+      pkgVersion=""
       if [ -z "$pkgVersion" ]; then
         getVersion "$pkgName"
         pkgVersion="$pkgVersion"

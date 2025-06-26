@@ -317,7 +317,7 @@ while true; do
       outputAPK="$SimplUsr/yt-music-rvx_v${pkgVersion}-$cpuAbi.apk"
       log="$SimplUsr/yt-music-rvx-patch_log.txt"
       appName="YouTube Music"
-      build_app "$pkgName" "$pkgVersion" "$Type" "$cpuAbi" \"$yt_music_apk_path\" "yt_music_patches_args" "$outputAPK" "$log" "$appName" "$rvxBugReportUrl"
+      build_app "$pkgName" "$pkgVersion" "$Type" "$cpuAbi" \"$yt_music_apk_path\" "yt_music_patches_args" "$outputAPK" "$log" \"$appName\" "$rvxBugReportUrl"
       ;;
     "YouTube RVX v17.34.36")
       pkgName="com.google.android.youtube"
@@ -338,7 +338,7 @@ while true; do
       outputAPK="$SimplUsr/yt-music-rvx_v${pkgVersion}-$cpuAbi.apk"
       log="$SimplUsr/yt-music-rvx-patch_log.txt"
       appName="YouTube Music"
-      build_app "$pkgName" "$pkgVersion" "$Type" "$cpuAbi" \"$yt_music_apk_path\" "yt_music_patches_args" "$outputAPK" "$log" "$appName" "$rvxBugReportUrl"
+      build_app "$pkgName" "$pkgVersion" "$Type" "$cpuAbi" \"$yt_music_apk_path\" "yt_music_patches_args" "$outputAPK" "$log" \"$appName\" "$rvxBugReportUrl"
       ;;
     "YT Music RVX v6.20.51")
       pkgName="com.google.android.apps.youtube.music"
@@ -348,7 +348,7 @@ while true; do
       outputAPK="$SimplUsr/yt-music-rvx_v${pkgVersion}-$cpuAbi.apk"
       log="$SimplUsr/yt-music-rvx-patch_log.txt"
       appName="YouTube Music"
-      build_app "$pkgName" "$pkgVersion" "$Type" "$cpuAbi" \"$yt_music_apk_path\" "yt_music_patches_args" "$outputAPK" "$log" "$appName" "$rvxBugReportUrl"
+      build_app "$pkgName" "$pkgVersion" "$Type" "$cpuAbi" \"$yt_music_apk_path\" "yt_music_patches_args" "$outputAPK" "$log" \"$appName\" "$rvxBugReportUrl"
       ;;
   esac  
 done

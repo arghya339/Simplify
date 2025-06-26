@@ -308,11 +308,12 @@ while true; do
       appName="YouTube Music"
       pkgPatches="app.rvx.android.apps.youtube.music"
       activityPatches="com.google.android.apps.youtube.music.activities.MusicActivity"
-      build_app "$pkgName" "$pkgVersion" "$Type" "$cpuAbi" \"$yt_music_apk_path\" "yt_music_patches_args" "$outputAPK" "$log" "$appName" "$rvxBugReportUrl" "$pkgPatches" "$activityPatches" "$VancedMicroG"
+      build_app "$pkgName" "$pkgVersion" "$Type" "$cpuAbi" \"$yt_music_apk_path\" "yt_music_patches_args" "$outputAPK" "$log" \"$appName\" "$rvxBugReportUrl" "$pkgPatches" "$activityPatches" "$VancedMicroG"
       ;;
     Reddit)
       pkgName="com.reddit.frontpage"
       #pkgVersion="2025.12.1"
+      pkgVersion=""
       if [ -z "$pkgVersion" ]; then
         getVersion "$pkgName"
         pkgVersion="$pkgVersion"
@@ -349,7 +350,7 @@ while true; do
       appName="YouTube Music"
       pkgPatches="app.rvx.android.apps.youtube.music"
       activityPatches="com.google.android.apps.youtube.music.activities.MusicActivity"
-      build_app "$pkgName" "$pkgVersion" "$Type" "$cpuAbi" \"$yt_music_apk_path\" "yt_music_patches_args" "$outputAPK" "$log" "$appName" "$rvxBugReportUrl" "$pkgPatches" "$activityPatches" "$VancedMicroG"
+      build_app "$pkgName" "$pkgVersion" "$Type" "$cpuAbi" \"$yt_music_apk_path\" "yt_music_patches_args" "$outputAPK" "$log" \"$appName\" "$rvxBugReportUrl" "$pkgPatches" "$activityPatches" "$VancedMicroG"
       ;;
     "YT Music RVX v6.20.51")
       pkgName="com.google.android.apps.youtube.music"
@@ -361,7 +362,7 @@ while true; do
       appName="YouTube Music"
       pkgPatches="app.rvx.android.apps.youtube.music"
       activityPatches="com.google.android.apps.youtube.music.activities.MusicActivity"
-      build_app "$pkgName" "$pkgVersion" "$Type" "$cpuAbi" \"$yt_music_apk_path\" "yt_music_patches_args" "$outputAPK" "$log" "$appName" "$rvxBugReportUrl" "$pkgPatches" "$activityPatches" "$VancedMicroG"
+      build_app "$pkgName" "$pkgVersion" "$Type" "$cpuAbi" \"$yt_music_apk_path\" "yt_music_patches_args" "$outputAPK" "$log" \"$appName\" "$rvxBugReportUrl" "$pkgPatches" "$activityPatches" "$VancedMicroG"
       ;;
   esac  
 done
