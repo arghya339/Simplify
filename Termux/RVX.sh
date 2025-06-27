@@ -113,7 +113,7 @@ patch_app() {
   local -n patches=$2  # nameref (-n) accept an array name as parameter
   local outputAPK=$3
   local log=$4
-  local -n nameRef=$5
+  local appName="$5"
   local Url=$6
   
   $PREFIX/lib/jvm/java-21-openjdk/bin/java -jar $ReVancedCLIJar patch -p $PatchesRvp \
@@ -124,7 +124,7 @@ patch_app() {
     --purge $ripLib -f | tee "$log"
   
   if [ ! -f "$outputAPK" ] && [ -f "$stock_apk_path" ]; then
-    echo -e "$bad Oops, ${nameRef[0]} Patching failed !! Logs saved to "$log". Share the Patchlog to developer."
+    echo -e "$bad Oops, $appName Patching failed !! Logs saved to "$log". Share the Patchlog to developer."
     termux-open-url "$Url"
     termux-open --send "$log"
   fi
