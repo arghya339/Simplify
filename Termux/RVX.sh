@@ -113,7 +113,7 @@ patch_app() {
   local -n patches=$2  # nameref (-n) accept an array name as parameter
   local outputAPK=$3
   local log=$4
-  local appName=$5
+  local -n nameRef=$5
   local Url=$6
   
   $PREFIX/lib/jvm/java-21-openjdk/bin/java -jar $ReVancedCLIJar patch -p $PatchesRvp \
@@ -124,7 +124,7 @@ patch_app() {
     --purge $ripLib -f | tee "$log"
   
   if [ ! -f "$outputAPK" ] && [ -f "$stock_apk_path" ]; then
-    echo -e "$bad Oops, $appName Patching failed !! Logs saved to "$log". Share the Patchlog to developer."
+    echo -e "$bad Oops, ${nameRef[0]} Patching failed !! Logs saved to "$log". Share the Patchlog to developer."
     termux-open-url "$Url"
     termux-open --send "$log"
   fi
@@ -174,7 +174,7 @@ build_app() {
   local outputAPK=$7
   local fileName=$(basename $outputAPK)
   local log=$8
-  local appName=$9
+  local -n appNameRef=$9
   local bugReportUrl=$10
   local pkgPatches=$11
   local activityPatches=$12
@@ -183,9 +183,9 @@ build_app() {
   bash $Simplify/APKMdl.sh "$pkgName" "$pkgVersion" "$Type" "$Arch"  # Download stock apk from APKMirror
   
   if [ -f "${stock_apk_ref[0]}" ]; then
-    echo -e "$good ${Green}Downloaded $appName APK found:${Reset} ${stock_apk_ref[0]}"
-    echo -e "$running Patching $appName RVX.."
-    patch_app "${stock_apk_ref[0]}" "$appPatchesArgs" "$outputAPK" "$log" "$appName" "$bugReportUrl"
+    echo -e "$good ${Green}Downloaded ${appNameRef[0]} APK found:${Reset} ${stock_apk_ref[0]}"
+    echo -e "$running Patching ${appNameRef[0]} RVX.."
+    patch_app "${stock_apk_ref[0]}" "$appPatchesArgs" "$outputAPK" "$log" "${appNameRef[0]}" "$bugReportUrl"
   fi
   
   if [ -f "$outputAPK" ]; then
@@ -203,26 +203,26 @@ build_app() {
       esac
     fi
 
-    echo -e "[?] ${Yellow}Do you want to install $appName RVX app? [Y/n] ${Reset}\c" && read opt
+    echo -e "[?] ${Yellow}Do you want to install ${appNameRef[0]} RVX app? [Y/n] ${Reset}\c" && read opt
     case $opt in
       y*|Y*|"")
-        echo -e "$running Please Wait !! Installing Patched $appName RVX apk.."
+        echo -e "$running Please Wait !! Installing Patched ${appNameRef[0]} RVX apk.."
         bash $Simplify/apkInstall.sh "$outputAPK" "$pkgPatches" "$activityPatches"
         ;;
-      n*|N*) echo -e "$notice $appName RVX Installaion skipped!" ;;
-      *) echo -e "$info Invalid choice! $appName RVX Installaion skipped." ;;
+      n*|N*) echo -e "$notice ${appNameRef[0]} RVX Installaion skipped!" ;;
+      *) echo -e "$info Invalid choice! ${appNameRef[0]} RVX Installaion skipped." ;;
     esac
     
-    echo -e "[?] ${Yellow}Do you want to Share $appName RVX app? [Y/n] ${Reset}\c" && read opt
+    echo -e "[?] ${Yellow}Do you want to Share ${appNameRef[0]} RVX app? [Y/n] ${Reset}\c" && read opt
     case $opt in
       y*|Y*|"")
-        echo - e"$running Please Wait !! Sharing Patched $appName RVX apk.."
+        echo - e"$running Please Wait !! Sharing Patched ${appNameRef[0]} RVX apk.."
         termux-open --send "$outputAPK"
         ;;
-      n*|N*) echo -e "$notice $appName RVX Sharing skipped!"
+      n*|N*) echo -e "$notice ${appNameRef[0]} RVX Sharing skipped!"
         echo -e "$info Locate '$fileName' in '/sdcard/Simplify/' dir, Share it with your Friends and Family ;)"
         ;;
-        *) echo -e "$info Invalid choice! $appName RVX Sharing skipped." ;;
+        *) echo -e "$info Invalid choice! ${appNameRef[0]} RVX Sharing skipped." ;;
     esac
   
   fi
@@ -294,10 +294,10 @@ while true; do
       stock_apk_path=("$Download/YouTube_v${pkgVersion}-$cpuAbi.apk")
       outputAPK="$SimplUsr/youtube-rvx_v${pkgVersion}-$cpuAbi.apk"
       log="$SimplUsr/yt-rvx-patch_log.txt"
-      appName="YouTube"
+      appName=("YouTube")
       pkgPatches="app.rvx.android.youtube"
       activityPatches="com.google.android.apps.youtube.app.watchwhile.MainActivity"
-      build_app "$pkgName" "$pkgVersion" "$Type" "$Arch" "stock_apk_path" "yt_patches_args" "$outputAPK" "$log" "$appName" "$rvxBugReportUrl" "$pkgPatches" "$activityPatches"
+      build_app "$pkgName" "$pkgVersion" "$Type" "$Arch" "stock_apk_path" "yt_patches_args" "$outputAPK" "$log" "appName" "$rvxBugReportUrl" "$pkgPatches" "$activityPatches"
       ;;
     YT\ Music)
       pkgName="com.google.android.apps.youtube.music"
@@ -310,10 +310,10 @@ while true; do
       stock_apk_path=("${Download}/YouTube Music_v${pkgVersion}-${cpuAbi}.apk")
       outputAPK="$SimplUsr/yt-music-rvx_v${pkgVersion}-$cpuAbi.apk"
       log="$SimplUsr/yt-music-rvx-patch_log.txt"
-      appName="YouTube Music"
+      appName=("YouTube Music")
       pkgPatches="app.rvx.android.apps.youtube.music"
       activityPatches="com.google.android.apps.youtube.music.activities.MusicActivity"
-      build_app "$pkgName" "$pkgVersion" "$Type" "$cpuAbi" "stock_apk_path" "yt_music_patches_args" "$outputAPK" "$log" \"$appName\" "$rvxBugReportUrl" "$pkgPatches" "$activityPatches"
+      build_app "$pkgName" "$pkgVersion" "$Type" "$cpuAbi" "stock_apk_path" "yt_music_patches_args" "$outputAPK" "$log" "appName" "$rvxBugReportUrl" "$pkgPatches" "$activityPatches"
       ;;
     Reddit)
       pkgName="com.reddit.frontpage"
@@ -328,9 +328,9 @@ while true; do
       stock_apk_path=("$Download/Reddit_v${pkgVersion}-$cpuAbi.apk")
       outputAPK="$SimplUsr/reddit-rvx_v${pkgVersion}-$cpuAbi.apk"
       log="$SimplUsr/reddit-rvx-patch_log.txt"
-      appName="Reddit"
+      appName=("Reddit")
       activityPatches="com.reddit.launch.main.MainActivity"
-      build_app "$pkgName" "$pkgVersion" "$Type" "$Arch" "stock_apk_path" "reddit_patches_args" "$outputAPK" "$log" "$appName" "$rvxBugReportUrl" "$pkgName" "$activityPatches"
+      build_app "$pkgName" "$pkgVersion" "$Type" "$Arch" "stock_apk_path" "reddit_patches_args" "$outputAPK" "$log" "appName" "$rvxBugReportUrl" "$pkgName" "$activityPatches"
       ;;
     "YouTube RVX v17.34.36")
       pkgName="com.google.android.youtube"
@@ -340,10 +340,10 @@ while true; do
       stock_apk_path=("$Download/YouTube_v${pkgVersion}-$cpuAbi.apk")
       outputAPK="$SimplUsr/youtube-rvx_v${pkgVersion}-$cpuAbi.apk"
       log="$SimplUsr/yt-rvx-patch_log.txt"
-      appName="YouTube"
+      appName=("YouTube")
       pkgPatches="app.rvx.android.youtube"
       activityPatches="com.google.android.apps.youtube.app.watchwhile.MainActivity"
-      build_app "$pkgName" "$pkgVersion" "$Type" "$Arch" "stock_apk_path" "yt_patches_args" "$outputAPK" "$log" "$appName" "$rvxa6_7BugReportUrl" "$pkgPatches" "$activityPatches"
+      build_app "$pkgName" "$pkgVersion" "$Type" "$Arch" "stock_apk_path" "yt_patches_args" "$outputAPK" "$log" "appName" "$rvxa6_7BugReportUrl" "$pkgPatches" "$activityPatches"
       ;;
     "YT Music RVX v6.42.55")
       pkgName="com.google.android.apps.youtube.music"
@@ -352,10 +352,10 @@ while true; do
       stock_apk_path=("${Download}/YouTube Music_v${pkgVersion}-${cpuAbi}.apk")
       outputAPK="$SimplUsr/yt-music-rvx_v${pkgVersion}-$cpuAbi.apk"
       log="$SimplUsr/yt-music-rvx-patch_log.txt"
-      appName="YouTube Music"
+      appName=("YouTube Music")
       pkgPatches="app.rvx.android.apps.youtube.music"
       activityPatches="com.google.android.apps.youtube.music.activities.MusicActivity"
-      build_app "$pkgName" "$pkgVersion" "$Type" "$cpuAbi" "stock_apk_path" "yt_music_patches_args" "$outputAPK" "$log" \"$appName\" "$rvxBugReportUrl" "$pkgPatches" "$activityPatches"
+      build_app "$pkgName" "$pkgVersion" "$Type" "$cpuAbi" "stock_apk_path" "yt_music_patches_args" "$outputAPK" "$log" "appName" "$rvxBugReportUrl" "$pkgPatches" "$activityPatches"
       ;;
     "YT Music RVX v6.20.51")
       pkgName="com.google.android.apps.youtube.music"
@@ -364,10 +364,10 @@ while true; do
       stock_apk_path=("${Download}/YouTube Music_v${pkgVersion}-${cpuAbi}.apk")
       outputAPK="$SimplUsr/yt-music-rvx_v${pkgVersion}-$cpuAbi.apk"
       log="$SimplUsr/yt-music-rvx-patch_log.txt"
-      appName="YouTube Music"
+      appName=("YouTube Music")
       pkgPatches="app.rvx.android.apps.youtube.music"
       activityPatches="com.google.android.apps.youtube.music.activities.MusicActivity"
-      build_app "$pkgName" "$pkgVersion" "$Type" "$cpuAbi" "stock_apk_path" "yt_music_patches_args" "$outputAPK" "$log" \"$appName\" "$rvxBugReportUrl" "$pkgPatches" "$activityPatches"
+      build_app "$pkgName" "$pkgVersion" "$Type" "$cpuAbi" "stock_apk_path" "yt_music_patches_args" "$outputAPK" "$log" "appName" "$rvxBugReportUrl" "$pkgPatches" "$activityPatches"
       ;;
   esac  
 done

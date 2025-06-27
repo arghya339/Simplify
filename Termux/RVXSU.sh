@@ -107,7 +107,7 @@ patch_app() {
   local -n patches=$2  # nameref (-n) accept an array name as parameter
   local outputAPK=$3
   local log=$4
-  local appName=$5
+  local -n nameRef=$5
   local Url=$6
   
   $PREFIX/lib/jvm/java-21-openjdk/bin/java -jar $ReVancedCLIJar patch -p $PatchesRvp \
@@ -118,7 +118,7 @@ patch_app() {
     --purge $ripLib --unsigned -f | tee "$log"
   
   if [ ! -f "$outputAPK" ] && [ -f "$stock_apk_path" ]; then
-    echo -e "$bad Oops, $appName Patching failed !! Logs saved to "$log". Share the Patchlog to developer."
+    echo -e "$bad Oops, ${nameRef[0]} Patching failed !! Logs saved to "$log". Share the Patchlog to developer."
     termux-open-url "$Url"
     termux-open --send "$log"
   fi
@@ -191,16 +191,16 @@ build_app() {
   local outputAPK=$7
   local fileName=$(basename $outputAPK)
   local log=$8
-  local appName=$9
+  local -n appNameRef=$9
   local bugReportUrl=$10
   
   
   bash $Simplify/APKMdl.sh "$pkgName" "$pkgVersion" "$Type" "$Arch"  # Download stock apk from APKMirror
   
   if [ -f "${stock_apk_ref[0]}" ]; then
-    echo -e "$good ${Green}Downloaded $appName APK found:${Reset} ${stock_apk_ref[0]}"
-    echo -e "$running Patching $appName RVX.."
-    patch_app "${stock_apk_ref[0]}" "$appPatchesArgs" "$outputAPK" "$log" "$appName" "$bugReportUrl"
+    echo -e "$good ${Green}Downloaded ${appNameRef[0]} APK found:${Reset} ${stock_apk_ref[0]}"
+    echo -e "$running Patching ${appNameRef[0]} RVX.."
+    patch_app "${stock_apk_ref[0]}" "$appPatchesArgs" "$outputAPK" "$log" "${appNameRef[0]}" "$bugReportUrl"
   fi
   if [ -f "$outputAPK" ]; then
     
@@ -213,34 +213,34 @@ build_app() {
           Type="APK"
           Arch="universal"
           bash $Simplify/APKMdl.sh "$pkgName" "$pkgVersion" "$Type" "$Arch"
-          stock_apk_path="$Download/${appName}_v${pkgVersion}-$Arch.apk"
-          echo -e "$running Copy signature from $appName.."
-          cs "$stock_apk_path" "$outputAPK" "$SimplUsr/$appName-RVX-CS_v${pkgVersion}-$Arch.apk"
-          echo -e "$running Please Wait !! Installing Patched $appName RVX CS apk.."
-          bash $Simplify/apkInstall.sh "$SimplUsr/$appName-RVX-CS_v${pkgVersion}-$Arch.apk" "$pkgName" ""
+          stock_apk_path="$Download/${appNameRef[0]}_v${pkgVersion}-$Arch.apk"
+          echo -e "$running Copy signature from ${appNameRef[0]}.."
+          cs "$stock_apk_path" "$outputAPK" "$SimplUsr/${appNameRef[0]}-RVX-CS_v${pkgVersion}-$Arch.apk"
+          echo -e "$running Please Wait !! Installing Patched ${appNameRef[0]} RVX CS apk.."
+          bash $Simplify/apkInstall.sh "$SimplUsr/${appNameRef[0]}-RVX-CS_v${pkgVersion}-$Arch.apk" "$pkgName" ""
           ;;
         M*|m*)
-          echo -e "$running Please Wait !! Mounting Patched $appName RVX apk.."
-          su -mm -c "/system/bin/sh $Simplify/apkMount.sh ${stock_apk_ref[0]} $outputAPK $appName $pkgName $pkgVersion" &> /dev/null
-          su -mm -c "/system/bin/sh $Simplify/apkMount.sh ${stock_apk_ref[0]} $outputAPK $appName $pkgName $pkgVersion" | tee "$SimplUsr/${appName}-RVX_mount_log.txt"
+          echo -e "$running Please Wait !! Mounting Patched ${appNameRef[0]} RVX apk.."
+          su -mm -c "/system/bin/sh $Simplify/apkMount.sh ${stock_apk_ref[0]} $outputAPK ${appNameRef[0]} $pkgName $pkgVersion" &> /dev/null
+          su -mm -c "/system/bin/sh $Simplify/apkMount.sh ${stock_apk_ref[0]} $outputAPK ${appNameRef[0]} $pkgName $pkgVersion" | tee "$SimplUsr/${appNameRef[0]}-RVX_mount_log.txt"
           rm $outputAPK
           ;;
-        N*|n*) echo -e "$notice $appName RVX Installaion skipped!" ;;
-        *) echo -e "$info Invalid choice! $appName RVX Installaion skipped." ;;
+        N*|n*) echo -e "$notice ${appNameRef[0]} RVX Installaion skipped!" ;;
+        *) echo -e "$info Invalid choice! ${appNameRef[0]} RVX Installaion skipped." ;;
       esac
 
     else
       
-      echo -e "[?] ${Yellow}Do you want to Mount $appName RVX app? [Y/n] ${Reset}\c" && read opt
+      echo -e "[?] ${Yellow}Do you want to Mount ${appNameRef[0]} RVX app? [Y/n] ${Reset}\c" && read opt
       case $opt in
         y*|Y*|"")
-          echo -e "$running Please Wait !! Mounting Patched $appName RVX apk.."
-          su -mm -c "/system/bin/sh $Simplify/apkMount.sh ${stock_apk_ref[0]} $outputAPK $appName $pkgName $pkgVersion" &> /dev/null
-          su -mm -c "/system/bin/sh $Simplify/apkMount.sh ${stock_apk_ref[0]} $outputAPK $appName $pkgName $pkgVersion" | tee "$SimplUsr/${appName}-RVX_mount_log.txt"
+          echo -e "$running Please Wait !! Mounting Patched ${appNameRef[0]} RVX apk.."
+          su -mm -c "/system/bin/sh $Simplify/apkMount.sh ${stock_apk_ref[0]} $outputAPK ${appNameRef[0]} $pkgName $pkgVersion" &> /dev/null
+          su -mm -c "/system/bin/sh $Simplify/apkMount.sh ${stock_apk_ref[0]} $outputAPK ${appNameRef[0]} $pkgName $pkgVersion" | tee "$SimplUsr/${appNameRef[0]}-RVX_mount_log.txt"
           rm $outputAPK
           ;;
-        n*|N*) echo -e "$notice $appName RVX Installaion skipped!" ;;
-        *) echo -e "$info Invalid choice! $appName RVX Installaion skipped." ;;
+        n*|N*) echo -e "$notice ${appNameRef[0]} RVX Installaion skipped!" ;;
+        *) echo -e "$info Invalid choice! ${appNameRef[0]} RVX Installaion skipped." ;;
       esac
 
     fi
@@ -307,8 +307,8 @@ while true; do
       stock_apk_path=("$Download/YouTube_v${pkgVersion}-$cpuAbi.apk")
       outputAPK="$SimplUsr/youtube-rvx_v${pkgVersion}-$cpuAbi.apk"
       log="$SimplUsr/yt-rvx-patch_log.txt"
-      appName="YouTube"
-      build_app "$pkgName" "$pkgVersion" "$Type" "$Arch" "stock_apk_path" "yt_patches_args" "$outputAPK" "$log" "$appName" "$rvxBugReportUrl"
+      appName=("YouTube")
+      build_app "$pkgName" "$pkgVersion" "$Type" "$Arch" "stock_apk_path" "yt_patches_args" "$outputAPK" "$log" "appName" "$rvxBugReportUrl"
       ;;
     YT\ Music)
       pkgName="com.google.android.apps.youtube.music"
@@ -321,8 +321,8 @@ while true; do
       stock_apk_path=("$Download/YouTube Music_v${pkgVersion}-$cpuAbi.apk")
       outputAPK="$SimplUsr/yt-music-rvx_v${pkgVersion}-$cpuAbi.apk"
       log="$SimplUsr/yt-music-rvx-patch_log.txt"
-      appName="YouTube Music"
-      build_app "$pkgName" "$pkgVersion" "$Type" "$cpuAbi" "stock_apk_path" "yt_music_patches_args" "$outputAPK" "$log" \"$appName\" "$rvxBugReportUrl"
+      appName=("YouTube Music")
+      build_app "$pkgName" "$pkgVersion" "$Type" "$cpuAbi" "stock_apk_path" "yt_music_patches_args" "$outputAPK" "$log" "appName" "$rvxBugReportUrl"
       ;;
     "YouTube RVX v17.34.36")
       pkgName="com.google.android.youtube"
@@ -332,8 +332,8 @@ while true; do
       stock_apk_path=("$Download/YouTube_v${pkgVersion}-$cpuAbi.apk")
       outputAPK="$SimplUsr/youtube-rvx_v${pkgVersion}-$cpuAbi.apk"
       log="$SimplUsr/yt-rvx-patch_log.txt"
-      appName="YouTube"
-      build_app "$pkgName" "$pkgVersion" "$Type" "$Arch" "stock_apk_path" "yt_patches_args" "$outputAPK" "$log" "$appName" "$rvxa6_7BugReportUrl"
+      appName=("YouTube")
+      build_app "$pkgName" "$pkgVersion" "$Type" "$Arch" "stock_apk_path" "yt_patches_args" "$outputAPK" "$log" "appName" "$rvxa6_7BugReportUrl"
       ;;
     "YT Music RVX v6.42.55")
       pkgName="com.google.android.apps.youtube.music"
@@ -342,8 +342,8 @@ while true; do
       stock_apk_path=("$Download/YouTube Music_v${pkgVersion}-$cpuAbi.apk")
       outputAPK="$SimplUsr/yt-music-rvx_v${pkgVersion}-$cpuAbi.apk"
       log="$SimplUsr/yt-music-rvx-patch_log.txt"
-      appName="YouTube Music"
-      build_app "$pkgName" "$pkgVersion" "$Type" "$cpuAbi" "stock_apk_path" "yt_music_patches_args" "$outputAPK" "$log" \"$appName\" "$rvxBugReportUrl"
+      appName=("YouTube Music")
+      build_app "$pkgName" "$pkgVersion" "$Type" "$cpuAbi" "stock_apk_path" "yt_music_patches_args" "$outputAPK" "$log" "appName" "$rvxBugReportUrl"
       ;;
     "YT Music RVX v6.20.51")
       pkgName="com.google.android.apps.youtube.music"
@@ -352,8 +352,8 @@ while true; do
       stock_apk_path=("$Download/YouTube Music_v${pkgVersion}-$cpuAbi.apk")
       outputAPK="$SimplUsr/yt-music-rvx_v${pkgVersion}-$cpuAbi.apk"
       log="$SimplUsr/yt-music-rvx-patch_log.txt"
-      appName="YouTube Music"
-      build_app "$pkgName" "$pkgVersion" "$Type" "$cpuAbi" "stock_apk_path" "yt_music_patches_args" "$outputAPK" "$log" \"$appName\" "$rvxBugReportUrl"
+      appName=("YouTube Music")
+      build_app "$pkgName" "$pkgVersion" "$Type" "$cpuAbi" "stock_apk_path" "yt_music_patches_args" "$outputAPK" "$log" "appName" "$rvxBugReportUrl"
       ;;
   esac  
 done
