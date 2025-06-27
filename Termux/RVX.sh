@@ -184,16 +184,16 @@ build_app() {
   
   bash $Simplify/APKMdl.sh "$pkgName" "$pkgVersion" "$Type" "$Arch"  # Download stock apk from APKMirror
   
-  if [ -f "$stock_apk_path" ]; then
+  if [ -f $stock_apk_path ]; then
     echo -e "$good ${Green}Downloaded $appName APK found:${Reset} $stock_apk_path"
     echo -e "$running Patching $appName RVX.."
-    patch_app "$stock_apk_path" "$appPatchesArgs" "$outputAPK" "$log" "$appName" "$bugReportUrl"
+    patch_app $stock_apk_path "$appPatchesArgs" "$outputAPK" "$log" "$appName" "$bugReportUrl"
   fi
-  echo -e "$info DEBUG: stockFile: $Download/\"$stockFileName\""
-  if [ -f "$Download/\"$stockFileName\"" ]; then
-    echo -e "$good ${Green}Downloaded $appName APK found:${Reset} $Download/\"$stockFileName\""
+  echo -e "$info DEBUG: stockFile: $Download/$stockFileName"
+  if [ -f $Download/$stockFileName ]; then
+    echo -e "$good ${Green}Downloaded $appName APK found:${Reset} $Download/$stockFileName"
     echo -e "$running Patching $appName RVX.."
-    patch_app "$Download/\"$stockFileName\"" "$appPatchesArgs" "$outputAPK" "$log" "$appName" "$bugReportUrl"
+    patch_app "$Download/$stockFileName" "$appPatchesArgs" "$outputAPK" "$log" "$appName" "$bugReportUrl"
   fi
   
   if [ -f "$outputAPK" ]; then
