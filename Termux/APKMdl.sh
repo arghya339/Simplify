@@ -102,11 +102,12 @@ APKMdl() {
   fi
   
   variantsJson=$(echo "$html_content" | pup 'div.table-row json{}')
-  
-  Type=()
-  Arch=()
-  Link=()
-  
+
+  # Use local variables to hold the found variant's details
+  local found_type=""
+  local found_arch=""
+  local found_link=""
+
   mapfile -t parsed_rows < <(echo "$variantsJson" | jq -r '.[] | select((.children | type) == "array" and (.children | length) == 5)
     | select(
       (.children[0].children[1].text | type) == "string" and # Type text (BUNDLE/APK)
@@ -126,26 +127,35 @@ APKMdl() {
   fi
   
   # Filter variants based on both TYPE and ARCH parameters
-  selected_index=-1
+  # Use a loop with indices to print the row number
   for i in "${!parsed_rows[@]}"; do
     IFS=$'\t' read -r type arch link <<< "${parsed_rows[$i]}"
+    # Print the row number here (using $i)
+    echo -e "[$i] ${Blue}Type: $type | Arch: $arch | Link: $link${Reset}"
+    
     if [[ "$type" == "$TYPE" ]] && [[ "$arch" == "$ARCH" ]]; then
-        Type[i]="$type"
-        Arch[i]="$arch"
-        Link[i]="$link"
-        echo -e "[$i] ${Blue}Type: $type | Arch: $arch | Link: $link${Reset}"
-        selected_index=$i
+        found_type="$type"
+        found_arch="$arch"
+        found_link="$link"
+        echo -e "$info selectedAppVeriant:"
+        echo "Type    : $found_type" # Print selected Type
+        echo "Arch    : $found_arch"
+        echo -e "Link    : ${Blue}$found_link${Reset}"
+        break # Exit the loop once a match is found
     fi
   done
-  
-  if [ "$found_variant" = false ]; then
+
+  # Check if a variant was found
+  if [ -z "$found_type" ]; then
     echo -e "$bad No $TYPE variant found for architecture $ARCH!"
     return 1
   fi
   
-  Type="${Type[$selected_index]}"
-  Arch="${Arch[$selected_index]}"
-  Link="${Link[$selected_index]}"
+  # Assign the found values to the variables used later in the script
+  Type="$found_type"
+  Arch="$found_arch"
+  Link="$found_link"
+
   if [ "$Type" == "APK" ]; then
     file_ext=".apk"
   else
