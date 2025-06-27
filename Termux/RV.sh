@@ -156,6 +156,10 @@ fb_messenger_patches_args=(
   -e "Change package name" -OackageName="com.facebook.orca"
 )
 
+lightroom_patches_args=(
+  -e "Change package name" -OackageName="com.adobe.lrmobile"
+)
+
 # --- Build App ---
 build_app() {
   # local variables
@@ -239,6 +243,7 @@ build_app() {
   Facebook arm32 + x86 8.0+
   Facebook Messenger arm64 + x64 9.0+
   Facebook Messenger arm32 + x86 5.0+
+  Lightroom 8.0+
 comment
 
 if  [[ $Android -ge 9  &&  ( "$cpuAbi" == "arm64-v8a" || "$cpuAbi" == "x86_64" ) ]]; then
@@ -264,6 +269,7 @@ if [ $Android -ge 9 ]; then
     "$Instagram"
     "$Facebook"
     "${fbMessenger[0]}"
+    Lightroom
   )
 elif [ $Android -eq 8 ]; then
   apps=(
@@ -275,6 +281,7 @@ elif [ $Android -eq 8 ]; then
     "$Instagram"
     "$Facebook"
     "${fbMessenger[0]}"
+    Lightroom
   )
 elif [ $Android -eq 7 ]; then
   apps=(
@@ -466,6 +473,23 @@ while true; do
       log="$SimplUsr/fb-messenger-rv-patch_log.txt"
       activityPatches="com.facebook.orca.auth.StartScreenActivity"
       build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "APKMirror" "fb_messenger_apk_path" "fb_messenger_patches_args" "$outputAPK" "$log" "$pkgName" "$activityPatches"
+      ;;
+    Lightroom)
+      pkgName="com.adobe.lrmobile"
+      appName=("Lightroom")
+      #pkgVersion="10.0.2"
+      pkgVersion=""
+      if [ -z "$pkgVersion" ]; then
+        getVersion "$pkgName"
+        pkgVersion="$pkgVersion"
+      fi
+      Type="BUNDLE"
+      Arch=("arm64-v8a + x86_64")
+      lightroom_apk_path=("$Download/Lightroom_v${pkgVersion}-${Arch[0]}.apk")
+      outputAPK="$SimplUsr/lightroom-rv_v${pkgVersion}-$cpuAbi.apk"
+      log="$SimplUsr/lightroom-rv-patch_log.txt"
+      activityPatches="com.adobe.lrmobile.StorageCheckActivity"
+      build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "APKMirror" "lightroom_apk_path" "lightroom_patches_args" "$outputAPK" "$log" "$pkgName" "$activityPatches"
       ;;
   esac  
 done
