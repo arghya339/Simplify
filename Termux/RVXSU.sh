@@ -186,8 +186,7 @@ build_app() {
   local pkgVersion=$2
   local Type=$3
   local Arch=$4
-  local -n stock_apk_path=$5
-  local stockFileName=$(basename "${stock_apk_path[0]}")
+  local -n stock_apk_ref=$5
   local appPatchesArgs=$6
   local outputAPK=$7
   local fileName=$(basename $outputAPK)
@@ -198,10 +197,10 @@ build_app() {
   
   bash $Simplify/APKMdl.sh "$pkgName" "$pkgVersion" "$Type" "$Arch"  # Download stock apk from APKMirror
   
-  if [ -f "${stock_apk_path[0]}" ]; then
-    echo -e "$good ${Green}Downloaded $appName APK found:${Reset} ${stock_apk_path[0]}"
+  if [ -f "${stock_apk_ref[0]}" ]; then
+    echo -e "$good ${Green}Downloaded $appName APK found:${Reset} ${stock_apk_ref[0]}"
     echo -e "$running Patching $appName RVX.."
-    patch_app "${stock_apk_path[0]}" "$appPatchesArgs" "$outputAPK" "$log" "$appName" "$bugReportUrl"
+    patch_app "${stock_apk_ref[0]}" "$appPatchesArgs" "$outputAPK" "$log" "$appName" "$bugReportUrl"
   fi
   if [ -f "$outputAPK" ]; then
     
@@ -222,8 +221,8 @@ build_app() {
           ;;
         M*|m*)
           echo -e "$running Please Wait !! Mounting Patched $appName RVX apk.."
-          su -mm -c "/system/bin/sh $Simplify/apkMount.sh ${stock_apk_path[0]} $outputAPK $appName $pkgName $pkgVersion" &> /dev/null
-          su -mm -c "/system/bin/sh $Simplify/apkMount.sh ${stock_apk_path[0]} $outputAPK $appName $pkgName $pkgVersion" | tee "$SimplUsr/${appName}-RVX_mount_log.txt"
+          su -mm -c "/system/bin/sh $Simplify/apkMount.sh ${stock_apk_ref[0]} $outputAPK $appName $pkgName $pkgVersion" &> /dev/null
+          su -mm -c "/system/bin/sh $Simplify/apkMount.sh ${stock_apk_ref[0]} $outputAPK $appName $pkgName $pkgVersion" | tee "$SimplUsr/${appName}-RVX_mount_log.txt"
           rm $outputAPK
           ;;
         N*|n*) echo -e "$notice $appName RVX Installaion skipped!" ;;
@@ -236,8 +235,8 @@ build_app() {
       case $opt in
         y*|Y*|"")
           echo -e "$running Please Wait !! Mounting Patched $appName RVX apk.."
-          su -mm -c "/system/bin/sh $Simplify/apkMount.sh ${stock_apk_path[0]} $outputAPK $appName $pkgName $pkgVersion" &> /dev/null
-          su -mm -c "/system/bin/sh $Simplify/apkMount.sh ${stock_apk_path[0]} $outputAPK $appName $pkgName $pkgVersion" | tee "$SimplUsr/${appName}-RVX_mount_log.txt"
+          su -mm -c "/system/bin/sh $Simplify/apkMount.sh ${stock_apk_ref[0]} $outputAPK $appName $pkgName $pkgVersion" &> /dev/null
+          su -mm -c "/system/bin/sh $Simplify/apkMount.sh ${stock_apk_ref[0]} $outputAPK $appName $pkgName $pkgVersion" | tee "$SimplUsr/${appName}-RVX_mount_log.txt"
           rm $outputAPK
           ;;
         n*|N*) echo -e "$notice $appName RVX Installaion skipped!" ;;

@@ -52,7 +52,7 @@ dlGitHub() {
     if [ "$repo" == "VancedMicroG" ]; then
       if [ "$fileName" != "$fileBaseName" ]; then
         echo -e "$notice diffs: $fileName ~ $fileBaseName"
-        rm $findFile
+        [ -f "$findFile" ] && rm "$findFile"
         echo -e "$running Downloading $fileName.."
         curl -L -C - --progress-bar -o "$dir/$fileName" "https://github.com/$owner/$repo/releases/download/v${latestReleases}/$assetsName"
         findFile="$dir/$fileName"
@@ -60,7 +60,7 @@ dlGitHub() {
     else 
       if [ "$assetsName" != "$fileBaseName" ]; then
         echo -e "$notice diffs: $assetsName ~ $fileBaseName"
-        rm $findFile
+        [ -f "$findFile" ] && rm "$findFile"
         # downloading assets
         echo -e "$running Downloading $assetsName.."
         if [ "$repo" == "APKEditor" ]; then
@@ -68,6 +68,7 @@ dlGitHub() {
         else
           if [ "$repo" == "revanced-cli" ]; then
             aria2c -x 16 -s 16 --console-log-level=error --summary-interval=0 --download-result=hide -c -o "$assetsName" -d "$dir" "https://github.com/$owner/$repo/releases/download/v${latestReleases}/$assetsName"
+            echo  # White Space
           else
             curl -L -C - --progress-bar -o "$dir/$assetsName" "https://github.com/$owner/$repo/releases/download/v${latestReleases}/$assetsName"
           fi
@@ -90,7 +91,7 @@ dlGitHub() {
     
     if [ "$preAssetsName" != "$preFileBaseName" ]; then
       echo -e "$notice diffs: $preAssetsName ~ $preFileBaseName"
-      rm $findFile
+      [ -f "$findFile" ] && rm "$findFile"
       # downloading assets
       echo -e "$running Downloading $preAssetsName.."
       curl -L -C - --progress-bar -o "$dir/$preAssetsName" "https://github.com/$owner/$repo/releases/download/v${lastPreReleases}/$preAssetsName"
