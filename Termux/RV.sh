@@ -144,6 +144,10 @@ photos_patches_args=(
   -e "Change package name" -OackageName="app.revanced.android.apps.photos"
 )
 
+instagram_patches_args=(
+  -e "Change package name" -OackageName="com.instagram.android"
+)
+
 # --- Build App ---
 build_app() {
   # local variables
@@ -221,16 +225,36 @@ build_app() {
   Spotify 7.0+
   TikTok 5.0+
   Google Photos 5.0+
+  Instagram arm64 + x64 9.0+
+  Instagram arm32 + x86 7.0+
 comment
 
+if  [[ $Android -ge 9  &&  ( "$cpuAbi" == "arm64-v8a" || "$cpuAbi" == "x86_64" ) ]]; then
+  Instagram="Instagram"
+elif [[ $Android -eq 8  &&  ( "$cpuAbi" == "armeabi-v7a" || "$cpuAbi" == "x86" ) ]]; then
+  Instagram="Instagram"
+elif [[ $Android -eq 7  &&  ( "$cpuAbi" == "armeabi-v7a" || "$cpuAbi" == "x86" ) ]]; then
+  Instagram="Instagram"
+fi
+
 # Define the array
-if [ $Android -ge 8 ]; then
+if [ $Android -ge 9 ]; then
   apps=(
     Quit
     YouTube
     Spotify
     TikTok
     Google\ Photos
+    "$Instagram"
+  )
+elif [ $Android -eq 8 ]; then
+  apps=(
+    Quit
+    YouTube
+    Spotify
+    TikTok
+    Google\ Photos
+    "$Instagram"
   )
 elif [ $Android -eq 7 ]; then
   apps=(
@@ -238,6 +262,7 @@ elif [ $Android -eq 7 ]; then
     Spotify
     TikTok
     Google\ Photos
+    "$Instagram"
   )
 elif [ $Android -eq 6 ]; then
   apps=(
@@ -367,6 +392,23 @@ while true; do
       pkgPatches="app.revanced.android.apps.photos"
       activityPatches="com.google.android.apps.photos.home.HomeActivity"
       build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "APKMirror" "photos_apk_path" "photos_patches_args" "$outputAPK" "$log" "$pkgPatches" "$activityPatches"
+      ;;
+    Instagram)
+      pkgName="com.instagram.android"
+      appName=("Instagram")
+      pkgVersion="324.0.0.27.50"
+      #pkgVersion=""
+      if [ -z "$pkgVersion" ]; then
+        getVersion "$pkgName"
+        pkgVersion="$pkgVersion"
+      fi
+      Type="APK"
+      Arch=("$cpuAbi")
+      instagram_apk_path=("$Download/Instagram_v${pkgVersion}-${Arch[0]}.apk")
+      outputAPK="$SimplUsr/instagram-rv_v${pkgVersion}-$cpuAbi.apk"
+      log="$SimplUsr/instagram-rv-patch_log.txt"
+      activityPatches="com.instagram.android.activity.MainTabActivity"
+      build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "APKMirror" "instagram_apk_path" "instagram_patches_args" "$outputAPK" "$log" "$pkgName" "$activityPatches"
       ;;
   esac  
 done
