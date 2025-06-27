@@ -73,12 +73,12 @@ APKMdl() {
   fi
   #echo "$RESPONSE_JSON" | jq -e ".data[]"  # for debug
   appLink="https://www.apkmirror.com$(jq -r ".data[] | select(.pname == \"$PKG_NAME\") | .app.link" <<< "$RESPONSE_JSON")"
-  appLink=$(echo "$appLink" | sed 's/-android-automotive//g; s/-wear-os//g')
+  appLink=$(echo "$appLink" | sed 's/-android-automotive//g; s/-wear-os//g; s/-daydream//g')
   second_last_segment=$(basename "$appLink")  # chrome
   appName=$(jq -r ".data[] | select(.pname == \"$PKG_NAME\") | .app.name" <<< "$RESPONSE_JSON")
-  appName=$(echo "$appName" | sed 's/(Android Automotive)//g; s/(Wear OS)//g' | xargs)
+  appName=$(echo "$appName" | sed 's/(Android Automotive)//g; s/(Wear OS)//g; s/(Daydream)//g' | xargs)
   versionLink=$(jq -r ".data[] | select(.pname == \"$PKG_NAME\") | .release.link" <<< "$RESPONSE_JSON" | grep -Eo "/apk/[^\"']+" | grep "/apk/.*$second_last_segment" | head -n 1 | sed -E 's/-[0-9].*//')
-  selectedApp=$(basename "$versionLink" | sed 's/-android-automotive//g; s/-wear-os//g')  # google-chrome
+  selectedApp=$(basename "$versionLink" | sed 's/-android-automotive//g; s/-wear-os//g; s/-daydream//g')  # google-chrome
   if [ "$VERSION" != "null" ] && [ -n "$VERSION" ]; then
     VERSION=$(echo "$VERSION" | tr '.' '-')
     version_link="${appLink}${selectedApp}-${VERSION}-release/"
