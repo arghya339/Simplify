@@ -19,8 +19,8 @@ Reset="\033[0m"
 # --- Global Veriable ---
 Android=$(getprop ro.build.version.release)  # Get Android version
 cpuAbi=$(getprop ro.product.cpu.abi)  # Get Android arch
-serial=$(su -c 'getprop ro.serialno')  # Get Serial Number required root
-model=$(getprop ro.product.model)  # Get Device Model
+Serial=$(su -c 'getprop ro.serialno')  # Get Serial Number required root
+Model=$(getprop ro.product.model)  # Get Device Model
 Simplify="$HOME/Simplify"
 RVX="$Simplify/RVX"
 SimplUsr="/sdcard/Simplify"
@@ -28,6 +28,12 @@ mkdir -p "$Simplify" "$RVX" "$SimplUsr"
 Download="/sdcard/Download"
 rvxBugReportUrl="https://github.com/kitadai31/revanced-patches-android6-7/issues/new?template=bug_report.yml"
 rvxa6_7BugReportUrl="https://github.com/inotia00/ReVanced_Extended/issues/new?template=bug-report.yml"
+
+# --- Checking Android Version ---
+if [ $Android -le 4 ]; then
+  echo -e "${bad} ${Red}Android $Android is not supported by RVX Patches.${Reset}"
+  return 1
+fi
 
 # --- Termux SuperUser Permission Check ---
 if su -c "id" >/dev/null 2>&1; then
@@ -37,6 +43,8 @@ else
   echo -e "$notice Please open the Magisk/KernelSU/APatch app and manually grant root permissions to Termux."
   return 1
 fi
+
+echo -e "$info ${Blue}Target device:${Reset} $Model ($Serial)"
 
 # --- Check if CorePatch Installed ---
 checkCoreLSPosed() {
@@ -62,8 +70,6 @@ checkCoreLSPosed() {
   fi
 }
 
-echo -e "$info ${Blue}Target device:${Reset} $model ($serial)"
-
 # --- Generate ripLib ---
 all_arch="arm64-v8a armeabi-v7a x86_64 x86"
 # --- Generate ripLib arguments for all ABIs EXCEPT the detected one ---
@@ -77,12 +83,6 @@ for current_arch in $all_arch; do
     fi
   fi
 done
-
-# --- Checking Android Version ---
-if [ $Android -le 8 ]; then
-  echo -e "${bad} ${Red}Android $Android is not supported by RVXCoreLSPosed Patches.${Reset}"
-  return 1
-fi
 
 bash $Simplify/dlGitHub.sh "inotia00" "revanced-cli" "latest" ".jar" "$RVX"
 ReVancedCLIJar=$(find "$RVX" -type f -name "revanced-cli-*-all.jar" -print -quit)
@@ -210,10 +210,14 @@ build_app() {
       case $opt in
         I*|i*|"")
           checkCoreLSPosed  # Call the check core patch functions
+          Type="APK"
+          Arch="universal"
+          bash $Simplify/APKMdl.sh "$pkgName" "$pkgVersion" "$Type" "$Arch"
+          stock_apk_path="$Download/${appName}_v${pkgVersion}-$Arch.apk"
           echo -e "$running Copy signature from $appName.."
-          cs "$youtube_apk_path" "$outputAPK" "$SimplUsr/$appName-RVX-CS_v${pkgVersion}-$cpuAbi.apk"
+          cs "$stock_apk_path" "$outputAPK" "$SimplUsr/$appName-RVX-CS_v${pkgVersion}-$Arch.apk"
           echo -e "$running Please Wait !! Installing Patched $appName RVX CS apk.."
-          bash $Simplify/apkInstall.sh "$SimplUsr/$appName-RVX-CS_v${pkgVersion}-$cpuAbi.apk" "$pkgName" ""
+          bash $Simplify/apkInstall.sh "$SimplUsr/$appName-RVX-CS_v${pkgVersion}-$Arch.apk" "$pkgName" ""
           ;;
         M*|m*)
           echo -e "$running Please Wait !! Mounting Patched $appName RVX apk.."
@@ -279,7 +283,7 @@ while true; do
 
   # Ask for an index, showing the valid range
   max=$(( ${#apps[@]} - 1 ))  # highest legal index
-  read -rp "Enter the index [0-${max}] of apps you want to patch or 'Q' to Quit: " idx
+  read -rp "Enter the index [0-${max}] of apps you want to patch or '0' to Quit: " idx
 
   # Validate and respond
   if [ "$idx" == 0 ]; then
@@ -353,4 +357,4 @@ while true; do
       ;;
   esac  
 done
-########################################################################################################################################################
+#############################################################################################################################################################

@@ -21,7 +21,7 @@ Reset="\033[0m"
 # --- Global Variables ---
 Android=$(getprop ro.build.version.release)  # Get Android version
 cpuAbi=$(getprop ro.product.cpu.abi)  # Get Android arch
-model=$(getprop ro.product.model)  # Get Device Model
+Model=$(getprop ro.product.model)  # Get Device Model
 Simplify="$HOME/Simplify"  # /data/data/com.termux/files/home/Simplify dir
 RV="$Simplify/RV"
 RVX="$Simplify/RVX"
@@ -29,7 +29,13 @@ SimplUsr="/sdcard/Simplify"  # /storage/emulated/0/Simplify dir
 mkdir -p "$Simplify" "$RV" "$RVX" "$SimplUsr"  # Create $Simplify, $RV, $RVX and $SimplUsr dir if it does't exist
 Download="/sdcard/Download"  # Download dir
 
-echo -e "$info ${Blue}Target device:${Reset} $model"
+# --- Checking Android Version ---
+if [ $Android -le 4 ]; then
+  echo -e "${bad} ${Red}Android $Android is not supported by ReVanced Patches.${Reset}"
+  return 1
+fi
+
+echo -e "$info ${Blue}Target device:${Reset} $Model"
 
 bash $Simplify/dlGitHub.sh "inotia00" "revanced-cli" "latest" ".jar" "$RVX"
 ReVancedCLIJar=$(find "$RVX" -type f -name "revanced-cli-*-all.jar" -print -quit)
@@ -149,7 +155,6 @@ build_app() {
   local log=$10
   local pkgPatches=$11
   local activityPatches=$12
-  local VancedMicroG=$13
   
 
   if [ "$web" == "APKMirror" ]; then
@@ -261,7 +266,7 @@ while true; do
       log="$SimplUsr/yt-rv-patch_log.txt"
       pkgPatches="app.revanced.android.youtube"
       activityPatches="com.google.android.apps.youtube.app.watchwhile.MainActivity"
-      build_app "$pkgName" "$appName" "$pkgVersion" "$Type" "$Arch" "APKMirror" "$youtube_apk_path" "yt_patches_args" "$outputAPK" "$log" "$pkgPatches" "$activityPatches" "$VancedMicroG"
+      build_app "$pkgName" "$appName" "$pkgVersion" "$Type" "$Arch" "APKMirror" "$youtube_apk_path" "yt_patches_args" "$outputAPK" "$log" "$pkgPatches" "$activityPatches"
       ;;
     Spotify)
       pkgName="com.spotify.music"
@@ -290,7 +295,7 @@ while true; do
       outputAPK="$SimplUsr/spotify-rv_v${pkgVersion}-$cpuAbi.apk"
       log="$SimplUsr/spotify-rv-patch_log.txt"
       activityPatches="com.spotify.music.MainActivity"
-      build_app "$pkgName" "$appName" "$pkgVersion" "$Type" "$Arch" "Uptodown" "$spotify_apk_path" "spotify_patches_args" "$outputAPK" "$log" "$pkgName" "$activityPatches" ""
+      build_app "$pkgName" "$appName" "$pkgVersion" "$Type" "$Arch" "Uptodown" "$spotify_apk_path" "spotify_patches_args" "$outputAPK" "$log" "$pkgName" "$activityPatches"
       ;;
     TikTok)
       pkgName="com.zhiliaoapp.musically"
@@ -307,8 +312,8 @@ while true; do
       outputAPK="$SimplUsr/tiktok-rv_v${pkgVersion}-$cpuAbi.apk"
       log="$SimplUsr/tiktok-rv-patch_log.txt"
       activityPatches="com.ss.android.ugc.aweme.main.MainActivity"
-      build_app "$pkgName" "$appName" "$pkgVersion" "$Type" \"$Arch\" "APKMirror" "$tiktok_apk_path" "tiktok_patches_args" "$outputAPK" "$log" "$pkgName" "$activityPatches" ""
+      build_app "$pkgName" "$appName" "$pkgVersion" "$Type" \"${Arch}\" "APKMirror" "$tiktok_apk_path" "tiktok_patches_args" "$outputAPK" "$log" "$pkgName" "$activityPatches"
       ;;
   esac  
 done
-##########################################################################################################################################################################
+##############################################################################################################################################################################
