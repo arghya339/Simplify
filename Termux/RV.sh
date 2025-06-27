@@ -148,7 +148,7 @@ build_app() {
   local Type=$4
   local -n archRef=$5
   local web=$6
-  local stock_apk_path=$7
+  local -n stock_apk_path=$7
   local appPatchesArgs=$8
   local outputAPK=$9
   local fileName=$(basename $outputAPK)
@@ -164,10 +164,10 @@ build_app() {
     #bash $Simplify/dlUptodown.sh "$appName" "$pkgVersion" "$Type" "${archRef[0]}"  # Download stock apk from Uptodown
   fi
   
-  if [ -f "$stock_apk_path" ]; then
-    echo -e "$good ${Green}Downloaded $appName APK found:${Reset} $stock_apk_path"
+  if [ -f "${stock_apk_path[0]}" ]; then
+    echo -e "$good ${Green}Downloaded $appName APK found:${Reset} ${stock_apk_path[0]}"
     echo -e "$running Patching $appName RVX.."
-    patch_app "$stock_apk_path" "$appPatchesArgs" "$outputAPK" "$log" "$appName" "$bugReportUrl"
+    patch_app "${stock_apk_path[0]}" "$appPatchesArgs" "$outputAPK" "$log" "$appName" "$bugReportUrl"
   fi
   
   if [ -f "$outputAPK" ]; then
@@ -261,12 +261,12 @@ while true; do
       fi
       Type="BUNDLE"
       Arch=("universal")
-      youtube_apk_path="$Download/YouTube_v${pkgVersion}-$cpuAbi.apk"
+      youtube_apk_path=("$Download/YouTube_v${pkgVersion}-$cpuAbi.apk")
       outputAPK="$SimplUsr/youtube-rv_v${pkgVersion}-$cpuAbi.apk"
       log="$SimplUsr/yt-rv-patch_log.txt"
       pkgPatches="app.revanced.android.youtube"
       activityPatches="com.google.android.apps.youtube.app.watchwhile.MainActivity"
-      build_app "$pkgName" "$appName" "$pkgVersion" "$Type" "Arch" "APKMirror" "$youtube_apk_path" "yt_patches_args" "$outputAPK" "$log" "$pkgPatches" "$activityPatches"
+      build_app "$pkgName" "$appName" "$pkgVersion" "$Type" "Arch" "APKMirror" "youtube_apk_path" "yt_patches_args" "$outputAPK" "$log" "$pkgPatches" "$activityPatches"
       ;;
     Spotify)
       pkgName="com.spotify.music"
@@ -278,7 +278,7 @@ while true; do
         if [ ! -f "$Download/Spotify_v${pkgVersion}-$Arch.apk" ]; then
           curl -L --progress-bar -C - -o "$Download/Spotify_v${pkgVersion}-$Arch.apk" "https://github.com/arghya339/apk-me/releases/download/SpotifyRV_v9.0.28.630-5.16.0/spotify-revanced_v8.6.98.900-5.21.0-5-all.apk"  # https://spotify.en.uptodown.com/android/download/4283531
         fi
-        spotify_apk_path="$Download/Spotify_v${pkgVersion}-$Arch.apk"
+        spotify_apk_path=("$Download/Spotify_v${pkgVersion}-${Arch[0]}.apk")
       elif [ $Android -ge 8 ]; then
         pkgVersion="9.0.28.630"
         if [ -z "$pkgVersion" ]; then
@@ -290,12 +290,12 @@ while true; do
         if [ ! -f "$Download/Spotify_v${pkgVersion}-$cpuAbi.apk" ];then
           curl -L --progress-bar -C - -o "$Download/Spotify_v${pkgVersion}-$cpuAbi.apk" "https://github.com/arghya339/apk-me/releases/download/SpotifyRV_v9.0.28.630-5.16.0/Spotify_v9.0.28.630-125833530-${cpuAbi}.apk"
         fi
-        spotify_apk_path="$Download/Spotify_v${pkgVersion}-$cpuAbi.apk"
+        spotify_apk_path=("$Download/Spotify_v${pkgVersion}-$cpuAbi.apk")
       fi
       outputAPK="$SimplUsr/spotify-rv_v${pkgVersion}-$cpuAbi.apk"
       log="$SimplUsr/spotify-rv-patch_log.txt"
       activityPatches="com.spotify.music.MainActivity"
-      build_app "$pkgName" "$appName" "$pkgVersion" "$Type" "Arch" "Uptodown" "$spotify_apk_path" "spotify_patches_args" "$outputAPK" "$log" "$pkgName" "$activityPatches"
+      build_app "$pkgName" "$appName" "$pkgVersion" "$Type" "Arch" "Uptodown" "spotify_apk_path" "spotify_patches_args" "$outputAPK" "$log" "$pkgName" "$activityPatches"
       ;;
     TikTok)
       pkgName="com.zhiliaoapp.musically"
@@ -306,13 +306,13 @@ while true; do
         getVersion "$pkgName"
         pkgVersion="$pkgVersion"
       fi
-      Type="BUNDLE"
+      Type="APK"
       Arch=("arm64-v8a + armeabi-v7a")
-      tiktok_apk_path="$Download/TikTok_v${pkgVersion}-$cpuAbi.apk"
+      tiktok_apk_path=("$Download/TikTok_v${pkgVersion}-${Arch[0]}.apk")
       outputAPK="$SimplUsr/tiktok-rv_v${pkgVersion}-$cpuAbi.apk"
       log="$SimplUsr/tiktok-rv-patch_log.txt"
       activityPatches="com.ss.android.ugc.aweme.main.MainActivity"
-      build_app "$pkgName" "$appName" "$pkgVersion" "$Type" "Arch" "APKMirror" "$tiktok_apk_path" "tiktok_patches_args" "$outputAPK" "$log" "$pkgName" "$activityPatches"
+      build_app "$pkgName" "$appName" "$pkgVersion" "$Type" "Arch" "APKMirror" "tiktok_apk_path" "tiktok_patches_args" "$outputAPK" "$log" "$pkgName" "$activityPatches"
       ;;
   esac  
 done
