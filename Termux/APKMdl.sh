@@ -82,6 +82,9 @@ APKMdl() {
   if [ "$VERSION" != "null" ] && [ -n "$VERSION" ]; then
     VERSION=$(echo "$VERSION" | tr '.' '-')
     version_link="${appLink}${selectedApp}-${VERSION}-release/"
+    if ! curl -sL --doh-url "$cloudflareDOH" -A "$USER_AGENT" -H "Referer: https://www.apkmirror.com/" --head --silent --fail "$version_link" >/dev/null 2>&1; then
+      version_link="${appLink}${second_last_segment}-${VERSION}-release/"
+    fi
     VERSION=$(echo "$VERSION" | tr '-' '.')
   elif [ "$VERSION" == "null" ] || [ -z "$VERSION" ]; then
     version_link="https://www.apkmirror.com$(jq -r ".data[] | select(.pname == \"$PKG_NAME\") | .release.link" <<< "$RESPONSE_JSON")"
