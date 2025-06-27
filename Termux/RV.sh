@@ -148,6 +148,14 @@ instagram_patches_args=(
   -e "Change package name" -OackageName="com.instagram.android"
 )
 
+facebook_patches_args=(
+  -e "Change package name" -OackageName="com.facebook.katana"
+)
+
+fb_messenger_patches_args=(
+  -e "Change package name" -OackageName="com.facebook.orca"
+)
+
 # --- Build App ---
 build_app() {
   # local variables
@@ -227,14 +235,22 @@ build_app() {
   Google Photos 5.0+
   Instagram arm64 + x64 9.0+
   Instagram arm32 + x86 7.0+
+  Facebook arm64 + x64 9.0+
+  Facebook arm32 + x86 8.0+
+  Facebook Messenger arm64 + x64 9.0+
+  Facebook Messenger arm32 + x86 5.0+
 comment
 
 if  [[ $Android -ge 9  &&  ( "$cpuAbi" == "arm64-v8a" || "$cpuAbi" == "x86_64" ) ]]; then
   Instagram="Instagram"
-elif [[ $Android -eq 8  &&  ( "$cpuAbi" == "armeabi-v7a" || "$cpuAbi" == "x86" ) ]]; then
+  Facebook="Facebook"
+  fbMessenger=("Facebook Messenger")
+elif [[ $Android -ge 8  &&  ( "$cpuAbi" == "armeabi-v7a" || "$cpuAbi" == "x86" ) ]]; then
+  Facebook="Facebook"
+elif [[ $Android -ge 7  &&  ( "$cpuAbi" == "armeabi-v7a" || "$cpuAbi" == "x86" ) ]]; then
   Instagram="Instagram"
-elif [[ $Android -eq 7  &&  ( "$cpuAbi" == "armeabi-v7a" || "$cpuAbi" == "x86" ) ]]; then
-  Instagram="Instagram"
+elif [[ $Android -ge 5  &&  ( "$cpuAbi" == "armeabi-v7a" || "$cpuAbi" == "x86" ) ]]; then
+  fbMessenger=("Facebook Messenger")
 fi
 
 # Define the array
@@ -246,6 +262,8 @@ if [ $Android -ge 9 ]; then
     TikTok
     Google\ Photos
     "$Instagram"
+    "$Facebook"
+    "${fbMessenger[0]}"
   )
 elif [ $Android -eq 8 ]; then
   apps=(
@@ -255,6 +273,8 @@ elif [ $Android -eq 8 ]; then
     TikTok
     Google\ Photos
     "$Instagram"
+    "$Facebook"
+    "${fbMessenger[0]}"
   )
 elif [ $Android -eq 7 ]; then
   apps=(
@@ -263,18 +283,21 @@ elif [ $Android -eq 7 ]; then
     TikTok
     Google\ Photos
     "$Instagram"
+    "${fbMessenger[0]}"
   )
 elif [ $Android -eq 6 ]; then
   apps=(
     Quit
     TikTok
     Google\ Photos
+    "${fbMessenger[0]}"
   )
 elif [ $Android -eq 5 ]; then
   apps=(
     Quit
     TikTok
     Google\ Photos\ Android\ 5.0+
+    "${fbMessenger[0]}"
   )
 fi
 
@@ -410,6 +433,40 @@ while true; do
       activityPatches="com.instagram.android.activity.MainTabActivity"
       build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "APKMirror" "instagram_apk_path" "instagram_patches_args" "$outputAPK" "$log" "$pkgName" "$activityPatches"
       ;;
+    Facebook)
+      pkgName="com.facebook.katana"
+      appName=("Facebook")
+      pkgVersion="490.0.0.63.82"
+      #pkgVersion=""
+      if [ -z "$pkgVersion" ]; then
+        getVersion "$pkgName"
+        pkgVersion="$pkgVersion"
+      fi
+      Type="APK"
+      Arch=("$cpuAbi")
+      facebook_apk_path=("$Download/Facebook_v${pkgVersion}-${Arch[0]}.apk")
+      outputAPK="$SimplUsr/facebook-rv_v${pkgVersion}-$cpuAbi.apk"
+      log="$SimplUsr/facebook-rv-patch_log.txt"
+      activityPatches="com.facebook.katana.LoginActivity"
+      build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "APKMirror" "facebook_apk_path" "facebook_patches_args" "$outputAPK" "$log" "$pkgName" "$activityPatches"
+      ;;
+    Facebook\ Messenger)
+      pkgName="com.facebook.orca"
+      appName=("Facebook Messenger")
+      pkgVersion="381.0.0.17.102"
+      #pkgVersion=""
+      if [ -z "$pkgVersion" ]; then
+        getVersion "$pkgName"
+        pkgVersion="$pkgVersion"
+      fi
+      Type="APK"
+      Arch=("$cpuAbi")
+      fb_messenger_apk_path=("$Download/Facebook Messenger_v${pkgVersion}-${Arch[0]}.apk")
+      outputAPK="$SimplUsr/fb-messenger-rv_v${pkgVersion}-$cpuAbi.apk"
+      log="$SimplUsr/fb-messenger-rv-patch_log.txt"
+      activityPatches="com.facebook.orca.auth.StartScreenActivity"
+      build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "APKMirror" "fb_messenger_apk_path" "fb_messenger_patches_args" "$outputAPK" "$log" "$pkgName" "$activityPatches"
+      ;;
   esac  
 done
-##########################################################################################################################################################################
+###################################################################################################################################################################################
