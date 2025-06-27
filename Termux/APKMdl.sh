@@ -124,26 +124,37 @@ APKMdl() {
   if [ ${#parsed_rows[@]} -eq 0 ]; then
     echo -e "$bad No valid variants found!"
     return 1
-  fi
-  
-  # Filter variants based on both TYPE and ARCH parameters
-  # Use a loop with indices to print the row number
-  for i in "${!parsed_rows[@]}"; do
-    IFS=$'\t' read -r type arch link <<< "${parsed_rows[$i]}"
-    # Print the row number here (using $i)
+  elif [ ${#parsed_rows[@]} -eq 1 ]; then
+    # Automatically select the single variant found
+    IFS=$'\t' read -r type arch link <<< "${parsed_rows[0]}"
     echo -e "[$i] ${Blue}Type: $type | Arch: $arch | Link: $link${Reset}"
+    found_type="$type"
+    found_arch="$arch"
+    found_link="$link"
+    echo -e "$notice Only one variant found! auto selected:"
+    echo "Type    : $found_type"
+    echo "Arch    : $found_arch"
+    echo -e "Link    : ${Blue}$found_link${Reset}"
+  else
+    # Filter variants based on both TYPE and ARCH parameters
+    # Use a loop with indices to print the row number
+    for i in "${!parsed_rows[@]}"; do
+      IFS=$'\t' read -r type arch link <<< "${parsed_rows[$i]}"
+      # Print the row number here (using $i)
+      echo -e "[$i] ${Blue}Type: $type | Arch: $arch | Link: $link${Reset}"
     
-    if [[ "$type" == "$TYPE" ]] && [[ "$arch" == "$ARCH" ]]; then
+      if [[ "$type" == "$TYPE" ]] && [[ "$arch" == "$ARCH" ]]; then
         found_type="$type"
         found_arch="$arch"
         found_link="$link"
-        echo -e "$info selectedAppVeriant:"
+        echo -e "$info autoSelectedVeriant:"
         echo "Type    : $found_type" # Print selected Type
         echo "Arch    : $found_arch"
         echo -e "Link    : ${Blue}$found_link${Reset}"
         break # Exit the loop once a match is found
-    fi
-  done
+      fi
+    done
+  fi
 
   # Check if a variant was found
   if [ -z "$found_type" ]; then
