@@ -139,11 +139,16 @@ tiktok_patches_args=(
   -e "Change package name" -OackageName="com.zhiliaoapp.musically"
 )
 
+photos_patches_args=(
+  -e "GmsCore support" -OgmsCoreVendorGroupId="com.mgoogle"
+  -e "Change package name" -OackageName="app.revanced.android.apps.photos"
+)
+
 # --- Build App ---
 build_app() {
   # local variables
   local pkgName=$1
-  local appName=$2
+  local -n appNameRef=$2
   local pkgVersion=$3
   local Type=$4
   local -n archRef=$5
@@ -161,13 +166,13 @@ build_app() {
     bash $Simplify/APKMdl.sh "$pkgName" "$pkgVersion" "$Type" "${archRef[0]}"  # Download stock apk from APKMirror
   else
     echo -e "$notice dlUptodown.sh not implement yeat!"
-    #bash $Simplify/dlUptodown.sh "$appName" "$pkgVersion" "$Type" "${archRef[0]}"  # Download stock apk from Uptodown
+    #bash $Simplify/dlUptodown.sh "${appNameRef[0]}" "$pkgVersion" "$Type" "${archRef[0]}"  # Download stock apk from Uptodown
   fi
   
   if [ -f "${stock_apk_path[0]}" ]; then
-    echo -e "$good ${Green}Downloaded $appName APK found:${Reset} ${stock_apk_path[0]}"
-    echo -e "$running Patching $appName RVX.."
-    patch_app "stock_apk_path" "$appPatchesArgs" "$outputAPK" "$log" "$appName" "$bugReportUrl"
+    echo -e "$good ${Green}Downloaded ${appNameRef[0]} APK found:${Reset} ${stock_apk_path[0]}"
+    echo -e "$running Patching ${appNameRef[0]} RVX.."
+    patch_app "stock_apk_path" "$appPatchesArgs" "$outputAPK" "$log" "${appNameRef[0]}" "$bugReportUrl"
   fi
   
   if [ -f "$outputAPK" ]; then
@@ -185,48 +190,66 @@ build_app() {
       esac
     fi
 
-    echo -e "[?] ${Yellow}Do you want to install $appName RVX app? [Y/n] ${Reset}\c" && read opt
+    echo -e "[?] ${Yellow}Do you want to install ${appNameRef[0]} RVX app? [Y/n] ${Reset}\c" && read opt
     case $opt in
       y*|Y*|"")
-        echo -e "$running Please Wait !! Installing Patched $appName RVX apk.."
+        echo -e "$running Please Wait !! Installing Patched ${appNameRef[0]} RVX apk.."
         bash $Simplify/apkInstall.sh "$outputAPK" "$pkgPatches" "$activityPatches"
         ;;
-      n*|N*) echo -e "$notice $appName RVX Installaion skipped!" ;;
-      *) echo -e "$info Invalid choice! $appName RVX Installaion skipped." ;;
+      n*|N*) echo -e "$notice ${appNameRef[0]} RVX Installaion skipped!" ;;
+      *) echo -e "$info Invalid choice! ${appNameRef[0]} RVX Installaion skipped." ;;
     esac
     
-    echo -e "[?] ${Yellow}Do you want to Share $appName RVX app? [Y/n] ${Reset}\c" && read opt
+    echo -e "[?] ${Yellow}Do you want to Share ${appNameRef[0]} RVX app? [Y/n] ${Reset}\c" && read opt
     case $opt in
       y*|Y*|"")
-        echo - e"$running Please Wait !! Sharing Patched $appName RVX apk.."
+        echo - e"$running Please Wait !! Sharing Patched ${appNameRef[0]} RVX apk.."
         termux-open --send "$outputAPK"
         ;;
-      n*|N*) echo -e "$notice $appName RVX Sharing skipped!"
+      n*|N*) echo -e "$notice ${appNameRef[0]} RVX Sharing skipped!"
         echo -e "$info Locate '$fileName' in '/sdcard/Simplify/' dir, Share it with your Friends and Family ;)"
         ;;
-        *) echo -e "$info Invalid choice! $appName RVX Sharing skipped." ;;
+        *) echo -e "$info Invalid choice! ${appNameRef[0]} RVX Sharing skipped." ;;
     esac
   
   fi
 }
 
+# Req
+<<comment
+  YouTube 8.0+
+  Spotify 7.0+
+  TikTok 5.0+
+  Google Photos 5.0+
+comment
+
 # Define the array
-if [ $Android -ge 5 ]; then
+if [ $Android -ge 8 ]; then
   apps=(
     Quit
     YouTube
     Spotify
     TikTok
+    Google\ Photos
   )
 elif [ $Android -eq 7 ]; then
   apps=(
     Quit
     Spotify
+    TikTok
+    Google\ Photos
+  )
+elif [ $Android -eq 6 ]; then
+  apps=(
+    Quit
+    TikTok
+    Google\ Photos
   )
 elif [ $Android -eq 5 ]; then
   apps=(
     Quit
     TikTok
+    Google\ Photos\ Android\ 5.0+
   )
 fi
 
@@ -253,7 +276,7 @@ while true; do
   case ${apps[$idx]} in
     YouTube)
       pkgName="com.google.android.youtube"
-      appName="YouTube"
+      appName=("YouTube")
       #pkgVersion="20.13.41"
       if [ -z "$pkgVersion" ]; then
         getVersion "$pkgName"
@@ -266,11 +289,11 @@ while true; do
       log="$SimplUsr/yt-rv-patch_log.txt"
       pkgPatches="app.revanced.android.youtube"
       activityPatches="com.google.android.apps.youtube.app.watchwhile.MainActivity"
-      build_app "$pkgName" "$appName" "$pkgVersion" "$Type" "Arch" "APKMirror" "youtube_apk_path" "yt_patches_args" "$outputAPK" "$log" "$pkgPatches" "$activityPatches"
+      build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "APKMirror" "youtube_apk_path" "yt_patches_args" "$outputAPK" "$log" "$pkgPatches" "$activityPatches"
       ;;
     Spotify)
       pkgName="com.spotify.music"
-      appName="Spotify"
+      appName=("Spotify")
       if [ $Android -eq 7 ]; then
         pkgVersion="8.6.98.900"
         Type="xapk"
@@ -295,11 +318,11 @@ while true; do
       outputAPK="$SimplUsr/spotify-rv_v${pkgVersion}-$cpuAbi.apk"
       log="$SimplUsr/spotify-rv-patch_log.txt"
       activityPatches="com.spotify.music.MainActivity"
-      build_app "$pkgName" "$appName" "$pkgVersion" "$Type" "Arch" "Uptodown" "spotify_apk_path" "spotify_patches_args" "$outputAPK" "$log" "$pkgName" "$activityPatches"
+      build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "Uptodown" "spotify_apk_path" "spotify_patches_args" "$outputAPK" "$log" "$pkgName" "$activityPatches"
       ;;
     TikTok)
       pkgName="com.zhiliaoapp.musically"
-      appName="TikTok"
+      appName=("TikTok")
       #pkgVersion="36.5.4"
       pkgVersion=""
       if [ -z "$pkgVersion" ]; then
@@ -312,8 +335,39 @@ while true; do
       outputAPK="$SimplUsr/tiktok-rv_v${pkgVersion}-$cpuAbi.apk"
       log="$SimplUsr/tiktok-rv-patch_log.txt"
       activityPatches="com.ss.android.ugc.aweme.main.MainActivity"
-      build_app "$pkgName" "$appName" "$pkgVersion" "$Type" "Arch" "APKMirror" "tiktok_apk_path" "tiktok_patches_args" "$outputAPK" "$log" "$pkgName" "$activityPatches"
+      build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "APKMirror" "tiktok_apk_path" "tiktok_patches_args" "$outputAPK" "$log" "$pkgName" "$activityPatches"
+      ;;
+    Google\ Photos)
+      pkgName="com.google.android.apps.photos"
+      appName=("Google Photos")
+      pkgVersion="6.95.0.663027175"
+      #pkgVersion=""
+      if [ -z "$pkgVersion" ]; then
+        getVersion "$pkgName"
+        pkgVersion="$pkgVersion"
+      fi
+      Type="APK"
+      Arch=("$cpuAbi")
+      photos_apk_path=("$Download/Google Photos_v${pkgVersion}-${Arch[0]}.apk")
+      outputAPK="$SimplUsr/google-photos-rv_v${pkgVersion}-$cpuAbi.apk"
+      log="$SimplUsr/google-photos-rv-patch_log.txt"
+      pkgPatches="app.revanced.android.apps.photos"
+      activityPatches="com.google.android.apps.photos.home.HomeActivity"
+      build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "APKMirror" "photos_apk_path" "photos_patches_args" "$outputAPK" "$log" "$pkgPatches" "$activityPatches"
+      ;;
+    Google\ Photos\ Android\ 5.0+)
+      pkgName="com.google.android.apps.photos"
+      appName=("Google Photos")
+      pkgVersion="5.78.0.430249291"
+      Type="APK"
+      Arch=("$cpuAbi")
+      photos_apk_path=("$Download/Google Photos_v${pkgVersion}-${Arch[0]}.apk")
+      outputAPK="$SimplUsr/google-photos-rv_v${pkgVersion}-$cpuAbi.apk"
+      log="$SimplUsr/google-photos-rv-patch_log.txt"
+      pkgPatches="app.revanced.android.apps.photos"
+      activityPatches="com.google.android.apps.photos.home.HomeActivity"
+      build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "APKMirror" "photos_apk_path" "photos_patches_args" "$outputAPK" "$log" "$pkgPatches" "$activityPatches"
       ;;
   esac  
 done
-##############################################################################################################################################################################
+##########################################################################################################################################################################
