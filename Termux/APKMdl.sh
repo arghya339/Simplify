@@ -257,7 +257,11 @@ APKMdl() {
       echo
     fi
   else
-    echo -e "$notice Download skiped! '${appName}_v${VERSION}-${cpuAbi}.apk' already exist."
+    if [ "$Type" == "BUNDLE" ]; then
+      echo -e "$notice Download skiped! '${appName}_v${VERSION}-${cpuAbi}.apk' already exist."
+    else
+      echo -e "$notice Download skiped! '${appName}_v${VERSION}-${Arch}.apk' already exist."
+    fi
     echo  # Space
   fi
 }
