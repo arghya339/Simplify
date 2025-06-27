@@ -117,13 +117,13 @@ patch_app() {
   local Url=$6
   
   $PREFIX/lib/jvm/java-21-openjdk/bin/java -jar $ReVancedCLIJar patch -p $PatchesRvp \
-    -o "$outputAPK" $stock_apk_path \
+    -o "$outputAPK" "$stock_apk_path" \
     "${patches[@]}" \
     -e "Change version code" -OversionCode="2147483647" \
     --custom-aapt2-binary="$HOME/aapt2" \
     --purge $ripLib -f | tee "$log"
   
-  if [ ! -f "$outputAPK" ] && [ -f $stock_apk_path ]; then
+  if [ ! -f "$outputAPK" ] && [ -f "$stock_apk_path" ]; then
     echo -e "$bad Oops, $appName Patching failed !! Logs saved to "$log". Share the Patchlog to developer."
     termux-open-url "$Url"
     termux-open --send "$log"
@@ -170,6 +170,8 @@ build_app() {
   local Type=$3
   local Arch=$4
   local stock_apk_path=$5
+  local stockFileName=$(basename "$stock_apk_path")
+  echo -e "$info DEBUG: stock_apk_path: $stock_apk_path, stockFileName: $stockFileName"
   local appPatchesArgs=$6
   local outputAPK=$7
   local fileName=$(basename $outputAPK)
@@ -182,10 +184,16 @@ build_app() {
   
   bash $Simplify/APKMdl.sh "$pkgName" "$pkgVersion" "$Type" "$Arch"  # Download stock apk from APKMirror
   
-  if [ -f \"$stock_apk_path\" ]; then
+  if [ -f "$stock_apk_path" ]; then
     echo -e "$good ${Green}Downloaded $appName APK found:${Reset} $stock_apk_path"
     echo -e "$running Patching $appName RVX.."
-    patch_app \"$stock_apk_path\" "$appPatchesArgs" "$outputAPK" "$log" "$appName" "$bugReportUrl"
+    patch_app "$stock_apk_path" "$appPatchesArgs" "$outputAPK" "$log" "$appName" "$bugReportUrl"
+  fi
+  echo -e "$info DEBUG: stockFile: $Download/\"$stockFileName\""
+  if [ -f "$Download/\"$stockFileName\"" ]; then
+    echo -e "$good ${Green}Downloaded $appName APK found:${Reset} $Download/\"$stockFileName\""
+    echo -e "$running Patching $appName RVX.."
+    patch_app "$Download/\"$stockFileName\"" "$appPatchesArgs" "$outputAPK" "$log" "$appName" "$bugReportUrl"
   fi
   
   if [ -f "$outputAPK" ]; then
