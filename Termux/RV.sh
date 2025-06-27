@@ -94,20 +94,20 @@ getVersion() {
 
 #  --- Patch Apps ---
 patch_app() {
-  local stock_apk_path=$1
+  local -n stock_apk_ref=$1
   local -n patches=$2  # nameref (-n) accept an array name as parameter
   local outputAPK=$3
   local log=$4
   local appName=$5
   
   $PREFIX/lib/jvm/java-21-openjdk/bin/java -jar $ReVancedCLIJar patch -p $PatchesRvp \
-    -o "$outputAPK" $stock_apk_path \
+    -o "$outputAPK" "${stock_apk_ref[0]}" \
     "${patches[@]}" \
     -e "Change version code" -OversionCode="2147483647" -e "Disable Pairip license check" -e "Predictive back gesture" -e "Remove share targets" \
     --custom-aapt2-binary="$HOME/aapt2" \
     --purge $ripLib -f | tee "$log"
   
-  if [ ! -f "$outputAPK" ] && [ -f $stock_apk_path ]; then
+  if [ ! -f "$outputAPK" ] && [ -f "${stock_apk_ref[0]}" ]; then
     echo -e "$bad Oops, $appName Patching failed !! Logs saved to "$log". Share the Patchlog to developer."
     termux-open-url "https://github.com/ReVanced/revanced-patches/issues/new?template=bug_report.yml"
     termux-open --send "$log"
@@ -167,7 +167,7 @@ build_app() {
   if [ -f "${stock_apk_path[0]}" ]; then
     echo -e "$good ${Green}Downloaded $appName APK found:${Reset} ${stock_apk_path[0]}"
     echo -e "$running Patching $appName RVX.."
-    patch_app "${stock_apk_path[0]}" "$appPatchesArgs" "$outputAPK" "$log" "$appName" "$bugReportUrl"
+    patch_app "stock_apk_path" "$appPatchesArgs" "$outputAPK" "$log" "$appName" "$bugReportUrl"
   fi
   
   if [ -f "$outputAPK" ]; then
