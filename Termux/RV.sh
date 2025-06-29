@@ -348,21 +348,15 @@ while true; do
     Spotify)
       pkgName="com.spotify.music"
       appName=("Spotify")
-      if [ $Android -eq 7 ]; then
-        pkgVersion="8.6.98.900"
-        Type="apk"
-        Arch=("armeabi-v7a, x86, arm64-v8a, x86_64")
-        spotify_apk_path=("$Download/Spotify_v${pkgVersion}-${Arch[0]}.apk")
-      elif [ $Android -ge 8 ]; then
-        pkgVersion="9.0.28.630"
-        if [ -z "$pkgVersion" ]; then
-          getVersion "$pkgName"
-          pkgVersion="$pkgVersion"
-        fi
-        Type="apk"
-        Arch=("arm64-v8a, armeabi-v7a, x86, x86_64")
-        spotify_apk_path=("$Download/Spotify_v${pkgVersion}-${Arch[0]}.apk")
+      pkgVersion="8.6.98.900"
+      #pkgVersion=""
+      if [ -z "$pkgVersion" ]; then
+        getVersion "$pkgName"
+        pkgVersion="$pkgVersion"
       fi
+      Type="apk"
+      Arch=("armeabi-v7a, x86, arm64-v8a, x86_64")
+      spotify_apk_path=("$Download/Spotify_v${pkgVersion}-${Arch[0]}.apk")
       outputAPK="$SimplUsr/spotify-rv_v${pkgVersion}-$cpuAbi.apk"
       log="$SimplUsr/spotify-rv-patch_log.txt"
       activityPatches="com.spotify.music.MainActivity"
