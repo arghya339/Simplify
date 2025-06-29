@@ -218,7 +218,7 @@ build_app() {
     echo -e "[?] ${Yellow}Do you want to Share ${appNameRef[0]} RVX app? [Y/n] ${Reset}\c" && read opt
     case $opt in
       y*|Y*|"")
-        echo - e"$running Please Wait !! Sharing Patched ${appNameRef[0]} RVX apk.."
+        echo -e "$running Please Wait !! Sharing Patched ${appNameRef[0]} RVX apk.."
         termux-open --send "$outputAPK"
         ;;
       n*|N*) echo -e "$notice ${appNameRef[0]} RVX Sharing skipped!"
