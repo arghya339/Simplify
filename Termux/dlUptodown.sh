@@ -52,7 +52,7 @@ dlUptodown() {
   local Type=$3
   local -n ArchRef=$4
   
-  if [ "$ArchRef" == "universal" ]; then
+  if [ "${ArchRef[0]}" == "universal" ]; then
     ArchRef=("arm64-v8a, armeabi-v7a, x86, x86_64")
   fi
   
