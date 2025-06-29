@@ -478,7 +478,7 @@ while true; do
       fi
       Type="apk"
       Arch=("arm64-v8a")
-      lightroom_apk_path=("$Download/Lightroom_v${pkgVersion}-${Arch[0]}.apk")
+      lightroom_apk_path=("$Download/Adobe Photoshop Lightroom_v${pkgVersion}-${Arch[0]}.apk")
       outputAPK="$SimplUsr/lightroom-rv_v${pkgVersion}-$cpuAbi.apk"
       log="$SimplUsr/lightroom-rv-patch_log.txt"
       activityPatches="com.adobe.lrmobile.StorageCheckActivity"
