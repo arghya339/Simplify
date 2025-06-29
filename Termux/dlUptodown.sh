@@ -106,7 +106,6 @@ dlUptodown() {
   
   # --- SCRAPE DOWNLOAD URL ---
   data_version=$(curl -sL "$versionURL" | grep -oP '<button class="button variants" data-version="\K[^"]+')  # 'ALL VARIANTS' BUTTON ID
-  echo -e "$notice DEBUG - button_variants: $data_version"
   if [ -z "$data_version" ]; then
     data_url=$(curl -sL "$versionURL" | grep -oP 'data-url="\K[^"]+' | head -n1)
     echo -e "$info data_url: ${Cyan}$data_url${Reset}"
