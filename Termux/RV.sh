@@ -469,7 +469,7 @@ while true; do
       ;;
     Lightroom)
       pkgName="com.adobe.lrmobile"
-      appName=("Lightroom")
+      appName=("Adobe Photoshop Lightroom")
       #pkgVersion="10.0.2"
       pkgVersion=""
       if [ -z "$pkgVersion" ]; then
