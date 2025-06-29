@@ -199,6 +199,8 @@ curl -L "https://raw.githubusercontent.com/arghya339/Simplify/refs/heads/main/Te
 
 curl -L "https://raw.githubusercontent.com/arghya339/Simplify/refs/heads/main/Termux/APKMdl.sh" --progress-bar -o $Simplify/APKMdl.sh  > /dev/null 2>&1
 
+curl -L "https://raw.githubusercontent.com/arghya339/Simplify/refs/heads/main/Termux/dlUptodown.sh" --progress-bar -o $Simplify/dlUptodown.sh  > /dev/null 2>&1
+
 curl -L "https://raw.githubusercontent.com/arghya339/Simplify/refs/heads/main/Termux/apkInstall.sh" --progress-bar -o $Simplify/apkInstall.sh  > /dev/null 2>&1
 
 # --- Download branding.zip ---

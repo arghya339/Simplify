@@ -181,8 +181,7 @@ build_app() {
   if [ "$web" == "APKMirror" ]; then
     bash $Simplify/APKMdl.sh "$pkgName" "$pkgVersion" "$Type" "${archRef[0]}"  # Download stock apk from APKMirror
   else
-    echo -e "$notice dlUptodown.sh not implement yeat!"
-    #bash $Simplify/dlUptodown.sh "${appNameRef[0]}" "$pkgVersion" "$Type" "${archRef[0]}"  # Download stock apk from Uptodown
+    bash $Simplify/dlUptodown.sh "${appNameRef[0]}" "$pkgVersion" "$Type" "${archRef[0]}"  # Download stock apk from Uptodown
   fi
   
   if [ -f "${stock_apk_path[0]}" ]; then
@@ -351,11 +350,8 @@ while true; do
       appName=("Spotify")
       if [ $Android -eq 7 ]; then
         pkgVersion="8.6.98.900"
-        Type="xapk"
+        Type="apk"
         Arch=("armeabi-v7a, x86, arm64-v8a, x86_64")
-        if [ ! -f "$Download/Spotify_v${pkgVersion}-$Arch.apk" ]; then
-          curl -L --progress-bar -C - -o "$Download/Spotify_v${pkgVersion}-$Arch.apk" "https://github.com/arghya339/apk-me/releases/download/SpotifyRV_v9.0.28.630-5.16.0/spotify-revanced_v8.6.98.900-5.21.0-5-all.apk"  # https://spotify.en.uptodown.com/android/download/4283531
-        fi
         spotify_apk_path=("$Download/Spotify_v${pkgVersion}-${Arch[0]}.apk")
       elif [ $Android -ge 8 ]; then
         pkgVersion="9.0.28.630"
@@ -364,11 +360,8 @@ while true; do
           pkgVersion="$pkgVersion"
         fi
         Type="apk"
-        Arch=("armeabi-v7a, arm64-v8a, x86_64")
-        if [ ! -f "$Download/Spotify_v${pkgVersion}-$cpuAbi.apk" ];then
-          curl -L --progress-bar -C - -o "$Download/Spotify_v${pkgVersion}-$cpuAbi.apk" "https://github.com/arghya339/apk-me/releases/download/SpotifyRV_v9.0.28.630-5.16.0/Spotify_v9.0.28.630-125833530-${cpuAbi}.apk"
-        fi
-        spotify_apk_path=("$Download/Spotify_v${pkgVersion}-$cpuAbi.apk")
+        Arch=("arm64-v8a, armeabi-v7a, x86, x86_64")
+        spotify_apk_path=("$Download/Spotify_v${pkgVersion}-${Arch[0]}.apk")
       fi
       outputAPK="$SimplUsr/spotify-rv_v${pkgVersion}-$cpuAbi.apk"
       log="$SimplUsr/spotify-rv-patch_log.txt"
@@ -483,13 +476,13 @@ while true; do
         getVersion "$pkgName"
         pkgVersion="$pkgVersion"
       fi
-      Type="BUNDLE"
-      Arch=("arm64-v8a + x86_64")
+      Type="apk"
+      Arch=("arm64-v8a")
       lightroom_apk_path=("$Download/Lightroom_v${pkgVersion}-${Arch[0]}.apk")
       outputAPK="$SimplUsr/lightroom-rv_v${pkgVersion}-$cpuAbi.apk"
       log="$SimplUsr/lightroom-rv-patch_log.txt"
       activityPatches="com.adobe.lrmobile.StorageCheckActivity"
-      build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "APKMirror" "lightroom_apk_path" "lightroom_patches_args" "$outputAPK" "$log" "$pkgName" "$activityPatches"
+      build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "Uptodown" "lightroom_apk_path" "lightroom_patches_args" "$outputAPK" "$log" "$pkgName" "$activityPatches"  # F*** Cloudflare DDoS Protection on APKMirror Lightroom Page
       ;;
   esac  
 done
