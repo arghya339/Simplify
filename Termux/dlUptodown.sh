@@ -50,10 +50,10 @@ dlUptodown() {
   local appName=$1
   local appVersion=$2
   local Type=$3
-  local -n ArchRef=$4
+  local Arch=$4
   
-  if [ "${ArchRef[0]}" == "universal" ]; then
-    ArchRef=("arm64-v8a, armeabi-v7a, x86, x86_64")
+  if [ "$Arch" == "universal" ]; then
+    Arch=("arm64-v8a, armeabi-v7a, x86, x86_64")
   fi
   
   # --- UPTODOWN SEARCH ---
@@ -144,7 +144,7 @@ dlUptodown() {
       for ((n = 1; n <=variant_count; n += 1)); do
         arch=$(pup ".content > p:nth-child($n) text{}" <<<"$files_json" | xargs)
         type=$(pup "div.variant:nth-child($((n + 1))) div.v-file span text{}" <<<"$files_json" | xargs)
-        if [ "${ArchRef[0]}" == "$arch" ] && [ "$Type" == "$type" ]; then
+        if [ "$Arch" == "$arch" ] && [ "$Type" == "$type" ]; then
           data_file_id=$(pup "div.variant:nth-child($((n + 1))) > .v-report attr{data-file-id}" <<<"$files_json")
           location_url="$versionLink/${data_file_id}-x"
           data_url=$(curl -sL "$location_url" | grep -oP 'data-url="\K[^"]+' | head -n1)
