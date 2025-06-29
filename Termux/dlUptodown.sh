@@ -190,9 +190,14 @@ dlUptodown() {
   # Set varible for later use the sh
   pkgName="${package_name:-N/A}"
   Type="${file_type:-N/A}"
-  Arch="${architecture:-N/A}"
   SHA256="${sha256:-N/A}"
   
+  if [ -z "$data_version" ]; then
+    Arch="${architecture:-N/A}"
+  else
+    Arch="$arch"
+  fi
+
   # --- DOWNLOAD FILE USING ARIA2 ---
   if [ "$Type" == "XAPK" ]; then
     file_ext="apks"
