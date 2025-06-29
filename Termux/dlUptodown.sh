@@ -53,81 +53,79 @@ dlUptodown() {
   local Arch=$4
   
   if [ "$Arch" == "universal" ]; then
-    Arch=("arm64-v8a, armeabi-v7a, x86, x86_64")
+    Arch=("arm64-v8a,armeabi-v7a,x86,x86_64")
+  fi
+  
+  universal=("arm64-v8a, armeabi-v7a, x86, x86_64")
+  # Normalize Arch string
+  if [ "$Arch" == "${universal[0]}" ]; then
+    Arch=$(echo "$Arch" | tr -d ' ')  # rm spaces
   fi
   
   # --- UPTODOWN SEARCH ---
-  local searchHTML
-  earchHTML=$(curl -s -X POST "https://en.uptodown.com/android/en/s" -H "Content-Type: application/x-www-form-urlencoded; charset=UTF-8" -H "X-Requested-With: XMLHttpRequest" -H "Origin: https://en.uptodown.com" \
-    -H "Referer: https://en.uptodown.com/android/search" --data "q=${appName,,}")
-
-  if echo "$searchHTML" | jq -e '.success==1 and (.data|length>0)' >/dev/null 2>&1; then
-    appUrl=$(jq -r '.data[] | select(.url | test("^https://[^/]+\\.uptodown\\.com/android$")) | .url' <<<"$searchHTML" | head -n1)
-    echo -e "$info appUrl: ${Blue}$appUrl${Reset}"
-    echo  # white space
-  fi
+  # Build a slug-based URL (web address with human-readable keyword) ie. "Spotify Lite" → spotify-lite.en.uptodown.com/android) & check if it exists
+  local slug
+  slug=$(echo "$appName" | tr '[:upper:]' '[:lower:]' | sed 's/ /-/g')  # Convert: uppercase → lowercase letters. Replace: Spaces with hyphen
+  local appUrl="https://$slug.en.uptodown.com/android"
   
-  if [ -z $appUrl ]; then
-    # Fallback: build a slug-based URL (web address with human-readable keyword) ie. "Spotify Lite" → spotify-lite.en.uptodown.com/android) & check if it exists
-    local slug
-    slug=$(echo "$appName" | tr '[:upper:]' '[:lower:]' | sed -E 's/[^a-z0-9]+/-/g; s/^-+|-+$//g')  # Convert: uppercase → lowercase letters. Replace: Spaces with hyphen
-    local appUrl="https://$slug.en.uptodown.com/android"
-
-    if curl -s --head --fail "$appUrl" >/dev/null; then
-      echo -e "$info appUrl: ${Blue}$appUrl${Reset}"
-      echo  # White Space
-    else
-      return 1  # return error (1): if nothing worked
-    fi
+  if curl -s --head --fail "$appUrl" >/dev/null; then
+    echo -e "$info appUrl: ${Blue}$appUrl${Reset}"
+    echo  # White Space
+  else
+    echo -e "$notice ${Red}404 Whoops!${Reset} The requested URL ${Blue}$appUrl${Reset} could not be found."
+    exit 1
   fi
   
   # --- SCRAPE VERSION URL ---
   data_code=$(curl -sL "$appUrl" | grep -i "data-code" | sed -n 's/.*data-code="\([0-9]*\)".*/\1/p')  # Get app ID on Uptodown
   echo -e "$info ${appName}'s appID (data_code): $data_code"
-
-  page=1  # Start Uptodown’s OLDER VERSIONS Page from 1
-  fileID=""  # initializes variable with empty value
-  while true ; do
-    versions_json=$(curl -s "$appUrl/apps/$data_code/versions/$page")  # Uptodown’s OLDER VERSIONS Page Url
-    # Stop if the API is out of pages
-    if [ "$(jq '.data | length' <<<"$versions_json")" -eq 0 ]; then
-      echo -e "$notice Version $appVersion not found!" >&2
-      exit 1
-    fi
-
-    hit=$(jq -r --arg v "$appVersion" '.data[] | select(.version == $v) | [.fileID, .version, .sdkVersion, .kindFile, .versionURL] | @tsv' <<<"$versions_json")  # Check if versions page contain target appVersion
-    # if $hit is non-empty, means found target appVersion then extract variables fields & break ∞ while loop
-    if [ -n "$hit" ]; then
-      IFS=$'\t' read -r fileID version sdkVersion kindFile versionURL <<<"$hit"
-      echo -e "$info fileID (versionID)         : $fileID\n$info version                    : $version\n$info sdkVersion (minAndroid)    : $sdkVersion\n$info kindFile (fileType)        : $kindFile\n$good versionURL                 : ${Blue}$versionURL${Reset}"
-      echo  # Space
-      break  # brake the loop
-    fi
-
-    page=$((page + 1))  # if $hit is empty then increase Page value +1
-  done
-
+  
+  if [ $data_code ]; then
+    page=1  # Start Uptodown’s OLDER VERSIONS Page from 1
+    fileID=""  # initializes variable with empty value
+    while true ; do
+      versions_json=$(curl -s "$appUrl/apps/$data_code/versions/$page")  # Uptodown’s OLDER VERSIONS Page Url
+      # Stop if the API is out of pages
+      if [ "$(jq '.data | length' <<<"$versions_json")" -eq 0 ]; then
+        echo -e "$notice Version $appVersion not found!" >&2
+        exit 1
+      fi
+      
+      hit=$(jq -r --arg v "$appVersion" '.data[] | select(.version == $v) | [.fileID, .version, .sdkVersion, .kindFile, .versionURL] | @tsv' <<<"$versions_json")  # Check if versions page contain target appVersion
+      # if $hit is non-empty, means found target appVersion then extract variables fields & break ∞ while loop
+      if [ -n "$hit" ]; then
+        IFS=$'\t' read -r fileID version sdkVersion kindFile versionURL <<<"$hit"
+        echo -e "$info fileID (versionID)         : $fileID\n$info version                    : $version\n$info sdkVersion (minAndroid)    : $sdkVersion\n$info kindFile (fileType)        : $kindFile\n$good versionURL                 : ${Blue}$versionURL${Reset}"
+        echo  # Space
+        break  # brake the loop
+      fi
+      
+      page=$((page + 1))  # if $hit is empty then increase Page value +1
+    done
+  fi
+  
   # --- SCRAPE DOWNLOAD URL ---
-  button_variants=$(curl -sL "$versionURL" | grep -oP '<button class="button variants"')  # 'ALL VARIANTS' BUTTON
-  if [ -z "$button_variants" ] && [ "$kindFile" == "apk" ]; then
+  data_version=$(curl -sL "$versionURL" | grep -oP '<button class="button variants" data-version="\K[^"]+')  # 'ALL VARIANTS' BUTTON ID
+  echo -e "$notice DEBUG - button_variants: $data_version"
+  if [ -z "$data_version" ]; then
     data_url=$(curl -sL "$versionURL" | grep -oP 'data-url="\K[^"]+' | head -n1)
     echo -e "$info data_url: ${Cyan}$data_url${Reset}"
-
+    
     dlUrl="https://dw.uptodown.com/dwn/${data_url}"
     echo -e "$info dlUrl: ${Blue}$dlUrl${Reset}"
   else
    data_version=$(curl -sL "$versionURL" | grep -oP '<button class="button variants" data-version="\K[^"]+')  # 'ALL VARIANTS' BUTTON ID
     echo -e "$info data_version (ALL VARIANTS BUTTON ID): $data_version"
-
+    
     appLink=$(dirname $appUrl)  # https://app.en.uptodown.com/~~android~~
     echo -e "$info appLink: ${Blue}$appLink${Reset}"
-
+    
     files_json=$(curl -sL "$appLink/app/${data_code}/version/${data_version}/files" | jq -r '.content')  # 'ALL VARIANTS' NETWORK RESPONSE HEADERS
     #echo -e "$notice files_json (ALL VARIANTS RESPONSE): $files_json"  # for debug
-
+    
     versionLink=$(dirname $versionURL)  # https://app.en.uptodown.com/android/download/~~fileID~~
     echo -e "$info versionLink: ${Blue}$versionLink${Reset}"
-
+    
     variant_count=$(echo "$files_json" | pup 'div.variant' | grep -c 'class="variant"')  # Count variants from 'ALL VARIANTS' Response
     echo -e "$notice Found $variant_count variants!"
     
@@ -144,7 +142,9 @@ dlUptodown() {
       for ((n = 1; n <=variant_count; n += 1)); do
         arch=$(pup ".content > p:nth-child($n) text{}" <<<"$files_json" | xargs)
         type=$(pup "div.variant:nth-child($((n + 1))) div.v-file span text{}" <<<"$files_json" | xargs)
-        if [ "$Arch" == "$arch" ] && [ "$Type" == "$type" ]; then
+        # Normalize arch string: remove spaces
+        arch_clean=$(echo "$arch" | tr -d ' ')
+        if [ "$Arch" == "$arch_clean" ] && [ "$Type" == "$type" ]; then
           data_file_id=$(pup "div.variant:nth-child($((n + 1))) > .v-report attr{data-file-id}" <<<"$files_json")
           location_url="$versionLink/${data_file_id}-x"
           data_url=$(curl -sL "$location_url" | grep -oP 'data-url="\K[^"]+' | head -n1)
@@ -165,7 +165,7 @@ dlUptodown() {
   
   # --- Extract app info ---
   if [ "$kindFile" == "apk" ]; then
-    local raw_info=$(curl -s -L "$versionLink")  # Get raw info
+    local raw_info=$(curl -s -L "$versionURL")  # Get raw info
   else
     local raw_info=$(curl -s -L "$location_url")
   fi
@@ -178,7 +178,7 @@ dlUptodown() {
   local architecture=$(echo "$raw_info" | grep -A1 "Architecture" | tail -1 | sed -e 's/<[^>]*>//g' -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')
   local sha256=$(echo "$raw_info" | grep -A1 "SHA256" | tail -1 | sed -e 's/<[^>]*>//g' -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')
   local requirements=$(echo "$raw_info" | awk '/<th[^>]*>Requirements<\/th>/{flag=1;next} flag && /<li>/{gsub(/.*<li>|<\/li>.*/,"");print;exit}' | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
-
+  
   # Print app info
   echo -e "${info} pkgName   : ${Reset}${package_name:-N/A}"
   echo -e "${info} fileSize  : ${Reset}${size:-N/A}"
@@ -210,7 +210,7 @@ dlUptodown() {
     if [ $dlStatus == 0 ]; then
       echo -e "$good Download complete. file saved to ${Cyan}$outputPath${Reset}"
     fi
-  
+    
     sha256sum=$(sha256sum "$outputPath" | cut -d' ' -f1)
     if [ "$sha256sum" == "$SHA256" ]; then
       echo -e "$good Downloaded file appears in the original state."
@@ -218,7 +218,7 @@ dlUptodown() {
       echo -e "$notice Look like downloaded file appears corrupted!"
     fi
     echo  # Space
-
+    
     if [ $file_ext == apks ]; then
       bash $Simplify/dlGitHub.sh "REAndroid" "APKEditor" "latest" ".jar" "$Simplify"
       APKEditor=$(find "$HOME/Simplify" -type f -name "APKEditor-*.jar" -print -quit)
@@ -241,9 +241,13 @@ dlUptodown() {
   fi
 }
 
-#Arch=("universal")
+#Arch=("arm64-v8a")
+#dlUptodown "Adobe Lightroom Mobile" "10.0.2" "apk" "Arch"
+
+#Arch=("arm64-v8a, armeabi-v7a, x86, x86_64")
 #dlUptodown "Spotify" "8.6.98.900" "apk" "Arch"
 #dlUptodown "Spotify" "9.0.28.630" "apk" "Arch"
+
 #dlUptodown.sh "Spotify" "8.6.98.900" "apk" "Arch"
 
 dlUptodown "$@"  # call the function with arguments
