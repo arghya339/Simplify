@@ -491,8 +491,8 @@ while true; do
     Photomath)
       pkgName="com.microblink.photomath"
       appName=("Photomath")
-      #pkgVersion="8.43.0"
-      pkgVersion=""
+      pkgVersion="8.43.0"
+      #pkgVersion=""
       if [ -z "$pkgVersion" ]; then
         getVersion "$pkgName"
         pkgVersion="$pkgVersion"

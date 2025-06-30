@@ -113,11 +113,13 @@ APKMdl() {
 
   mapfile -t parsed_rows < <(echo "$variantsJson" | jq -r '.[] | select((.children | type) == "array" and (.children | length) == 5)
     | select(
+      (.children[0].children[0].text | type) == "string" and # Version text
       (.children[0].children[1].text | type) == "string" and # Type text (BUNDLE/APK)
       (.children[1].text | type) == "string" and # Arch text
       (.children[4].children[0].href | type) == "string" # Link href
     )
     | [
+        (.children[0].text // .children[0].children[0].text), # Version (fallback)
         .children[0].children[1].text, # Type (BUNDLE/APK)
         .children[1].text, # Arch
         ("https://www.apkmirror.com" + .children[4].children[0].href) # Link
@@ -129,12 +131,14 @@ APKMdl() {
     return 1
   elif [ ${#parsed_rows[@]} -eq 1 ]; then
     # Automatically select the single variant found
-    IFS=$'\t' read -r type arch link <<< "${parsed_rows[0]}"
+    IFS=$'\t' read -r version type arch link <<< "${parsed_rows[0]}"
     echo -e "[0] ${Blue}Type: $type | Arch: $arch{Reset}"
+    found_version="$version"
     found_type="$type"
     found_arch="$arch"
     found_link="$link"
     echo -e "$notice Only one variant found! auto selected:"
+    echo "Version : $found_version"
     echo "Type    : $found_type"
     echo "Arch    : $found_arch"
     echo -e "Link    : ${Blue}$found_link${Reset}"
@@ -142,15 +146,17 @@ APKMdl() {
     # Filter variants based on both TYPE and ARCH parameters
     # Use a loop with indices to print the row number
     for i in "${!parsed_rows[@]}"; do
-      IFS=$'\t' read -r type arch link <<< "${parsed_rows[$i]}"
+      IFS=$'\t' read -r version type arch link <<< "${parsed_rows[$i]}"
       # Print the row number here (using $i)
       echo -e "[$i] ${Blue}Type: $type | Arch: $arch${Reset}"
     
       if [[ "$type" == "$TYPE" ]] && [[ "$arch" == "$ARCH" ]]; then
+        found_version="$version"
         found_type="$type"
         found_arch="$arch"
         found_link="$link"
         echo -e "$info autoSelectedVeriant:"
+        echo "Version : $found_version"
         echo "Type    : $found_type" # Print selected Type
         echo "Arch    : $found_arch"
         echo -e "Link    : ${Blue}$found_link${Reset}"
@@ -166,6 +172,7 @@ APKMdl() {
   fi
   
   # Assign the found values to the variables used later in the script
+  VERSION="$found_version"
   Type="$found_type"
   Arch="$found_arch"
   Link="$found_link"
