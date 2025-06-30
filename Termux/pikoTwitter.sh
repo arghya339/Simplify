@@ -47,6 +47,23 @@ echo -e "$info ${Blue}ReVancedCLIJar:${Reset} $ReVancedCLIJar"
 bash $Simplify/dlGitHub.sh "crimera" "piko" "pre" ".jar" "$pikoTwitter"
 PatchesJar=$(find "$pikoTwitter" -type f -name "piko-twitter-patches-*.jar" -print -quit)
 echo -e "$info ${Blue}PatchesJar:${Reset} $PatchesJar"
+patchesJarFile=$(basename "$PatchesJar")
+if echo "$patchesJarFile" | grep -q "dev" 2>/dev/null; then
+  isPreReleases="true"
+else
+  isPreReleases=false
+fi
+
+PatchesJson="$pikoTwitter/patches.json"
+if [ -f "$PatchesJson" ]; then
+  rm $PatchesJson
+fi
+#bash $Simplify/dlGitHub.sh "crimera" "piko" "latest" ".json" "$pikoTwitter"
+bash $Simplify/dlGitHub.sh "crimera" "piko" "pre" ".json" "$pikoTwitter"
+echo -e "$info ${Blue}PatchesJson:${Reset} $PatchesJson"
+if [ -f "$pikoTwitter/patches.json" ]; then
+  jq -r '.[] | .compatiblePackages // empty | .[] | {name: .name, version: .versions[-1]} | "\(.name) \(.version)"' $pikoTwitter/patches.json | sort -u | awk '{a[$1]=$2} END{for (i in a) printf "\"%s\" \"%s\"\n", i, a[i]}'
+fi
 
 #bash $Simplify/dlGitHub.sh "crimera" "revanced-integrations" "latest" ".apk" "$pikoTwitter"
 bash $Simplify/dlGitHub.sh "crimera" "revanced-integrations" "pre" ".apk" "$pikoTwitter"
@@ -70,17 +87,6 @@ done
 echo -e "$info ${Blue}cpuAbi:${Reset} $cpuAbi"
 echo -e "$info ${Blue}ripLib:${Reset} $ripLib"
 
-if [ -f "$pikoTwitter/patches.json" ]; then
-  rm $pikoTwitter/patches.json
-fi
-$PREFIX/lib/jvm/java-21-openjdk/bin/java -jar $ReVancedCLIJar patches -p "$pikoTwitter/patches.json" $PatchesJar
-if [ $? == 0 ] && [ -f "$pikoTwitter/patches.json" ]; then
-  echo -e "$info patches.json generated successfully."
-  jq -r '.[] | .compatiblePackages // empty | .[] | {name: .name, version: .versions[-1]} | "\(.name) \(.version)"' $pikoTwitter/patches.json | sort -u | awk '{a[$1]=$2} END{for (i in a) printf "\"%s\" \"%s\"\n", i, a[i]}'
-else
-  echo -e "$bad patches.json was not generated!"
-fi
-
 # Get compatiblePackages version from json
 getVersion() {
   local pkgName="$1"
@@ -88,6 +94,16 @@ getVersion() {
   
   # Get all versions for the package and sort them, then take the highest version
   pkgVersion=$(jq -r --arg pkg "$pkgName" '[.[] | .compatiblePackages // empty | .[] | select(.name == $pkg and .versions != null) | .versions[]] | sort | last' $json 2>/dev/null)
+  if [ "$pkgVersion" == "null" ]; then
+    if [ "$isPreReleases" == "true" ]; then
+      pkgVersion=$(curl -sL "https://api.github.com/repos/crimera/twitter-apk/releases" | jq -r '.[].tag_name' | head -1)  # Last Releases
+    else
+      pkgVersion=$(curl -sL "https://api.github.com/repos/crimera/twitter-apk/releases/latest" | jq -r '.tag_name')  # Latest Releases
+    fi
+    if [ -z "$pkgVersion" ]; then
+      pkgVersion=$($PREFIX/lib/jvm/java-21-openjdk/bin/java -jar $ReVancedCLIJar list-patches --with-packages $PatchesJar | grep -oP 'Requires X \K[\d.]+-release\.\d+' | sort -u | tail -1)
+    fi
+  fi
 }
 
 #  --- Patch Apps ---
@@ -120,7 +136,7 @@ Arch=("universal")
 xFileName=$(basename "$(find "$Download" -type f -name "${appName[0]}_v*-$cpuAbi.apk" -print -quit)")
 stock_apk_path=("$Download/$xFileName")
 outputAPK="$SimplUsr/piko-twitter_v${pkgVersion}-$cpuAbi.apk"
-fileName=$(basenaem $outputAPK)
+fileName=$(basename $outputAPK)
 activityPatches="com.twitter.android/.StartActivity"
 
 bash $Simplify/APKMdl.sh "$pkgName" "$pkgVersion" "$Type" "${Arch[0]}"  # Download stock apk from APKMirror
