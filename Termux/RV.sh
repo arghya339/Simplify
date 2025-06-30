@@ -620,11 +620,7 @@ while true; do
     Amazon\ Prime\ Video)
       pkgName="com.amazon.avod.thirdpartyclient"
       appName=("Amazon Prime Video")
-      if [ $cpuAbi == "arm64-v8a" ]; then
-        pkgVersion="3.0.403.257"
-      elif [ $cpuAbi == "armeabi-v7a" ]; then
-        pkgVersion="3.0.403.245"
-      fi
+      pkgVersion="3.0.403"
       #pkgVersion=""
       if [ -z "$pkgVersion" ]; then
         getVersion "$pkgName"
