@@ -121,7 +121,9 @@ SimplUsr="/sdcard/Simplify"
 Simplify="$HOME/Simplify"
 RV="$Simplify/RV"
 RVX="$Simplify/RVX"
-mkdir -p "$Simplify" "$RV" "$RVX" "$SimplUsr"
+pikoTwitter="$Simplify/pikoTwitter"
+Dropped="$Simplify/Dropped"
+mkdir -p "$Simplify" "$RV" "$RVX" "$pikoTwitter" "$Dropped" "$SimplUsr"
 Download="/sdcard/Download"
 
 # --- Checking Android Version ---
@@ -284,7 +286,7 @@ while true; do
   clear  # Clear
   # Apply the eye color to the simplify shape and print it
   echo -e "${BoldGreen}$print_simplify${Reset}" && echo ""  # Space
-  echo -e "RV. ReVanced\nRVX. ReVanced Extended\nRVXS. RVX SuperUser\nF. Feature request\nB. Bug report\nS. Support\nA. About\nQ. Quit\n"
+  echo -e "RV. ReVanced\nRVX. ReVanced Extended\nRVXS. RVX SuperUser\nPiko. Piko Twitter\nDrop. Dropped Patches\nF. Feature request\nB. Bug report\nS. Support\nA. About\nQ. Quit\n"
   echo -n "Select Patches source: " && read source
   case $source in
     RV|rv)
@@ -307,12 +309,22 @@ while true; do
       fi
       sleep 3
       ;;
+    PIKO*|piko*)
+      curl -sL -o "$pikoTwitter/pikoTwitter.sh" "https://raw.githubusercontent.com/arghya339/Simplify/refs/heads/main/Termux/pikoTwitter.sh" > /dev/null 2>&1
+      bash "$pikoTwitter/pikoTwitter.sh"
+      sleep 3
+      ;;
+    DROPPED*|dropped*)
+      curl -sL -o "$Dropped/droppedPatches.sh" "https://raw.githubusercontent.com/arghya339/Simplify/refs/heads/main/Termux/droppedPatches.sh" > /dev/null 2>&1
+      bash "$Dropped/droppedPatches.sh"
+      sleep 3
+      ;;
     [Ff]*) feature && sleep 3 ;;
     [Bb]*) bug && sleep 3 ;;
     [Ss]*) support && sleep 3 ;;
     [Aa]*) about && sleep 3 ;;
     [Qq]*) clear && break ;;
-    *) echo -e "$info Invalid input! Please enter RV / RVX / RVXS / F / B / S / A / Q." && sleep 3 ;;
+    *) echo -e "$info Invalid input! Please enter RV / RVX / RVXS / Piko / Drop / F / B / S / A / Q." && sleep 3 ;;
   esac
 done
-#####################################################################################################
+###################################################################################################################
