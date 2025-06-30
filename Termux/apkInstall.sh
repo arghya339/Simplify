@@ -23,7 +23,13 @@ apkInstall() {
   local pkgName=$2
   local activity=$3
   if su -c "id" >/dev/null 2>&1; then
-    local activityClass=$(su -c "pm resolve-activity --brief $pkgName" | tail -n 1)
+    if [ "$(su -c 'getenforce 2>/dev/null')" = "Enforcing" ]; then
+      su -c "setenforce 0"
+      local activityClass=$(su -c "pm resolve-activity --brief $pkgName" | tail -n 1)
+      su -c "setenforce 1"
+    else
+      local activityClass=$(su -c "pm resolve-activity --brief $pkgName" | tail -n 1)
+    fi
   elif "$HOME/rish" -c "id" >/dev/null 2>&1; then
     local activityClass=$($HOME/rish -c "pm resolve-activity --brief $pkgName" | tail -n 1)
   else

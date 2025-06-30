@@ -296,7 +296,7 @@ while true; do
       log="$SimplUsr/yt-rvx-patch_log.txt"
       appName=("YouTube")
       pkgPatches="app.rvx.android.youtube"
-      activityPatches="com.google.android.apps.youtube.app.watchwhile.MainActivity"
+      activityPatches="com.google.android.youtube/.app.honeycomb.Shell\$HomeActivity"
       build_app "$pkgName" "$pkgVersion" "$Type" "$Arch" "stock_apk_path" "yt_patches_args" "$outputAPK" "$log" "appName" "$rvxBugReportUrl" "$pkgPatches" "$activityPatches"
       ;;
     YT\ Music)
@@ -312,7 +312,7 @@ while true; do
       log="$SimplUsr/yt-music-rvx-patch_log.txt"
       appName=("YouTube Music")
       pkgPatches="app.rvx.android.apps.youtube.music"
-      activityPatches="com.google.android.apps.youtube.music.activities.MusicActivity"
+      activityPatches="com.google.android.apps.youtube.music/.activities.MusicActivity"
       build_app "$pkgName" "$pkgVersion" "$Type" "$cpuAbi" "stock_apk_path" "yt_music_patches_args" "$outputAPK" "$log" "appName" "$rvxBugReportUrl" "$pkgPatches" "$activityPatches"
       ;;
     Reddit)
@@ -329,7 +329,7 @@ while true; do
       outputAPK="$SimplUsr/reddit-rvx_v${pkgVersion}-$cpuAbi.apk"
       log="$SimplUsr/reddit-rvx-patch_log.txt"
       appName=("Reddit")
-      activityPatches="com.reddit.launch.main.MainActivity"
+      activityPatches="com.reddit.frontpage/launcher.default"
       build_app "$pkgName" "$pkgVersion" "$Type" "$Arch" "stock_apk_path" "reddit_patches_args" "$outputAPK" "$log" "appName" "$rvxBugReportUrl" "$pkgName" "$activityPatches"
       ;;
     "YouTube RVX v17.34.36")
@@ -342,7 +342,7 @@ while true; do
       log="$SimplUsr/yt-rvx-patch_log.txt"
       appName=("YouTube")
       pkgPatches="app.rvx.android.youtube"
-      activityPatches="com.google.android.apps.youtube.app.watchwhile.MainActivity"
+      activityPatches="com.google.android.youtube/.app.honeycomb.Shell\$HomeActivity"
       build_app "$pkgName" "$pkgVersion" "$Type" "$Arch" "stock_apk_path" "yt_patches_args" "$outputAPK" "$log" "appName" "$rvxa6_7BugReportUrl" "$pkgPatches" "$activityPatches"
       ;;
     "YT Music RVX v6.42.55")
@@ -354,7 +354,7 @@ while true; do
       log="$SimplUsr/yt-music-rvx-patch_log.txt"
       appName=("YouTube Music")
       pkgPatches="app.rvx.android.apps.youtube.music"
-      activityPatches="com.google.android.apps.youtube.music.activities.MusicActivity"
+      activityPatches="com.google.android.apps.youtube.music/.activities.MusicActivity"
       build_app "$pkgName" "$pkgVersion" "$Type" "$cpuAbi" "stock_apk_path" "yt_music_patches_args" "$outputAPK" "$log" "appName" "$rvxBugReportUrl" "$pkgPatches" "$activityPatches"
       ;;
     "YT Music RVX v6.20.51")
@@ -366,7 +366,7 @@ while true; do
       log="$SimplUsr/yt-music-rvx-patch_log.txt"
       appName=("YouTube Music")
       pkgPatches="app.rvx.android.apps.youtube.music"
-      activityPatches="com.google.android.apps.youtube.music.activities.MusicActivity"
+      activityPatches="com.google.android.apps.youtube.music/.activities.MusicActivity"
       build_app "$pkgName" "$pkgVersion" "$Type" "$cpuAbi" "stock_apk_path" "yt_music_patches_args" "$outputAPK" "$log" "appName" "$rvxBugReportUrl" "$pkgPatches" "$activityPatches"
       ;;
   esac  

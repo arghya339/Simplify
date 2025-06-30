@@ -430,7 +430,7 @@ while true; do
       outputAPK="$SimplUsr/youtube-rv_v${pkgVersion}-$cpuAbi.apk"
       log="$SimplUsr/yt-rv-patch_log.txt"
       pkgPatches="app.revanced.android.youtube"
-      activityPatches="com.google.android.apps.youtube.app.watchwhile.MainActivity"
+      activityPatches="com.google.android.youtube/.app.honeycomb.Shell\$HomeActivity"
       build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "APKMirror" "youtube_apk_path" "yt_patches_args" "$outputAPK" "$log" "$pkgPatches" "$activityPatches"
       ;;
     Spotify)
@@ -448,7 +448,7 @@ while true; do
       spotify_apk_path=("$Download/${appName[0]}_v${pkgVersion}-${Arch[0]}.apk")
       outputAPK="$SimplUsr/spotify-rv_v${pkgVersion}-$cpuAbi.apk"
       log="$SimplUsr/spotify-rv-patch_log.txt"
-      activityPatches="com.spotify.music.MainActivity"
+      activityPatches="com.spotify.music/.MainActivity"
       build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "Uptodown" "spotify_apk_path" "spotify_patches_args" "$outputAPK" "$log" "$pkgName" "$activityPatches"
       ;;
     TikTok)
@@ -465,7 +465,7 @@ while true; do
       tiktok_apk_path=("$Download/${appName[0]}_v${pkgVersion}-${Arch[0]}.apk")
       outputAPK="$SimplUsr/tiktok-rv_v${pkgVersion}-$cpuAbi.apk"
       log="$SimplUsr/tiktok-rv-patch_log.txt"
-      activityPatches="com.ss.android.ugc.aweme.main.MainActivity"
+      activityPatches="com.zhiliaoapp.musically/com.ss.android.ugc.aweme.splash.SplashActivity"
       build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "APKMirror" "tiktok_apk_path" "tiktok_patches_args" "$outputAPK" "$log" "$pkgName" "$activityPatches"
       ;;
     Google\ Photos)
@@ -483,7 +483,7 @@ while true; do
       outputAPK="$SimplUsr/google-photos-rv_v${pkgVersion}-$cpuAbi.apk"
       log="$SimplUsr/google-photos-rv-patch_log.txt"
       pkgPatches="app.revanced.android.apps.photos"
-      activityPatches="com.google.android.apps.photos.home.HomeActivity"
+      activityPatches="com.google.android.apps.photos/.home.HomeActivity"
       build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "APKMirror" "photos_apk_path" "photos_patches_args" "$outputAPK" "$log" "$pkgPatches" "$activityPatches"
       ;;
     Google\ Photos\ Android\ 5.0+)
@@ -496,7 +496,7 @@ while true; do
       outputAPK="$SimplUsr/google-photos-rv_v${pkgVersion}-$cpuAbi.apk"
       log="$SimplUsr/google-photos-rv-patch_log.txt"
       pkgPatches="app.revanced.android.apps.photos"
-      activityPatches="com.google.android.apps.photos.home.HomeActivity"
+      activityPatches="com.google.android.apps.photos/.home.HomeActivity"
       build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "APKMirror" "photos_apk_path" "photos_patches_args" "$outputAPK" "$log" "$pkgPatches" "$activityPatches"
       ;;
     Instagram)
@@ -513,7 +513,7 @@ while true; do
       instagram_apk_path=("$Download/${appName[0]}_v${pkgVersion}-${Arch[0]}.apk")
       outputAPK="$SimplUsr/instagram-rv_v${pkgVersion}-$cpuAbi.apk"
       log="$SimplUsr/instagram-rv-patch_log.txt"
-      activityPatches="com.instagram.android.activity.MainTabActivity"
+      activityPatches="com.instagram.android/.activity.MainTabActivity"
       build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "APKMirror" "instagram_apk_path" "instagram_patches_args" "$outputAPK" "$log" "$pkgName" "$activityPatches"
       ;;
     Facebook)
@@ -530,7 +530,7 @@ while true; do
       facebook_apk_path=("$Download/${appName[0]}_v${pkgVersion}-${Arch[0]}.apk")
       outputAPK="$SimplUsr/facebook-rv_v${pkgVersion}-$cpuAbi.apk"
       log="$SimplUsr/facebook-rv-patch_log.txt"
-      activityPatches="com.facebook.katana.LoginActivity"
+      activityPatches="com.facebook.katana/.LoginActivity"
       build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "APKMirror" "facebook_apk_path" "facebook_patches_args" "$outputAPK" "$log" "$pkgName" "$activityPatches"
       ;;
     Facebook\ Messenger)
@@ -547,7 +547,7 @@ while true; do
       fb_messenger_apk_path=("$Download/${appName[0]}_v${pkgVersion}-${Arch[0]}.apk")
       outputAPK="$SimplUsr/fb-messenger-rv_v${pkgVersion}-$cpuAbi.apk"
       log="$SimplUsr/fb-messenger-rv-patch_log.txt"
-      activityPatches="com.facebook.orca.auth.StartScreenActivity"
+      activityPatches="com.facebook.orca/.auth.StartScreenActivity"
       build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "APKMirror" "fb_messenger_apk_path" "fb_messenger_patches_args" "$outputAPK" "$log" "$pkgName" "$activityPatches"
       ;;
     Lightroom)
@@ -564,7 +564,7 @@ while true; do
       lightroom_apk_path=("$Download/${appName[0]}_v${pkgVersion}-${Arch[0]}.apk")
       outputAPK="$SimplUsr/lightroom-rv_v${pkgVersion}-$cpuAbi.apk"
       log="$SimplUsr/lightroom-rv-patch_log.txt"
-      activityPatches="com.adobe.lrmobile.StorageCheckActivity"
+      activityPatches="com.adobe.lrmobile/.StorageCheckActivity"
       build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "Uptodown" "lightroom_apk_path" "lightroom_patches_args" "$outputAPK" "$log" "$pkgName" "$activityPatches"  # F*** Cloudflare DDoS Protection on APKMirror Lightroom Page
       ;;
     Photomath)
@@ -581,7 +581,7 @@ while true; do
       photomath_apk_path=("$Download/${appName[0]}_v${pkgVersion}-$cpuAbi.apk")
       outputAPK="$SimplUsr/photomath-rv_v${pkgVersion}-$cpuAbi.apk"
       log="$SimplUsr/photomath-rv-patch_log.txt"
-      activityPatches="com.microblink.photomath.main.activity.LauncherActivity"
+      activityPatches="com.microblink.photomath/.main.activity.LauncherActivity"
       build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "APKMirror" "photomath_apk_path" "photomath_patches_args" "$outputAPK" "$log" "$pkgName" "$activityPatches"
       ;;
     Duolingo)
@@ -598,7 +598,7 @@ while true; do
       duolingo_apk_path=("$Download/${appName[0]}_v${pkgVersion}-$cpuAbi.apk")
       outputAPK="$SimplUsr/duolingo-rv_v${pkgVersion}-$cpuAbi.apk"
       log="$SimplUsr/duolingo-rv-patch_log.txt"
-      activityPatches="com.duolingo.splash.LaunchActivity"
+      activityPatches="com.duolingo/.app.LoginActivity"
       build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "APKMirror" "duolingo_apk_path" "duolingo_patches_args" "$outputAPK" "$log" "$pkgName" "$activityPatches"
       ;;
     RAR)
@@ -615,7 +615,7 @@ while true; do
       rar_apk_path=("$Download/${appName[0]}_v${pkgVersion}-$cpuAbi.apk")
       outputAPK="$SimplUsr/rar-rv_v${pkgVersion}-$cpuAbi.apk"
       log="$SimplUsr/rar-rv-patch_log.txt"
-      activityPatches="com.rarlab.rar.MainActivity"
+      activityPatches="com.rarlab.rar/.MainActivity"
       build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "APKMirror" "rar_apk_path" "rar_patches_args" "$outputAPK" "$log" "$pkgName" "$activityPatches"
       ;;
     Amazon\ Prime\ Video)
@@ -633,7 +633,7 @@ while true; do
       prime_video_apk_path=("$Download/$primeVideoFileName")
       outputAPK="$SimplUsr/prime-video-rv_v${pkgVersion}-$cpuAbi.apk"
       log="$SimplUsr/prime-video-rv-patch_log.txt"
-      activityPatches="com.amazon.avod.thirdpartyclient.LauncherActivity"
+      activityPatches="com.amazon.avod.thirdpartyclient/.LauncherActivity"
       build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "APKMirror" "prime_video_apk_path" "prime_video_patches_args" "$outputAPK" "$log" "$pkgName" "$activityPatches"
       ;;
     Twitch)
@@ -650,7 +650,7 @@ while true; do
       twitch_apk_path=("$Download/${appName[0]}_v${pkgVersion}-$cpuAbi.apk")
       outputAPK="$SimplUsr/twitch-rv_v${pkgVersion}-$cpuAbi.apk"
       log="$SimplUsr/twitch-rv-patch_log.txt"
-      activityPatches="tv.twitch.android.app.core.LandingActivity"
+      activityPatches="tv.twitch.android.app/.core.LandingActivity"
       build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "APKMirror" "twitch_apk_path" "twitch_patches_args" "$outputAPK" "$log" "$pkgName" "$activityPatches"
       ;;
     Tumblr)
@@ -667,7 +667,7 @@ while true; do
       tumblr_apk_path=("$Download/${appName[0]}_v${pkgVersion}-$cpuAbi.apk")
       outputAPK="$SimplUsr/tumblr-rv_v${pkgVersion}-$cpuAbi.apk"
       log="$SimplUsr/tumblr-rv-patch_log.txt"
-      activityPatches="com.tumblr.ui.activity.JumpoffActivity"
+      activityPatches="com.tumblr/.ui.activity.JumpoffActivity"
       build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "APKMirror" "tumblr_apk_path" "tumblr_patches_args" "$outputAPK" "$log" "$pkgName" "$activityPatches"
       ;;
     Google\ Recorder)
@@ -684,7 +684,7 @@ while true; do
       recorder_apk_path=("$Download/${appName[0]}_v${pkgVersion}-$cpuAbi.apk")
       outputAPK="$SimplUsr/recorder-rv_v${pkgVersion}-$cpuAbi.apk"
       log="$SimplUsr/recorder-rv-patch_log.txt"
-      activityPatches="com.google.android.apps.recorder.ui.recordings.MainActivity"
+      activityPatches="com.google.android.apps.recorder/.ui.recordings.MainActivity"
       build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "APKMirror" "recorder_apk_path" "recorder_patches_args" "$outputAPK" "$log" "$pkgName" "$activityPatches"
       ;;
   esac  
