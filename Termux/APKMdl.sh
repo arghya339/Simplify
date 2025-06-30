@@ -132,7 +132,7 @@ APKMdl() {
   elif [ ${#parsed_rows[@]} -eq 1 ]; then
     # Automatically select the single variant found
     IFS=$'\t' read -r version type arch link <<< "${parsed_rows[0]}"
-    echo -e "[0] ${Blue}Type: $type | Arch: $arch{Reset}"
+    echo -e "[0] ${Blue}Version: $version | Type: $type | Arch: $arch{Reset}"
     found_version="$version"
     found_type="$type"
     found_arch="$arch"
@@ -148,7 +148,7 @@ APKMdl() {
     for i in "${!parsed_rows[@]}"; do
       IFS=$'\t' read -r version type arch link <<< "${parsed_rows[$i]}"
       # Print the row number here (using $i)
-      echo -e "[$i] ${Blue}Type: $type | Arch: $arch${Reset}"
+      echo -e "[$i] ${Blue}Version: $version | Type: $type | Arch: $arch${Reset}"
     
       if [[ "$type" == "$TYPE" ]] && [[ "$arch" == "$ARCH" ]]; then
         found_version="$version"
