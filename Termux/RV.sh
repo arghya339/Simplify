@@ -618,7 +618,7 @@ while true; do
       build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "APKMirror" "rar_apk_path" "rar_patches_args" "$outputAPK" "$log" "$pkgName" "$activityPatches"
       ;;
     Amazon\ Prime\ Video)
-      pkgName="ccom.amazon.avod.thirdpartyclient"
+      pkgName="com.amazon.avod.thirdpartyclient"
       appName=("Amazon Prime Video")
       if [ $cpuAbi == "arm64-v8a" ]; then
         pkgVersion="3.0.403.257"
