@@ -69,6 +69,8 @@ dlUptodown() {
   local appUrl="https://$slug.en.uptodown.com/android"
   
   if curl -s --head --fail "$appUrl" >/dev/null; then
+    actualAppName=$(curl -sL "https://spotify.en.uptodown.com/android/" | pup 'h1#detail-app-name json{}' | jq -r '.[0].text' | xargs)
+    echo -e "$info actualAppName: $actualAppName"
     echo -e "$info appUrl: ${Blue}$appUrl${Reset}"
     echo  # White Space
   else
