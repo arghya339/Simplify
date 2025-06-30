@@ -185,7 +185,7 @@ APKMdl() {
   echo  # Space
   
   #appName="${appName//[\*\\\/:\?\|<>]/}"
-  appName="${appName%%[:—(]*}"
+  appName=$(echo "${appName%%[:—(]*}" | xargs)
   FileName="${appName}_v${VERSION}-${Arch}${file_ext}"
   outputPath="${Download}/${FileName}" 
   if [ ! -f "$Download/${appName}_v${VERSION}-${cpuAbi}.apk" ] && [ ! -f "$outputPath" ]; then
