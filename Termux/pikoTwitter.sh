@@ -39,7 +39,7 @@ echo -e "$info ${Blue}Target device:${Reset} $Model"
 ReVancedCLIJar="$pikoTwitter/revanced-cli-4.6.2-all.jar"
 if [ ! -f "$ReVancedCLIJar" ]; then
   echo -e "$running Downloading revanced-cli-4.6.2-all.jar.."
-  curl -sL --progress-bar -C - -o "$ReVancedCLIJar" "https://github.com/inotia00/revanced-cli/releases/download/v4.6.2/revanced-cli-4.6.2-all.jar"
+  curl -L --progress-bar -C - -o "$ReVancedCLIJar" "https://github.com/inotia00/revanced-cli/releases/download/v4.6.2/revanced-cli-4.6.2-all.jar"
 fi
 echo -e "$info ${Blue}ReVancedCLIJar:${Reset} $ReVancedCLIJar"
 
