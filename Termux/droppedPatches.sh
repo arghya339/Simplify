@@ -64,6 +64,7 @@ echo -e "$info ${Blue}ripLib:${Reset} $ripLib"
 
 if [ -f "$Dropped/patches.json" ]; then
   rm $Dropped/patches.json
+  touch "$Dropped/patches.json"  # Create patches json file
 fi
 $PREFIX/lib/jvm/java-21-openjdk/bin/java -jar $ReVancedCLIJar patches -p="$Dropped/patches.json" $PatchesJar
 if [ $? == 0 ] && [ -f "$Dropped/patches.json" ]; then
