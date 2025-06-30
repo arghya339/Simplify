@@ -314,7 +314,7 @@ while true; do
       bash "$pikoTwitter/pikoTwitter.sh"
       sleep 3
       ;;
-    DROPPED*|dropped*)
+    DROP*|drop*)
       curl -sL -o "$Dropped/droppedPatches.sh" "https://raw.githubusercontent.com/arghya339/Simplify/refs/heads/main/Termux/droppedPatches.sh" > /dev/null 2>&1
       bash "$Dropped/droppedPatches.sh"
       sleep 3
