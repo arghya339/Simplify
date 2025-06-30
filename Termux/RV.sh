@@ -30,7 +30,7 @@ mkdir -p "$Simplify" "$RV" "$RVX" "$SimplUsr"  # Create $Simplify, $RV, $RVX and
 Download="/sdcard/Download"  # Download dir
 
 # --- Checking Android Version ---
-if [ $Android -le 4 ]; then
+if [ $Android -le 3 ]; then
   echo -e "${bad} ${Red}Android $Android is not supported by ReVanced Patches.${Reset}"
   return 1
 fi
@@ -164,6 +164,32 @@ photomath_patches_args=(
   -e "Change package name" -OackageName="com.microblink.photomath"
 )
 
+duolingo_patches_args=(
+  -e "Change package name" -OackageName="com.duolingo"
+)
+
+rar_patches_args=(
+  -e "Change package name" -OackageName="com.rarlab.rar"
+)
+
+prime_video_patches_args=(
+  -e "Rename shared permissions"
+  -e "Change package name" -OackageName="com.amazon.avod.thirdpartyclient"
+)
+
+twitch_patches_args=(
+  -e "Change package name" -OackageName="tv.twitch.android.app"
+)
+
+tumblr_patches_args=(
+  -e "Fix old versions"
+  -e "Change package name" -OackageName="com.tumblr"
+)
+
+recorder_patches_args=(
+  -e "Change package name" -OackageName="com.google.android.apps.recorder"
+)
+
 # --- Build App ---
 build_app() {
   # local variables
@@ -248,6 +274,12 @@ build_app() {
   Facebook Messenger arm32 + x86 5.0+
   Lightroom 8.0+
   Photomath 5.0+
+  Duolingo 10+
+  RAR 4.4+
+  Amazon Prime Video 5.0
+  Twitch 5.0
+  Tumblr 7.0+
+  Google Recorder 10+
 comment
 
 if  [[ $Android -ge 9  &&  ( "$cpuAbi" == "arm64-v8a" || "$cpuAbi" == "x86_64" ) ]]; then
@@ -262,8 +294,12 @@ elif [[ $Android -ge 5  &&  ( "$cpuAbi" == "armeabi-v7a" || "$cpuAbi" == "x86" )
   fbMessenger=("Facebook Messenger")
 fi
 
+if [ $cpuAbi == "arm64-v8a" ] || [ $cpuAbi == "armeabi-v7a" ]; then
+  amazonPrimeVideo=("Amazon Prime Video")
+fi
+
 # Define the array
-if [ $Android -ge 9 ]; then
+if [ $Android -ge 10 ]; then
   apps=(
     Quit
     YouTube
@@ -275,6 +311,29 @@ if [ $Android -ge 9 ]; then
     "${fbMessenger[0]}"
     Lightroom
     Photomath
+    Duolingo
+    RAR
+    "$amazonPrimeVideo"
+    Twitch
+    Tumblr
+    Google\ Recorder
+  )
+elif [ $Android -eq 9 ]; then
+  apps=(
+    Quit
+    YouTube
+    Spotify
+    TikTok
+    Google\ Photos
+    "$Instagram"
+    "$Facebook"
+    "${fbMessenger[0]}"
+    Lightroom
+    Photomath
+    RAR
+    "$amazonPrimeVideo"
+    Twitch
+    Tumblr
   )
 elif [ $Android -eq 8 ]; then
   apps=(
@@ -288,6 +347,10 @@ elif [ $Android -eq 8 ]; then
     "${fbMessenger[0]}"
     Lightroom
     Photomath
+    RAR
+    "$amazonPrimeVideo"
+    Twitch
+    Tumblr
   )
 elif [ $Android -eq 7 ]; then
   apps=(
@@ -298,6 +361,10 @@ elif [ $Android -eq 7 ]; then
     "$Instagram"
     "${fbMessenger[0]}"
     Photomath
+    RAR
+    "$amazonPrimeVideo"
+    Twitch
+    Tumblr
   )
 elif [ $Android -eq 6 ]; then
   apps=(
@@ -306,6 +373,9 @@ elif [ $Android -eq 6 ]; then
     Google\ Photos
     "${fbMessenger[0]}"
     Photomath
+    RAR
+    "$amazonPrimeVideo"
+    Twitch
   )
 elif [ $Android -eq 5 ]; then
   apps=(
@@ -314,6 +384,14 @@ elif [ $Android -eq 5 ]; then
     Google\ Photos\ Android\ 5.0+
     "${fbMessenger[0]}"
     Photomath
+    RAR
+    "$amazonPrimeVideo"
+    Twitch
+  )
+elif [ $Android -eq 4 ]; then
+  apps=(
+    Quit
+    RAR
   )
 fi
 
@@ -505,6 +583,112 @@ while true; do
       activityPatches="com.microblink.photomath.main.activity.LauncherActivity"
       build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "APKMirror" "photomath_apk_path" "photomath_patches_args" "$outputAPK" "$log" "$pkgName" "$activityPatches"
       ;;
+    Duolingo)
+      pkgName="com.duolingo"
+      appName=("Duolingo")
+      pkgVersion="5.158.4"
+      #pkgVersion=""
+      if [ -z "$pkgVersion" ]; then
+        getVersion "$pkgName"
+        pkgVersion="$pkgVersion"
+      fi
+      Type="BUNDLE"
+      Arch=("universal")
+      duolingo_apk_path=("$Download/Duolingo_v${pkgVersion}-$cpuAbi.apk")
+      outputAPK="$SimplUsr/duolingo-rv_v${pkgVersion}-$cpuAbi.apk"
+      log="$SimplUsr/duolingo-rv-patch_log.txt"
+      activityPatches="com.duolingo.splash.LaunchActivity"
+      build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "APKMirror" "duolingo_apk_path" "duolingo_patches_args" "$outputAPK" "$log" "$pkgName" "$activityPatches"
+      ;;
+    RAR)
+      pkgName="com.rarlab.rar"
+      appName=("RAR")
+      pkgVersion="7.01.build123"
+      #pkgVersion=""
+      if [ -z "$pkgVersion" ]; then
+        getVersion "$pkgName"
+        pkgVersion="$pkgVersion"
+      fi
+      Type="APK"
+      Arch=("$cpuAbi")
+      rar_apk_path=("$Download/RAR_v${pkgVersion}-$cpuAbi.apk")
+      outputAPK="$SimplUsr/rar-rv_v${pkgVersion}-$cpuAbi.apk"
+      log="$SimplUsr/rar-rv-patch_log.txt"
+      activityPatches="com.rarlab.rar.MainActivity"
+      build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "APKMirror" "rar_apk_path" "rar_patches_args" "$outputAPK" "$log" "$pkgName" "$activityPatches"
+      ;;
+    Amazon\ Prime\ Video)
+      pkgName="ccom.amazon.avod.thirdpartyclient"
+      appName=("Amazon Prime Video")
+      if [ $cpuAbi == "arm64-v8a" ]; then
+        pkgVersion="3.0.403.257"
+      elif [ $cpuAbi == "armeabi-v7a" ]; then
+        pkgVersion="3.0.403.245"
+      fi
+      #pkgVersion=""
+      if [ -z "$pkgVersion" ]; then
+        getVersion "$pkgName"
+        pkgVersion="$pkgVersion"
+      fi
+      Type="APK"
+      Arch=("$cpuAbi")
+      prime_video_apk_path=("$Download/Amazon Prime Video_v${pkgVersion}-$cpuAbi.apk")
+      outputAPK="$SimplUsr/prime-video-rv_v${pkgVersion}-$cpuAbi.apk"
+      log="$SimplUsr/prime-video-rv-patch_log.txt"
+      activityPatches="com.amazon.avod.thirdpartyclient.LauncherActivity"
+      build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "APKMirror" "prime_video_apk_path" "prime_video_patches_args" "$outputAPK" "$log" "$pkgName" "$activityPatches"
+      ;;
+    Twitch)
+      pkgName="tv.twitch.android.app"
+      appName=("Twitch")
+      pkgVersion="16.9.1"
+      #pkgVersion=""
+      if [ -z "$pkgVersion" ]; then
+        getVersion "$pkgName"
+        pkgVersion="$pkgVersion"
+      fi
+      Type="BUNDLE"
+      Arch=("universal")
+      twitch_apk_path=("$Download/Twitch_v${pkgVersion}-$cpuAbi.apk")
+      outputAPK="$SimplUsr/twitch-rv_v${pkgVersion}-$cpuAbi.apk"
+      log="$SimplUsr/twitch-rv-patch_log.txt"
+      activityPatches="tv.twitch.android.app.core.LandingActivity"
+      build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "APKMirror" "twitch_apk_path" "twitch_patches_args" "$outputAPK" "$log" "$pkgName" "$activityPatches"
+      ;;
+    Tumblr)
+      pkgName="com.tumblr"
+      appName=("Tumblr")
+      pkgVersion="33.8.0.110"
+      #pkgVersion=""
+      if [ -z "$pkgVersion" ]; then
+        getVersion "$pkgName"
+        pkgVersion="$pkgVersion"
+      fi
+      Type="BUNDLE"
+      Arch=("universal")
+      tumblr_apk_path=("$Download/Tumblr_v${pkgVersion}-$cpuAbi.apk")
+      outputAPK="$SimplUsr/tumblr-rv_v${pkgVersion}-$cpuAbi.apk"
+      log="$SimplUsr/tumblr-rv-patch_log.txt"
+      activityPatches="com.tumblr.ui.activity.JumpoffActivity"
+      build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "APKMirror" "tumblr_apk_path" "tumblr_patches_args" "$outputAPK" "$log" "$pkgName" "$activityPatches"
+      ;;
+    Google\ Recorder)
+      pkgName="com.google.android.apps.recorder"
+      appName=("Google Recorder")
+      pkgVersion="4.2.20230801.561280372"
+      #pkgVersion=""
+      if [ -z "$pkgVersion" ]; then
+        getVersion "$pkgName"
+        pkgVersion="$pkgVersion"
+      fi
+      Type="APK"
+      Arch=("$cpuAbi")
+      recorder_apk_path=("$Download/Google Recorder_v${pkgVersion}-$cpuAbi.apk")
+      outputAPK="$SimplUsr/recorder-rv_v${pkgVersion}-$cpuAbi.apk"
+      log="$SimplUsr/recorder-rv-patch_log.txt"
+      activityPatches="com.google.android.apps.recorder.ui.recordings.MainActivity"
+      build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "APKMirror" "recorder_apk_path" "recorder_patches_args" "$outputAPK" "$log" "$pkgName" "$activityPatches"
+      ;;
   esac  
 done
-###################################################################################################################################################################################
+###########################################################################################################################################################################
