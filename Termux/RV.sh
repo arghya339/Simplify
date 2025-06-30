@@ -160,6 +160,10 @@ lightroom_patches_args=(
   -e "Change package name" -OackageName="com.adobe.lrmobile"
 )
 
+photomath_patches_args=(
+  -e "Change package name" -OackageName="com.microblink.photomath"
+)
+
 # --- Build App ---
 build_app() {
   # local variables
@@ -243,6 +247,7 @@ build_app() {
   Facebook Messenger arm64 + x64 9.0+
   Facebook Messenger arm32 + x86 5.0+
   Lightroom 8.0+
+  Photomath 5.0+
 comment
 
 if  [[ $Android -ge 9  &&  ( "$cpuAbi" == "arm64-v8a" || "$cpuAbi" == "x86_64" ) ]]; then
@@ -269,6 +274,7 @@ if [ $Android -ge 9 ]; then
     "$Facebook"
     "${fbMessenger[0]}"
     Lightroom
+    Photomath
   )
 elif [ $Android -eq 8 ]; then
   apps=(
@@ -281,6 +287,7 @@ elif [ $Android -eq 8 ]; then
     "$Facebook"
     "${fbMessenger[0]}"
     Lightroom
+    Photomath
   )
 elif [ $Android -eq 7 ]; then
   apps=(
@@ -290,6 +297,7 @@ elif [ $Android -eq 7 ]; then
     Google\ Photos
     "$Instagram"
     "${fbMessenger[0]}"
+    Photomath
   )
 elif [ $Android -eq 6 ]; then
   apps=(
@@ -297,6 +305,7 @@ elif [ $Android -eq 6 ]; then
     TikTok
     Google\ Photos
     "${fbMessenger[0]}"
+    Photomath
   )
 elif [ $Android -eq 5 ]; then
   apps=(
@@ -304,6 +313,7 @@ elif [ $Android -eq 5 ]; then
     TikTok
     Google\ Photos\ Android\ 5.0+
     "${fbMessenger[0]}"
+    Photomath
   )
 fi
 
@@ -336,7 +346,7 @@ while true; do
         getVersion "$pkgName"
         pkgVersion="$pkgVersion"
       fi
-      Type="BUNDLE"
+      Type="APK"
       Arch=("universal")
       youtube_apk_path=("$Download/YouTube_v${pkgVersion}-$cpuAbi.apk")
       outputAPK="$SimplUsr/youtube-rv_v${pkgVersion}-$cpuAbi.apk"
@@ -477,6 +487,23 @@ while true; do
       log="$SimplUsr/lightroom-rv-patch_log.txt"
       activityPatches="com.adobe.lrmobile.StorageCheckActivity"
       build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "Uptodown" "lightroom_apk_path" "lightroom_patches_args" "$outputAPK" "$log" "$pkgName" "$activityPatches"  # F*** Cloudflare DDoS Protection on APKMirror Lightroom Page
+      ;;
+    Photomath)
+      pkgName="com.microblink.photomath"
+      appName=("Photomath")
+      #pkgVersion="8.43.0"
+      pkgVersion=""
+      if [ -z "$pkgVersion" ]; then
+        getVersion "$pkgName"
+        pkgVersion="$pkgVersion"
+      fi
+      Type="BUNDLE"
+      Arch=("universal")
+      photomath_apk_path=("$Download/Photomath_v${pkgVersion}-$cpuAbi.apk")
+      outputAPK="$SimplUsr/photomath-rv_v${pkgVersion}-$cpuAbi.apk"
+      log="$SimplUsr/photomath-rv-patch_log.txt"
+      activityPatches="com.microblink.photomath.main.activity.LauncherActivity"
+      build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "APKMirror" "photomath_apk_path" "photomath_patches_args" "$outputAPK" "$log" "$pkgName" "$activityPatches"
       ;;
   esac  
 done

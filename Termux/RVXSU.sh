@@ -210,12 +210,8 @@ build_app() {
       case $opt in
         I*|i*|"")
           checkCoreLSPosed  # Call the check core patch functions
-          Type="APK"
-          Arch="universal"
-          bash $Simplify/APKMdl.sh "$pkgName" "$pkgVersion" "$Type" "$Arch"
-          stock_apk_path="$Download/${appNameRef[0]}_v${pkgVersion}-$Arch.apk"
           echo -e "$running Copy signature from ${appNameRef[0]}.."
-          cs "$stock_apk_path" "$outputAPK" "$SimplUsr/${appNameRef[0]}-RVX-CS_v${pkgVersion}-$Arch.apk"
+          cs "${stock_apk_ref[0]}" "$outputAPK" "$SimplUsr/${appNameRef[0]}-RVX-CS_v${pkgVersion}-$Arch.apk"
           echo -e "$running Please Wait !! Installing Patched ${appNameRef[0]} RVX CS apk.."
           bash $Simplify/apkInstall.sh "$SimplUsr/${appNameRef[0]}-RVX-CS_v${pkgVersion}-$Arch.apk" "$pkgName" ""
           ;;
@@ -302,7 +298,7 @@ while true; do
         getVersion "$pkgName"
         pkgVersion="$pkgVersion"
       fi
-      Type="BUNDLE"
+      Type="APK"
       Arch="universal"
       stock_apk_path=("$Download/YouTube_v${pkgVersion}-$cpuAbi.apk")
       outputAPK="$SimplUsr/youtube-rvx_v${pkgVersion}-$cpuAbi.apk"
