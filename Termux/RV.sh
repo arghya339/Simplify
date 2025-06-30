@@ -235,26 +235,26 @@ build_app() {
       esac
     fi
 
-    echo -e "[?] ${Yellow}Do you want to install ${appNameRef[0]} RVX app? [Y/n] ${Reset}\c" && read opt
+    echo -e "[?] ${Yellow}Do you want to install ${appNameRef[0]} RV app? [Y/n] ${Reset}\c" && read opt
     case $opt in
       y*|Y*|"")
-        echo -e "$running Please Wait !! Installing Patched ${appNameRef[0]} RVX apk.."
+        echo -e "$running Please Wait !! Installing Patched ${appNameRef[0]} RV apk.."
         bash $Simplify/apkInstall.sh "$outputAPK" "$pkgPatches" "$activityPatches"
         ;;
-      n*|N*) echo -e "$notice ${appNameRef[0]} RVX Installaion skipped!" ;;
-      *) echo -e "$info Invalid choice! ${appNameRef[0]} RVX Installaion skipped." ;;
+      n*|N*) echo -e "$notice ${appNameRef[0]} RV Installaion skipped!" ;;
+      *) echo -e "$info Invalid choice! ${appNameRef[0]} RV Installaion skipped." ;;
     esac
     
-    echo -e "[?] ${Yellow}Do you want to Share ${appNameRef[0]} RVX app? [Y/n] ${Reset}\c" && read opt
+    echo -e "[?] ${Yellow}Do you want to Share ${appNameRef[0]} RV app? [Y/n] ${Reset}\c" && read opt
     case $opt in
       y*|Y*|"")
-        echo -e "$running Please Wait !! Sharing Patched ${appNameRef[0]} RVX apk.."
+        echo -e "$running Please Wait !! Sharing Patched ${appNameRef[0]} RV apk.."
         termux-open --send "$outputAPK"
         ;;
-      n*|N*) echo -e "$notice ${appNameRef[0]} RVX Sharing skipped!"
+      n*|N*) echo -e "$notice ${appNameRef[0]} RV Sharing skipped!"
         echo -e "$info Locate '$fileName' in '/sdcard/Simplify/' dir, Share it with your Friends and Family ;)"
         ;;
-        *) echo -e "$info Invalid choice! ${appNameRef[0]} RVX Sharing skipped." ;;
+        *) echo -e "$info Invalid choice! ${appNameRef[0]} RV Sharing skipped." ;;
     esac
   
   fi
