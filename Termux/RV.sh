@@ -216,7 +216,7 @@ build_app() {
   
   if [ -f "${stock_apk_path[0]}" ]; then
     echo -e "$good ${Green}Downloaded ${appNameRef[0]} APK found:${Reset} ${stock_apk_path[0]}"
-    echo -e "$running Patching ${appNameRef[0]} RVX.."
+    echo -e "$running Patching ${appNameRef[0]} RV.."
     patch_app "stock_apk_path" "$appPatchesArgs" "$outputAPK" "$log" "${appNameRef[0]}" "$bugReportUrl"
   fi
   
