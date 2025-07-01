@@ -294,12 +294,12 @@ while true; do
         pkgVersion="$pkgVersion"
       fi
       Type="APK"
-      Arch="universal"
+      Arch=("universal")
       yt_apk_path=("$Download/YouTube_v${pkgVersion}-${Arch[0]}.apk")
       outputAPK="$SimplUsr/youtube-rv_v${pkgVersion}-$cpuAbi.apk"
       log="$SimplUsr/yt-rv-patch_log.txt"
       appName=("YouTube")
-      build_app "$pkgName" "appName" "$pkgVersion" "$Type" "$Arch" "APKMirror" "yt_apk_path" "yt_patches_args" "$outputAPK" "$log"
+      build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "APKMirror" "yt_apk_path" "yt_patches_args" "$outputAPK" "$log"
       ;;
     Google\ Recorder)
       pkgName="com.google.android.apps.recorder"
