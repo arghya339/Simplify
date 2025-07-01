@@ -157,7 +157,6 @@ build_app() {
   local -n archRef=$5
   local web=$6
   local -n stock_apk_ref=$7
-  echo -e "$notice DEBUG - stock_apk_ref: ${stock_apk_ref[0]}"
   local appPatchesArgs=$8
   local outputAPK=$9
   local fileName=$(basename $outputAPK)
