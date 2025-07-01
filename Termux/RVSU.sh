@@ -155,6 +155,7 @@ build_app() {
   local pkgVersion=$3
   local Type=$4
   local -n archRef=$5
+  echo -e "$notice DEBUG - archRef: ${archRef[0]}"
   local web=$6
   local -n stock_apk_path=$7
   local appPatchesArgs=$8
