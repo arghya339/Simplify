@@ -100,7 +100,7 @@ patch_app() {
   local log=$4
   local appName=$5
   
-  if [ "$appname" != "Instagram" ] || [ "$appname" != "Facebook" ] || [ "$appname" != "Facebook Messenger" ]; then
+  if [ "$appName" != "Instagram" ] || [ "$appName" != "Facebook" ] || [ "$appName" != "Facebook Messenger" ]; then
     universalPatches=(
       -e "Change version code" -OversionCode="2147483647" 
       -e "Disable Pairip license check" 
