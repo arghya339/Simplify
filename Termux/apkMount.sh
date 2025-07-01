@@ -21,6 +21,7 @@ Reset="\033[0m"
 apkMount() {
   # local variables
   local stock=$1
+  local stockFileName=$(basename "$stock")
   local patched=$2
   local appName=$3
   local pkgName=$4
@@ -62,8 +63,16 @@ apkMount() {
     if [ $? == 0 ]; then
       echo "$good $appName $versionName installation complete."
     else
-      echo "$bad $appName $versionName installation failed !!"
-      exit 1
+      echo "$notice $appName $versionName installation failed! Attempting fallback to install Google Play as installation source."
+      cp "$stock" "/data/local/tmp/$stockFileName"
+      pm install -i com.android.vending "/data/local/tmp/$stockFileName"
+      if [ $? == 0 ]; then
+        rm "/data/local/tmp/$stockFileName"
+      else
+        echo "$bad $appName $versionName installation failed !!"
+        rm "/data/local/tmp/$stockFileName"
+        exit 1
+      fi
     fi
   else
     echo "$good stock $appName $versionName is installed."
