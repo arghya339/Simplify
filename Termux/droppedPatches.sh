@@ -130,6 +130,7 @@ build_app() {
     echo -e "[?] ${Yellow}Do you want to install ${appNameRef[0]} Dropped app? [Y/n] ${Reset}\c" && read opt
     case $opt in
       y*|Y*|"")
+        echo -e "$notice Warning! Disable auto updates for the patched app to avoid unexpected issues."
         echo -e "$running Please Wait !! Installing Patched ${appNameRef[0]} Dropped apk.."
         bash $Simplify/apkInstall.sh "$outputAPK" "$pkgPatches" "$activityPatches"
         ;;

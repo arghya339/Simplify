@@ -100,10 +100,21 @@ patch_app() {
   local log=$4
   local appName=$5
   
+  if [ "$appname" != "Instagram" ] || [ "$appname" != "Facebook" ] || [ "$appname" != "Facebook Messenger" ]; then
+    universalPatches=(
+      -e "Change version code" -OversionCode="2147483647" 
+      -e "Disable Pairip license check" 
+      -e "Predictive back gesture" 
+      -e "Remove share targets"
+      -e "Remove screen capture restriction"
+      -e "Remove screenshot restriction"
+    )
+  fi
+  
   $PREFIX/lib/jvm/java-21-openjdk/bin/java -jar $ReVancedCLIJar patch -p $PatchesRvp \
     -o "$outputAPK" "${stock_apk_ref[0]}" \
     "${patches[@]}" \
-    -e "Change version code" -OversionCode="2147483647" -e "Disable Pairip license check" -e "Predictive back gesture" -e "Remove share targets" \
+    "${universalPatches[@]}" \
     --custom-aapt2-binary="$HOME/aapt2" \
     --purge $ripLib -f | tee "$log"
   
@@ -144,17 +155,11 @@ photos_patches_args=(
   -e "Change package name" -OackageName="app.revanced.android.apps.photos"
 )
 
-instagram_patches_args=(
-  -e "Change package name" -OackageName="com.instagram.android"
-)
+instagram_patches_args=()
 
-facebook_patches_args=(
-  -e "Change package name" -OackageName="com.facebook.katana"
-)
+facebook_patches_args=()
 
-fb_messenger_patches_args=(
-  -e "Change package name" -OackageName="com.facebook.orca"
-)
+fb_messenger_patches_args=()
 
 lightroom_patches_args=(
   -e "Change package name" -OackageName="com.adobe.lrmobile"
@@ -234,6 +239,9 @@ build_app() {
     echo -e "[?] ${Yellow}Do you want to install ${appNameRef[0]} RV app? [Y/n] ${Reset}\c" && read opt
     case $opt in
       y*|Y*|"")
+        if [ $pkgName == "com.instagram.android" ] || [ $pkgName == "com.facebook.katana" ] || [ $pkgName == "com.facebook.orca" ]; then
+          echo -e "$notice Warning! Disable auto updates for the patched app to avoid unexpected issues."
+        fi
         echo -e "$running Please Wait !! Installing Patched ${appNameRef[0]} RV apk.."
         bash $Simplify/apkInstall.sh "$outputAPK" "$pkgPatches" "$activityPatches"
         ;;
