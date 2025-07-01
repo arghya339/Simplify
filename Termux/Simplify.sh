@@ -286,7 +286,7 @@ while true; do
   clear  # Clear
   # Apply the eye color to the simplify shape and print it
   echo -e "${BoldGreen}$print_simplify${Reset}" && echo ""  # Space
-  echo -e "RV. ReVanced\nRVS. RV SuperUser\nRVX. ReVanced Extended\nRVXS. RVX SuperUser\nPiko. Piko Twitter\nDrop. Dropped Patches\nF. Feature request\nB. Bug report\nS. Support\nA. About\nQ. Quit\n"
+  echo -e "RV  : ReVanced\nRVS : RV SuperUser\nRVX : ReVanced Extended\nRVXS: RVX SuperUser\nPiko: Piko Twitter\nDrop: Dropped Patches\nF   : Feature request\nB   : Bug report\nS   : Support\nA   : About\nQ   : Quit\n"
   echo -n "Select Patches source: " && read source
   case $source in
     RV|rv)

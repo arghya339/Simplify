@@ -217,8 +217,8 @@ build_app() {
           ;;
         M*|m*)
           echo -e "$running Please Wait !! Mounting Patched ${appNameRef[0]} RVX apk.."
-          su -mm -c "/system/bin/sh $Simplify/apkMount.sh ${stock_apk_ref[0]} $outputAPK ${appNameRef[0]} $pkgName $pkgVersion" &> /dev/null
-          su -mm -c "/system/bin/sh $Simplify/apkMount.sh ${stock_apk_ref[0]} $outputAPK ${appNameRef[0]} $pkgName $pkgVersion" | tee "$SimplUsr/${appNameRef[0]}-RVX_mount_log.txt"
+          su -mm -c "/system/bin/sh $Simplify/apkMount.sh \"${stock_apk_ref[0]}\" $outputAPK \"${appNameRef[0]}\" $pkgName $pkgVersion" &> /dev/null
+          su -mm -c "/system/bin/sh $Simplify/apkMount.sh \"${stock_apk_ref[0]}\" $outputAPK \"${appNameRef[0]}\" $pkgName $pkgVersion" | tee "$SimplUsr/${appNameRef[0]}-RVX_mount_log.txt"
           rm $outputAPK
           ;;
         N*|n*) echo -e "$notice ${appNameRef[0]} RVX Installaion skipped!" ;;
@@ -231,8 +231,8 @@ build_app() {
       case $opt in
         y*|Y*|"")
           echo -e "$running Please Wait !! Mounting Patched ${appNameRef[0]} RVX apk.."
-          su -mm -c "/system/bin/sh $Simplify/apkMount.sh ${stock_apk_ref[0]} $outputAPK ${appNameRef[0]} $pkgName $pkgVersion" &> /dev/null
-          su -mm -c "/system/bin/sh $Simplify/apkMount.sh ${stock_apk_ref[0]} $outputAPK ${appNameRef[0]} $pkgName $pkgVersion" | tee "$SimplUsr/${appNameRef[0]}-RVX_mount_log.txt"
+          su -mm -c "/system/bin/sh $Simplify/apkMount.sh \"${stock_apk_ref[0]}\" $outputAPK \"${appNameRef[0]}\" $pkgName $pkgVersion" &> /dev/null
+          su -mm -c "/system/bin/sh $Simplify/apkMount.sh \"${stock_apk_ref[0]}\" $outputAPK \"${appNameRef[0]}\" $pkgName $pkgVersion" | tee "$SimplUsr/${appNameRef[0]}-RVX_mount_log.txt"
           rm $outputAPK
           ;;
         n*|N*) echo -e "$notice ${appNameRef[0]} RVX Installaion skipped!" ;;
