@@ -101,7 +101,11 @@ patch_app() {
   local appName=$5
   
   if [ "$appName" == "Instagram" ] || [ "$appName" == "Facebook" ] || [ "$appName" == "Facebook Messenger" ]; then
-    universalPatches=()
+    universalPatches=(
+      -d "Hex"
+      -d "Spoof app signature"
+      -d "Spoof client"
+    )
   else
     universalPatches=(
       -e "Change version code" -OversionCode="2147483647" 
@@ -242,7 +246,7 @@ build_app() {
     case $opt in
       y*|Y*|"")
         if [ $pkgName == "com.instagram.android" ] || [ $pkgName == "com.facebook.katana" ] || [ $pkgName == "com.facebook.orca" ]; then
-          echo -e "$notice Warning! Disable auto updates for the patched app to avoid unexpected issues."
+          echo -e "$notice ${Yellow}Warning! Disable auto updates for the patched app to avoid unexpected issues.${Reset}"
         fi
         echo -e "$running Please Wait !! Installing Patched ${appNameRef[0]} RV apk.."
         bash $Simplify/apkInstall.sh "$outputAPK" "$pkgPatches" "$activityPatches"
