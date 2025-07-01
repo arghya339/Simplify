@@ -302,6 +302,26 @@ while true; do
       appName=("YouTube")
       build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "APKMirror" "yt_apk_path" "yt_patches_args" "$outputAPK" "$log"
       ;;
+    Google\ Photos)
+      pkgName="com.google.android.apps.photos"
+      appName=("Google Photos")
+      if [ $Android -ge 6 ]; then
+        pkgVersion="6.95.0.663027175"
+        #pkgVersion=""
+        if [ -z "$pkgVersion" ]; then
+          getVersion "$pkgName"
+          pkgVersion="$pkgVersion"
+        fi
+      elif [ $Android -eq 5 ]; then
+        pkgVersion="5.78.0.430249291"
+      fi
+      Type="APK"
+      Arch=("$cpuAbi")
+      photos_apk_path=("$Download/${appName[0]}_v${pkgVersion}-${Arch[0]}.apk")
+      outputAPK="$SimplUsr/google-photos-rv_v${pkgVersion}-$cpuAbi.apk"
+      log="$SimplUsr/google-photos-rv_patch-log.txt"
+      build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "APKMirror" "photos_apk_path" "photos_patches_args" "$outputAPK" "$log"
+      ;;
     Google\ Recorder)
       pkgName="com.google.android.apps.recorder"
       appName=("Google Recorder")
