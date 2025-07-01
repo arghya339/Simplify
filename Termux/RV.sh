@@ -186,10 +186,6 @@ tumblr_patches_args=(
   -e "Change package name" -OackageName="com.tumblr"
 )
 
-recorder_patches_args=(
-  -e "Change package name" -OackageName="com.google.android.apps.recorder"
-)
-
 # --- Build App ---
 build_app() {
   # local variables
@@ -279,7 +275,6 @@ build_app() {
   Amazon Prime Video 5.0
   Twitch 5.0
   Tumblr 7.0+
-  Google Recorder 10+
 comment
 
 if  [[ $Android -ge 9  &&  ( "$cpuAbi" == "arm64-v8a" || "$cpuAbi" == "x86_64" ) ]]; then
@@ -316,7 +311,6 @@ if [ $Android -ge 10 ]; then
     "$amazonPrimeVideo"
     Twitch
     Tumblr
-    Google\ Recorder
   )
 elif [ $Android -eq 9 ]; then
   apps=(
@@ -381,7 +375,7 @@ elif [ $Android -eq 5 ]; then
   apps=(
     Quit
     TikTok
-    Google\ Photos\ Android\ 5.0+
+    Google\ Photos
     "${fbMessenger[0]}"
     Photomath
     RAR
@@ -424,7 +418,7 @@ while true; do
         getVersion "$pkgName"
         pkgVersion="$pkgVersion"
       fi
-      Type="APK"
+      Type="BUNDLE"
       Arch=("universal")
       youtube_apk_path=("$Download/${appName[0]}_v${pkgVersion}-$cpuAbi.apk")
       outputAPK="$SimplUsr/youtube-rv_v${pkgVersion}-$cpuAbi.apk"
@@ -471,25 +465,16 @@ while true; do
     Google\ Photos)
       pkgName="com.google.android.apps.photos"
       appName=("Google Photos")
-      pkgVersion="6.95.0.663027175"
-      #pkgVersion=""
-      if [ -z "$pkgVersion" ]; then
-        getVersion "$pkgName"
-        pkgVersion="$pkgVersion"
+      if [ $Android -ge 6 ]; then
+        pkgVersion="6.95.0.663027175"
+        #pkgVersion=""
+        if [ -z "$pkgVersion" ]; then
+          getVersion "$pkgName"
+          pkgVersion="$pkgVersion"
+        fi
+      elif [ $Android -eq 5 ]; then
+        pkgVersion="5.78.0.430249291"
       fi
-      Type="APK"
-      Arch=("$cpuAbi")
-      photos_apk_path=("$Download/${appName[0]}_v${pkgVersion}-${Arch[0]}.apk")
-      outputAPK="$SimplUsr/google-photos-rv_v${pkgVersion}-$cpuAbi.apk"
-      log="$SimplUsr/google-photos-rv-patch_log.txt"
-      pkgPatches="app.revanced.android.apps.photos"
-      activityPatches="com.google.android.apps.photos/.home.HomeActivity"
-      build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "APKMirror" "photos_apk_path" "photos_patches_args" "$outputAPK" "$log" "$pkgPatches" "$activityPatches"
-      ;;
-    Google\ Photos\ Android\ 5.0+)
-      pkgName="com.google.android.apps.photos"
-      appName=("Google Photos")
-      pkgVersion="5.78.0.430249291"
       Type="APK"
       Arch=("$cpuAbi")
       photos_apk_path=("$Download/${appName[0]}_v${pkgVersion}-${Arch[0]}.apk")
@@ -502,7 +487,7 @@ while true; do
     Instagram)
       pkgName="com.instagram.android"
       appName=("Instagram")
-      pkgVersion="324.0.0.27.50"
+      pkgVersion="378.0.0.52.68"
       #pkgVersion=""
       if [ -z "$pkgVersion" ]; then
         getVersion "$pkgName"
@@ -536,7 +521,7 @@ while true; do
     Facebook\ Messenger)
       pkgName="com.facebook.orca"
       appName=("Facebook Messenger")
-      pkgVersion="381.0.0.17.102"
+      pkgVersion="512.1.0.67.109"
       #pkgVersion=""
       if [ -z "$pkgVersion" ]; then
         getVersion "$pkgName"
@@ -553,14 +538,14 @@ while true; do
     Lightroom)
       pkgName="com.adobe.lrmobile"
       appName=("Adobe Lightroom Mobile")
-      #pkgVersion="10.0.2"
-      pkgVersion=""
+      pkgVersion="9.2.0"
+      #pkgVersion=""
       if [ -z "$pkgVersion" ]; then
         getVersion "$pkgName"
         pkgVersion="$pkgVersion"
       fi
       Type="apk"
-      Arch=("arm64-v8a")
+      Arch=("arm64-v8a, x86_64")
       lightroom_apk_path=("$Download/${appName[0]}_v${pkgVersion}-${Arch[0]}.apk")
       outputAPK="$SimplUsr/lightroom-rv_v${pkgVersion}-$cpuAbi.apk"
       log="$SimplUsr/lightroom-rv-patch_log.txt"
@@ -669,23 +654,6 @@ while true; do
       log="$SimplUsr/tumblr-rv-patch_log.txt"
       activityPatches="com.tumblr/.ui.activity.JumpoffActivity"
       build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "APKMirror" "tumblr_apk_path" "tumblr_patches_args" "$outputAPK" "$log" "$pkgName" "$activityPatches"
-      ;;
-    Google\ Recorder)
-      pkgName="com.google.android.apps.recorder"
-      appName=("Google Recorder")
-      pkgVersion="4.2.20230801.561280372"
-      #pkgVersion=""
-      if [ -z "$pkgVersion" ]; then
-        getVersion "$pkgName"
-        pkgVersion="$pkgVersion"
-      fi
-      Type="APK"
-      Arch=("$cpuAbi")
-      recorder_apk_path=("$Download/${appName[0]}_v${pkgVersion}-$cpuAbi.apk")
-      outputAPK="$SimplUsr/recorder-rv_v${pkgVersion}-$cpuAbi.apk"
-      log="$SimplUsr/recorder-rv-patch_log.txt"
-      activityPatches="com.google.android.apps.recorder/.ui.recordings.MainActivity"
-      build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "APKMirror" "recorder_apk_path" "recorder_patches_args" "$outputAPK" "$log" "$pkgName" "$activityPatches"
       ;;
   esac  
 done

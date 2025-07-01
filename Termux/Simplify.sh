@@ -286,12 +286,22 @@ while true; do
   clear  # Clear
   # Apply the eye color to the simplify shape and print it
   echo -e "${BoldGreen}$print_simplify${Reset}" && echo ""  # Space
-  echo -e "RV. ReVanced\nRVX. ReVanced Extended\nRVXS. RVX SuperUser\nPiko. Piko Twitter\nDrop. Dropped Patches\nF. Feature request\nB. Bug report\nS. Support\nA. About\nQ. Quit\n"
+  echo -e "RV. ReVanced\nRVS. RV SuperUser\nRVX. ReVanced Extended\nRVXS. RVX SuperUser\nPiko. Piko Twitter\nDrop. Dropped Patches\nF. Feature request\nB. Bug report\nS. Support\nA. About\nQ. Quit\n"
   echo -n "Select Patches source: " && read source
   case $source in
     RV|rv)
       curl -sL --progress-bar -o "$RV/RV.sh" "https://raw.githubusercontent.com/arghya339/Simplify/refs/heads/main/Termux/RV.sh" > /dev/null 2>&1
       bash "$RV/RV.sh"
+      sleep 3
+      ;;
+    RVS*|rvs*)
+      if su -c "id" >/dev/null 2>&1; then
+        curl -sL -o "$RVX/RVSU.sh" "https://raw.githubusercontent.com/arghya339/Simplify/refs/heads/main/Termux/RVSU.sh"
+        curl -sL -o "$Simplify/apkMount.sh" "https://raw.githubusercontent.com/arghya339/Simplify/refs/heads/main/Termux/apkMount.sh"
+        bash "$RVX/RVSU.sh"
+      else
+        echo -e "$notice SuperUser permission is not granted! RV SuperUser required SU permission."
+      fi
       sleep 3
       ;;
     RVX|rvx)
@@ -305,7 +315,7 @@ while true; do
         curl -sL -o "$Simplify/apkMount.sh" "https://raw.githubusercontent.com/arghya339/Simplify/refs/heads/main/Termux/apkMount.sh" &> /dev/null
         bash "$RVX/RVXSU.sh"
       else
-        echo -e "$notice SuperUser permission is not granted! RVX CoreLSPosed required SU permission."
+        echo -e "$notice SuperUser permission is not granted! RVX SuperUser required SU permission."
       fi
       sleep 3
       ;;
@@ -324,7 +334,7 @@ while true; do
     [Ss]*) support && sleep 3 ;;
     [Aa]*) about && sleep 3 ;;
     [Qq]*) clear && break ;;
-    *) echo -e "$info Invalid input! Please enter RV / RVX / RVXS / Piko / Drop / F / B / S / A / Q." && sleep 3 ;;
+    *) echo -e "$info Invalid input! Please enter RV / RVS / RVX / RVXS / Piko / Drop / F / B / S / A / Q." && sleep 3 ;;
   esac
 done
-###################################################################################################################
+#########################################################################################################################

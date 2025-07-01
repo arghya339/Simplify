@@ -300,7 +300,7 @@ while true; do
       fi
       Type="APK"
       Arch="universal"
-      stock_apk_path=("$Download/YouTube_v${pkgVersion}-$cpuAbi.apk")
+      stock_apk_path=("$Download/YouTube_v${pkgVersion}-${Arch[0]}.apk")
       outputAPK="$SimplUsr/youtube-rvx_v${pkgVersion}-$cpuAbi.apk"
       log="$SimplUsr/yt-rvx-patch_log.txt"
       appName=("YouTube")
