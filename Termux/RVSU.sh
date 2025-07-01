@@ -110,20 +110,20 @@ getVersion() {
 
 #  --- Patch Apps ---
 patch_app() {
-  local -n stock_apk_ref=$1
+  local stock_apk_path=$1
   local -n patches=$2  # nameref (-n) accept an array name as parameter
   local outputAPK=$3
   local log=$4
   local appName=$5
   
   $PREFIX/lib/jvm/java-21-openjdk/bin/java -jar $ReVancedCLIJar patch -p $PatchesRvp \
-    -o "$outputAPK" "${stock_apk_ref[0]}" \
+    -o "$outputAPK" "$stock_apk_path" \
     "${patches[@]}" \
     -e "Change version code" -OversionCode="2147483647" -e "Disable Pairip license check" -e "Predictive back gesture" -e "Remove share targets" \
     --custom-aapt2-binary="$HOME/aapt2" \
     --purge $ripLib --unsigned -f | tee "$log"
   
-  if [ ! -f "$outputAPK" ] && [ -f "${stock_apk_ref[0]}" ]; then
+  if [ ! -f "$outputAPK" ] && [ -f "$stock_apk_path" ]; then
     echo -e "$bad Oops, $appName Patching failed !! Logs saved to "$log". Share the Patchlog to developer."
     termux-open-url "https://github.com/ReVanced/revanced-patches/issues/new?template=bug_report.yml"
     termux-open --send "$log"
@@ -156,8 +156,8 @@ build_app() {
   local Type=$4
   local -n archRef=$5
   local web=$6
-  local -n stock_apk_path=$7
-  echo -e "$notice DEBUG - stock_apk_path: ${stock_apk_path[0]}"
+  local -n stock_apk_ref=$7
+  echo -e "$notice DEBUG - stock_apk_ref: ${stock_apk_ref[0]}"
   local appPatchesArgs=$8
   local outputAPK=$9
   local fileName=$(basename $outputAPK)
@@ -170,10 +170,10 @@ build_app() {
     bash $Simplify/dlUptodown.sh "${appNameRef[0]}" "$pkgVersion" "$Type" "${archRef[0]}"  # Download stock apk from Uptodown
   fi
   
-  if [ -f "${stock_apk_path[0]}" ]; then
-    echo -e "$good ${Green}Downloaded ${appNameRef[0]} APK found:${Reset} ${stock_apk_path[0]}"
+  if [ -f "${stock_apk_ref[0]}" ]; then
+    echo -e "$good ${Green}Downloaded ${appNameRef[0]} APK found:${Reset} ${stock_apk_ref[0]}"
     echo -e "$running Patching ${appNameRef[0]} RV.."
-    patch_app "stock_apk_path" "$appPatchesArgs" "$outputAPK" "$log" "${appNameRef[0]}"
+    patch_app "${stock_apk_ref[0]}" "$appPatchesArgs" "$outputAPK" "$log" "${appNameRef[0]}"
   fi
   
   if [ -f "$outputAPK" ]; then
@@ -185,14 +185,14 @@ build_app() {
         I*|i*|"")
           checkCoreLSPosed  # Call the check core patch functions
           echo -e "$running Copy signature from ${appNameRef[0]}.."
-          cs "${stock_apk_path[0]}" "$outputAPK" "$SimplUsr/${appNameRef[0]}-RV-CS_v${pkgVersion}-${archRef[0]}.apk"
+          cs "${stock_apk_ref[0]}" "$outputAPK" "$SimplUsr/${appNameRef[0]}-RV-CS_v${pkgVersion}-${archRef[0]}.apk"
           echo -e "$running Please Wait !! Installing Patched ${appNameRef[0]} RV CS apk.."
           bash $Simplify/apkInstall.sh "$SimplUsr/${appNameRef[0]}-RV-CS_v${pkgVersion}-${archRef[0]}.apk" "$pkgName" ""
           ;;
         M*|m*)
           echo -e "$running Please Wait !! Mounting Patched ${appNameRef[0]} RV apk.."
-          su -mm -c "/system/bin/sh $Simplify/apkMount.sh ${stock_apk_path[0]} $outputAPK ${appNameRef[0]} $pkgName $pkgVersion" &> /dev/null
-          su -mm -c "/system/bin/sh $Simplify/apkMount.sh ${stock_apk_path[0]} $outputAPK ${appNameRef[0]} $pkgName $pkgVersion" | tee "$SimplUsr/${appNameRef[0]}-RV_mount-log.txt"
+          su -mm -c "/system/bin/sh $Simplify/apkMount.sh ${stock_apk_ref[0]} $outputAPK ${appNameRef[0]} $pkgName $pkgVersion" &> /dev/null
+          su -mm -c "/system/bin/sh $Simplify/apkMount.sh ${stock_apk_ref[0]} $outputAPK ${appNameRef[0]} $pkgName $pkgVersion" | tee "$SimplUsr/${appNameRef[0]}-RV_mount-log.txt"
           rm $outputAPK
           ;;
         N*|n*) echo -e "$notice ${appNameRef[0]} RV Installaion skipped!" ;;
@@ -205,8 +205,8 @@ build_app() {
       case $opt in
         y*|Y*|"")
           echo -e "$running Please Wait !! Mounting Patched ${appNameRef[0]} RV apk.."
-          su -mm -c "/system/bin/sh $Simplify/apkMount.sh ${stock_apk_path[0]} $outputAPK ${appNameRef[0]} $pkgName $pkgVersion" &> /dev/null
-          su -mm -c "/system/bin/sh $Simplify/apkMount.sh ${stock_apk_path[0]} $outputAPK ${appNameRef[0]} $pkgName $pkgVersion" | tee "$SimplUsr/${appNameRef[0]}-RV_mount-log.txt"
+          su -mm -c "/system/bin/sh $Simplify/apkMount.sh ${stock_apk_ref[0]} $outputAPK ${appNameRef[0]} $pkgName $pkgVersion" &> /dev/null
+          su -mm -c "/system/bin/sh $Simplify/apkMount.sh ${stock_apk_ref[0]} $outputAPK ${appNameRef[0]} $pkgName $pkgVersion" | tee "$SimplUsr/${appNameRef[0]}-RV_mount-log.txt"
           rm $outputAPK
           ;;
         n*|N*) echo -e "$notice ${appNameRef[0]} RV Installaion skipped!" ;;
@@ -296,11 +296,11 @@ while true; do
       fi
       Type="APK"
       Arch=("universal")
-      yt_apk_path=("$Download/YouTube_v${pkgVersion}-${Arch[0]}.apk")
+      stock_apk_path=("$Download/YouTube_v${pkgVersion}-${Arch[0]}.apk")
       outputAPK="$SimplUsr/youtube-rv_v${pkgVersion}-$cpuAbi.apk"
       log="$SimplUsr/yt-rv-patch_log.txt"
       appName=("YouTube")
-      build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "APKMirror" "yt_apk_path" "yt_patches_args" "$outputAPK" "$log"
+      build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "APKMirror" "stock_apk_path" "yt_patches_args" "$outputAPK" "$log"
       ;;
     Google\ Photos)
       pkgName="com.google.android.apps.photos"
@@ -317,10 +317,10 @@ while true; do
       fi
       Type="APK"
       Arch=("$cpuAbi")
-      photos_apk_path=("$Download/${appName[0]}_v${pkgVersion}-${Arch[0]}.apk")
+      stock_apk_path=("$Download/${appName[0]}_v${pkgVersion}-${Arch[0]}.apk")
       outputAPK="$SimplUsr/google-photos-rv_v${pkgVersion}-$cpuAbi.apk"
       log="$SimplUsr/google-photos-rv_patch-log.txt"
-      build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "APKMirror" "photos_apk_path" "photos_patches_args" "$outputAPK" "$log"
+      build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "APKMirror" "stock_apk_path" "photos_patches_args" "$outputAPK" "$log"
       ;;
     Google\ Recorder)
       pkgName="com.google.android.apps.recorder"
@@ -333,10 +333,10 @@ while true; do
       fi
       Type="APK"
       Arch=("$cpuAbi")
-      recorder_apk_path=("$Download/${appName[0]}_v${pkgVersion}-$cpuAbi.apk")
+      stock_apk_path=("$Download/${appName[0]}_v${pkgVersion}-$cpuAbi.apk")
       outputAPK="$SimplUsr/recorder-rv_v${pkgVersion}-$cpuAbi.apk"
       log="$SimplUsr/recorder-rv-patch_log.txt"
-      build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "APKMirror" "recorder_apk_path" "recorder_patches_args" "$outputAPK" "$log"
+      build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "APKMirror" "stock_apk_path" "recorder_patches_args" "$outputAPK" "$log"
       ;;
   esac  
 done
