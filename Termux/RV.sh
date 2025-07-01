@@ -100,7 +100,9 @@ patch_app() {
   local log=$4
   local appName=$5
   
-  if [ "$appName" -ne "Instagram" ] || [ "$appName" -ne "Facebook" ] || [ "$appName" -ne "Facebook Messenger" ]; then
+  if [ "$appName" == "Instagram" ] || [ "$appName" == "Facebook" ] || [ "$appName" == "Facebook Messenger" ]; then
+    universalPatches=()
+  else
     universalPatches=(
       -e "Change version code" -OversionCode="2147483647" 
       -e "Disable Pairip license check" 
@@ -109,8 +111,6 @@ patch_app() {
       -e "Remove screen capture restriction"
       -e "Remove screenshot restriction"
     )
-  else
-    universalPatches=()
   fi
   
   $PREFIX/lib/jvm/java-21-openjdk/bin/java -jar $ReVancedCLIJar patch -p $PatchesRvp \
