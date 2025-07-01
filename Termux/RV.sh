@@ -109,6 +109,8 @@ patch_app() {
       -e "Remove screen capture restriction"
       -e "Remove screenshot restriction"
     )
+  else
+    universalPatches=()
   fi
   
   $PREFIX/lib/jvm/java-21-openjdk/bin/java -jar $ReVancedCLIJar patch -p $PatchesRvp \
