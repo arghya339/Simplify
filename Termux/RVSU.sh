@@ -121,7 +121,7 @@ patch_app() {
     "${patches[@]}" \
     -e "Change version code" -OversionCode="2147483647" -e "Disable Pairip license check" -e "Predictive back gesture" -e "Remove share targets" \
     --custom-aapt2-binary="$HOME/aapt2" \
-    --purge $ripLib -f | tee "$log"
+    --purge $ripLib --unsigned -f | tee "$log"
   
   if [ ! -f "$outputAPK" ] && [ -f "$stock_apk_path" ]; then
     echo -e "$bad Oops, $appName Patching failed !! Logs saved to "$log". Share the Patchlog to developer."
