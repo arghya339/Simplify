@@ -108,7 +108,7 @@ build_app() {
   if [ -f "${stock_apk_ref[0]}" ]; then
     echo -e "$good ${Green}Downloaded ${appNameRef[0]} APK found:${Reset} ${stock_apk_ref[0]}"
     echo -e "$running Patching ${appNameRef[0]} LSPatch.."
-    patch_app "${stock_apk_ref[0]}" "$module_apk_path" "${appNameRef[0]}" "$BugReportUrl"
+    patch_app "${stock_apk_ref[0]}" "$module_apk_path" \"${appNameRef[0]}\" "$BugReportUrl"
   fi
   
   local output_apk_path=$(find "$SimplUsr" -type f -name "${stockFileNameWOExt}-*-lspatched.apk")
