@@ -161,7 +161,7 @@ comment
 if [ "$cpuAbi" == "arm64-v8a" ] || [ "$cpuAbi" == "armeabi-v7a" ]; then
   Snapchat=("Snapchat")
   LINE=("LINE")
-  if su -c "id" 2>&1; then
+  if su -c "id" >/dev/null 2>&1; then
     googleDialer=("Phone by Google")
   fi
 fi
