@@ -19,7 +19,7 @@ Reset="\033[0m"
 # Install final apk
 apkInstall() {
   local outputAPK=$1
-  local outputFileName=$(basename $outputAPK)
+  local outputFileName=$(basename "$outputAPK")
   local pkgName=$2
   local activity=$3
   if su -c "id" >/dev/null 2>&1; then
@@ -38,7 +38,7 @@ apkInstall() {
   local Model=$(getprop ro.product.model)
   
   if su -c "id" >/dev/null 2>&1; then
-    su -c "cp '$outputAPK' '/data/local/tmp/$outputFileName'"
+    su -c "cp \"$outputAPK\" \"/data/local/tmp/$outputFileName\""
     if [ "$pkgName" == "com.google.android.youtube" ] || [ "$pkgName" == "com.google.android.apps.youtube.music" ]; then
       rm "$outputAPK"
     fi
@@ -50,16 +50,16 @@ apkInstall() {
     else
       su -c "pm install -i com.android.vending '/data/local/tmp/$outputFileName'"
     fi
-    am start -n $activityClass &> /dev/null  # launch app after update
+    am start -n "$activityClass" &> /dev/null  # launch app after update
     if [ $? != 0 ]; then
       su -c "monkey -p $pkgName -c android.intent.category.LAUNCHER 1" > /dev/null 2>&1
     fi
     su -c "rm '/data/local/tmp/$outputFileName'"
   elif "$HOME/rish" -c "id" >/dev/null 2>&1; then
-    ~/rish -c "cp '$outputAPK' '/data/local/tmp/$outputFileName'" > /dev/null 2>&1  # copy apk to System dir
+    ~/rish -c "cp \"$outputAPK\" \"/data/local/tmp/$outputFileName\"" > /dev/null 2>&1  # copy apk to System dir
     ./rish -c "pm install -r -i com.android.vending '/data/local/tmp/$outputFileName'" > /dev/null 2>&1  # -r=reinstall --force-uplow=downgrade
     INSTALL_STATUS=$?  # Capture exit status of the install command
-    am start -n $activityClass &> /dev/null  # launch app after update
+    am start -n "$activityClass" &> /dev/null  # launch app after update
     if [ $? != 0 ]; then
       ~/rish -c "monkey -p $pkgName -c android.intent.category.LAUNCHER 1" > /dev/null 2>&1
     fi
@@ -79,7 +79,7 @@ apkInstall() {
       FALLBACK_INSTALL_STATUS=$?
     fi
     if [ "$INSTALL_STATUS" == "0" ] || [ "$FALLBACK_INSTALL_STATUS" == "0" ]; then
-      am start -n $activityClass &> /dev/null  # launch app after update
+      am start -n "$activityClass" &> /dev/null  # launch app after update
     else
       echo -e $notice "${Yellow}There was a problem open the app package using Termux API! Please manually install app from${Reset} Files: $Model > ${Blue}Simplify${Reset} > $outputFileName"
     fi
@@ -91,7 +91,7 @@ apkInstall() {
       FALLBACK_INSTALL_STATUS=$?
     fi
     if [ "$INSTALL_STATUS" == "0" ] || [ "$FALLBACK_INSTALL_STATUS" == "0" ]; then
-      am start -n $activityClass &> /dev/null  # launch app after update
+      am start -n "$activityClass" &> /dev/null  # launch app after update
     else
       echo -e $notice "${Yellow}There was a problem open the app package using Termux API! Please manually install app from${Reset} Files: $Model > ${Blue}Simplify${Reset} > $outputFileName"
     fi
