@@ -305,7 +305,7 @@ while true; do
       releasesTagName=$(curl -s "https://api.github.com/repos/Xposed-Modules-Repo/io.github.vvb2060.callrecording/releases/latest" | jq -r '.tag_name')  # 2-1.1
       releasesName=$(curl -s "https://api.github.com/repos/Xposed-Modules-Repo/io.github.vvb2060.callrecording/releases/latest" | jq -r '.name')  # 1.1
       dlUrl="https://github.com/Xposed-Modules-Repo/io.github.vvb2060.callrecording/releases/download/${releasesTagName}/app-release.apk"
-      curl -sL --progress-bar -C - -o "$LSPatch/callrecording-${releasesName}.apk" "$dlUrl"
+      curl -L --progress-bar -C - -o "$LSPatch/callrecording-${releasesName}.apk" "$dlUrl"
       module_apk_path=$(find "$LSPatch" -type f -name "callrecording-*.apk")
       echo -e "$info module_apk_path: $module_apk_path"
       stockFileName=$(basename "${stock_apk_path[0]}")
