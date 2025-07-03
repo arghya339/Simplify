@@ -122,7 +122,7 @@ build_app() {
         I*|i*|"")
           checkCoreLSPosed  # Call the check core patch functions
           echo -e "$running Please Wait !! Installing Patched ${appNameRef[0]} LSPatch apk.."
-          bash $Simplify/apkInstall.sh "$SimplUsr/${appNameRef[0]}-LSPatch_v${pkgVersion}-${archRef[0]}.apk" "$pkgName" ""
+          bash $Simplify/apkInstall.sh "$output_apk_path" "$pkgName" ""
           ;;
         M*|m*)
           echo -e "$running Please Wait !! Mounting Patched ${appNameRef[0]} LSPatch apk.."
@@ -135,18 +135,31 @@ build_app() {
       esac
     
     else
-      echo -e "[?] ${Yellow}Do you want to Mount ${appNameRef[0]} LSPatch app? [Y/n] ${Reset}\c" && read opt
+      
+      echo -e "[?] ${Yellow}Do you want to Install ${appNameRef[0]} LSPatch app? [Y/n] ${Reset}\c" && read opt
       case $opt in
         y*|Y*|"")
-          echo -e "$running Please Wait !! Mounting Patched ${appNameRef[0]} LSPatch apk.."
-          su -mm -c "/system/bin/sh $Simplify/apkMount.sh \"${stock_apk_ref[0]}\" $output_apk_path \"${appNameRef[0]}\" $pkgName $pkgVersion" &> /dev/null
-          su -mm -c "/system/bin/sh $Simplify/apkMount.sh \"${stock_apk_ref[0]}\" $output_apk_path \"${appNameRef[0]}\" $pkgName $pkgVersion" | tee "$SimplUsr/${appNameRef[0]}-LSPatch_mount-log.txt"
-          rm $output_apk_path
+          echo -e "$running Please Wait !! Installing Patched ${appNameRef[0]} LSPatch apk.."
+          bash $Simplify/apkInstall.sh "$output_apk_path" "$pkgName" "$pkgPatches"
           ;;
         n*|N*) echo -e "$notice ${appNameRef[0]} LSPatch Installaion skipped!" ;;
         *) echo -e "$info Invalid choice! ${appNameRef[0]} LSPatch Installaion skipped." ;;
       esac
+      
+      echo -e "[?] ${Yellow}Do you want to Share ${appNameRef[0]} LSPatch app? [Y/n] ${Reset}\c" && read opt
+      case $opt in
+        y*|Y*|"")
+          echo -e "$running Please Wait !! Sharing Patched ${appNameRef[0]} LSPatch apk.."
+          termux-open --send "$output_apk_path"
+          ;;
+        n*|N*) echo -e "$notice ${appNameRef[0]} LSPatch Sharing skipped!"
+          echo -e "$info Locate '$fileName' in '/sdcard/Simplify/' dir, Share it with your Friends and Family ;)"
+          ;;
+        *) echo -e "$info Invalid choice! ${appNameRef[0]} LSPatch Sharing skipped." ;;
+      esac
+
     fi
+
   fi
 }
 
@@ -250,10 +263,9 @@ while true; do
       stockFileNameWOExt="${stockFileName%.*}"
       output_apk_path=$(find "$SimplUsr" -type f -name "${stockFileNameWOExt}-*-lspatched.apk")
       log="$SimplUsr/${appName[0]}-LSPatch_patch-log.txt"
-      pkgPatches=""
-      activityPatches=""
+      activityPatches="com.snapchat.android/.LandingPageActivity"
       BugReport="https://github.com/rhunk/SnapEnhance/issues/new?template=bug_report.yml"
-      build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "APKMirror" "stock_apk_path" "$module_apk_path" "$output_apk_path" "$log" "$BugReport" "$pkgPatches" "$activityPatches"
+      build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "APKMirror" "stock_apk_path" "$module_apk_path" "$output_apk_path" "$log" "$BugReport" "$pkgName" "$activityPatches"
       ;;
     LINE)
       appName=("LINE")
@@ -271,10 +283,9 @@ while true; do
       stockFileNameWOExt="${stockFileName%.*}"
       output_apk_path=$(find "$SimplUsr" -type f -name "${stockFileNameWOExt}-*-lspatched.apk")
       log="$SimplUsr/${appName[0]}-LSPatch_patch-log.txt"
-      pkgPatches=""
-      activityPatches=""
+      activityPatches="jp.naver.line.android/.activity.SplashActivity"
       BugReport="https://github.com/yagiyuu/LineXtra/issues"
-      build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "APKMirror" "stock_apk_path" "$module_apk_path" "$output_apk_path" "$log" "$BugReport" "$pkgPatches" "$activityPatches"
+      build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "APKMirror" "stock_apk_path" "$module_apk_path" "$output_apk_path" "$log" "$BugReport" "$pkgName" "$activityPatches"
       ;;
   esac  
 done
