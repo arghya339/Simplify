@@ -190,23 +190,23 @@ sign_app() {
     checkOwner=$($PREFIX/lib/jvm/java-21-openjdk/bin/keytool -printcert -jarfile "${stock_apk_ref[0]}" | grep -oP 'Owner: \K.*')
     if [ -z "$checkOwner" ]; then
       echo -e "$notice keytool error: SHA-256 digest error!"
-      local output_apk_path=("$SimplUsr/$stockFileNameWOExt-signed.apk")
-      local fileName=$(basename "${output_apk_path[0]}")
-      $PREFIX/lib/jvm/java-21-openjdk/bin/java -jar $PREFIX/share/java/apksigner.jar sign --ks $Simplify/ks.keystore --ks-pass pass:123456 --ks-key-alias ReVancedKey --key-pass pass:123456 --out "${output_apk_path[0]}" "${stock_apk_ref[0]}"
-      $PREFIX/lib/jvm/java-21-openjdk/bin/keytool -printcert -jarfile "${output_apk_path[0]}" | grep -oP 'Owner: \K.*' 2>/dev/null
+      local output_apk_path="$SimplUsr/$stockFileNameWOExt-signed.apk"
+      local fileName=$(basename "${output_apk_path}")
+      $PREFIX/lib/jvm/java-21-openjdk/bin/java -jar $PREFIX/share/java/apksigner.jar sign --ks $Simplify/ks.keystore --ks-pass pass:123456 --ks-key-alias ReVancedKey --key-pass pass:123456 --out "${output_apk_path}" "${stock_apk_ref[0]}"
+      $PREFIX/lib/jvm/java-21-openjdk/bin/keytool -printcert -jarfile "${output_apk_path}" | grep -oP 'Owner: \K.*' 2>/dev/null
       if [ $? == 0 ]; then
-        $PREFIX/lib/jvm/java-21-openjdk/bin/java -jar $PREFIX/share/java/apksigner.jar verify --print-certs "${output_apk_path[0]}" | grep -oP 'Signer #1 certificate DN: \K.*'
+        $PREFIX/lib/jvm/java-21-openjdk/bin/java -jar $PREFIX/share/java/apksigner.jar verify --print-certs "${output_apk_path}" | grep -oP 'Signer #1 certificate DN: \K.*'
       fi
     fi
   fi
   
-  if [ -f "${output_apk_path[0]}" ]; then
+  if [ -f "${output_apk_path}" ]; then
     
     echo -e "[?] ${Yellow}Do you want to Install ${appNameRef[0]} Signed app? [Y/n] ${Reset}\c" && read opt
     case $opt in
       y*|Y*|"")
         echo -e "$running Please Wait !! Installing Signed ${appNameRef[0]} apk.."
-        bash $Simplify/apkInstall.sh "${output_apk_path[0]}" "$pkgName" "$activityPatches"
+        bash $Simplify/apkInstall.sh \"${output_apk_path}\" "$pkgName" "$activityPatches"
         ;;
       n*|N*) echo -e "$notice ${appNameRef[0]} Signed Installaion skipped!" ;;
       *) echo -e "$info Invalid choice! ${appNameRef[0]} Signed Installaion skipped." ;;
@@ -216,7 +216,7 @@ sign_app() {
     case $opt in
       y*|Y*|"")
         echo -e "$running Please Wait !! Sharing Signed ${appNameRef[0]} apk.."
-        termux-open --send "${output_apk_path[0]}"
+        termux-open --send "${output_apk_path}"
         ;;
       n*|N*) echo -e "$notice ${appNameRef[0]} Signed Sharing skipped!"
         echo -e "$info Locate '$fileName' in '/sdcard/Simplify/' dir, Share it with your Friends and Family ;)"
