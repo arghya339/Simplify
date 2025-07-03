@@ -66,14 +66,14 @@ echo -e "$info ${Blue}LSPatchJar:${Reset} $LSPatchJar"
 
 #  --- Patch Apps ---
 patch_app() {
-  local stock_apk_path=$1
+  local -n stock_apk_path_ref=$1
   local module_apk_path=$2
   local output_apk_path=$3
   local log=$4
   local appName=$5
   local BugReportUrl=$6
 
-  $PREFIX/lib/jvm/java-21-openjdk/bin/java -jar $LSPatchJar "$stock_apk_path" -m "$module_apk_path" -o "$SimplUsr/" | tee "$log"
+  $PREFIX/lib/jvm/java-21-openjdk/bin/java -jar $LSPatchJar "${stock_apk_path_ref[0]}" -m "$module_apk_path" -o "$SimplUsr/" | tee "$log"
 
   if [ $? != 0 ]; then
     echo -e "$bad Oops, $appName Patching failed !! Logs saved to "$log". Share the Patchlog to developer."
