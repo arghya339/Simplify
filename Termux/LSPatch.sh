@@ -167,7 +167,7 @@ build_app() {
 <<comment
   Snapchat Android 5.0+
   LINE Android 10+
-  Phone by Google Android 10+
+  Phone by Google Android 9+
   1.1.1.1 + WARP Android 5.0+
 comment
 
@@ -191,6 +191,7 @@ elif [ $Android -eq 9 ]; then
   apps=(
     Quit
     "${Snapchat[0]}"
+    "${googleDialer[0]}"
     "1.1.1.1 + WARP"
   )
 elif [ $Android -eq 8 ]; then
@@ -287,6 +288,34 @@ while true; do
       BugReport="https://github.com/yagiyuu/LineXtra/issues"
       build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "APKMirror" "stock_apk_path" "$module_apk_path" "$output_apk_path" "$log" "$BugReport" "$pkgName" "$activityPatches"
       ;;
-  esac  
+    Phone\ by\ Google)
+      appName=("Phone by Google")
+      pkgName="com.google.android.dialer"
+      if [ $Android -ge 11 ]; then
+        pkgVersion="180.0.771769344"
+        #pkgVersion=""
+      elif [ $Android -eq 10 ]; then
+        pkgVersion="161.0.726587057"
+      elif [ $Android -eq 9 ]; then
+        pkgVersion="121.0.603393336-downloadable"
+      fi
+      Type="APK"
+      Arch=("$cpuAbi")
+      stock_apk_path=("$Download/${appName[0]}_v${pkgVersion}-$cpuAbi.apk")
+      releasesTagName=$(curl -s "https://api.github.com/repos/Xposed-Modules-Repo/io.github.vvb2060.callrecording/releases/latest" | jq -r '.tag_name')  # 2-1.1
+      releasesName=$(curl -s "https://api.github.com/repos/Xposed-Modules-Repo/io.github.vvb2060.callrecording/releases/latest" | jq -r '.name')  # 1.1
+      dlUrl="https://github.com/Xposed-Modules-Repo/io.github.vvb2060.callrecording/releases/download/${releasesTagName}/app-release.apk"
+      curl -sL --progress-bar -C - -o "$LSPatch/callrecording-${releasesName}.apk" "$dlUrl"
+      module_apk_path=$(find "$LSPatch" -type f -name "callrecording-*.apk")
+      echo -e "$info module_apk_path: $module_apk_path"
+      stockFileName=$(basename "${stock_apk_path[0]}")
+      stockFileNameWOExt="${stockFileName%.*}"
+      output_apk_path=$(find "$SimplUsr" -type f -name "${stockFileNameWOExt}-*-lspatched.apk")
+      log="$SimplUsr/${appName[0]}-LSPatch_patch-log.txt"
+      activityPatches="com.google.android.dialer/.extensions.GoogleDialtactsActivity"
+      BugReport="https://github.com/vvb2060/CallRecording/issues/new"
+      build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "APKMirror" "stock_apk_path" "$module_apk_path" "$output_apk_path" "$log" "$BugReport" "$pkgName" "$activityPatches"
+      ;;  
+  esac
 done
 #########################################################################################################################################################################################
