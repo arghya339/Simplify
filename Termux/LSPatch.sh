@@ -206,7 +206,7 @@ sign_app() {
     case $opt in
       y*|Y*|"")
         echo -e "$running Please Wait !! Installing Signed ${appNameRef[0]} apk.."
-        bash $Simplify/apkInstall.sh \"${output_apk_path}\" "$pkgName" "$activityPatches"
+        bash $Simplify/apkInstall.sh "${output_apk_path}" "$pkgName" "$activityPatches"
         ;;
       n*|N*) echo -e "$notice ${appNameRef[0]} Signed Installaion skipped!" ;;
       *) echo -e "$info Invalid choice! ${appNameRef[0]} Signed Installaion skipped." ;;
