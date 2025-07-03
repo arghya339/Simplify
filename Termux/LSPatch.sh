@@ -249,6 +249,7 @@ while true; do
       stockFileName=$(basename "${stock_apk_path[0]}")
       stockFileNameWOExt="${stockFileName%.*}"
       output_apk_path=$(find "$SimplUsr" -type f -name "${stockFileNameWOExt}-*-lspatched.apk")
+      echo -e "$notice DEBUG - stockFileName: '$stockFileName', stockFileNameWOExt: '$stockFileNameWOExt', output_apk_path: '$output_apk_path'"
       log="$SimplUsr/${appName[0]}-LSPatch_patch-log.txt"
       pkgPatches=""
       activityPatches=""
