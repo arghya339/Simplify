@@ -19,7 +19,7 @@ Reset="\033[0m"
 # Install final apk
 apkInstall() {
   local outputAPK=$1
-  local outputFileName=$(basename $outputAPK)
+  local outputFileName=$(basename "$outputAPK")
   local pkgName=$2
   local activity=$3
   if su -c "id" >/dev/null 2>&1; then
@@ -50,7 +50,7 @@ apkInstall() {
     else
       su -c "pm install -i com.android.vending '/data/local/tmp/$outputFileName'"
     fi
-    am start -n $activityClass &> /dev/null  # launch app after update
+    am start -n "$activityClass" &> /dev/null  # launch app after update
     if [ $? != 0 ]; then
       su -c "monkey -p $pkgName -c android.intent.category.LAUNCHER 1" > /dev/null 2>&1
     fi
@@ -59,19 +59,19 @@ apkInstall() {
     ~/rish -c "cp '$outputAPK' '/data/local/tmp/$outputFileName'" > /dev/null 2>&1  # copy apk to System dir
     ./rish -c "pm install -r -i com.android.vending '/data/local/tmp/$outputFileName'" > /dev/null 2>&1  # -r=reinstall --force-uplow=downgrade
     INSTALL_STATUS=$?  # Capture exit status of the install command
-    am start -n $activityClass &> /dev/null  # launch app after update
+    am start -n "$activityClass" &> /dev/null  # launch app after update
     if [ $? != 0 ]; then
       ~/rish -c "monkey -p $pkgName -c android.intent.category.LAUNCHER 1" > /dev/null 2>&1
     fi
     $HOME/rish -c "rm '/data/local/tmp/$outputFileName'"  # Cleanup tmp APK
-  elif [ $OEM == "Xiaomi" ] || [ $OEM == "Poco" ] || [ $arch == "x86_64" ]; then
-    if [ $OEM == "Xiaomi" ] || [ $OEM == "Poco" ]; then
+  elif [ "$OEM" == "Xiaomi" ] || [ "$OEM" == "Poco" ] || [ $arch == "x86_64" ]; then
+    if [ "$OEM" == "Xiaomi" ] || [ "$OEM" == "Poco" ]; then
       echo -e $notice "${Yellow}MIUI Optimization detected! Please manually install app from${Reset} ${Blue}file://$outputAPK${Reset}"
     else
       echo -e $notice "${Yellow}There was a problem open the app package using Termux API! Please manually install app from${Reset} Files: $Model > ${Blue}Simplify${Reset} > $outputAPK"
     fi
-    am start -n com.google.android.documentsui/com.android.documentsui.files.FilesActivity > /dev/null 2>&1  # Open Android Files
-  elif [ $Android -le 13 ]; then
+    am start -n "com.google.android.documentsui/com.android.documentsui.files.FilesActivity" > /dev/null 2>&1  # Open Android Files
+  elif [ "$Android" -le "13" ]; then
     am start -a android.intent.action.VIEW -t application/vnd.android.package-archive -d "file://$outputAPK" > /dev/null 2>&1  # Activity Manager
     INSTALL_STATUS=$?
     if [ "$INSTALL_STATUS" != "0" ]; then
@@ -79,7 +79,7 @@ apkInstall() {
       FALLBACK_INSTALL_STATUS=$?
     fi
     if [ "$INSTALL_STATUS" == "0" ] || [ "$FALLBACK_INSTALL_STATUS" == "0" ]; then
-      am start -n $activityClass &> /dev/null  # launch app after update
+      am start -n "$activityClass" &> /dev/null  # launch app after update
     else
       echo -e $notice "${Yellow}There was a problem open the app package using Termux API! Please manually install app from${Reset} Files: $Model > ${Blue}Simplify${Reset} > $outputFileName"
     fi
@@ -91,7 +91,7 @@ apkInstall() {
       FALLBACK_INSTALL_STATUS=$?
     fi
     if [ "$INSTALL_STATUS" == "0" ] || [ "$FALLBACK_INSTALL_STATUS" == "0" ]; then
-      am start -n $activityClass &> /dev/null  # launch app after update
+      am start -n "$activityClass" &> /dev/null  # launch app after update
     else
       echo -e $notice "${Yellow}There was a problem open the app package using Termux API! Please manually install app from${Reset} Files: $Model > ${Blue}Simplify${Reset} > $outputFileName"
     fi
