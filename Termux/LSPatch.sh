@@ -68,8 +68,8 @@ echo -e "$info ${Blue}LSPatchJar:${Reset} $LSPatchJar"
 patch_app() {
   local stock_apk_path=$1
   local module_apk_path=$2
-  local log=$3
   local appName=$4
+  local log="$SimplUsr/$appName-LSPatch_patch-log.txt"
   local BugReportUrl=$5
 
   $PREFIX/lib/jvm/java-21-openjdk/bin/java -jar $LSPatchJar "$stock_apk_path" -m "$module_apk_path" -o "$SimplUsr/" | tee "$log"
@@ -94,10 +94,9 @@ build_app() {
   local stockFileName=$(basename "${stock_apk_ref[0]}")
   local stockFileNameWOExt="${stockFileName%.*}"
   local module_apk_path=$8
-  local log=$9
-  local BugReportUrl=$10
-  local pkgPatches=$11
-  local activityPatches=$12
+  local BugReportUrl=$9
+  local pkgPatches=$10
+  local activityPatches=$11
 
 
   if [ "$web" == "APKMirror" ]; then
@@ -109,7 +108,7 @@ build_app() {
   if [ -f "${stock_apk_ref[0]}" ]; then
     echo -e "$good ${Green}Downloaded ${appNameRef[0]} APK found:${Reset} ${stock_apk_ref[0]}"
     echo -e "$running Patching ${appNameRef[0]} LSPatch.."
-    patch_app "${stock_apk_ref[0]}" "$module_apk_path" \"$log\" "${appNameRef[0]}" "$BugReportUrl"
+    patch_app "${stock_apk_ref[0]}" "$module_apk_path" "${appNameRef[0]}" "$BugReportUrl"
   fi
   
   local output_apk_path=$(find "$SimplUsr" -type f -name "${stockFileNameWOExt}-*-lspatched.apk")
@@ -262,10 +261,9 @@ while true; do
       bash $Simplify/dlGitHub.sh "rhunk" "SnapEnhance" "latest" ".apk" "$LSPatch" "$regex"
       module_apk_path=$(find "$LSPatch" -type f -name "snapenhance_*-${arch}-release-signed.apk")
       echo -e "$info module_apk_path: $module_apk_path"
-      log="$SimplUsr/${appName[0]}-LSPatch_patch-log.txt"
       activityPatches="com.snapchat.android/.LandingPageActivity"
       BugReport="https://github.com/rhunk/SnapEnhance/issues/new?template=bug_report.yml"
-      build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "APKMirror" "stock_apk_path" "$module_apk_path" "$log" "$BugReport" "$pkgName" "$activityPatches"
+      build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "APKMirror" "stock_apk_path" "$module_apk_path" "$BugReport" "$pkgName" "$activityPatches"
       ;;
     LINE)
       appName=("LINE")
@@ -279,10 +277,9 @@ while true; do
       bash $Simplify/dlGitHub.sh "yagiyuu" "LineXtra" "latest" ".apk" "$LSPatch" "$regex"
       module_apk_path=$(find "$LSPatch" -type f -name "LineXtra-*-all-release.apk")
       echo -e "$info module_apk_path: $module_apk_path"
-      log="$SimplUsr/${appName[0]}-LSPatch_patch-log.txt"
       activityPatches="jp.naver.line.android/.activity.SplashActivity"
       BugReport="https://github.com/yagiyuu/LineXtra/issues"
-      build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "APKMirror" "stock_apk_path" "$module_apk_path" "$log" "$BugReport" "$pkgName" "$activityPatches"
+      build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "APKMirror" "stock_apk_path" "$module_apk_path" "$BugReport" "$pkgName" "$activityPatches"
       ;;
     Phone\ by\ Google)
       appName=("Phone by Google")
@@ -304,10 +301,9 @@ while true; do
       curl -L --progress-bar -C - -o "$LSPatch/callrecording-${releasesName}.apk" "$dlUrl"
       module_apk_path=$(find "$LSPatch" -type f -name "callrecording-*.apk")
       echo -e "$info module_apk_path: $module_apk_path"
-      log="$SimplUsr/${appName[0]}-LSPatch_patch-log.txt"
       activityPatches="com.google.android.dialer/.extensions.GoogleDialtactsActivity"
       BugReport="https://github.com/vvb2060/CallRecording/issues/new"
-      build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "APKMirror" "stock_apk_path" "$module_apk_path" "$log" "$BugReport" "$pkgName" "$activityPatches"
+      build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "APKMirror" "stock_apk_path" "$module_apk_path" "$BugReport" "$pkgName" "$activityPatches"
       ;;  
   esac
 done
