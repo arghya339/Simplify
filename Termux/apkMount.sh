@@ -27,18 +27,18 @@ apkMount() {
   local pkgName=$4
   local versionName=$5
   local model=$(getprop ro.product.model)
-  local stock_path=$(pm path $pkgName | grep base | sed "s/package://g")
+  local stock_path=$(pm path "$pkgName" | grep base | sed "s/package://g")
 
   # Mount using Magisk mirror, if available.
   MAGISKTMP="$( magisk --path )" || MAGISKTMP=/sbin
   MIRROR="$MAGISKTMP/.magisk/mirror"
-  if [ ! -f $MIRROR ]; then
+  if [ ! -f "$MIRROR" ]; then
     MIRROR=""
   fi
   
   # Creating some directory
   for DIR in /data/adb/revanced/$pkgName/ /data/adb/post-fs-data.d/ /data/adb/service.d/; do
-    if [ ! -e $DIR ]; then
+    if [ ! -e "$DIR" ]; then
       mkdir -p "$DIR"
       echo "$info ${Cyan}$DIR${Reset} created."
     fi
@@ -87,7 +87,7 @@ apkMount() {
   grep $pkgName /proc/mounts | while read -r line; do echo $line | cut -d " " -f 2 | sed "s/apk.*/apk/" | xargs -r umount -l; done
   
   # Copying patched apk to /data/adb/revanced/$pkgName directory
-  if [ -f $patched ]; then
+  if [ -f "$patched" ]; then
     echo "$running Copying patched base.apk file to ${Cyan}/data/adb/revanced/$pkgName/${Reset} dir.."
     cp -f "$patched" "$base_path"
   else
@@ -96,10 +96,10 @@ apkMount() {
   fi
   
   # Change context sensitivity label as 0 & give rwx permissions to copied base.apk
-  if [ -f $base_path ]; then
+  if [ -f "$base_path" ]; then
     echo "$good base.apk copied successfully."
     echo "$running Setting up base.apk file permissions.."
-    chmod 644 $base_path  # give read-write (to owner) & read-only (to others) permissions to base.apk
+    chmod 644 "$base_path"  # give read-write (to owner) & read-only (to others) permissions to base.apk
     #chown system:system "$base_path"  # change ownership of user & others both set to system
     chcon u:object_r:apk_data_file:s0  "$base_path"  # Change SELinux user apk file & apk data context sensitivity label as 0 (not sensitive), to assign correct security context for apk-related files to avoid system_server won't be allowed to access it.
   else
@@ -108,12 +108,12 @@ apkMount() {
   fi
 
   # Mounting (attaching) with bind (mirror) base.apk with system stock.apk
-  if [ -f $base_path ] && [ -f $stock_path ]; then
+  if [ -f "$base_path" ] && [ -f "$stock_path" ]; then
     echo "$running Mounting (attaching) $appName.."
-    if [ -n $MIRROR ]; then
-      mount -o bind $MIRROR$base_path $stock_path  # links an existing target (stock) directory to another location (similar symlink that can hides target’s original contents)
+    if [ -n "$MIRROR" ]; then
+      mount -o bind "${MIRROR}${base_path}" "$stock_path"  # links an existing target (stock) directory to another location (similar symlink that can hides target’s original contents)
     else
-      mount -o bind $base_path $stock_path
+      mount -o bind "$base_path" "$stock_path"
     fi
   fi
 
@@ -194,7 +194,7 @@ EOF
   chmod 0755 "/data/adb/post-fs-data.d/$pkgName.sh"
   
   echo "$good Mount Successfull."
-  am start -n $activityClass &> /dev/null  # Launch app using activity monitor
+  am start -n "$activityClass" &> /dev/null  # Launch app using activity monitor
   #rm $patched  # remove patched.apk file
 }
 
