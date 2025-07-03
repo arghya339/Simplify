@@ -233,7 +233,7 @@ while true; do
       pkgVersion="12.33.1.19"
       #pkgVersion=""
       Type="BUNDLE"
-      Arch=("arm64-v8a + arm-v7a")
+      Arch=("arm64-v8a + armeabi-v7a")
       stock_apk_path=("$Download/${appName[0]}_v${pkgVersion}-$cpuAbi.apk")
       if [ $cpuAbi == arm64-v8a ]; then
         arch=armv8
