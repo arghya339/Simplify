@@ -242,7 +242,7 @@ while true; do
       else
         arch=all
       fi
-      regex="snapenhance_.*-$arch-release-signed.apk"
+      regex="snapenhance_*-$arch-release-signed.apk"
       bash $Simplify/dlGitHub.sh "rhunk" "SnapEnhance" "latest" ".apk" "$LSPatch" "$regex"
       module_apk_path=$(find "$LSPatch" -type f -name "$regex")
       echo -e "$info module_apk_path: $module_apk_path"
