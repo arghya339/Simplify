@@ -269,7 +269,7 @@ while true; do
       ;;
     LINE)
       appName=("LINE")
-      pkgName="com.snapchat.android"
+      pkgName="jp.naver.line.android"
       pkgVersion="15.10.2"
       #pkgVersion=""
       Type="BUNDLE"
