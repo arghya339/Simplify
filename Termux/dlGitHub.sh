@@ -28,9 +28,10 @@ dlGitHub() {
   
   if [ -n "$assets" ]; then
     regex="$assets"
+  elif [ -n "$ext" ] && [ -z "$assets" ]; then
+    regex=".*\\${ext}$"  # Simplified regex pattern
   fi
 
-  regex=".*\\${ext}$"  # Simplified regex pattern
   if [ "$releases" == "latest" ]; then
     if [ "$repo" == "APKEditor" ]; then
       latestReleases=$(curl -s https://api.github.com/repos/$owner/$repo/releases/latest | jq -r '.tag_name | sub("^V"; "")')  # 1.4.3
