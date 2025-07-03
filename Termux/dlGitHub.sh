@@ -24,7 +24,12 @@ dlGitHub() {
   local releases=$3
   local ext=$4
   local dir=$5
+  local assets=$6
   
+  if [ -n "$assets" ]; then
+    regex="$assets"
+  fi
+
   regex=".*\\${ext}$"  # Simplified regex pattern
   if [ "$releases" == "latest" ]; then
     if [ "$repo" == "APKEditor" ]; then
@@ -34,7 +39,7 @@ dlGitHub() {
       latestReleases=$(curl -s "https://api.github.com/repos/$owner/$repo/releases/latest" | jq -r '.tag_name | sub("^v"; "")' 2>/dev/null)
       echo -e "$info latestReleases: v$latestReleases"
     fi
-    if [ "$repo" == "VancedMicroG" ]; then
+    if [ "$repo" == "VancedMicroG" ] || [ "$repo" == "LSPatch" ]; then
       assetsName=$(curl -s "https://api.github.com/repos/$owner/$repo/releases/latest" | jq -r --arg regex "$regex" '.assets[] | select(.name | test($regex)) | .name' 2>/dev/null)
       assetsNameWithoutExt="${assetsName%.*}"
       fileName="$assetsNameWithoutExt-${latestReleases}$ext"
@@ -49,7 +54,7 @@ dlGitHub() {
     findFile=$(find "$dir" -type f -name "$assetsNamePattern" -print -quit)
     fileBaseName=$(basename $findFile)
     
-    if [ "$repo" == "VancedMicroG" ]; then
+    if [ "$repo" == "VancedMicroG" ] || [ "$repo" == "LSPatch" ]; then
       if [ "$fileName" != "$fileBaseName" ]; then
         echo -e "$notice diffs: $fileName ~ $fileBaseName"
         [ -f "$findFile" ] && rm "$findFile"
