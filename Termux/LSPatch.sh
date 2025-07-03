@@ -95,7 +95,7 @@ build_app() {
   local module_apk_path=$8
   local output_apk_path=$9
   local fileName=$(basename "$output_apk_path")
-  local -n logRef=$10
+  local log=$10
   local BugReportUrl=$11
   local pkgPatches=$12
   local activityPatches=$13
@@ -110,7 +110,7 @@ build_app() {
   if [ -f "${stock_apk_ref[0]}" ]; then
     echo -e "$good ${Green}Downloaded ${appNameRef[0]} APK found:${Reset} ${stock_apk_ref[0]}"
     echo -e "$running Patching ${appNameRef[0]} LSPatch.."
-    patch_app "${stock_apk_ref[0]}" "$module_apk_path" \"$output_apk_path\" "${logRef[0]}" "${appNameRef[0]}" "$BugReportUrl"
+    patch_app "${stock_apk_ref[0]}" "$module_apk_path" \"$output_apk_path\" \"$log\" "${appNameRef[0]}" "$BugReportUrl"
   fi
 
   if [ -f "$output_apk_path" ]; then
@@ -263,10 +263,10 @@ while true; do
       stockFileName=$(basename "${stock_apk_path[0]}")
       stockFileNameWOExt="${stockFileName%.*}"
       output_apk_path=$(find "$SimplUsr" -type f -name "${stockFileNameWOExt}-*-lspatched.apk")
-      log=("$SimplUsr/${appName[0]}-LSPatch_patch-log.txt")
+      log="$SimplUsr/${appName[0]}-LSPatch_patch-log.txt"
       activityPatches="com.snapchat.android/.LandingPageActivity"
       BugReport="https://github.com/rhunk/SnapEnhance/issues/new?template=bug_report.yml"
-      build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "APKMirror" "stock_apk_path" "$module_apk_path" "$output_apk_path" "log" "$BugReport" "$pkgName" "$activityPatches"
+      build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "APKMirror" "stock_apk_path" "$module_apk_path" "$output_apk_path" "$log" "$BugReport" "$pkgName" "$activityPatches"
       ;;
     LINE)
       appName=("LINE")
@@ -283,10 +283,10 @@ while true; do
       stockFileName=$(basename "${stock_apk_path[0]}")
       stockFileNameWOExt="${stockFileName%.*}"
       output_apk_path=$(find "$SimplUsr" -type f -name "${stockFileNameWOExt}-*-lspatched.apk")
-      log=("$SimplUsr/${appName[0]}-LSPatch_patch-log.txt")
+      log="$SimplUsr/${appName[0]}-LSPatch_patch-log.txt"
       activityPatches="jp.naver.line.android/.activity.SplashActivity"
       BugReport="https://github.com/yagiyuu/LineXtra/issues"
-      build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "APKMirror" "stock_apk_path" "$module_apk_path" "$output_apk_path" "log" "$BugReport" "$pkgName" "$activityPatches"
+      build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "APKMirror" "stock_apk_path" "$module_apk_path" "$output_apk_path" "$log" "$BugReport" "$pkgName" "$activityPatches"
       ;;
     Phone\ by\ Google)
       appName=("Phone by Google")
@@ -311,10 +311,10 @@ while true; do
       stockFileName=$(basename "${stock_apk_path[0]}")
       stockFileNameWOExt="${stockFileName%.*}"
       output_apk_path=$(find "$SimplUsr" -type f -name "${stockFileNameWOExt}-*-lspatched.apk")
-      log=("$SimplUsr/${appName[0]}-LSPatch_patch-log.txt")
+      log="$SimplUsr/${appName[0]}-LSPatch_patch-log.txt"
       activityPatches="com.google.android.dialer/.extensions.GoogleDialtactsActivity"
       BugReport="https://github.com/vvb2060/CallRecording/issues/new"
-      build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "APKMirror" "stock_apk_path" "$module_apk_path" "$output_apk_path" "log" "$BugReport" "$pkgName" "$activityPatches"
+      build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "APKMirror" "stock_apk_path" "$module_apk_path" "$output_apk_path" "$log" "$BugReport" "$pkgName" "$activityPatches"
       ;;  
   esac
 done
