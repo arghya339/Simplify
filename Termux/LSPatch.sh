@@ -141,7 +141,7 @@ build_app() {
       case $opt in
         y*|Y*|"")
           echo -e "$running Please Wait !! Installing Patched ${appNameRef[0]} LSPatch apk.."
-          bash $Simplify/apkInstall.sh \"$output_apk_path\" "$pkgName" "$pkgPatches"
+          bash $Simplify/apkInstall.sh \"$output_apk_path\" "$pkgName" "$activityPatches"
           ;;
         n*|N*) echo -e "$notice ${appNameRef[0]} LSPatch Installaion skipped!" ;;
         *) echo -e "$info Invalid choice! ${appNameRef[0]} LSPatch Installaion skipped." ;;
@@ -161,6 +161,69 @@ build_app() {
 
     fi
 
+  fi
+}
+
+sign_app() {
+  local pkgName=$1
+  local -n appNameRef=$2
+  local pkgVersion=$3
+  local Type=$4
+  local -n ArchRef=$5
+  local web=$6
+  local -n stock_apk_ref=$7
+  local stockFileName=$(basename "${stock_apk_ref[0]}")
+  local stockFileNameWOExt="${stockFileName%.*}"
+  local pkgPatches=$8
+  local activityPatches=$9
+  
+  
+  if [ "$web" == "APKMirror" ]; then
+    bash $Simplify/APKMdl.sh "$pkgName" "$pkgVersion" "$Type" "${archRef[0]}"  # Download stock apk from APKMirror
+  else
+    bash $Simplify/dlUptodown.sh "${appNameRef[0]}" "$pkgVersion" "$Type" "${archRef[0]}"  # Download stock apk from Uptodown
+  fi
+  
+  if [ -f "${stock_apk_ref[0]}" ]; then
+    echo -e "$good ${Green}Downloaded ${appNameRef[0]} APK found:${Reset} ${stock_apk_ref[0]}"
+    echo -e "$running Checking ${appNameRef[0]} Certificate.."
+    checkOwner=$($PREFIX/lib/jvm/java-21-openjdk/bin/keytool -printcert -jarfile "${stock_apk_ref[0]}" | grep -oP 'Owner: \K.*')
+    if [ -z "$checkOwner" ]; then
+      echo -e "$notice keytool error: SHA-256 digest error!"
+      local output_apk_path=("$SimplUsr/$stockFileNameWOExt-signed.apk")
+      local fileName=$(basename "${output_apk_path[0]}")
+      $PREFIX/lib/jvm/java-21-openjdk/bin/java -jar $PREFIX/share/java/apksigner.jar sign --ks $Simplify/ks.keystore --ks-pass pass:123456 --ks-key-alias ReVancedKey --key-pass pass:123456 --out "${output_apk_path[0]}" "${stock_apk_ref[0]}"
+      $PREFIX/lib/jvm/java-21-openjdk/bin/keytool -printcert -jarfile "${output_apk_path[0]}" | grep -oP 'Owner: \K.*' 2>/dev/null
+      if [ $? == 0 ]; then
+        $PREFIX/lib/jvm/java-21-openjdk/bin/java -jar $PREFIX/share/java/apksigner.jar verify --print-certs "${output_apk_path[0]}" | grep -oP 'Signer #1 certificate DN: \K.*'
+      fi
+    fi
+  fi
+  
+  if [ -f "${output_apk_path[0]}" ]; then
+    
+    echo -e "[?] ${Yellow}Do you want to Install ${appNameRef[0]} Signed app? [Y/n] ${Reset}\c" && read opt
+    case $opt in
+      y*|Y*|"")
+        echo -e "$running Please Wait !! Installing Signed ${appNameRef[0]} apk.."
+        bash $Simplify/apkInstall.sh "${output_apk_path[0]}" "$pkgName" "$activityPatches"
+        ;;
+      n*|N*) echo -e "$notice ${appNameRef[0]} Signed Installaion skipped!" ;;
+      *) echo -e "$info Invalid choice! ${appNameRef[0]} Signed Installaion skipped." ;;
+    esac
+      
+    echo -e "[?] ${Yellow}Do you want to Share ${appNameRef[0]} Signed app? [Y/n] ${Reset}\c" && read opt
+    case $opt in
+      y*|Y*|"")
+        echo -e "$running Please Wait !! Sharing Signed ${appNameRef[0]} apk.."
+        termux-open --send "${output_apk_path[0]}"
+        ;;
+      n*|N*) echo -e "$notice ${appNameRef[0]} Signed Sharing skipped!"
+        echo -e "$info Locate '$fileName' in '/sdcard/Simplify/' dir, Share it with your Friends and Family ;)"
+        ;;
+      *) echo -e "$info Invalid choice! ${appNameRef[0]} Signed Sharing skipped." ;;
+    esac
+    
   fi
 }
 
@@ -304,7 +367,18 @@ while true; do
       activityPatches="com.google.android.dialer/.extensions.GoogleDialtactsActivity"
       BugReport="https://github.com/vvb2060/CallRecording/issues/new"
       build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "APKMirror" "stock_apk_path" "$module_apk_path" "$BugReport" "$pkgName" "$activityPatches"
-      ;;  
+      ;;
+    1.1.1.1\ +\ WARP)
+      appName=("1.1.1.1 + WARP")
+      pkgName="com.cloudflare.onedotonedotonedotone"
+      pkgVersion="6.38.3"
+      #pkgVersion=""
+      Type="BUNDLE"
+      Arch=("universal")
+      stock_apk_path=("$Download/${appName[0]}_v${pkgVersion}-$cpuAbi.apk")
+      activityPatches=""
+      sign_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "APKMirror" "stock_apk_path" "$pkgName" "$activityPatches"
+      ;;
   esac
 done
 #########################################################################################################################################################################################

@@ -221,15 +221,12 @@ if [ -d "$SimplUsr/branding" ] && [ -f "$SimplUsr/branding.zip" ]; then
   rm "$SimplUsr/branding.zip"
 fi
 
-<<comment
 # --- Create a ks.keystore for Signing apk ---
 if [ ! -f "$Simplify/ks.keystore" ]; then
   echo -e "$running Create a 'ks.keystore' for Signing apk.."
-  keytool -genkey -v -storetype pkcs12 -keystore $Simplify/ks.keystore -alias ReVancedKey -keyalg RSA -keysize 2048 -validity 36050 -dname "CN=arghya339, OU=Android Development Team, O=ReVanced, L=Kolkata, S=West Bengal, C=In" -storepass 123456 -keypass 123456
-else
-  echo -e "$good 'ks.keystore' already exist in $Simplify dir."
+  $PREFIX/lib/jvm/java-21-openjdk/bin/keytool -genkey -v -storetype pkcs12 -keystore $Simplify/ks.keystore -alias ReVancedKey -keyalg RSA -keysize 2048 -validity 36050 -dname "CN=arghya339, OU=Android Development Team, O=ReVanced, L=Kolkata, S=West Bengal, C=In" -storepass 123456 -keypass 123456
+  $PREFIX/lib/jvm/java-21-openjdk/bin/keytool -list -v -keystore $Simplify/ks.keystore -storepass 123456 | grep -oP '(?<=Owner:).*' | xargs
 fi
-comment
 
 # --- Feature request prompt ---
 feature() {
