@@ -248,14 +248,14 @@ while true; do
       Type="BUNDLE"
       Arch=("arm64-v8a + armeabi-v7a")
       stock_apk_path=("$Download/${appName[0]}_v${pkgVersion}-$cpuAbi.apk")
-      if [ $cpuAbi == arm64-v8a ]; then
-        arch=armv8
-      elif [ $cpuAbi == armeabi-v7a ]; then
-        arch=armv7
+      if [ "$cpuAbi" == "arm64-v8a" ]; then
+        arch="armv8"
+      elif [ "$cpuAbi" == "armeabi-v7a" ]; then
+        arch="armv7"
       else
-        arch=all
+        arch="all"
       fi
-      regex="snapenhance_.*-$arch-release-signed.apk"
+      regex="snapenhance_.*-${arch}-release-signed.apk"
       bash $Simplify/dlGitHub.sh "rhunk" "SnapEnhance" "latest" ".apk" "$LSPatch" "$regex"
       module_apk_path=$(find "$LSPatch" -type f -name "$regex")
       echo -e "$info module_apk_path: $module_apk_path"
