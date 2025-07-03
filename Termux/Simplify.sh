@@ -124,7 +124,7 @@ RVX="$Simplify/RVX"
 pikoTwitter="$Simplify/pikoTwitter"
 Dropped="$Simplify/Dropped"
 LSPatch="$Simplify/LSPatch"
-mkdir -p "$Simplify" "$RV" "$RVX" "$pikoTwitter" "$Dropped" "LSPatch" "$SimplUsr"
+mkdir -p "$Simplify" "$RV" "$RVX" "$pikoTwitter" "$Dropped" "$LSPatch" "$SimplUsr"
 Download="/sdcard/Download"
 
 # --- Checking Android Version ---
