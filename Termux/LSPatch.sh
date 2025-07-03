@@ -245,6 +245,7 @@ while true; do
       regex="snapenhance_.*-$arch-release-signed.apk"
       bash $Simplify/dlGitHub.sh "rhunk" "SnapEnhance" "latest" ".apk" "$LSPatch" "$regex"
       module_apk_path=$(find "$LSPatch" -type f -name "$regex")
+      echo -e "$info module_apk_path: $module_apk_path"
       stockFileName=$(basename "${stock_apk_path[0]}")
       stockFileNameWOExt="${stockFileName%.*}"
       output_apk_path=$(find "$SimplUsr" -type f -name "${stockFileNameWOExt}-*-lspatched.apk")
@@ -265,6 +266,7 @@ while true; do
       regex="LineXtra-*-all-release.apk"
       bash $Simplify/dlGitHub.sh "yagiyuu" "LineXtra" "latest" ".apk" "$LSPatch" "$regex"
       module_apk_path=$(find "$LSPatch" -type f -name "$regex")
+      echo -e "$info module_apk_path: $module_apk_path"
       stockFileName=$(basename "${stock_apk_path[0]}")
       stockFileNameWOExt="${stockFileName%.*}"
       output_apk_path=$(find "$SimplUsr" -type f -name "${stockFileNameWOExt}-*-lspatched.apk")
