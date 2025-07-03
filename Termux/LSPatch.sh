@@ -94,7 +94,7 @@ build_app() {
   local -n stock_apk_ref=$7
   local module_apk_path=$8
   local output_apk_path=$9
-  local fileName=$(basename $output_apk_path)
+  local fileName=$(basename "$output_apk_path")
   local log=$10
   local BugReportUrl=$11
   local pkgPatches=$12
