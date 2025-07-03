@@ -165,13 +165,14 @@ dlUptodown() {
   echo  # White Space
   
   # --- Extract app info ---
-  if [ "$kindFile" == "apk" ]; then
+  if [ -z "$data_version" ]; then
     local raw_info=$(curl -s -L "$versionURL")  # Get raw info
   else
     local raw_info=$(curl -s -L "$location_url")
   fi
   
   # Extract each field individually
+  local version=$(echo "$raw_info" | pup 'div.version json{}' | jq -r '.[0].text')
   local package_name=$(echo "$raw_info" | grep -A1 "Package Name" | tail -1 | sed -e 's/<[^>]*>//g' -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')
   local size=$(echo "$raw_info" | grep -A1 "Size" | tail -1 | sed -e 's/<[^>]*>//g' -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')
   local downloads=$(echo "$raw_info" | grep -A1 "Downloads" | tail -1 | sed -e 's/<[^>]*>//g' -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')
@@ -181,6 +182,7 @@ dlUptodown() {
   local requirements=$(echo "$raw_info" | awk '/<th[^>]*>Requirements<\/th>/{flag=1;next} flag && /<li>/{gsub(/.*<li>|<\/li>.*/,"");print;exit}' | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
   
   # Print app info
+  echo -e "Information about $actualAppName $version"
   echo -e "${info} pkgName   : ${Reset}${package_name:-N/A}"
   echo -e "${info} fileSize  : ${Reset}${size:-N/A}"
   echo -e "${info} Downloads : ${Reset}${downloads:-N/A}"
