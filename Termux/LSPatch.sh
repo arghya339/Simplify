@@ -199,7 +199,7 @@ sign_app() {
       fi
     fi
   fi
-  echo -e "$notice DEBUG - output_apk_path: '$output_apk_path'"
+  
   if [ -f "${output_apk_path[0]}" ]; then
     
     echo -e "[?] ${Yellow}Do you want to Install ${appNameRef[0]} Signed app? [Y/n] ${Reset}\c" && read opt
