@@ -95,7 +95,7 @@ build_app() {
   local module_apk_path=$8
   local output_apk_path=$9
   local fileName=$(basename "$output_apk_path")
-  local -n log=$10
+  local -n logRef=$10
   local BugReportUrl=$11
   local pkgPatches=$12
   local activityPatches=$13
@@ -110,7 +110,7 @@ build_app() {
   if [ -f "${stock_apk_ref[0]}" ]; then
     echo -e "$good ${Green}Downloaded ${appNameRef[0]} APK found:${Reset} ${stock_apk_ref[0]}"
     echo -e "$running Patching ${appNameRef[0]} LSPatch.."
-    patch_app \"${stock_apk_ref[0]}\" "$module_apk_path" \"$output_apk_path\" \"${log[0]}\" "${appNameRef[0]}" "$BugReportUrl"
+    patch_app \"${stock_apk_ref[0]}\" "$module_apk_path" \"$output_apk_path\" \"${logRef[0]}\" "${appNameRef[0]}" "$BugReportUrl"
   fi
 
   if [ -f "$output_apk_path" ]; then
