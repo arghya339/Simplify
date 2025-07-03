@@ -255,7 +255,7 @@ while true; do
       else
         arch=all
       fi
-      regex="snapenhance_*-$arch-release-signed.apk"
+      regex="snapenhance_.*-$arch-release-signed.apk"
       bash $Simplify/dlGitHub.sh "rhunk" "SnapEnhance" "latest" ".apk" "$LSPatch" "$regex"
       module_apk_path=$(find "$LSPatch" -type f -name "$regex")
       echo -e "$info module_apk_path: $module_apk_path"
@@ -275,7 +275,7 @@ while true; do
       Type="BUNDLE"
       Arch=("arm64-v8a + armeabi-v7a")
       stock_apk_path=("$Download/${appName[0]}_v${pkgVersion}-$cpuAbi.apk")
-      regex="LineXtra-*-all-release.apk"
+      regex="LineXtra-.*-all-release.apk"
       bash $Simplify/dlGitHub.sh "yagiyuu" "LineXtra" "latest" ".apk" "$LSPatch" "$regex"
       module_apk_path=$(find "$LSPatch" -type f -name "$regex")
       echo -e "$info module_apk_path: $module_apk_path"
