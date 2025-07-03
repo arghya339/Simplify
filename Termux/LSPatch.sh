@@ -266,7 +266,7 @@ while true; do
       log=("$SimplUsr/${appName[0]}-LSPatch_patch-log.txt")
       activityPatches="com.snapchat.android/.LandingPageActivity"
       BugReport="https://github.com/rhunk/SnapEnhance/issues/new?template=bug_report.yml"
-      build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "APKMirror" "stock_apk_path" "$module_apk_path" "$output_apk_path" "log" "$BugReport" "$pkgName" "$activityPatches"
+      build_app "$pkgName" appName "$pkgVersion" "$Type" Arch "APKMirror" stock_apk_path "$module_apk_path" "$output_apk_path" log "$BugReport" "$pkgName" "$activityPatches"
       ;;
     LINE)
       appName=("LINE")
@@ -286,7 +286,7 @@ while true; do
       log=("$SimplUsr/${appName[0]}-LSPatch_patch-log.txt")
       activityPatches="jp.naver.line.android/.activity.SplashActivity"
       BugReport="https://github.com/yagiyuu/LineXtra/issues"
-      build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "APKMirror" "stock_apk_path" "$module_apk_path" "$output_apk_path" "log" "$BugReport" "$pkgName" "$activityPatches"
+      build_app "$pkgName" appName "$pkgVersion" "$Type" Arch "APKMirror" stock_apk_path "$module_apk_path" "$output_apk_path" log "$BugReport" "$pkgName" "$activityPatches"
       ;;
     Phone\ by\ Google)
       appName=("Phone by Google")
@@ -314,7 +314,7 @@ while true; do
       log=("$SimplUsr/${appName[0]}-LSPatch_patch-log.txt")
       activityPatches="com.google.android.dialer/.extensions.GoogleDialtactsActivity"
       BugReport="https://github.com/vvb2060/CallRecording/issues/new"
-      build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "APKMirror" "stock_apk_path" "$module_apk_path" "$output_apk_path" "log" "$BugReport" "$pkgName" "$activityPatches"
+      build_app "$pkgName" appName "$pkgVersion" "$Type" Arch "APKMirror" stock_apk_path "$module_apk_path" "$output_apk_path" log "$BugReport" "$pkgName" "$activityPatches"
       ;;  
   esac
 done
