@@ -73,7 +73,7 @@ patch_app() {
   local appName=$5
   local BugReportUrl=$6
 
-  $PREFIX/lib/jvm/java-21-openjdk/bin/java -jar $LSPatchJar "$stock_apk_path" -m $module_apk_path -o $SimplUsr | tee "$log"
+  $PREFIX/lib/jvm/java-21-openjdk/bin/java -jar $LSPatchJar "$stock_apk_path" -m "$module_apk_path" -o "$SimplUsr/" | tee "$log"
 
   if [ $? != 0 ]; then
     echo -e "$bad Oops, $appName Patching failed !! Logs saved to "$log". Share the Patchlog to developer."
