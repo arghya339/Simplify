@@ -56,6 +56,7 @@ APKMdl() {
   local ARCH=$4
   local OS=$5
   local DPI=$6
+  local OR=$7
   local RESPONSE_JSON
   local html_content
   local HTML_CONTENT
@@ -214,12 +215,6 @@ APKMdl() {
   Type="$found_type"
   Arch="$found_arch"
   Link="$found_link"
-
-  if [ "$Type" == "APK" ]; then
-    file_ext=".apk"
-  else
-    file_ext=".apkm"
-  fi
   echo  # Space
   
   #appName="${appName//[\*\\\/:\?\|<>]/}"
@@ -240,9 +235,25 @@ APKMdl() {
     else
       SHA256=$(<<<"$HTML_CONTENT" awk '/<h4>APK bundle file hashes<\/h4>/,/<h5>Verify the APK bundle file you downloaded/' | sed -n 's/.*SHA-256: *<span[^>]*>\([0-9a-fA-F]\{64\}\)<\/span.*/\1/p' | head -n1)
     fi
-  
-    # This selector looks for an <a> tag with 'downloadButton' in its class list and extracts its href.
-    final_apk_link="https://www.apkmirror.com$(echo "$HTML_CONTENT" | pup -p --charset utf-8 'a.downloadButton attr{href}' 2>/dev/null)"
+    
+    or=$(echo "$HTML_CONTENT" | pup -p --charset utf-8 'a.downloadButton text{}, p:contains("- or -") text{}' 2>/dev/null)
+    if [ -n "$or" ]; then
+      # This selector looks for an <a> tag with 'downloadButton' in its class list and extracts its href.
+      if [ "$OR" == "Download APK" ] || [ -z "$OR" ]; then
+        final_apk_link="https://www.apkmirror.com$(echo "$HTML_CONTENT" | pup -p --charset utf-8 'a.downloadButton attr{href}' | head -1 2>/dev/null)"
+        file_ext=".apk"
+      elif [ "$OR" == "Download APK Bundle" ]; then
+        final_apk_link="https://www.apkmirror.com$(echo "$HTML_CONTENT" | pup -p --charset utf-8 'a.downloadButton attr{href}' | tail -1 2>/dev/null)"
+        file_ext=".apkm"
+      fi
+    else
+      final_apk_link="https://www.apkmirror.com$(echo "$HTML_CONTENT" | pup -p --charset utf-8 'a.downloadButton attr{href}' 2>/dev/null)"
+      if [ "$Type" == "APK" ]; then
+        file_ext=".apk"
+      else
+        file_ext=".apkm"
+      fi
+    fi
     if [ -n "$final_apk_link" ]; then
       echo -e "$running Fetching intermediate download button content from: ${Blue}$final_apk_link${Reset}"
       final_apk_link_content=$(curl -sL --doh-url $cloudflareDOH -A "$USER_AGENT" -H "Referer: $Link" "$final_apk_link")
@@ -293,7 +304,7 @@ APKMdl() {
     fi
     echo  # Space
     
-    if [ "$Type" == "BUNDLE" ]; then
+    if [ "$file_ext" == ".apkm" ]; then
       bash $Simplify/dlGitHub.sh "REAndroid" "APKEditor" "latest" ".jar" "$Simplify"
       APKEditor=$(find "$Simplify" -type f -name "APKEditor-*.jar" -print -quit)
       mkdir -p "$Download/${appName}_v${VERSION}-${cpuAbi}"
