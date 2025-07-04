@@ -229,7 +229,7 @@ APKMdl() {
   if [ -n "$or" ]; then
     # This selector looks for an <a> tag with 'downloadButton' in its class list and extracts its href.
     if [ "$OR" == "Download APK" ] || [ -z "$OR" ]; then
-      SHA256=$(<<<"$HTML_CONTENT" grep -A10 "APK certificate fingerprints" | sed -n '/APK certificate fingerprints/,+10 { s/.*SHA-256:.*<a[^>]*>\([0-9a-fA-F]\{64\}\)<\/a>.*/\1/p; }' | head -n1)
+      SHA256=$(<<<"$HTML_CONTENT" sed -n '/APK certificate fingerprints/,+10 { s/.*SHA-256:.*<a[^>]*>\([0-9a-fA-F]\{64\}\)<\/a>.*/\1/p; }' | head -n1)
       final_apk_link="https://www.apkmirror.com$(echo "$HTML_CONTENT" | pup -p --charset utf-8 'a.downloadButton attr{href}' | head -1 2>/dev/null)"
       file_ext=".apk"
     elif [ "$OR" == "Download APK Bundle" ]; then
