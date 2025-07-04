@@ -229,9 +229,11 @@ APKMdl() {
   if [ -n "$or" ]; then
     # This selector looks for an <a> tag with 'downloadButton' in its class list and extracts its href.
     if [ "$OR" == "Download APK" ] || [ -z "$OR" ]; then
+      SHA256=$(<<<"$HTML_CONTENT" grep -A10 "APK certificate fingerprints" | sed -n '/APK certificate fingerprints/,+10 { s/.*SHA-256:.*<a[^>]*>\([0-9a-fA-F]\{64\}\)<\/a>.*/\1/p; }' | head -n1)
       final_apk_link="https://www.apkmirror.com$(echo "$HTML_CONTENT" | pup -p --charset utf-8 'a.downloadButton attr{href}' | head -1 2>/dev/null)"
       file_ext=".apk"
     elif [ "$OR" == "Download APK Bundle" ]; then
+      SHA256=$(<<<"$HTML_CONTENT" awk '/<h4>APK bundle file hashes<\/h4>/,/<h5>Verify the APK bundle file you downloaded/' | sed -n 's/.*SHA-256: *<span[^>]*>\([0-9a-fA-F]\{64\}\)<\/span.*/\1/p' | head -n1)
       final_apk_link="https://www.apkmirror.com$(echo "$HTML_CONTENT" | pup -p --charset utf-8 'a.downloadButton attr{href}' | tail -1 2>/dev/null)"
       file_ext=".apkm"
     fi
@@ -239,15 +241,11 @@ APKMdl() {
     final_apk_link="https://www.apkmirror.com$(echo "$HTML_CONTENT" | pup -p --charset utf-8 'a.downloadButton attr{href}' 2>/dev/null)"
     if [ "$Type" == "APK" ]; then
       file_ext=".apk"
+      SHA256=$(<<<"$HTML_CONTENT" awk '/<h4>APK file hashes<\/h4>/,/<h5>Verify the file you downloaded/' | sed -n 's/.*SHA-256: *<span[^>]*>\([0-9a-fA-F]\{64\}\)<\/span.*/\1/p' | head -n1)
     else
       file_ext=".apkm"
+      SHA256=$(<<<"$HTML_CONTENT" awk '/<h4>APK bundle file hashes<\/h4>/,/<h5>Verify the APK bundle file you downloaded/' | sed -n 's/.*SHA-256: *<span[^>]*>\([0-9a-fA-F]\{64\}\)<\/span.*/\1/p' | head -n1)
     fi
-  fi
-  
-  if [ "$file_ext" == ".apk" ]; then
-    SHA256=$(<<<"$HTML_CONTENT" awk '/<h4>APK file hashes<\/h4>/,/<h5>Verify the file you downloaded/' | sed -n 's/.*SHA-256: *<span[^>]*>\([0-9a-fA-F]\{64\}\)<\/span.*/\1/p' | head -n1)
-  else
-    SHA256=$(<<<"$HTML_CONTENT" awk '/<h4>APK bundle file hashes<\/h4>/,/<h5>Verify the APK bundle file you downloaded/' | sed -n 's/.*SHA-256: *<span[^>]*>\([0-9a-fA-F]\{64\}\)<\/span.*/\1/p' | head -n1)
   fi
   
   if [ -n "$final_apk_link" ]; then
