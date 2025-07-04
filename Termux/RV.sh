@@ -218,7 +218,7 @@ build_app() {
     
     bash $Simplify/APKMdl.sh "$pkgName" "$pkgVersion" "$Type" "${archRef[0]}" "$os_val" "$dpi_val" "$or_val"  # Download stock apk from APKMirror
     
-    if [ "$Type" ==  "BUNDLE" ]; then
+    if [ "$Type" == "BUNDLE" ]; then
       local stock_apk_path=("$Download/${appNameRef[0]}_v${pkgVersion}-$cpuAbi.apk")
     else
       local stock_apk_path=("$Download/${appNameRef[0]}_v${pkgVersion}-${archRef[0]}.apk")
