@@ -213,12 +213,12 @@ build_app() {
   local log=$10
   local pkgPatches=$11
   local activityPatches=$12
-  local -n osRef=$13
+  local os=$13
   local Dpi=$14
   
 
   if [ "$web" == "APKMirror" ]; then
-    bash $Simplify/APKMdl.sh "$pkgName" "$pkgVersion" "$Type" "${archRef[0]}" "${osRef[0]}" "$Dpi"  # Download stock apk from APKMirror
+    bash $Simplify/APKMdl.sh "$pkgName" "$pkgVersion" "$Type" "${archRef[0]}" "$os" "$Dpi"  # Download stock apk from APKMirror
   else
     bash $Simplify/dlUptodown.sh "${appNameRef[0]}" "$pkgVersion" "$Type" "${archRef[0]}"  # Download stock apk from Uptodown
   fi
@@ -542,7 +542,7 @@ while true; do
       outputAPK="$SimplUsr/facebook-rv_v${pkgVersion}-$cpuAbi.apk"
       log="$SimplUsr/facebook-rv-patch_log.txt"
       activityPatches="com.facebook.katana/.LoginActivity"
-      build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "APKMirror" "facebook_apk_path" "facebook_patches_args" "$outputAPK" "$log" "$pkgName" "$activityPatches" "Os" "$Dpi"
+      build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "APKMirror" "facebook_apk_path" "facebook_patches_args" "$outputAPK" "$log" "$pkgName" "$activityPatches" "${Os[0]}" "$Dpi"
       ;;
     Facebook\ Messenger)
       pkgName="com.facebook.orca"
