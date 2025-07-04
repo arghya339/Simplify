@@ -209,15 +209,15 @@ build_app() {
   local appPatchesArgs=$7
   local pkgPatches=$8
   local activityPatches=$9
-  local Os=$10
+  local -n os_ref=$10
   local Dpi=$11
-  local Or=$12
-  echo -e "$notice DEBUG - Os: '$Os', Dpi: $Dpi, Or: '$Or'"
+  local -n or_ref=$12
+  echo -e "$notice DEBUG - Os: '${os_ref[0]}', Dpi: $Dpi, Or: '${or_ref[0]}'"
   
   
   if [ "$web" == "APKMirror" ]; then
     
-    bash $Simplify/APKMdl.sh "$pkgName" "$pkgVersion" "$Type" "${archRef[0]}" "$Os" "$Dpi" "$Or"  # Download stock apk from APKMirror
+    bash $Simplify/APKMdl.sh "$pkgName" "$pkgVersion" "$Type" "${archRef[0]}" "${os_ref[0]}" "$Dpi" "${or_ref[0]}"  # Download stock apk from APKMirror
     
     if [ "$Type" ==  "BUNDLE" ]; then
       local stock_apk_path=("$Download/${appNameRef[0]}_v${pkgVersion}-$cpuAbi.apk")
