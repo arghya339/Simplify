@@ -217,72 +217,72 @@ APKMdl() {
   Link="$found_link"
   echo  # Space
   
+  echo -e "$running Scraping actual download button from: ${Blue}$Link${Reset}"
+  # Fetch the HTML of the download page
+  HTML_CONTENT=$(curl -sL --doh-url "$cloudflareDOH" -A "$USER_AGENT" -H "Referer: https://www.apkmirror.com/" "$Link")
+  if [ $? -ne 0 ] || [ -z "$HTML_CONTENT" ]; then
+    echo -e "$bad Error: Scraping download url failed for ${Blue}apkmirror.com${Reset}.\nTry again later..."
+    return 1
+  fi
+  
+  if [ "$Type" == "APK" ]; then
+    SHA256=$(<<<"$HTML_CONTENT" awk '/<h4>APK file hashes<\/h4>/,/<h5>Verify the file you downloaded/' | sed -n 's/.*SHA-256: *<span[^>]*>\([0-9a-fA-F]\{64\}\)<\/span.*/\1/p' | head -n1)
+  else
+    SHA256=$(<<<"$HTML_CONTENT" awk '/<h4>APK bundle file hashes<\/h4>/,/<h5>Verify the APK bundle file you downloaded/' | sed -n 's/.*SHA-256: *<span[^>]*>\([0-9a-fA-F]\{64\}\)<\/span.*/\1/p' | head -n1)
+  fi
+  
+  or=$(echo "$HTML_CONTENT" | pup -p --charset utf-8 'a.downloadButton text{}, p:contains("- or -") text{}' 2>/dev/null)
+  if [ -n "$or" ]; then
+    # This selector looks for an <a> tag with 'downloadButton' in its class list and extracts its href.
+    if [ "$OR" == "Download APK" ] || [ -z "$OR" ]; then
+      final_apk_link="https://www.apkmirror.com$(echo "$HTML_CONTENT" | pup -p --charset utf-8 'a.downloadButton attr{href}' | head -1 2>/dev/null)"
+      file_ext=".apk"
+    elif [ "$OR" == "Download APK Bundle" ]; then
+      final_apk_link="https://www.apkmirror.com$(echo "$HTML_CONTENT" | pup -p --charset utf-8 'a.downloadButton attr{href}' | tail -1 2>/dev/null)"
+      file_ext=".apkm"
+    fi
+  else
+    final_apk_link="https://www.apkmirror.com$(echo "$HTML_CONTENT" | pup -p --charset utf-8 'a.downloadButton attr{href}' 2>/dev/null)"
+    if [ "$Type" == "APK" ]; then
+      file_ext=".apk"
+    else
+      file_ext=".apkm"
+    fi
+  fi
+  if [ -n "$final_apk_link" ]; then
+    echo -e "$running Fetching intermediate download button content from: ${Blue}$final_apk_link${Reset}"
+    final_apk_link_content=$(curl -sL --doh-url $cloudflareDOH -A "$USER_AGENT" -H "Referer: $Link" "$final_apk_link")
+    if [ $? -ne 0 ]; then
+      echo -e "$bad Error: failed to fetch content for intermediate download page ${Blue}$final_apk_link${Reset}!" >&2
+      return 1
+    fi
+    if [ -z "$final_apk_link_content" ]; then
+      echo -e "$bad Error: Fetched empty content from intermediate download page ${Blue}$final_apk_link${Reset}!" >&2
+      return 1
+    fi
+    
+    # An <a> tag with an href attribute that 'contains("here")' or similar patterns.
+    final_app_url="https://www.apkmirror.com$(echo "$final_apk_link_content" | pup -p --charset UTF-8 'a:contains("here") attr{href}' | head -1 2>/dev/null)"
+      # https://www.apkmirror.com/wp-content/themes/APKMirror/download.php?id=XXXXXXX&key=XxX 
+      # https://www.androidpolice.com/2020/07/04/how-to-download-apps-without-the-play-store-and-why-apkmirror-is-the-best-place-to-get-them/
+      # https://github.com/illogical-robot/apkmirror-public/issues
+    if [ -z "$final_app_url" ]; then
+      echo -e "$bad Error: Could not find the final download URL in the content of ${Blue}$final_apk_link${Reset} using pup!" >&2
+      return 1
+    else
+      echo -e "$good Found final download URL: ${Blue}$final_app_url${Reset}"
+    fi
+  else
+    echo -e "$bad Error: Could not find the final download button link on ${Blue}$Link${Reset}!" >&2
+    return 1
+  fi
+  echo  # Space
+    
   #appName="${appName//[\*\\\/:\?\|<>]/}"
   appName=$(echo "${appName%%[:—(]*}" | xargs)
   FileName="${appName}_v${VERSION}-${Arch}${file_ext}"
   outputPath="${Download}/${FileName}" 
   if [ ! -f "$Download/${appName}_v${VERSION}-${cpuAbi}.apk" ] && [ ! -f "$outputPath" ]; then
-    echo -e "$running Scraping actual download button from: ${Blue}$Link${Reset}"
-    # Fetch the HTML of the download page
-    HTML_CONTENT=$(curl -sL --doh-url "$cloudflareDOH" -A "$USER_AGENT" -H "Referer: https://www.apkmirror.com/" "$Link")
-    if [ $? -ne 0 ] || [ -z "$HTML_CONTENT" ]; then
-      echo -e "$bad Error: Scraping download url failed for ${Blue}apkmirror.com${Reset}.\nTry again later..."
-      return 1
-    fi
-  
-    if [ "$Type" == "APK" ]; then
-      SHA256=$(<<<"$HTML_CONTENT" awk '/<h4>APK file hashes<\/h4>/,/<h5>Verify the file you downloaded/' | sed -n 's/.*SHA-256: *<span[^>]*>\([0-9a-fA-F]\{64\}\)<\/span.*/\1/p' | head -n1)
-    else
-      SHA256=$(<<<"$HTML_CONTENT" awk '/<h4>APK bundle file hashes<\/h4>/,/<h5>Verify the APK bundle file you downloaded/' | sed -n 's/.*SHA-256: *<span[^>]*>\([0-9a-fA-F]\{64\}\)<\/span.*/\1/p' | head -n1)
-    fi
-    
-    or=$(echo "$HTML_CONTENT" | pup -p --charset utf-8 'a.downloadButton text{}, p:contains("- or -") text{}' 2>/dev/null)
-    if [ -n "$or" ]; then
-      # This selector looks for an <a> tag with 'downloadButton' in its class list and extracts its href.
-      if [ "$OR" == "Download APK" ] || [ -z "$OR" ]; then
-        final_apk_link="https://www.apkmirror.com$(echo "$HTML_CONTENT" | pup -p --charset utf-8 'a.downloadButton attr{href}' | head -1 2>/dev/null)"
-        file_ext=".apk"
-      elif [ "$OR" == "Download APK Bundle" ]; then
-        final_apk_link="https://www.apkmirror.com$(echo "$HTML_CONTENT" | pup -p --charset utf-8 'a.downloadButton attr{href}' | tail -1 2>/dev/null)"
-        file_ext=".apkm"
-      fi
-    else
-      final_apk_link="https://www.apkmirror.com$(echo "$HTML_CONTENT" | pup -p --charset utf-8 'a.downloadButton attr{href}' 2>/dev/null)"
-      if [ "$Type" == "APK" ]; then
-        file_ext=".apk"
-      else
-        file_ext=".apkm"
-      fi
-    fi
-    if [ -n "$final_apk_link" ]; then
-      echo -e "$running Fetching intermediate download button content from: ${Blue}$final_apk_link${Reset}"
-      final_apk_link_content=$(curl -sL --doh-url $cloudflareDOH -A "$USER_AGENT" -H "Referer: $Link" "$final_apk_link")
-      if [ $? -ne 0 ]; then
-        echo -e "$bad Error: failed to fetch content for intermediate download page ${Blue}$final_apk_link${Reset}!" >&2
-        return 1
-      fi
-      if [ -z "$final_apk_link_content" ]; then
-        echo -e "$bad Error: Fetched empty content from intermediate download page ${Blue}$final_apk_link${Reset}!" >&2
-        return 1
-      fi
-    
-      # An <a> tag with an href attribute that 'contains("here")' or similar patterns.
-      final_app_url="https://www.apkmirror.com$(echo "$final_apk_link_content" | pup -p --charset UTF-8 'a:contains("here") attr{href}' | head -1 2>/dev/null)"
-        # https://www.apkmirror.com/wp-content/themes/APKMirror/download.php?id=XXXXXXX&key=XxX 
-        # https://www.androidpolice.com/2020/07/04/how-to-download-apps-without-the-play-store-and-why-apkmirror-is-the-best-place-to-get-them/
-        # https://github.com/illogical-robot/apkmirror-public/issues
-      if [ -z "$final_app_url" ]; then
-        echo -e "$bad Error: Could not find the final download URL in the content of ${Blue}$final_apk_link${Reset} using pup!" >&2
-        return 1
-      else
-        echo -e "$good Found final download URL: ${Blue}$final_app_url${Reset}"
-      fi
-    else
-      echo -e "$bad Error: Could not find the final download button link on ${Blue}$Link${Reset}!" >&2
-      return 1
-    fi
-    echo  # Space
-    
     echo -e "$running Attempting to download APK from: ${Blue}$final_app_url${Reset}"
     while true; do
       aria2c -x 16 -s 16 --continue=true --console-log-level=error --download-result=hide --summary-interval=0 -d "$Download" -o "$FileName" -U "User-Agent: $USER_AGENT" -U "Referer: $final_apk_link" --async-dns=true --async-dns-server="$cloudflareIP" "$final_app_url"
@@ -317,7 +317,7 @@ APKMdl() {
       echo
     fi
   else
-    if [ "$Type" == "BUNDLE" ]; then
+    if [ "$file_ext" == ".apkm" ]; then
       echo -e "$notice Download skiped! '${appName}_v${VERSION}-${cpuAbi}.apk' already exist."
     else
       echo -e "$notice Download skiped! '${appName}_v${VERSION}-${Arch}.apk' already exist."
