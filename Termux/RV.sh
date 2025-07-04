@@ -549,7 +549,7 @@ while true; do
       Dpi="nodpi"
       Or=("Download APK")
       activityPatches="com.facebook.katana/.LoginActivity"
-      build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "APKMirror" "facebook_patches_args" "$pkgName" "$activityPatches" "${Os[0]}" "$Dpi" "${Or[0]}"
+      build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "APKMirror" "facebook_patches_args" "$pkgName" "$activityPatches" "Os" "$Dpi" "Or"
       ;;
     Facebook\ Messenger)
       pkgName="com.facebook.orca"
