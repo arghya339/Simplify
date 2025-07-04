@@ -215,6 +215,7 @@ build_app() {
   local activityPatches=$12
   local os=$13
   local Dpi=$14
+  echo -e "$notice DEBUG - os: '$os', Dpi: $Dpi"
   
 
   if [ "$web" == "APKMirror" ]; then
