@@ -110,7 +110,7 @@ getVersion() {
 patch_twitter() {
   local -n stock_apk_ref=$1
   local outputAPK=$2
-  local log="$pikoTwitter/piko-twitter_patch-log.txt"
+  local log="$SimplUsr/piko-twitter_patch-log.txt"
   
   $PREFIX/lib/jvm/java-21-openjdk/bin/java -jar $ReVancedCLIJar patch -b $PatchesJar -m $IntegrationsApk \
     -o "$outputAPK" "${stock_apk_ref[0]}" \

@@ -294,9 +294,9 @@ while true; do
       ;;
     RVS*|rvs*)
       if su -c "id" >/dev/null 2>&1; then
-        curl -sL -o "$RVX/RVSU.sh" "https://raw.githubusercontent.com/arghya339/Simplify/refs/heads/main/Termux/RVSU.sh"
+        curl -sL -o "$RV/RVSU.sh" "https://raw.githubusercontent.com/arghya339/Simplify/refs/heads/main/Termux/RVSU.sh"
         curl -sL -o "$Simplify/apkMount.sh" "https://raw.githubusercontent.com/arghya339/Simplify/refs/heads/main/Termux/apkMount.sh"
-        bash "$RVX/RVSU.sh"
+        bash "$RV/RVSU.sh"
       else
         echo -e "$notice SuperUser permission is not granted! RV SuperUser required SU permission."
       fi
