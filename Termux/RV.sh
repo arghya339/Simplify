@@ -213,10 +213,12 @@ build_app() {
   local log=$10
   local pkgPatches=$11
   local activityPatches=$12
+  local -n osRef=$13
+  local Dpi=$14
   
 
   if [ "$web" == "APKMirror" ]; then
-    bash $Simplify/APKMdl.sh "$pkgName" "$pkgVersion" "$Type" "${archRef[0]}"  # Download stock apk from APKMirror
+    bash $Simplify/APKMdl.sh "$pkgName" "$pkgVersion" "$Type" "${archRef[0]}" "${osRef[0]}" "$Dpi"  # Download stock apk from APKMirror
   else
     bash $Simplify/dlUptodown.sh "${appNameRef[0]}" "$pkgVersion" "$Type" "${archRef[0]}"  # Download stock apk from Uptodown
   fi
@@ -293,10 +295,10 @@ comment
 
 if  [[ $Android -ge 9  &&  ( "$cpuAbi" == "arm64-v8a" || "$cpuAbi" == "x86_64" ) ]]; then
   Instagram="Instagram"
-  Facebook="Facebook"
+  #Facebook="Facebook"
   fbMessenger=("Facebook Messenger")
 elif [[ $Android -ge 8  &&  ( "$cpuAbi" == "armeabi-v7a" || "$cpuAbi" == "x86" ) ]]; then
-  Facebook="Facebook"
+  #Facebook="Facebook"
 elif [[ $Android -ge 7  &&  ( "$cpuAbi" == "armeabi-v7a" || "$cpuAbi" == "x86" ) ]]; then
   Instagram="Instagram"
 elif [[ $Android -ge 5  &&  ( "$cpuAbi" == "armeabi-v7a" || "$cpuAbi" == "x86" ) ]]; then
@@ -305,6 +307,10 @@ fi
 
 if [ $cpuAbi == "arm64-v8a" ] || [ $cpuAbi == "armeabi-v7a" ]; then
   amazonPrimeVideo=("Amazon Prime Video")
+fi
+
+if  [[ $Android -ge 11  &&  ( "$cpuAbi" == "arm64-v8a" || "$cpuAbi" == "armeabi-v7a" ) ]]; then
+  Facebook="Facebook"
 fi
 
 # Define the array
@@ -524,13 +530,19 @@ while true; do
         getVersion "$pkgName"
         pkgVersion="$pkgVersion"
       fi
-      Type="APK"
       Arch=("$cpuAbi")
+      if [ $cpuAbi == arm64-v8a ] && [ $Android -ge 11 ]; then
+        Type="APK"
+      elif [ $cpuAbi == armeabi-v7a ] && [ $Android -ge 11 ]; then
+        Type="BUNDLE"
+      fi
+      Os=("Android 11+")
+      Dpi="nodpi"
       facebook_apk_path=("$Download/${appName[0]}_v${pkgVersion}-${Arch[0]}.apk")
       outputAPK="$SimplUsr/facebook-rv_v${pkgVersion}-$cpuAbi.apk"
       log="$SimplUsr/facebook-rv-patch_log.txt"
       activityPatches="com.facebook.katana/.LoginActivity"
-      build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "APKMirror" "facebook_apk_path" "facebook_patches_args" "$outputAPK" "$log" "$pkgName" "$activityPatches"
+      build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "APKMirror" "facebook_apk_path" "facebook_patches_args" "$outputAPK" "$log" "$pkgName" "$activityPatches" "Os" "$Dpi"
       ;;
     Facebook\ Messenger)
       pkgName="com.facebook.orca"

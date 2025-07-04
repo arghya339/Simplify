@@ -54,6 +54,8 @@ APKMdl() {
   local VERSION=$2
   local TYPE=$3
   local ARCH=$4
+  local OS=$5
+  local DPI=$6
   local RESPONSE_JSON
   local html_content
   local HTML_CONTENT
@@ -123,12 +125,16 @@ APKMdl() {
       (.children[0].children[0].text | type) == "string" and # Version text
       (.children[0].children[1].text | type) == "string" and # Type text (BUNDLE/APK)
       (.children[1].text | type) == "string" and # Arch text
+      (.children[2].text | type) == "string" and # OS text
+      (.children[3].text | type) == "string" and # DPI text
       (.children[4].children[0].href | type) == "string" # Link href
     )
     | [
         (.children[0].text // .children[0].children[0].text), # Version (fallback)
         .children[0].children[1].text, # Type (BUNDLE/APK)
         .children[1].text, # Arch
+        .children[2].text, # OS
+        .children[3].text, # DPI
         ("https://www.apkmirror.com" + .children[4].children[0].href) # Link
       ] | join("\t")
   ')
@@ -138,34 +144,59 @@ APKMdl() {
     return 1
   elif [ ${#parsed_rows[@]} -eq 1 ]; then
     # Automatically select the single variant found
-    IFS=$'\t' read -r version type arch link <<< "${parsed_rows[0]}"
-    echo -e "[0] ${Blue}Version: $version | Type: $type | Arch: $arch{Reset}"
+    IFS=$'\t' read -r version type arch os dpi link <<< "${parsed_rows[0]}"
+    echo -e "[0] ${Blue}Version: $version | Type: $type | Arch: $arch | OS: $os | DPI: $dpi{Reset}"
     found_version="$version"
     found_type="$type"
     found_arch="$arch"
+    found_os="$os"
+    found_dpi="$dpi"
     found_link="$link"
     echo -e "$notice Only one variant found! auto selected:"
     echo "Version : $found_version"
     echo "Type    : $found_type"
     echo "Arch    : $found_arch"
+    echo "OS      : $found_os"
+    echo "DPI     : $found_dpi"
     echo -e "Link    : ${Blue}$found_link${Reset}"
   else
     # Filter variants based on both TYPE and ARCH parameters
     # Use a loop with indices to print the row number
     for i in "${!parsed_rows[@]}"; do
-      IFS=$'\t' read -r version type arch link <<< "${parsed_rows[$i]}"
+      IFS=$'\t' read -r version type arch os dpi link <<< "${parsed_rows[$i]}"
       # Print the row number here (using $i)
-      echo -e "[$i] ${Blue}Version: $version | Type: $type | Arch: $arch${Reset}"
-    
-      if [[ "$type" == "$TYPE" ]] && [[ "$arch" == "$ARCH" ]]; then
+      echo -e "[$i] ${Blue}Version: $version | Type: $type | Arch: $arch | OS: $os | DPI: $dpi${Reset}"
+      
+      if [ -n "$OS" ] && [ -n "$DPI" ]; then
+        if [ "$type" == "$TYPE" ] && [ "$arch" == "$ARCH" ] && [ "$os" == "$OS" ] && [ "$dpi" == "$DPI" ]; then
+          found_version="$version"
+          found_type="$type"
+          found_arch="$arch"
+          found_os="$os"
+          found_dpi="$dpi"
+          found_link="$link"
+          echo -e "$info autoSelectedVeriant:"
+          echo "Version : $found_version"
+          echo "Type    : $found_type" # Print selected Type
+          echo "Arch    : $found_arch"
+          echo "OS      : $found_os"
+          echo "DPI     : $found_dpi"
+          echo -e "Link    : ${Blue}$found_link${Reset}"
+          break # Exit the loop once a match is found
+        fi
+      elif [[ "$type" == "$TYPE" ]] && [[ "$arch" == "$ARCH" ]]; then
         found_version="$version"
         found_type="$type"
         found_arch="$arch"
+        found_os="$os"
+        found_dpi="$dpi"
         found_link="$link"
         echo -e "$info autoSelectedVeriant:"
         echo "Version : $found_version"
         echo "Type    : $found_type" # Print selected Type
         echo "Arch    : $found_arch"
+        echo "OS      : $found_os"
+        echo "DPI     : $found_dpi"
         echo -e "Link    : ${Blue}$found_link${Reset}"
         break # Exit the loop once a match is found
       fi
