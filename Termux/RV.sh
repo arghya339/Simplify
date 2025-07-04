@@ -213,13 +213,13 @@ build_app() {
   local log=$10
   local pkgPatches=$11
   local activityPatches=$12
-  local os=$13
+  local osRef=$13
   local Dpi=$14
-  echo -e "$notice DEBUG - os: '$os', Dpi: $Dpi"
+  echo -e "$notice DEBUG - os: '$osRef', Dpi: $Dpi"
   
 
   if [ "$web" == "APKMirror" ]; then
-    bash $Simplify/APKMdl.sh "$pkgName" "$pkgVersion" "$Type" "${archRef[0]}" "$os" "$Dpi"  # Download stock apk from APKMirror
+    bash $Simplify/APKMdl.sh "$pkgName" "$pkgVersion" "$Type" "${archRef[0]}" "$osRef" "$Dpi"  # Download stock apk from APKMirror
   else
     bash $Simplify/dlUptodown.sh "${appNameRef[0]}" "$pkgVersion" "$Type" "${archRef[0]}"  # Download stock apk from Uptodown
   fi
