@@ -207,7 +207,6 @@ build_app() {
   local -n archRef=$5
   local web=$6
   local appPatchesArgs=$7
-  local fileName=$(basename $outputAPK)
   local pkgPatches=$8
   local activityPatches=$9
   local os=$10
@@ -244,7 +243,8 @@ build_app() {
   fi
   
   local outputAPK="$SimplUsr/${appNameRef[0]}-RV_v${pkgVersion}-$cpuAbi.apk"
-
+  local fileName=$(basename $outputAPK)
+  
   if [ -f "${stock_apk_path[0]}" ]; then
     echo -e "$good ${Green}Downloaded ${appNameRef[0]} APK found:${Reset} ${stock_apk_path[0]}"
     echo -e "$running Patching ${appNameRef[0]} RV.."
