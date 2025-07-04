@@ -209,15 +209,15 @@ build_app() {
   local appPatchesArgs=$7
   local pkgPatches=$8
   local activityPatches=$9
-  local os=$10
+  local Os=$10
   local Dpi=$11
-  local -n orRef=$12
-  echo -e "$notice DEBUG - os: '$os', Dpi: $Dpi, or: '${orRef[0]}'"
+  local Or=$12
+  echo -e "$notice DEBUG - Os: '$Os', Dpi: $Dpi, Or: '$Or'"
   
   
   if [ "$web" == "APKMirror" ]; then
     
-    bash $Simplify/APKMdl.sh "$pkgName" "$pkgVersion" "$Type" "${archRef[0]}" "$os" "$Dpi" "${orRef[0]}"  # Download stock apk from APKMirror
+    bash $Simplify/APKMdl.sh "$pkgName" "$pkgVersion" "$Type" "${archRef[0]}" "$Os" "$Dpi" "$Or"  # Download stock apk from APKMirror
     
     if [ "$Type" ==  "BUNDLE" ]; then
       local stock_apk_path=("$Download/${appNameRef[0]}_v${pkgVersion}-$cpuAbi.apk")
@@ -244,7 +244,7 @@ build_app() {
   
   local outputAPK="$SimplUsr/${appNameRef[0]}-RV_v${pkgVersion}-$cpuAbi.apk"
   local fileName=$(basename $outputAPK)
-  
+
   if [ -f "${stock_apk_path[0]}" ]; then
     echo -e "$good ${Green}Downloaded ${appNameRef[0]} APK found:${Reset} ${stock_apk_path[0]}"
     echo -e "$running Patching ${appNameRef[0]} RV.."
@@ -549,7 +549,7 @@ while true; do
       Dpi="nodpi"
       Or=("Download APK")
       activityPatches="com.facebook.katana/.LoginActivity"
-      build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "APKMirror" "facebook_patches_args" "$pkgName" "$activityPatches" "${Os[0]}" "$Dpi" "Or"
+      build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "APKMirror" "facebook_patches_args" "$pkgName" "$activityPatches" "${Os[0]}" "$Dpi" "${Or[0]}"
       ;;
     Facebook\ Messenger)
       pkgName="com.facebook.orca"
