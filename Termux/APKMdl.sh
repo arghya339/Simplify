@@ -225,12 +225,6 @@ APKMdl() {
     return 1
   fi
   
-  if [ "$Type" == "APK" ]; then
-    SHA256=$(<<<"$HTML_CONTENT" awk '/<h4>APK file hashes<\/h4>/,/<h5>Verify the file you downloaded/' | sed -n 's/.*SHA-256: *<span[^>]*>\([0-9a-fA-F]\{64\}\)<\/span.*/\1/p' | head -n1)
-  else
-    SHA256=$(<<<"$HTML_CONTENT" awk '/<h4>APK bundle file hashes<\/h4>/,/<h5>Verify the APK bundle file you downloaded/' | sed -n 's/.*SHA-256: *<span[^>]*>\([0-9a-fA-F]\{64\}\)<\/span.*/\1/p' | head -n1)
-  fi
-  
   or=$(echo "$HTML_CONTENT" | pup -p --charset utf-8 'a.downloadButton text{}, p:contains("- or -") text{}' 2>/dev/null)
   if [ -n "$or" ]; then
     # This selector looks for an <a> tag with 'downloadButton' in its class list and extracts its href.
@@ -249,6 +243,13 @@ APKMdl() {
       file_ext=".apkm"
     fi
   fi
+  
+  if [ "$file_ext" == ".apk" ]; then
+    SHA256=$(<<<"$HTML_CONTENT" awk '/<h4>APK file hashes<\/h4>/,/<h5>Verify the file you downloaded/' | sed -n 's/.*SHA-256: *<span[^>]*>\([0-9a-fA-F]\{64\}\)<\/span.*/\1/p' | head -n1)
+  else
+    SHA256=$(<<<"$HTML_CONTENT" awk '/<h4>APK bundle file hashes<\/h4>/,/<h5>Verify the APK bundle file you downloaded/' | sed -n 's/.*SHA-256: *<span[^>]*>\([0-9a-fA-F]\{64\}\)<\/span.*/\1/p' | head -n1)
+  fi
+  
   if [ -n "$final_apk_link" ]; then
     echo -e "$running Fetching intermediate download button content from: ${Blue}$final_apk_link${Reset}"
     final_apk_link_content=$(curl -sL --doh-url $cloudflareDOH -A "$USER_AGENT" -H "Referer: $Link" "$final_apk_link")
