@@ -235,7 +235,7 @@ build_app() {
     
     bash $Simplify/dlUptodown.sh "${appNameRef[0]}" "$pkgVersion" "$Type" "${archRef[0]}"  # Download stock apk from Uptodown
     
-    if [ "$Type" ==  "xapk" ]; then
+    if [ "$Type" == "xapk" ]; then
       local stock_apk_path=("$Download/${appNameRef[0]}_v${pkgVersion}-$cpuAbi.apk")
     else
       local stock_apk_path=("$Download/${appNameRef[0]}_v${pkgVersion}-${archRef[0]}.apk")
