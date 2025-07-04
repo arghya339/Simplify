@@ -300,6 +300,7 @@ APKMdl() {
       echo -e "$good Downloaded file appears in the original state."
     else
       echo -e "$bad Look like downloaded file appears corrupted!"
+      echo -e "$notice SHA-256 SUM Diffs - Expected: ${Cyan}$SHA256${Reset} ~ Result: ${Cyan}$sha256sum${Reset}"
     fi
     echo  # Space
     
