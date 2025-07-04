@@ -209,15 +209,15 @@ build_app() {
   local appPatchesArgs=$7
   local pkgPatches=$8
   local activityPatches=$9
-  local -n os_ref=$10
-  local Dpi=$11
-  local -n or_ref=$12
-  echo -e "$notice DEBUG - Os: '${os_ref[0]}', Dpi: $Dpi, Or: '${or_ref[0]}'"
+  local os_val=${10}
+  local dpi_val=${11}
+  local or_val=${12}
+  echo -e "$notice DEBUG - os_val: '$os_val', dpi_val: $dpi_val, or_val: '$or_val'"
   
   
   if [ "$web" == "APKMirror" ]; then
     
-    bash $Simplify/APKMdl.sh "$pkgName" "$pkgVersion" "$Type" "${archRef[0]}" "${os_ref[0]}" "$Dpi" "${or_ref[0]}"  # Download stock apk from APKMirror
+    bash $Simplify/APKMdl.sh "$pkgName" "$pkgVersion" "$Type" "${archRef[0]}" "$os_val" "$dpi_val" "$or_val"  # Download stock apk from APKMirror
     
     if [ "$Type" ==  "BUNDLE" ]; then
       local stock_apk_path=("$Download/${appNameRef[0]}_v${pkgVersion}-$cpuAbi.apk")
@@ -548,8 +548,9 @@ while true; do
       Os=("Android 11+")
       Dpi="nodpi"
       Or=("Download APK")
+      echo -e "$notice DEBUG - Os: '${Os[0]}', Dpi: $Dpi, Or: '${Or[0]}'"
       activityPatches="com.facebook.katana/.LoginActivity"
-      build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "APKMirror" "facebook_patches_args" "$pkgName" "$activityPatches" "Os" "$Dpi" "Or"
+      build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "APKMirror" "facebook_patches_args" "$pkgName" "$activityPatches" "${Os[0]}" "$Dpi" "${Or[0]}"
       ;;
     Facebook\ Messenger)
       pkgName="com.facebook.orca"
