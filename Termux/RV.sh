@@ -212,7 +212,6 @@ build_app() {
   local os_val=${10}
   local dpi_val=${11}
   local or_val=${12}
-  echo -e "$notice DEBUG - os_val: '$os_val', dpi_val: $dpi_val, or_val: '$or_val'"
   
   
   if [ "$web" == "APKMirror" ]; then
@@ -548,7 +547,6 @@ while true; do
       Os=("Android 11+")
       Dpi="nodpi"
       Or=("Download APK")
-      echo -e "$notice DEBUG - Os: '${Os[0]}', Dpi: $Dpi, Or: '${Or[0]}'"
       activityPatches="com.facebook.katana/.LoginActivity"
       build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "APKMirror" "facebook_patches_args" "$pkgName" "$activityPatches" "${Os[0]}" "$Dpi" "${Or[0]}"
       ;;
