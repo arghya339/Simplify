@@ -402,12 +402,13 @@ while true; do
       sleep 3
       ;;
     [Cc]*)
-      echo -e "P. FetchPreRelease\nR. RipLib\nS. Change RVX Source"
+      echo -e "P. FetchPreRelease\nR. RipLib\nS. Change RVX Source\nQ. Quit"
       read -r -p "Select: " opt
       case "$opt" in
         [Pp]*) fetchPreRelease ;;
         [Rr]*) ripLib ;;
         [Ss]*) changeRVXSource ;;
+        [Qq]*) clear && break ;;
         *) echo -e "$info Invalid input! Please enter P / R / S." ;;
       esac
       sleep 3
