@@ -27,6 +27,9 @@ pikoTwitter="$Simplify/pikoTwitter"
 SimplUsr="/sdcard/Simplify"  # /storage/emulated/0/Simplify dir
 mkdir -p "$Simplify" "$pikoTwitter" "$SimplUsr"  # Create $Simplify, $RV, $RVX and $SimplUsr dir if it does't exist
 Download="/sdcard/Download"  # Download dir
+simplifyJson="$Simplify/simplify.json"  # Configuration file to store simplify settings
+FetchPreRelease=$(jq -r '.FetchPreRelease' "$simplifyJson" 2>/dev/null)
+RipLib="$(jq -r '.RipLib' "$simplifyJson" 2>/dev/null)"
 
 # --- Checking Android Version ---
 if [ $Android -le 7 ]; then
@@ -43,8 +46,13 @@ if [ ! -f "$ReVancedCLIJar" ]; then
 fi
 echo -e "$info ${Blue}ReVancedCLIJar:${Reset} $ReVancedCLIJar"
 
-#bash $Simplify/dlGitHub.sh "crimera" "piko" "latest" ".jar" "$pikoTwitter"
-bash $Simplify/dlGitHub.sh "crimera" "piko" "pre" ".jar" "$pikoTwitter"
+if [ "$FetchPreRelease" -eq 0 ]; then
+  release="latest"  # Use latest release
+else
+  release="pre"  # Use pre-release
+fi
+
+bash $Simplify/dlGitHub.sh "crimera" "piko" "$release" ".jar" "$pikoTwitter"
 PatchesJar=$(find "$pikoTwitter" -type f -name "piko-twitter-patches-*.jar" -print -quit)
 echo -e "$info ${Blue}PatchesJar:${Reset} $PatchesJar"
 patchesJarFile=$(basename "$PatchesJar")
@@ -66,26 +74,31 @@ if [ -f "$pikoTwitter/patches.json" ]; then
 fi
 
 #bash $Simplify/dlGitHub.sh "crimera" "revanced-integrations" "latest" ".apk" "$pikoTwitter"
-bash $Simplify/dlGitHub.sh "crimera" "revanced-integrations" "pre" ".apk" "$pikoTwitter"
+bash $Simplify/dlGitHub.sh "crimera" "revanced-integrations" "$release" ".apk" "$pikoTwitter"
 IntegrationsApk=$(find "$pikoTwitter" -type f -name "revanced-integrations-*.apk" -print -quit)
 echo -e "$info ${Blue}IntegrationsApk:${Reset} $IntegrationsApk"
 
-# --- Architecture Detection ---
-all_arch="arm64-v8a armeabi-v7a x86_64 x86"  # Space-separated list instead of array
-# Generate ripLib arguments for all ABIs EXCEPT the detected one
-ripLib=""
-for current_arch in $all_arch; do
-  if [ "$current_arch" != "$cpuAbi" ]; then
-    if [ -z "$ripLib" ]; then
-      ripLib="--rip-lib=$current_arch"  # No leading space for first item
-    else
-      ripLib="$ripLib --rip-lib=$current_arch"  # Add space for subsequent items
+if [ "$RipLib" -eq 1 ]; then
+  # --- Architecture Detection ---
+  all_arch="arm64-v8a armeabi-v7a x86_64 x86"  # Space-separated list instead of array
+  # Generate ripLib arguments for all ABIs EXCEPT the detected one
+  ripLib=""
+  for current_arch in $all_arch; do
+    if [ "$current_arch" != "$cpuAbi" ]; then
+      if [ -z "$ripLib" ]; then
+        ripLib="--rip-lib=$current_arch"  # No leading space for first item
+      else
+        ripLib="$ripLib --rip-lib=$current_arch"  # Add space for subsequent items
+      fi
     fi
-  fi
-done
-# Display the final ripLib arguments
-echo -e "$info ${Blue}cpuAbi:${Reset} $cpuAbi"
-echo -e "$info ${Blue}ripLib:${Reset} $ripLib"
+  done
+  # Display the final ripLib arguments
+  echo -e "$info ${Blue}cpuAbi:${Reset} $cpuAbi"
+  echo -e "$info ${Blue}ripLib:${Reset} $ripLib"
+else
+  ripLib=""  # If RipLib is not enabled, set ripLib to an empty string
+  echo -e "$notice RipLib Disabled!"
+fi
 
 # Get compatiblePackages version from json
 getVersion() {

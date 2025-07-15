@@ -28,6 +28,9 @@ RVX="$Simplify/RVX"
 SimplUsr="/sdcard/Simplify"  # /storage/emulated/0/Simplify dir
 mkdir -p "$Simplify" "$RV" "$RVX" "$SimplUsr"  # Create $Simplify, $RV, $RVX and $SimplUsr dir if it does't exist
 Download="/sdcard/Download"  # Download dir
+simplifyJson="$Simplify/simplify.json"  # Configuration file to store simplify settings
+FetchPreRelease=$(jq -r '.FetchPreRelease' "$simplifyJson" 2>/dev/null)
+RipLib="$(jq -r '.RipLib' "$simplifyJson" 2>/dev/null)"
 
 # --- Checking Android Version ---
 if [ $Android -le 3 ]; then
@@ -41,8 +44,12 @@ bash $Simplify/dlGitHub.sh "inotia00" "revanced-cli" "latest" ".jar" "$RVX"
 ReVancedCLIJar=$(find "$RVX" -type f -name "revanced-cli-*-all.jar" -print -quit)
 echo -e "$info ${Blue}ReVancedCLIJar:${Reset} $ReVancedCLIJar"
 
-#bash $Simplify/dlGitHub.sh "ReVanced" "revanced-patches" "latest" ".rvp" "$RV"
-bash $Simplify/dlGitHub.sh "ReVanced" "revanced-patches" "pre" ".rvp" "$RV"
+if [ "$FetchPreRelease" -eq 0 ]; then
+  release="latest"  # Use latest release
+else
+  release="pre"  # Use pre-release
+fi
+bash $Simplify/dlGitHub.sh "ReVanced" "revanced-patches" "$release" ".rvp" "$RV"
 PatchesRvp=$(find "$RV" -type f -name "patches-*.rvp" -print -quit)
 echo -e "$info ${Blue}PatchesRvp:${Reset} $PatchesRvp"
 
@@ -52,22 +59,27 @@ if [ "$Android" -ge "6" ]; then
   echo -e "$info ${Blue}VancedMicroG:${Reset} $VancedMicroG"
 fi
 
-# --- Architecture Detection ---
-all_arch="arm64-v8a armeabi-v7a x86_64 x86"  # Space-separated list instead of array
-# Generate ripLib arguments for all ABIs EXCEPT the detected one
-ripLib=""
-for current_arch in $all_arch; do
-  if [ "$current_arch" != "$cpuAbi" ]; then
-    if [ -z "$ripLib" ]; then
-      ripLib="--rip-lib=$current_arch"  # No leading space for first item
-    else
-      ripLib="$ripLib --rip-lib=$current_arch"  # Add space for subsequent items
+if [ "$RipLib" -eq 1 ]; then
+  # --- Architecture Detection ---
+  all_arch="arm64-v8a armeabi-v7a x86_64 x86"  # Space-separated list instead of array
+  # Generate ripLib arguments for all ABIs EXCEPT the detected one
+  ripLib=""
+  for current_arch in $all_arch; do
+    if [ "$current_arch" != "$cpuAbi" ]; then
+      if [ -z "$ripLib" ]; then
+        ripLib="--rip-lib=$current_arch"  # No leading space for first item
+      else
+        ripLib="$ripLib --rip-lib=$current_arch"  # Add space for subsequent items
+      fi
     fi
-  fi
-done
-# Display the final ripLib arguments
-echo -e "$info ${Blue}cpuAbi:${Reset} $cpuAbi"
-echo -e "$info ${Blue}ripLib:${Reset} $ripLib"
+  done
+  # Display the final ripLib arguments
+  echo -e "$info ${Blue}cpuAbi:${Reset} $cpuAbi"
+  echo -e "$info ${Blue}ripLib:${Reset} $ripLib"
+else
+  ripLib=""  # If RipLib is not enabled, set ripLib to an empty string
+  echo -e "$notice RipLib Disabled!"
+fi
 
 # --- Generate patches.json file --- 
 if [ $Android -ge 8 ]; then

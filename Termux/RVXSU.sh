@@ -28,6 +28,10 @@ mkdir -p "$Simplify" "$RVX" "$SimplUsr"
 Download="/sdcard/Download"
 rvxBugReportUrl="https://github.com/kitadai31/revanced-patches-android6-7/issues/new?template=bug_report.yml"
 rvxa6_7BugReportUrl="https://github.com/inotia00/ReVanced_Extended/issues/new?template=bug-report.yml"
+simplifyJson="$Simplify/simplify.json"  # Configuration file to store simplify settings
+FetchPreRelease=$(jq -r '.FetchPreRelease' "$simplifyJson" 2>/dev/null)
+RipLib="$(jq -r '.RipLib' "$simplifyJson" 2>/dev/null)"
+ChangeRVXSource="$(jq -r '.ChangeRVXSource' "$simplifyJson" 2>/dev/null)"
 
 # --- Checking Android Version ---
 if [ $Android -le 4 ]; then
@@ -70,25 +74,43 @@ checkCoreLSPosed() {
   fi
 }
 
-# --- Generate ripLib ---
-all_arch="arm64-v8a armeabi-v7a x86_64 x86"
-# --- Generate ripLib arguments for all ABIs EXCEPT the detected one ---
-ripLib=""
-for current_arch in $all_arch; do
-  if [ "$current_arch" != "$cpuAbi" ]; then
-    if [ -z "$ripLib" ]; then
-      ripLib="--rip-lib=$current_arch"  # No leading space for first item
-    else
-      ripLib="$ripLib --rip-lib=$current_arch"  # Add space for subsequent items
+if [ "$RipLib" -eq 1 ]; then
+  # --- Architecture Detection ---
+  all_arch="arm64-v8a armeabi-v7a x86_64 x86"  # Space-separated list instead of array
+  # Generate ripLib arguments for all ABIs EXCEPT the detected one
+  ripLib=""
+  for current_arch in $all_arch; do
+    if [ "$current_arch" != "$cpuAbi" ]; then
+      if [ -z "$ripLib" ]; then
+        ripLib="--rip-lib=$current_arch"  # No leading space for first item
+      else
+        ripLib="$ripLib --rip-lib=$current_arch"  # Add space for subsequent items
+      fi
     fi
-  fi
-done
+  done
+  # Display the final ripLib arguments
+  echo -e "$info ${Blue}cpuAbi:${Reset} $cpuAbi"
+  echo -e "$info ${Blue}ripLib:${Reset} $ripLib"
+else
+  ripLib=""  # If RipLib is not enabled, set ripLib to an empty string
+  echo -e "$notice RipLib Disabled!"
+fi
 
 bash $Simplify/dlGitHub.sh "inotia00" "revanced-cli" "latest" ".jar" "$RVX"
 ReVancedCLIJar=$(find "$RVX" -type f -name "revanced-cli-*-all.jar" -print -quit)
 echo -e "$info ${Blue}ReVancedCLIJar:${Reset} $ReVancedCLIJar"
-#bash $Simplify/dlGitHub.sh "inotia00" "revanced-patches" "latest" ".rvp" "$RVX"
-bash $Simplify/dlGitHub.sh "anddea" "revanced-patches" "pre" ".rvp" "$RVX"
+
+if [ "$FetchPreRelease" -eq 0 ]; then
+  release="latest"  # Use latest release
+else
+  release="pre"  # Use pre-release
+fi
+if [ "$ChangeRVXSource" -eq 0 ]; then
+  owner="inotia00"  # Use inotia00 as owner
+else
+  owner="anddea"  # Use anddea as owner
+fi
+bash $Simplify/dlGitHub.sh "$owner" "revanced-patches" "$release" ".rvp" "$RVX"
 PatchesRvp=$(find "$RVX" -type f -name "patches-*.rvp" -print -quit)
 echo -e "$info ${Blue}PatchesRvp:${Reset} $PatchesRvp"
 

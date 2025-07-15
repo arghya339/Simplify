@@ -126,6 +126,13 @@ Dropped="$Simplify/Dropped"
 LSPatch="$Simplify/LSPatch"
 mkdir -p "$Simplify" "$RV" "$RVX" "$pikoTwitter" "$Dropped" "$LSPatch" "$SimplUsr"
 Download="/sdcard/Download"
+simplifyJson="$Simplify/simplify.json"  # Configuration file to store simplify settings
+FetchPreRelease=$(jq -r '.FetchPreRelease' "$simplifyJson" 2>/dev/null)
+RipLib="$(jq -r '.RipLib' "$simplifyJson" 2>/dev/null)"
+ChangeRVXSource="$(jq -r '.ChangeRVXSource' "$simplifyJson" 2>/dev/null)"
+isPreRelease=0  # Default value (false/off/0) for isPreRelease, it's enabled latest release for Patches source
+isRipLib=1  # Default value (true/on/1) for RipLib, it's delete lib dir from patches apk file except device specific arch lib by default
+isChangeRVXSource=0  # Default value (false/off/0) for ChangeRVXSource, means patches source remain unchange ie. official source (inotia00) for RVX Patches
 
 # --- Checking Android Version ---
 if [ $Android -le 4 ]; then
@@ -228,6 +235,65 @@ if [ ! -f "$Simplify/ks.keystore" ]; then
   $PREFIX/lib/jvm/java-21-openjdk/bin/keytool -list -v -keystore $Simplify/ks.keystore -storepass 123456 | grep -oP '(?<=Owner:).*' | xargs
 fi
 
+
+if [ ! -f "$simplifyJson" ]; then
+  echo -e "$running Creating Configuration file.."
+  jq -n "{ \"FetchPreRelease\": "$isPreRelease" }" > "$simplifyJson"  # Create new json file with {data} using jq null flags
+  jq ".RipLib = $isRipLib" "$simplifyJson" > temp.json && mv temp.json "$simplifyJson"  # Change key value: Reads content of existing json and assigns key new value then redirect new json data to temp.json then rename it to simplify.json
+  jq ".ChangeRVXSource = $isChangeRVXSource" "$simplifyJson" > temp.json && mv temp.json "$simplifyJson"  # Change key value: Reads content of existing json and assigns key new value then redirect new json data to temp.json then rename it to simplify.json
+fi
+
+fetchPreRelease() {
+  read -r -p "FetchPreRelease [E/d]: " opt
+  case "$opt" in
+    [Ee]*)
+      isPreRelease=1  # Enable FetchPreRelease
+      jq ".FetchPreRelease = $isPreRelease" "$simplifyJson" > temp.json && mv temp.json "$simplifyJson"  # Change key value: Reads content of existing json and assigns key new value then redirect new json data to temp.json then rename it to simplify.json
+      echo -e "$info FetchPreRelease is enabled. Last Pre Release Patches will be fetched."
+      ;;
+    [Dd]*)
+      isPreRelease=0  # Disable FetchPreRelease
+      jq ".FetchPreRelease = $isPreRelease" "$simplifyJson" > temp.json && mv temp.json "$simplifyJson"  # Change key value: Reads content of existing json and assigns key new value then redirect new json data to temp.json then rename it to simplify.json
+      echo -e "$info FetchPreRelease is disabled. Latest Release Patches will be fetched."
+      ;;
+    *) echo -e "${info} Invalid input! Please enter E or D." ;;
+  esac
+}
+
+ripLib() {
+  read -r -p "RipLib [E/d]: " opt
+  case "$opt" in
+    [En]*)
+      isRipLib=1  # Enable RipLib
+      jq ".RipLib = $isRipLib" "$simplifyJson" > temp.json && mv temp.json "$simplifyJson"  # Change key value: Reads content of existing json and assigns key new value then redirect new json data to temp.json then rename it to simplify.json
+      echo -e "$info RipLib is enabled. Device specific arch lib will be kept in patches apk file."
+      ;;
+    [Dd]*)
+      isRipLib=0  # Disable RipLib
+      jq ".RipLib = $isRipLib" "$simplifyJson" > temp.json && mv temp.json "$simplifyJson"  # Change key value: Reads content of existing json and assigns key new value then redirect new json data to temp.json then rename it to simplify.json
+      echo -e "$info RipLib is disabled. All lib dir will be kept in patches apk file."
+      ;;
+    *) echo -e "${info} Invalid input! Please enter E or D." ;;
+  esac
+}
+
+changeRVXSource() {
+  read -r -p "ChangeRVXSource [E/d]: " opt
+  case "$opt" in
+    [Ee]*)
+      isChangeRVXSource=1  # Enable ChangeRVXSource
+      jq ".ChangeRVXSource = $isChangeRVXSource" "$simplifyJson" > temp.json && mv temp.json "$simplifyJson"  # Change key value: Reads content of existing json and assigns key new value then redirect new json data to temp.json then rename it to simplify.json
+      echo -e "$info ChangeRVXSource is enabled. RVX Patches source will be changed to anddea."
+      ;;
+    [Dd]*)
+      isChangeRVXSource=0  # Disable ChangeRVXSource
+      jq ".ChangeRVXSource = $isChangeRVXSource" "$simplifyJson" > temp.json && mv temp.json "$simplifyJson"  # Change key value: Reads content of existing json and assigns key new value then redirect new json data to temp.json then rename it to simplify.json
+      echo -e "$info ChangeRVXSource is disabled. RVX Patches source will remain official (inotia00)."
+      ;;
+    *) echo -e "${info} Invalid input! Please enter E or D." ;;
+  esac
+}
+
 # --- Feature request prompt ---
 feature() {
   echo -e "${Yellow}Do you want any new feature in this script? [Y/n]${Reset}: \c" && read userInput
@@ -284,7 +350,7 @@ while true; do
   clear  # Clear
   # Apply the eye color to the simplify shape and print it
   echo -e "${BoldGreen}$print_simplify${Reset}" && echo ""  # Space
-  echo -e "RV  : ReVanced\nRVS : RV SuperUser\nRVX : ReVanced Extended\nRVXS: RVX SuperUser\nPiko: Piko Twitter\nDrop: Dropped Patches\nLS  : LSPatch\nF   : Feature request\nB   : Bug report\nS   : Support\nA   : About\nQ   : Quit\n"
+  echo -e "RV  : ReVanced\nRVS : RV SuperUser\nRVX : ReVanced Extended\nRVXS: RVX SuperUser\nPiko: Piko Twitter\nDrop: Dropped Patches\nLS  : LSPatch\C   : Configuration\nF   : Feature request\nB   : Bug report\nS   : Support\nA   : About\nQ   : Quit\n"
   echo -n "Select Patches source: " && read source
   case $source in
     RV|rv)
@@ -335,12 +401,22 @@ while true; do
       bash "$LSPatch/LSPatch.sh"
       sleep 3
       ;;
+    [Cc]*)
+      read -r -p "P. FetchPreRelease\nR. RipLib\nS. Change RVX Source\n\nSelect: " opt
+      case "$opt" in
+        [Pp]*) fetchPreRelease ;;
+        [Rr]*) ripLib ;;
+        [Ss]*) changeRVXSource ;;
+        *) echo -e "$info Invalid input! Please enter P / R / S." ;;
+      esac
+      sleep 3
+      ;;
     [Ff]*) feature && sleep 3 ;;
     [Bb]*) bug && sleep 3 ;;
     [Ss]*) support && sleep 3 ;;
     [Aa]*) about && sleep 3 ;;
     [Qq]*) clear && break ;;
-    *) echo -e "$info Invalid input! Please enter RV / RVS / RVX / RVXS / Piko / Drop / LS / F / B / S / A / Q." && sleep 3 ;;
+    *) echo -e "$info Invalid input! Please enter RV / RVS / RVX / RVXS / Piko / Drop / LS / C / F / B / S / A / Q." && sleep 3 ;;
   esac
 done
-##############################################################################################################################
+##################################################################################################################################
