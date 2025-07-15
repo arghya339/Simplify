@@ -268,7 +268,7 @@ ripLib() {
   while true; do
     read -r -p "RipLib [E/d]: " opt
     case "$opt" in
-      [En]*)
+      [Ee]*)
         isRipLib=1  # Enable RipLib
         jq ".RipLib = $isRipLib" "$simplifyJson" > temp.json && mv temp.json "$simplifyJson"  # Change key value: Reads content of existing json and assigns key new value then redirect new json data to temp.json then rename it to simplify.json
         echo -e "$info RipLib is Enabled. Device specific arch lib will be kept in patches apk file."
