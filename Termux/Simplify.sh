@@ -244,54 +244,66 @@ if [ ! -f "$simplifyJson" ]; then
 fi
 
 fetchPreRelease() {
-  read -r -p "FetchPreRelease [E/d]: " opt
-  case "$opt" in
-    [Ee]*)
-      isPreRelease=1  # Enable FetchPreRelease
-      jq ".FetchPreRelease = $isPreRelease" "$simplifyJson" > temp.json && mv temp.json "$simplifyJson"  # Change key value: Reads content of existing json and assigns key new value then redirect new json data to temp.json then rename it to simplify.json
-      echo -e "$info FetchPreRelease is enabled. Last Pre Release Patches will be fetched."
-      ;;
-    [Dd]*)
-      isPreRelease=0  # Disable FetchPreRelease
-      jq ".FetchPreRelease = $isPreRelease" "$simplifyJson" > temp.json && mv temp.json "$simplifyJson"  # Change key value: Reads content of existing json and assigns key new value then redirect new json data to temp.json then rename it to simplify.json
-      echo -e "$info FetchPreRelease is disabled. Latest Release Patches will be fetched."
-      ;;
-    *) echo -e "${info} Invalid input! Please enter E or D." ;;
-  esac
+  while true; do
+    read -r -p "FetchPreRelease [E/d]: " opt
+    case "$opt" in
+      [Ee]*)
+        isPreRelease=1  # Enable FetchPreRelease
+        jq ".FetchPreRelease = $isPreRelease" "$simplifyJson" > temp.json && mv temp.json "$simplifyJson"  # Change key value: Reads content of existing json and assigns key new value then redirect new json data to temp.json then rename it to simplify.json
+        echo -e "$info FetchPreRelease is enabled. Last Pre Release Patches will be fetched."
+        break
+        ;;
+      [Dd]*)
+        isPreRelease=0  # Disable FetchPreRelease
+        jq ".FetchPreRelease = $isPreRelease" "$simplifyJson" > temp.json && mv temp.json "$simplifyJson"  # Change key value: Reads content of existing json and assigns key new value then redirect new json data to temp.json then rename it to simplify.json
+        echo -e "$info FetchPreRelease is disabled. Latest Release Patches will be fetched."
+        break
+        ;;
+      *) echo -e "${info} Invalid input! Please enter E or D." ;;
+    esac
+  done
 }
 
 ripLib() {
-  read -r -p "RipLib [E/d]: " opt
-  case "$opt" in
-    [En]*)
-      isRipLib=1  # Enable RipLib
-      jq ".RipLib = $isRipLib" "$simplifyJson" > temp.json && mv temp.json "$simplifyJson"  # Change key value: Reads content of existing json and assigns key new value then redirect new json data to temp.json then rename it to simplify.json
-      echo -e "$info RipLib is enabled. Device specific arch lib will be kept in patches apk file."
-      ;;
-    [Dd]*)
-      isRipLib=0  # Disable RipLib
-      jq ".RipLib = $isRipLib" "$simplifyJson" > temp.json && mv temp.json "$simplifyJson"  # Change key value: Reads content of existing json and assigns key new value then redirect new json data to temp.json then rename it to simplify.json
-      echo -e "$info RipLib is disabled. All lib dir will be kept in patches apk file."
-      ;;
-    *) echo -e "${info} Invalid input! Please enter E or D." ;;
-  esac
+  while true; do
+    read -r -p "RipLib [E/d]: " opt
+    case "$opt" in
+      [En]*)
+        isRipLib=1  # Enable RipLib
+        jq ".RipLib = $isRipLib" "$simplifyJson" > temp.json && mv temp.json "$simplifyJson"  # Change key value: Reads content of existing json and assigns key new value then redirect new json data to temp.json then rename it to simplify.json
+        echo -e "$info RipLib is enabled. Device specific arch lib will be kept in patches apk file."
+        break
+        ;;
+      [Dd]*)
+        isRipLib=0  # Disable RipLib
+        jq ".RipLib = $isRipLib" "$simplifyJson" > temp.json && mv temp.json "$simplifyJson"  # Change key value: Reads content of existing json and assigns key new value then redirect new json data to temp.json then rename it to simplify.json
+        echo -e "$info RipLib is disabled. All lib dir will be kept in patches apk file."
+        break
+        ;;
+      *) echo -e "${info} Invalid input! Please enter E or D." ;;
+    esac
+  done
 }
 
 changeRVXSource() {
-  read -r -p "ChangeRVXSource [E/d]: " opt
-  case "$opt" in
-    [Ee]*)
-      isChangeRVXSource=1  # Enable ChangeRVXSource
-      jq ".ChangeRVXSource = $isChangeRVXSource" "$simplifyJson" > temp.json && mv temp.json "$simplifyJson"  # Change key value: Reads content of existing json and assigns key new value then redirect new json data to temp.json then rename it to simplify.json
-      echo -e "$info ChangeRVXSource is enabled. RVX Patches source will be changed to anddea."
-      ;;
-    [Dd]*)
-      isChangeRVXSource=0  # Disable ChangeRVXSource
-      jq ".ChangeRVXSource = $isChangeRVXSource" "$simplifyJson" > temp.json && mv temp.json "$simplifyJson"  # Change key value: Reads content of existing json and assigns key new value then redirect new json data to temp.json then rename it to simplify.json
-      echo -e "$info ChangeRVXSource is disabled. RVX Patches source will remain official (inotia00)."
-      ;;
-    *) echo -e "${info} Invalid input! Please enter E or D." ;;
-  esac
+  while true; do
+    read -r -p "ChangeRVXSource [E/d]: " opt
+    case "$opt" in
+      [Ee]*)
+        isChangeRVXSource=1  # Enable ChangeRVXSource
+        jq ".ChangeRVXSource = $isChangeRVXSource" "$simplifyJson" > temp.json && mv temp.json "$simplifyJson"  # Change key value: Reads content of existing json and assigns key new value then redirect new json data to temp.json then rename it to simplify.json
+        echo -e "$info ChangeRVXSource is enabled. RVX Patches source will be changed to anddea."
+        break
+        ;;
+      [Dd]*)
+        isChangeRVXSource=0  # Disable ChangeRVXSource
+        jq ".ChangeRVXSource = $isChangeRVXSource" "$simplifyJson" > temp.json && mv temp.json "$simplifyJson"  # Change key value: Reads content of existing json and assigns key new value then redirect new json data to temp.json then rename it to simplify.json
+        echo -e "$info ChangeRVXSource is disabled. RVX Patches source will remain official (inotia00)."
+        break
+        ;;
+      *) echo -e "${info} Invalid input! Please enter E or D." ;;
+    esac
+  done
 }
 
 # --- Feature request prompt ---
@@ -402,15 +414,17 @@ while true; do
       sleep 3
       ;;
     [Cc]*)
-      echo -e "P. FetchPreRelease\nR. RipLib\nS. Change RVX Source\nQ. Quit\n"
-      read -r -p "Select: " opt
-      case "$opt" in
-        [Pp]*) fetchPreRelease ;;
-        [Rr]*) ripLib ;;
-        [Ss]*) changeRVXSource ;;
-        [Qq]*) clear && break ;;
-        *) echo -e "$info Invalid input! Please enter P / R / S." ;;
-      esac
+      while true; do
+        echo -e "P. FetchPreRelease\nR. RipLib\nS. Change RVX Source\nQ. Quit\n"
+        read -r -p "Select: " opt
+        case "$opt" in
+          [Pp]*) fetchPreRelease ;;
+          [Rr]*) ripLib ;;
+          [Ss]*) changeRVXSource ;;
+          [Qq]*) break ;;
+          *) echo -e "$info Invalid input! Please enter P / R / S." ;;
+        esac
+      done
       sleep 3
       ;;
     [Ff]*) feature && sleep 3 ;;
