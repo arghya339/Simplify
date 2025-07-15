@@ -402,7 +402,8 @@ while true; do
       sleep 3
       ;;
     [Cc]*)
-      read -r -p "P. FetchPreRelease\nR. RipLib\nS. Change RVX Source\n\nSelect: " opt
+      echo -e "P. FetchPreRelease\nR. RipLib\nS. Change RVX Source"
+      read -r -p "Select: " opt
       case "$opt" in
         [Pp]*) fetchPreRelease ;;
         [Rr]*) ripLib ;;
