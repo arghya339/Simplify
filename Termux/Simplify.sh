@@ -235,6 +235,61 @@ if [ ! -f "$Simplify/ks.keystore" ]; then
   $PREFIX/lib/jvm/java-21-openjdk/bin/keytool -list -v -keystore $Simplify/ks.keystore -storepass 123456 | grep -oP '(?<=Owner:).*' | xargs
 fi
 
+Unmount() {
+  pkgArr=("com.google.android.youtube" "com.google.android.apps.youtube.music" "com.google.android.apps.photos")
+  nameArr=("YouTube" "YouTube Music" "Google Photos")
+  if [ -d "/data/adb/revanced" ]; then
+    for i in "${!pkgArr[@]}"; do 
+        DIR="/data/adb/revanced/${pkgArr[$i]}/"
+        if [ -e "$DIR" ]; then
+          if [ "$i" == "0" ]; then
+            nameList[$i]="${nameArr[0]}"
+          elif [ "$i" == "1" ]; then
+            nameList[$i]="${nameArr[1]}"
+          elif [ "$i" == "2" ]; then
+            nameList[$i]="${nameArr[2]}"
+          fi
+        fi
+    done
+
+    while true; do
+      # Display the list
+      echo -e "$info Available apps:"
+      for i in "${!nameList[@]}"; do
+        printf "%d. %s\n" "$i" "${nameList[$i]}"
+      done
+
+      # Ask for an index, showing the valid range
+      max=$(( ${#nameList[@]} - 1 ))  # highest legal index
+      read -rp "Enter the index [0-${max}] of apps you want to unmount or 'Q' to Quit: " idx
+
+      # Validate and respond
+      if [[ "$idx" == [Qq]* ]]; then
+        break  # break the while loop
+      elif [[ "$idx" =~ ^[0-9]+$ ]] && (( idx >= 0 && idx <= max )); then
+        echo -e "$notice You chose: ${nameList[$idx]}"
+      else
+        echo -e "$info \"$idx\" is not a valid index! Please select index [0-${max}]." >&2
+      fi
+  
+      case "${nameList[$idx]}" in
+        YouTube)
+          pkgName="com.google.android.youtube"
+          su -mm -c "/system/bin/sh /data/adb/post-fs-data.d/$pkgName.sh"
+          ;;
+        "YouTube Music")
+          pkgName="com.google.android.apps.youtube.music"
+          su -mm -c "/system/bin/sh /data/adb/post-fs-data.d/$pkgName.sh"
+          ;;
+        "Google Photos")
+          pkgName="com.google.android.apps.photos"
+          su -mm -c "/system/bin/sh /data/adb/post-fs-data.d/$pkgName.sh"
+          ;;
+        *) echo -e "$info Invalid selection! Please select a valid app." ;;
+      esac
+    done
+  fi
+}
 
 if [ ! -f "$simplifyJson" ]; then
   echo -e "$running Creating Configuration file.."
@@ -362,7 +417,7 @@ while true; do
   clear  # Clear
   # Apply the eye color to the simplify shape and print it
   echo -e "${BoldGreen}$print_simplify${Reset}" && echo ""  # Space
-  echo -e "RV  : ReVanced\nRVS : RV SuperUser\nRVX : ReVanced Extended\nRVXS: RVX SuperUser\nPiko: Piko Twitter\nDrop: Dropped Patches\nLS  : LSPatch\nC   : Configuration\nF   : Feature request\nB   : Bug report\nS   : Support\nA   : About\nQ   : Quit\n"
+  echo -e "RV  : ReVanced\nRVS : RV SuperUser\nRVX : ReVanced Extended\nRVXS: RVX SuperUser\nPiko: Piko Twitter\nDrop: Dropped Patches\nLS  : LSPatch\nC   : Configuration\nU   : Unmount Apps\nF   : Feature request\nB   : Bug report\nS   : Support\nA   : About\nQ   : Quit\n"
   echo -n "Select Patches source: " && read source
   case $source in
     RV|rv)
@@ -427,12 +482,13 @@ while true; do
       done
       sleep 3
       ;;
+    [Uu]*) Unmount && sleep 3 ;;
     [Ff]*) feature && sleep 3 ;;
     [Bb]*) bug && sleep 3 ;;
     [Ss]*) support && sleep 3 ;;
     [Aa]*) about && sleep 3 ;;
     [Qq]*) clear && break ;;
-    *) echo -e "$info Invalid input! Please enter RV / RVS / RVX / RVXS / Piko / Drop / LS / C / F / B / S / A / Q." && sleep 3 ;;
+    *) echo -e "$info Invalid input! Please enter RV / RVS / RVX / RVXS / Piko / Drop / LS / C / U / F / B / S / A / Q." && sleep 3 ;;
   esac
 done
-##################################################################################################################################
+######################################################################################################################################
