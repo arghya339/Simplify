@@ -250,13 +250,13 @@ fetchPreRelease() {
       [Tt]*)
         isPreRelease=1  # FetchPreRelease  == true
         jq ".FetchPreRelease = $isPreRelease" "$simplifyJson" > temp.json && mv temp.json "$simplifyJson"  # Change key value: Reads content of existing json and assigns key new value then redirect new json data to temp.json then rename it to simplify.json
-        echo -e "$info FetchPreRelease is enabled. Last Pre Release Patches will be fetched."
+        echo -e "$info FetchPreRelease is True. Last Pre Release Patches will be fetched."
         break
         ;;
       [Ff]*)
         isPreRelease=0  # FetchPreRelease  == false
         jq ".FetchPreRelease = $isPreRelease" "$simplifyJson" > temp.json && mv temp.json "$simplifyJson"  # Change key value: Reads content of existing json and assigns key new value then redirect new json data to temp.json then rename it to simplify.json
-        echo -e "$info FetchPreRelease is disabled. Latest Release Patches will be fetched."
+        echo -e "$info FetchPreRelease is False. Latest Release Patches will be fetched."
         break
         ;;
       *) echo -e "${info} Invalid input! Please enter T or F." ;;
@@ -271,13 +271,13 @@ ripLib() {
       [En]*)
         isRipLib=1  # Enable RipLib
         jq ".RipLib = $isRipLib" "$simplifyJson" > temp.json && mv temp.json "$simplifyJson"  # Change key value: Reads content of existing json and assigns key new value then redirect new json data to temp.json then rename it to simplify.json
-        echo -e "$info RipLib is enabled. Device specific arch lib will be kept in patches apk file."
+        echo -e "$info RipLib is Enabled. Device specific arch lib will be kept in patches apk file."
         break
         ;;
       [Dd]*)
         isRipLib=0  # Disable RipLib
         jq ".RipLib = $isRipLib" "$simplifyJson" > temp.json && mv temp.json "$simplifyJson"  # Change key value: Reads content of existing json and assigns key new value then redirect new json data to temp.json then rename it to simplify.json
-        echo -e "$info RipLib is disabled. All lib dir will be kept in patches apk file."
+        echo -e "$info RipLib is Disabled. All lib dir will be kept in patches apk file."
         break
         ;;
       *) echo -e "${info} Invalid input! Please enter E or D." ;;
@@ -292,13 +292,13 @@ changeRVXSource() {
       [Yy]*)
         isChangeRVXSource=1  # ChangeRVXSource: anddea
         jq ".ChangeRVXSource = $isChangeRVXSource" "$simplifyJson" > temp.json && mv temp.json "$simplifyJson"  # Change key value: Reads content of existing json and assigns key new value then redirect new json data to temp.json then rename it to simplify.json
-        echo -e "$info ChangeRVXSource is enabled. RVX Patches source will be changed to anddea."
+        echo -e "$info ChangeRVXSource == Yes. RVX Patches source will be changed to anddea."
         break
         ;;
       [Nn]*)
         isChangeRVXSource=0  # ChangeRVXSource: inotia00
         jq ".ChangeRVXSource = $isChangeRVXSource" "$simplifyJson" > temp.json && mv temp.json "$simplifyJson"  # Change key value: Reads content of existing json and assigns key new value then redirect new json data to temp.json then rename it to simplify.json
-        echo -e "$info ChangeRVXSource is disabled. RVX Patches source will remain official (inotia00)."
+        echo -e "$info ChangeRVXSource == No. RVX Patches source will remain official (inotia00)."
         break
         ;;
       *) echo -e "${info} Invalid input! Please enter Y or N." ;;
