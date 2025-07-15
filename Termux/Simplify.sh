@@ -418,9 +418,9 @@ while true; do
         echo -e "P. FetchPreRelease\nR. RipLib\nS. Change RVX Source\nQ. Quit\n"
         read -r -p "Select: " opt
         case "$opt" in
-          [Pp]*) fetchPreRelease ;;
-          [Rr]*) ripLib ;;
-          [Ss]*) changeRVXSource ;;
+          [Pp]*) if [ "$FetchPreRelease" == 0 ]; then echo "FetchPreRelease == false"; else echo "FetchPreRelease == true"; fi && fetchPreRelease ;;
+          [Rr]*) if [ "$RipLib" == 1 ]; then echo "RipLib == Enabled"; else echo "RipLib == Disabled"; fi && ripLib ;;
+          [Ss]*) if [ "$ChangeRVXSource" == 0 ]; then echo "ChangeRVXSource == No"; else echo "ChangeRVXSource == Yes"; fi && changeRVXSource ;;
           [Qq]*) break ;;
           *) echo -e "$info Invalid input! Please enter P / R / S." ;;
         esac
