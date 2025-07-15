@@ -236,6 +236,7 @@ if [ ! -f "$Simplify/ks.keystore" ]; then
 fi
 
 Unmount() {
+  su -c '/data/data/com.termux/files/usr/bin/bash -c '\''
   pkgArr=("com.google.android.youtube" "com.google.android.apps.youtube.music" "com.google.android.apps.photos")
   nameArr=("YouTube" "YouTube Music" "Google Photos")
   if [ -d "/data/adb/revanced" ]; then
@@ -289,6 +290,7 @@ Unmount() {
       esac
     done
   fi
+  '\'''
 }
 
 if [ ! -f "$simplifyJson" ]; then
