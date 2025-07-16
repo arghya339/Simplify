@@ -302,10 +302,18 @@ while true; do
   case "${apps[$idx]}" in
     YouTube)
       pkgName="com.google.android.youtube"
-      pkgVersion="20.21.37"
-      if [ -z "$pkgVersion" ]; then
-        getVersion "$pkgName"
-        pkgVersion="$pkgVersion"
+      if [ "$ChangeRVXSource" == 0 ]; then
+        pkgVersion="20.12.46"
+        if [ -z "$pkgVersion" ]; then
+          getVersion "$pkgName"
+          pkgVersion="$pkgVersion"
+        fi
+      else
+        pkgVersion="20.21.37"
+        if [ -z "$pkgVersion" ]; then
+          getVersion "$pkgName"
+          pkgVersion="$pkgVersion"
+        fi
       fi
       Type="APK"
       Arch="universal"
