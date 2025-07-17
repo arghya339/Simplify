@@ -28,26 +28,23 @@ Simplify="$HOME/Simplify"
 Download="/sdcard/Download"
 cpuAbi=$(getprop ro.product.cpu.abi)  # Get Android architecture
 locale=$(getprop persist.sys.locale | cut -d'-' -f1)  # Get System Languages
-# Function to get the DPI category based on density using getprop
-get_dpi() {
-  # Get the device screen density using 'getprop ro.sf.lcd_density'
-  density=$(getprop ro.sf.lcd_density)
+density=$(getprop ro.sf.lcd_density)  # Get the device screen density
   # Check and categorize the density
-  if [ "$density" -le 160 ]; then
-    echo "mdpi"  # Medium Density
+  if [ "$density" -le 120 ]; then
+    dpi="ldpi"  # Low Density
+  elif [ "$density" -le 160 ]; then
+    dpi="mdpi"  # Medium Density
   elif [ "$density" -le 240 ]; then
-    echo "hdpi"  # High Density
+    dpi="hdpi"  # High Density
   elif [ "$density" -le 320 ]; then
-    echo "xhdpi"  # Extra High Density
-  elif [ "$density" -le 440 ]; then
-    echo "xxhdpi"  # Extra Extra High Density
-  elif [ "$density" -gt 440 ]; then
-    echo "xxxhdpi"  # Extra Extra Extra High Density
+    dpi="xhdpi"  # Extra High Density
+  elif [ "$density" -le 480 ]; then
+    dpi="xxhdpi"  # Extra Extra High Density
+  elif [ "$density" -gt 480 ] || [ "$density" -ge 640 ]; then
+    dpi="xxxhdpi"  # Extra Extra Extra High Density
   else
-    echo "*dpi"
+    dpi="*dpi"
   fi
-}
-dpi=$(get_dpi)  # Get the DPI Category
 
 APKMdl() {
   local PKG_NAME=$1
@@ -309,7 +306,7 @@ APKMdl() {
       APKEditor=$(find "$Simplify" -type f -name "APKEditor-*.jar" -print -quit)
       mkdir -p "$Download/${appName}_v${VERSION}-${cpuAbi}"
       echo -e "$running Extracting APKM content.."
-      pv "$outputPath" | bsdtar -xf - -C "$Download/${appName}_v${VERSION}-${cpuAbi}/" --include "base.apk" "split_config.${cpuAbi//-/_}.apk" "split_config.${locale}.apk" "split_config.$dpi.apk"
+      pv "$outputPath" | bsdtar -xf - -C "$Download/${appName}_v${VERSION}-${cpuAbi}/" --include "base.apk" "split_config.${cpuAbi//-/_}.apk" "split_config.${locale}.apk" "split_config.${dpi}.apk"
       rm "$outputPath"
       echo -e "$running Merge splits apkm to standalone lite apk.."
       $PREFIX/lib/jvm/java-21-openjdk/bin/java -jar $APKEditor m -i "$Download/${appName}_v${VERSION}-${cpuAbi}" -o "$Download/${appName}_v${VERSION}-${cpuAbi}.apk"
