@@ -315,7 +315,7 @@ while true; do
           pkgVersion="$pkgVersion"
         fi
       fi
-      Type="APK"
+      Type="BUNDLE"
       Arch="universal"
       stock_apk_path=("$Download/YouTube_v${pkgVersion}-$cpuAbi.apk")
       outputAPK="$SimplUsr/youtube-rvx_v${pkgVersion}-$cpuAbi.apk"
