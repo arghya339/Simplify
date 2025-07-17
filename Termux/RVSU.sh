@@ -145,8 +145,8 @@ patch_app() {
 # --- Collect the enable/disable patches name with options in arrays ---
 yt_patches_args=(
   # enable patches with their options
-  -e "Custom branding" -O appName="YouTube RV" -O iconPath="$SimplUsr/branding/youtube/launcher/google_family"
-  -e "Change header" -O header="$SimplUsr/branding/youtube/header/google_family"
+  -e "Custom branding" -O appName="YouTube RV" -O iconPath="$SimplUsr/.branding/youtube/launcher/google_family"
+  -e "Change header" -O header="$SimplUsr/.branding/youtube/header/google_family"
   
   # disable patches
   -d "GmsCore support"

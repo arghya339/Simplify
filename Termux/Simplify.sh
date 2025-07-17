@@ -219,12 +219,13 @@ if [ ! -d "$SimplUsr/branding" ] && [ ! -f "$SimplUsr/branding.zip" ]; then
   curl -sL "https://github.com/arghya339/Simplify/releases/download/all/branding.zip" --progress-bar -o "$SimplUsr/branding.zip"
 fi
 # --- Extrct branding.zip ---
-if [ -f "$SimplUsr/branding.zip" ] && [ ! -d "$SimplUsr/branding" ]; then
+if [ -f "$SimplUsr/branding.zip" ] && [ ! -d "$SimplUsr/.branding" ]; then
   echo -e "$running Extrcting ${Red}branding.zip${Reset} to $SimplUsr dir.."
   pv "$SimplUsr/branding.zip" | bsdtar -xof - -C "$SimplUsr/" --no-same-owner --no-same-permissions
+  mv "$SimplUsr/branding" "$SimplUsr/.branding"  # Rename branding dir to .branding to hide it from file Gallery
 fi
 # --- Remove branding.zip ---
-if [ -d "$SimplUsr/branding" ] && [ -f "$SimplUsr/branding.zip" ]; then
+if [ -d "$SimplUsr/.branding" ] && [ -f "$SimplUsr/branding.zip" ]; then
   rm "$SimplUsr/branding.zip"
 fi
 

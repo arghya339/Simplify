@@ -153,8 +153,8 @@ yt_patches_args=(
   # enable patches with their options
   -e "GmsCore support" -OgmsCoreVendorGroupId="com.mgoogle" -OcheckGmsCore=true -OpackageNameYouTube="app.rvx.android.youtube"
   -e "Custom Shorts action buttons" -OiconType="round"
-  -e "Custom branding icon for YouTube" -OappIcon="$SimplUsr/branding/youtube/launcher/google_family" -OchangeSplashIcon=true -OrestoreOldSplashAnimation=false
-  -e "Custom header for YouTube" -OcustomHeader="$SimplUsr/branding/youtube/header/google_family"
+  -e "Custom branding icon for YouTube" -OappIcon="$SimplUsr/.branding/youtube/launcher/google_family" -OchangeSplashIcon=true -OrestoreOldSplashAnimation=false
+  -e "Custom header for YouTube" -OcustomHeader="$SimplUsr/.branding/youtube/header/google_family"
   -e "Custom branding name for YouTube" -OappName="YouTube RVX"
   -e "Hide shortcuts" -Oshorts=false
   -e "Visual preferences icons for YouTube" -OsettingsMenuIcon="extension"
@@ -168,8 +168,8 @@ yt_patches_args=(
 
 yt_music_patches_args=(
   -e "GmsCore support" -OgmsCoreVendorGroupId="com.mgoogle" -OcheckGmsCore=true -OpackageNameYouTubeMusic="app.rvx.android.apps.youtube.music"
-  -e "Custom branding icon for YouTube Music" -OappIcon="$SimplUsr/branding/music/launcher/google_family"
-  -e "Custom header for YouTube Music" -OcustomHeader="$SimplUsr/branding/music/header/google_family"
+  -e "Custom branding icon for YouTube Music" -OappIcon="$SimplUsr/.branding/music/launcher/google_family"
+  -e "Custom header for YouTube Music" -OcustomHeader="$SimplUsr/.branding/music/header/google_family"
   -e "Custom branding name for YouTube Music" -OappNameNotification="YouTube Music RVX" -OappNameLauncher="YT Music RVX"
   -e "Dark theme" -OmaterialYou=true
   -e "Visual preferences icons for YouTube Music" -OsettingsMenuIcon="extension"

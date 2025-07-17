@@ -147,8 +147,8 @@ patch_app() {
 yt_patches_args=(
   # enable patches with their options
   -e "GmsCore support" -O gmsCoreVendorGroupId="com.mgoogle"
-  -e "Custom branding" -O appName="YouTube RV" -O iconPath="$SimplUsr/branding/youtube/launcher/google_family"
-  -e "Change header" -O header="$SimplUsr/branding/youtube/header/google_family"
+  -e "Custom branding" -O appName="YouTube RV" -O iconPath="$SimplUsr/.branding/youtube/launcher/google_family"
+  -e "Change header" -O header="$SimplUsr/.branding/youtube/header/google_family"
   -e "Change package name" -O packageName="app.revanced.android.youtube"
   
   # disable patches
