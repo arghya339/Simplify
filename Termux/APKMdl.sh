@@ -307,6 +307,9 @@ APKMdl() {
       mkdir -p "$Download/${appName}_v${VERSION}-${cpuAbi}"
       echo -e "$running Extracting APKM content.."
       pv "$outputPath" | bsdtar -xf - -C "$Download/${appName}_v${VERSION}-${cpuAbi}/" --include "base.apk" "split_config.${cpuAbi//-/_}.apk" "split_config.${locale}.apk" "split_config.${dpi}.apk"
+      if [ ! -e "$Download/${appName}_v${VERSION}-${cpuAbi}/split_config.${dpi}.apk" ]; then  # check if file exists
+        pv "$outputPath" | bsdtar -xf - -C "$Download/${appName}_v${VERSION}-${cpuAbi}/" --include "base.apk" "split_config.${cpuAbi//-/_}.apk" "split_config.${locale}.apk" "split_config.*dpi.apk"
+      fi
       rm "$outputPath"
       echo -e "$running Merge splits apkm to standalone lite apk.."
       $PREFIX/lib/jvm/java-21-openjdk/bin/java -jar $APKEditor m -i "$Download/${appName}_v${VERSION}-${cpuAbi}" -o "$Download/${appName}_v${VERSION}-${cpuAbi}.apk"

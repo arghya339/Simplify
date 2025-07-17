@@ -230,6 +230,9 @@ dlUptodown() {
       mkdir -p "/sdcard/Download/${appName}_v${appVersion}-${cpuAbi}"
       echo -e "$running Extracting APKS content.."
       pv "$outputPath" | bsdtar -xf - -C "$Download/${appName}_v${appVersion}-${cpuAbi}/" --include "$pkgName.apk" "config.${cpuAbi//-/_}.apk" "config.${locale}.apk" "config.${dpi}.apk"
+      if [ ! -e "$Download/${appName}_v${appVersion}-${cpuAbi}/config.${dpi}.apk" ]; then  # check if file exists
+        pv "$outputPath" | bsdtar -xf - -C "$Download/${appName}_v${appVersion}-${cpuAbi}/" --include "$pkgName.apk" "config.${cpuAbi//-/_}.apk" "config.${locale}.apk" "config.*dpi.apk"
+      fi
       rm "$outputPath"
       echo -e "$running Merge splits apks to standalone lite apk.."
       $PREFIX/lib/jvm/java-21-openjdk/bin/java -jar $APKEditor m -i "$Download/${appName}_v${appVersion}-${cpuAbi}" -o "$Download/${appName}_v${appVersion}-${cpuAbi}.apk"
