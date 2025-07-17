@@ -214,7 +214,7 @@ curl -L "https://raw.githubusercontent.com/arghya339/Simplify/refs/heads/main/Te
 curl -L "https://raw.githubusercontent.com/arghya339/Simplify/refs/heads/main/Termux/apkInstall.sh" --progress-bar -o $Simplify/apkInstall.sh  > /dev/null 2>&1
 
 # --- Download branding.zip ---
-if [ ! -d "$SimplUsr/branding" ] && [ ! -f "$SimplUsr/branding.zip" ]; then
+if [ ! -d "$SimplUsr/.branding" ] && [ ! -f "$SimplUsr/branding.zip" ]; then
   echo -e "$running Downloading ${Red}branding.zip${Reset} from GitHub.."
   curl -sL "https://github.com/arghya339/Simplify/releases/download/all/branding.zip" --progress-bar -o "$SimplUsr/branding.zip"
 fi
