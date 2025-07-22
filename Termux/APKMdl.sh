@@ -31,19 +31,19 @@ locale=$(getprop persist.sys.locale | cut -d'-' -f1)  # Get System Languages
 density=$(getprop ro.sf.lcd_density)  # Get the device screen density
   # Check and categorize the density
   if [ "$density" -le 120 ]; then
-    dpi="ldpi"  # Low Density
+    lcd_dpi="ldpi"  # Low Density
   elif [ "$density" -le 160 ]; then
-    dpi="mdpi"  # Medium Density
+    lcd_dpi="mdpi"  # Medium Density
   elif [ "$density" -le 240 ]; then
-    dpi="hdpi"  # High Density
+    lcd_dpi="hdpi"  # High Density
   elif [ "$density" -le 320 ]; then
-    dpi="xhdpi"  # Extra High Density
+    lcd_dpi="xhdpi"  # Extra High Density
   elif [ "$density" -le 480 ]; then
-    dpi="xxhdpi"  # Extra Extra High Density
+    lcd_dpi="xxhdpi"  # Extra Extra High Density
   elif [ "$density" -gt 480 ] || [ "$density" -ge 640 ]; then
-    dpi="xxxhdpi"  # Extra Extra Extra High Density
+    lcd_dpi="xxxhdpi"  # Extra Extra Extra High Density
   else
-    dpi="*dpi"
+    lcd_dpi="*dpi"
   fi
 
 APKMdl() {
@@ -306,8 +306,8 @@ APKMdl() {
       APKEditor=$(find "$Simplify" -type f -name "APKEditor-*.jar" -print -quit)
       mkdir -p "$Download/${appName}_v${VERSION}-${cpuAbi}"
       echo -e "$running Extracting APKM content.."
-      pv "$outputPath" | bsdtar -xf - -C "$Download/${appName}_v${VERSION}-${cpuAbi}/" --include "base.apk" "split_config.${cpuAbi//-/_}.apk" "split_config.${locale}.apk" "split_config.${dpi}.apk"
-      if [ ! -e "$Download/${appName}_v${VERSION}-${cpuAbi}/split_config.${dpi}.apk" ]; then  # check if file exists
+      pv "$outputPath" | bsdtar -xf - -C "$Download/${appName}_v${VERSION}-${cpuAbi}/" --include "base.apk" "split_config.${cpuAbi//-/_}.apk" "split_config.${locale}.apk" "split_config.${lcd_dpi}.apk"
+      if [ ! -e "$Download/${appName}_v${VERSION}-${cpuAbi}/split_config.${lcd_dpi}.apk" ]; then  # check if file exists
         pv "$outputPath" | bsdtar -xf - -C "$Download/${appName}_v${VERSION}-${cpuAbi}/" --include "base.apk" "split_config.${cpuAbi//-/_}.apk" "split_config.${locale}.apk" "split_config.*dpi.apk"
       fi
       rm "$outputPath"

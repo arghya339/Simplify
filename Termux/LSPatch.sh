@@ -371,11 +371,12 @@ while true; do
     1.1.1.1\ +\ WARP)
       appName=("1.1.1.1 + WARP")
       pkgName="com.cloudflare.onedotonedotonedotone"
-      pkgVersion="6.38.3"
-      #pkgVersion=""
+      #pkgVersion="6.38.4"
+      pkgVersion=""
       Type="BUNDLE"
       Arch=("universal")
-      stock_apk_path=("$Download/${appName[0]}_v${pkgVersion}-$cpuAbi.apk")
+      apk_path=$(find "$Download" -type f -name "${appName[0]}_v*-$cpuAbi.apk")
+      stock_apk_path=("$apk_path")
       activityPatches=""
       sign_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "APKMirror" "stock_apk_path" "$pkgName" "$activityPatches"
       ;;
