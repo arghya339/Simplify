@@ -113,7 +113,7 @@ patch_app() {
   local log="$SimplUsr/$appName-RV_patch-log.txt"
   local appName=$4
   
-  if [ "$appName" == "Instagram" ] || [ "$appName" == "Facebook" ] || [ "$appName" == "Facebook Messenger" ]; then
+  if [ "$appName" == "Instagram" ] || [ "$appName" == "Facebook" ] || [ "$appName" == "Facebook Messenger" ] || [ "$appName" == "Threads" ]; then
     universalPatches=(
       -d "Hex"
       -d "Spoof app signature"
@@ -291,7 +291,7 @@ build_app() {
     echo -e "[?] ${Yellow}Do you want to install ${appNameRef[0]} RV app? [Y/n] ${Reset}\c" && read opt
     case $opt in
       y*|Y*|"")
-        if [ $pkgName == "com.instagram.android" ] || [ $pkgName == "com.facebook.katana" ] || [ $pkgName == "com.facebook.orca" ]; then
+        if [ $pkgName == "com.instagram.android" ] || [ $pkgName == "com.facebook.katana" ] || [ $pkgName == "com.facebook.orca" ] || [ $pkgName == "com.instagram.barcelona" ]; then
           echo -e "$notice ${Yellow}Warning! Disable auto updates for the patched app to avoid unexpected issues.${Reset}"
         fi
         echo -e "$running Please Wait !! Installing Patched ${appNameRef[0]} RV apk.."
