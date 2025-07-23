@@ -109,6 +109,7 @@ patch_app() {
   local -n stock_apk_ref=$1
   local -n patches=$2  # nameref (-n) accept an array name as parameter
   local outputAPK=$3
+  without_ext="${outputAPK%.*}"  # remove file extension (.apk)
   local log="$SimplUsr/$appName-RV_patch-log.txt"
   local appName=$4
   
@@ -140,6 +141,14 @@ patch_app() {
     echo -e "$bad Oops, $appName Patching failed !! Logs saved to "$log". Share the Patchlog to developer."
     termux-open-url "https://github.com/ReVanced/revanced-patches/issues/new?template=bug_report.yml"
     termux-open --send "$log"
+    rm -rf "$without_ext-temporary-files"  # Remove temporary files directory
+  else
+    if [ "$appName" == "Instagram" ] || [ "$appName" == "Facebook" ] || [ "$appName" == "Facebook Messenger" ]; then
+      rm "$without_ext-options.json"
+      rm "$without_ext.keystore"
+    else
+      rm "$without_ext.keystore"
+    fi
   fi
 }
 

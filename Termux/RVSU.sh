@@ -125,6 +125,7 @@ patch_app() {
   local stock_apk_path=$1
   local -n patches=$2  # nameref (-n) accept an array name as parameter
   local outputAPK=$3
+  without_ext="${outputAPK%.*}"  # remove file extension (.apk)
   local log=$4
   local appName=$5
   
@@ -139,6 +140,9 @@ patch_app() {
     echo -e "$bad Oops, $appName Patching failed !! Logs saved to "$log". Share the Patchlog to developer."
     termux-open-url "https://github.com/ReVanced/revanced-patches/issues/new?template=bug_report.yml"
     termux-open --send "$log"
+    rm -rf "$without_ext-temporary-files"  # Remove temporary files directory
+  else
+    rm "$without_ext.keystore"
   fi
 }
 
