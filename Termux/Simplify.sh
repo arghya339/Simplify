@@ -128,9 +128,13 @@ mkdir -p "$Simplify" "$RV" "$RVX" "$pikoTwitter" "$Dropped" "$LSPatch" "$SimplUs
 Download="/sdcard/Download"
 simplifyJson="$Simplify/simplify.json"  # Configuration file to store simplify settings
 FetchPreRelease=$(jq -r '.FetchPreRelease' "$simplifyJson" 2>/dev/null)
+RipLocale="$(jq -r '.RipLocale' "$simplifyJson" 2>/dev/null)"
+RipDpi="$(jq -r '.RipDpi' "$simplifyJson" 2>/dev/null)"
 RipLib="$(jq -r '.RipLib' "$simplifyJson" 2>/dev/null)"
 ChangeRVXSource="$(jq -r '.ChangeRVXSource' "$simplifyJson" 2>/dev/null)"
 isPreRelease=0  # Default value (false/off/0) for isPreRelease, it's enabled latest release for Patches source
+isRipLocale=1  # Default value (true/on/1) for RipLocale, it's delete locale from patches apk file except device specific locale by default
+isRipDpi=1  # Default value (true/on/1) for RipDpi, it's delete dpi from patches apk file except device specific dpi by default
 isRipLib=1  # Default value (true/on/1) for RipLib, it's delete lib dir from patches apk file except device specific arch lib by default
 isChangeRVXSource=0  # Default value (false/off/0) for ChangeRVXSource, means patches source remain unchange ie. official source (inotia00) for RVX Patches
 
@@ -297,6 +301,8 @@ Unmount() {
 if [ ! -f "$simplifyJson" ]; then
   echo -e "$running Creating Configuration file.."
   jq -n "{ \"FetchPreRelease\": "$isPreRelease" }" > "$simplifyJson"  # Create new json file with {data} using jq null flags
+  jq ".RipLocale = $isRipLocale" "$simplifyJson" > temp.json && mv temp.json "$simplifyJson"
+  jq ".RipDpi = $isRipDpi" "$simplifyJson" > temp.json && mv temp.json "$simplifyJson"
   jq ".RipLib = $isRipLib" "$simplifyJson" > temp.json && mv temp.json "$simplifyJson"  # Change key value: Reads content of existing json and assigns key new value then redirect new json data to temp.json then rename it to simplify.json
   jq ".ChangeRVXSource = $isChangeRVXSource" "$simplifyJson" > temp.json && mv temp.json "$simplifyJson"  # Change key value: Reads content of existing json and assigns key new value then redirect new json data to temp.json then rename it to simplify.json
 fi
@@ -318,6 +324,48 @@ fetchPreRelease() {
         break
         ;;
       *) echo -e "${info} Invalid input! Please enter T or F." ;;
+    esac
+  done
+}
+
+ripLocale() {
+  while true; do
+    read -r -p "RipLocale [E/d]: " opt
+    case "$opt" in
+      [Ee]*)
+        isRipLocale=1  # Enable RipLocale
+        jq ".RipLocale = $isRipLocale" "$simplifyJson" > temp.json && mv temp.json "$simplifyJson"  # Change key value: Reads content of existing json and assigns key new value then redirect new json data to temp.json then rename it to simplify.json
+        echo -e "$info RipLocale is Enabled! Device specific locale will be kept in patches apk file."
+        break
+        ;;
+      [Dd]*)
+        isRipLocale=0  # Disable RipLocale
+        jq ".RipLocale = $isRipLocale" "$simplifyJson" > temp.json && mv temp.json "$simplifyJson"  # Change key value: Reads content of existing json and assigns key new value then redirect new json data to temp.json then rename it to simplify.json
+        echo -e "$info RipLocale is Disabled! All locale will be kept in patches apk file."
+        break
+        ;;
+      *) echo -e "${info} Invalid input! Please enter E or D." ;;
+    esac
+  done
+}
+
+ripDpi() {
+  while true; do
+    read -r -p "RipDpi [E/d]: " opt
+    case "$opt" in
+      [Ee]*)
+        isRipDpi=1  # Enable RipDpi
+        jq ".RipDpi = $isRipDpi" "$simplifyJson" > temp.json && mv temp.json "$simplifyJson"  # Change key value: Reads content of existing json and assigns key new value then redirect new json data to temp.json then rename it to simplify.json
+        echo -e "$info RipDpi is Enabled! Device specific dpi will be kept in patches apk file."
+        break
+        ;;
+      [Dd]*)
+        isRipDpi=0  # Disable RipDpi
+        jq ".RipDpi = $isRipDpi" "$simplifyJson" > temp.json && mv temp.json "$simplifyJson"  # Change key value: Reads content of existing json and assigns key new value then redirect new json data to temp.json then rename it to simplify.json
+        echo -e "$info RipDpi is Disabled! All dpi will be kept in patches apk file."
+        break
+        ;;
+      *) echo -e "${info} Invalid input! Please enter E or D." ;;
     esac
   done
 }
@@ -473,14 +521,16 @@ while true; do
       ;;
     [Cc]*)
       while true; do
-        echo -e "P. FetchPreRelease\nR. RipLib\nS. Change RVX Source\nQ. Quit\n"
+        echo -e "P. FetchPreRelease\nL. RipLocale\nD. RipDpi\nR. RipLib\nS. Change RVX Source\nQ. Quit\n"
         read -r -p "Select: " opt
         case "$opt" in
           [Pp]*) if [ "$FetchPreRelease" == 0 ]; then echo "FetchPreRelease == false"; else echo "FetchPreRelease == true"; fi && fetchPreRelease ;;
+          [Ll]*) if [ "$RipLocale" == 1 ]; then echo "RipLocale == Enabled"; else echo "RipLocale == Disabled"; fi && ripLocale ;;
+          [Dd]*) if [ "$RipDpi" == 1 ]; then echo "RipDpi == Enabled"; else echo "RipDpi == Disabled"; fi && ripDpi ;;
           [Rr]*) if [ "$RipLib" == 1 ]; then echo "RipLib == Enabled"; else echo "RipLib == Disabled"; fi && ripLib ;;
           [Ss]*) if [ "$ChangeRVXSource" == 0 ]; then echo "ChangeRVXSource == No"; else echo "ChangeRVXSource == Yes"; fi && changeRVXSource ;;
           [Qq]*) break ;;
-          *) echo -e "$info Invalid input! Please enter P / R / S." ;;
+          *) echo -e "$info Invalid input! Please enter P / L / D / R / S." ;;
         esac
       done
       sleep 3

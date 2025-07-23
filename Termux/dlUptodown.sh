@@ -42,6 +42,15 @@ density=$(getprop ro.sf.lcd_density)  # Get the device screen density
     dpi="*dpi"
   fi
 
+simplifyJson="$Simplify/simplify.json"  # Configuration file to store simplify settings
+if [ -f "$simplifyJson" ]; then
+  RipLocale="$(jq -r '.RipLocale' "$simplifyJson" 2>/dev/null)"
+  RipDpi="$(jq -r '.RipDpi' "$simplifyJson" 2>/dev/null)"
+  RipLib="$(jq -r '.RipLib' "$simplifyJson" 2>/dev/null)"
+else
+  RipLocale="" && RipDpi="" && RipLib=""
+fi
+
 dlUptodown() {
   # --- local variables ---
   local appName=$1
@@ -227,11 +236,20 @@ dlUptodown() {
     if [ $file_ext == apks ]; then
       bash $Simplify/dlGitHub.sh "REAndroid" "APKEditor" "latest" ".jar" "$Simplify"
       APKEditor=$(find "$HOME/Simplify" -type f -name "APKEditor-*.jar" -print -quit)
-      mkdir -p "/sdcard/Download/${appName}_v${appVersion}-${cpuAbi}"
+      mkdir -p "$Download/${appName}_v${appVersion}-${cpuAbi}"
       echo -e "$running Extracting APKS content.."
-      pv "$outputPath" | bsdtar -xf - -C "$Download/${appName}_v${appVersion}-${cpuAbi}/" --include "$pkgName.apk" "config.${cpuAbi//-/_}.apk" "config.${locale}.apk" "config.${dpi}.apk"
-      if [ ! -e "$Download/${appName}_v${appVersion}-${cpuAbi}/config.${dpi}.apk" ]; then  # check if file exists
-        pv "$outputPath" | bsdtar -xf - -C "$Download/${appName}_v${appVersion}-${cpuAbi}/" --include "$pkgName.apk" "config.${cpuAbi//-/_}.apk" "config.${locale}.apk" "config.*dpi.apk"
+      if [ $RipLocale -eq 1 ] && [ $RipDpi -eq 1 ] && [ $RipLib -eq 1 ]; then
+        pv "$outputPath" | bsdtar -xf - -C "$Download/${appName}_v${appVersion}-${cpuAbi}/" --include "$pkgName.apk" "config.${cpuAbi//-/_}.apk" "config.${locale}.apk" "config.${dpi}.apk"
+        if [ ! -e "$Download/${appName}_v${appVersion}-${cpuAbi}/config.${dpi}.apk" ]; then  # check if file exists
+          pv "$outputPath" | bsdtar -xf - -C "$Download/${appName}_v${appVersion}-${cpuAbi}/" --include "$pkgName.apk" "config.${cpuAbi//-/_}.apk" "config.${locale}.apk" "config.*dpi.apk"
+        fi
+      elif [ $RipLocale -eq 0 ] && [ $RipDpi -eq 0 ] && [ $RipLib -eq 0 ]; then
+        pv "$outputPath" | bsdtar -xf - -C "$Download/${appName}_v${appVersion}-${cpuAbi}/"
+      else
+        pv "$outputPath" | bsdtar -xf - -C "$Download/${appName}_v${appVersion}-${cpuAbi}/" --include "$pkgName.apk" "config.${cpuAbi//-/_}.apk" "config.${locale}.apk" "config.${dpi}.apk"
+        if [ ! -e "$Download/${appName}_v${appVersion}-${cpuAbi}/config.${dpi}.apk" ]; then  # check if file exists
+          pv "$outputPath" | bsdtar -xf - -C "$Download/${appName}_v${appVersion}-${cpuAbi}/" --include "$pkgName.apk" "config.${cpuAbi//-/_}.apk" "config.${locale}.apk" "config.*dpi.apk"
+        fi
       fi
       rm "$outputPath"
       echo -e "$running Merge splits apks to standalone lite apk.."

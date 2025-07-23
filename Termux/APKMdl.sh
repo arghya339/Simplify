@@ -46,6 +46,15 @@ density=$(getprop ro.sf.lcd_density)  # Get the device screen density
     lcd_dpi="*dpi"
   fi
 
+simplifyJson="$Simplify/simplify.json"  # Configuration file to store simplify settings
+if [ -f "$simplifyJson" ]; then
+  RipLocale="$(jq -r '.RipLocale' "$simplifyJson" 2>/dev/null)"
+  RipDpi="$(jq -r '.RipDpi' "$simplifyJson" 2>/dev/null)"
+  RipLib="$(jq -r '.RipLib' "$simplifyJson" 2>/dev/null)"
+else
+  RipLocale="" && RipDpi="" && RipLib=""
+fi
+
 APKMdl() {
   local PKG_NAME=$1
   local VERSION=$2
@@ -306,9 +315,18 @@ APKMdl() {
       APKEditor=$(find "$Simplify" -type f -name "APKEditor-*.jar" -print -quit)
       mkdir -p "$Download/${appName}_v${VERSION}-${cpuAbi}"
       echo -e "$running Extracting APKM content.."
-      pv "$outputPath" | bsdtar -xf - -C "$Download/${appName}_v${VERSION}-${cpuAbi}/" --include "base.apk" "split_config.${cpuAbi//-/_}.apk" "split_config.${locale}.apk" "split_config.${lcd_dpi}.apk"
-      if [ ! -e "$Download/${appName}_v${VERSION}-${cpuAbi}/split_config.${lcd_dpi}.apk" ]; then  # check if file exists
-        pv "$outputPath" | bsdtar -xf - -C "$Download/${appName}_v${VERSION}-${cpuAbi}/" --include "base.apk" "split_config.${cpuAbi//-/_}.apk" "split_config.${locale}.apk" "split_config.*dpi.apk"
+      if [ $RipLocale -eq 1 ] && [ $RipDpi -eq 1 ] && [ $RipLib -eq 1 ]; then
+        pv "$outputPath" | bsdtar -xf - -C "$Download/${appName}_v${VERSION}-${cpuAbi}/" --include "base.apk" "split_config.${cpuAbi//-/_}.apk" "split_config.${locale}.apk" "split_config.${lcd_dpi}.apk"
+        if [ ! -e "$Download/${appName}_v${VERSION}-${cpuAbi}/split_config.${lcd_dpi}.apk" ]; then  # check if file exists
+          pv "$outputPath" | bsdtar -xf - -C "$Download/${appName}_v${VERSION}-${cpuAbi}/" --include "base.apk" "split_config.${cpuAbi//-/_}.apk" "split_config.${locale}.apk" "split_config.*dpi.apk"
+        fi
+      elif [ $RipLocale -eq 0 ] && [ $RipDpi -eq 0 ] && [ $RipLib -eq 0 ]; then
+        pv "$outputPath" | bsdtar -xf - -C "$Download/${appName}_v${VERSION}-${cpuAbi}/"
+      else
+        pv "$outputPath" | bsdtar -xf - -C "$Download/${appName}_v${VERSION}-${cpuAbi}/" --include "base.apk" "split_config.${cpuAbi//-/_}.apk" "split_config.${locale}.apk" "split_config.${lcd_dpi}.apk"
+        if [ ! -e "$Download/${appName}_v${VERSION}-${cpuAbi}/split_config.${lcd_dpi}.apk" ]; then  # check if file exists
+          pv "$outputPath" | bsdtar -xf - -C "$Download/${appName}_v${VERSION}-${cpuAbi}/" --include "base.apk" "split_config.${cpuAbi//-/_}.apk" "split_config.${locale}.apk" "split_config.*dpi.apk"
+        fi
       fi
       rm "$outputPath"
       echo -e "$running Merge splits apkm to standalone lite apk.."
