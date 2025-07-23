@@ -252,14 +252,14 @@ build_app() {
     if [ "$Type" == "BUNDLE" ] || [ "${orRef[0]}" == "Download APK Bundle" ]; then
       if [ -n "$pkgVersion" ]; then
         local stock_apk_path=("$Download/${appNameRef[0]}_v${pkgVersion}-$cpuAbi.apk")
-      else
+      elif [ -z "$pkgVersion" ]; then
         local stock_apk=$(find "$Download" -type f -name "${appName}_v*-$cpuAbi.apk" -print -quit)
         local stock_apk_path=("$stock_apk")  # -quit= find stops after first match
       fi
-    else
+    elif [ "$Type" == "APK" ] || [ "${orRef[0]}" == "Download APK" ]; then
       if [ -n "$pkgVersion" ]; then
         local stock_apk_path=("$Download/${appNameRef[0]}_v${pkgVersion}-${archRef[0]}.apk")
-      else
+      elif [ -z "$pkgVersion" ]; then
         local stock_apk=$(find "$Download" -type f -name "${appName}_v*-${arch}.apk" -print -quit)
         local stock_apk_path=("$stock_apk")
       fi
