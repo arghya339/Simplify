@@ -224,6 +224,8 @@ strava_patches_args=()
 
 soundcloud_patches_args=()
 
+protonmail_patches_args=()
+
 # --- Build App ---
 build_app() {
   # local variables
@@ -343,6 +345,7 @@ build_app() {
   Threads arm32 + x86 8.0+
   Strava 8.0+
   SoundCloud 8.0+
+  Proton Mail 9.0+
 comment
 
 if  [[ $Android -ge 9  &&  ( "$cpuAbi" == "arm64-v8a" || "$cpuAbi" == "x86_64" ) ]]; then
@@ -388,6 +391,7 @@ if [ $Android -ge 10 ]; then
     "$Threads"
     Strava
     SoundCloud
+    Proton\ Mail
   )
 elif [ $Android -eq 9 ]; then
   apps=(
@@ -408,6 +412,7 @@ elif [ $Android -eq 9 ]; then
     "$Threads"
     Strava
     SoundCloud
+    Proton\ Mail
   )
 elif [ $Android -eq 8 ]; then
   apps=(
@@ -746,6 +751,19 @@ while true; do
       Arch=("universal")
       activityPatches="com.soundcloud.android/.launcher.LauncherActivity"
       build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "APKMirror" "soundcloud_patches_args" "$pkgName" "$activityPatches" "" "" ""
+      ;;
+    Proton\ Mail)
+      pkgName="ch.protonmail.android"
+      appName=("Proton Mail")
+      pkgVersion=""
+      if [ -z "$pkgVersion" ]; then
+        getVersion "$pkgName"
+        pkgVersion="$pkgVersion"
+      fi
+      Type="APK"
+      Arch=("universal")
+      activityPatches="ch.protonmail.android/.MainActivity"
+      build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "APKMirror" "protonmail_patches_args" "$pkgName" "$activityPatches" "" "" ""
       ;;
   esac  
 done
