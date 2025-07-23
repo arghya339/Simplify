@@ -235,6 +235,7 @@ build_app() {
   local pkgVersion=$3
   local Type=$4
   local -n archRef=$5
+  local arch="${archRef[0]}"
   local web=$6
   local appPatchesArgs=$7
   local pkgPatches=$8
@@ -258,7 +259,7 @@ build_app() {
       if [ -n $pkgVersion ]; then
         local stock_apk_path=("$Download/${appNameRef[0]}_v${pkgVersion}-${archRef[0]}.apk")
       else
-        local stock_apk_path=("$(find "$Download" -type f -name "${appName}_v*-${archRef[0]}.apk" -print -quit)")
+        local stock_apk_path=("$(find "$Download" -type f -name "${appName}_v*-${arch}.apk" -print -quit)")
       fi
     fi
     
