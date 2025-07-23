@@ -253,13 +253,15 @@ build_app() {
       if [ -n $pkgVersion ]; then
         local stock_apk_path=("$Download/${appNameRef[0]}_v${pkgVersion}-$cpuAbi.apk")
       else
-        local stock_apk_path=("$(find "$Download" -type f -name "${appName}_v*-$cpuAbi.apk" -print -quit)")  # -quit= find stops after first match
+        local stock_apk=$(find "$Download" -type f -name "${appName}_v*-$cpuAbi.apk" -print -quit)
+        local stock_apk_path=("$stock_apk")  # -quit= find stops after first match
       fi
     else
       if [ -n $pkgVersion ]; then
         local stock_apk_path=("$Download/${appNameRef[0]}_v${pkgVersion}-${archRef[0]}.apk")
       else
-        local stock_apk_path=("$(find "$Download" -type f -name "${appName}_v*-${arch}.apk" -print -quit)")
+        local stock_apk=$(find "$Download" -type f -name "${appName}_v*-${arch}.apk" -print -quit)
+        local stock_apk_path=("$stock_apk")
       fi
     fi
     
