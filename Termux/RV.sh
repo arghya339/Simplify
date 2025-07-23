@@ -257,12 +257,10 @@ build_app() {
         local stock_apk_path=("$stock_apk")  # -quit= find stops after first match
       fi
     elif [ "$Type" == "APK" ] || [ "${orRef[0]}" == "Download APK" ]; then
-      echo -e "$notice DEBUG: pkgVersion: $pkgVersion"
       if [ -n "$pkgVersion" ] && [ "$pkgVersion" != "null" ]; then
         local stock_apk_path=("$Download/${appNameRef[0]}_v${pkgVersion}-${archRef[0]}.apk")
       elif [ -z "$pkgVersion" ] || [ "$pkgVersion" == "null" ]; then
         local stock_apk=$(find "$Download" -type f -name "${appName}_v*-${arch}.apk" -print -quit)
-        echo -e "$notice DEBUG: appName: $appName, arch: $arch, stock_apk: ${stock_apk}"
         local stock_apk_path=("$stock_apk")
       fi
     fi
