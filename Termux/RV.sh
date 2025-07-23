@@ -222,6 +222,8 @@ threads_patches_args=()
 
 strava_patches_args=()
 
+soundcloud_patches_args=()
+
 # --- Build App ---
 build_app() {
   # local variables
@@ -340,6 +342,7 @@ build_app() {
   Threads arm64 + x64 9.0+
   Threads arm32 + x86 8.0+
   Strava 8.0+
+  SoundCloud 8.0+
 comment
 
 if  [[ $Android -ge 9  &&  ( "$cpuAbi" == "arm64-v8a" || "$cpuAbi" == "x86_64" ) ]]; then
@@ -384,6 +387,7 @@ if [ $Android -ge 10 ]; then
     Tumblr
     "$Threads"
     Strava
+    SoundCloud
   )
 elif [ $Android -eq 9 ]; then
   apps=(
@@ -403,6 +407,7 @@ elif [ $Android -eq 9 ]; then
     Tumblr
     "$Threads"
     Strava
+    SoundCloud
   )
 elif [ $Android -eq 8 ]; then
   apps=(
@@ -422,6 +427,7 @@ elif [ $Android -eq 8 ]; then
     Tumblr
     "$Threads"
     Strava
+    SoundCloud
   )
 elif [ $Android -eq 7 ]; then
   apps=(
@@ -727,6 +733,20 @@ while true; do
       activityPatches="com.strava/.SplashActivity"
       build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "Uptodown" "strava_patches_args" "$pkgName" "$activityPatches" "" "" ""
       ;;
+    SoundCloud)
+      pkgName="com.soundcloud.android"
+      appName=("SoundCloud")
+      pkgVersion="2025.05.27-release"
+      #pkgVersion=""
+      if [ -z "$pkgVersion" ]; then
+        getVersion "$pkgName"
+        pkgVersion="$pkgVersion"
+      fi
+      Type="BUNDLE"
+      Arch=("universal")
+      activityPatches="com.soundcloud.android/.launcher.LauncherActivity"
+      build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "APKMirror" "soundcloud_patches_args" "$pkgName" "$activityPatches" "" "" ""
+      ;;
   esac  
 done
-#########################################################################################################################################
+##############################################################################################################################################
