@@ -247,15 +247,18 @@ build_app() {
     
     bash $Simplify/APKMdl.sh "$pkgName" "$pkgVersion" "$Type" "${archRef[0]}" "$os_val" "$dpi_val" "$or_val"  # Download stock apk from APKMirror
     
-    if [ "$Type" == "BUNDLE" ]; then
-      local stock_apk_path=("$Download/${appNameRef[0]}_v${pkgVersion}-$cpuAbi.apk")
+    if [ "$Type" == "BUNDLE" ] || [ "${orRef[0]}" == "Download APK Bundle" ]; then
+      if [ -n $pkgVersion ]; then
+        local stock_apk_path=("$Download/${appNameRef[0]}_v${pkgVersion}-$cpuAbi.apk")
+      else
+        local stock_apk_path=("$(find "$Download" -type f -name "${appNameRef[0]}_v*-$cpuAbi.apk" -print -quit)")  # -quit= find stops after first match
+      fi
     else
-      local stock_apk_path=("$Download/${appNameRef[0]}_v${pkgVersion}-${archRef[0]}.apk")
-    fi
-    if [ "${orRef[0]}" == "Download APK" ]; then
-      local stock_apk_path=("$Download/${appNameRef[0]}_v${pkgVersion}-${archRef[0]}.apk")
-    elif [ "${orRef[0]}" == "Download APK Bundle" ]; then
-      local stock_apk_path=("$Download/${appNameRef[0]}_v${pkgVersion}-$cpuAbi.apk")
+      if [ -n $pkgVersion ]; then
+        local stock_apk_path=("$Download/${appNameRef[0]}_v${pkgVersion}-${archRef[0]}.apk")
+      else
+        local stock_apk_path=("$(find "$Download" -type f -name "${appNameRef[0]}_v*-${archRef[0]}.apk" -print -quit)")
+      fi
     fi
     
   else
