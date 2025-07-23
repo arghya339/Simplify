@@ -220,6 +220,8 @@ tumblr_patches_args=(
 
 threads_patches_args=()
 
+strava_patches_args=()
+
 # --- Build App ---
 build_app() {
   # local variables
@@ -337,6 +339,7 @@ build_app() {
   Tumblr 7.0+
   Threads arm64 + x64 9.0+
   Threads arm32 + x86 8.0+
+  Strava 8.0+
 comment
 
 if  [[ $Android -ge 9  &&  ( "$cpuAbi" == "arm64-v8a" || "$cpuAbi" == "x86_64" ) ]]; then
@@ -380,6 +383,7 @@ if [ $Android -ge 10 ]; then
     Twitch
     Tumblr
     "$Threads"
+    Strava
   )
 elif [ $Android -eq 9 ]; then
   apps=(
@@ -398,6 +402,7 @@ elif [ $Android -eq 9 ]; then
     Twitch
     Tumblr
     "$Threads"
+    Strava
   )
 elif [ $Android -eq 8 ]; then
   apps=(
@@ -416,6 +421,7 @@ elif [ $Android -eq 8 ]; then
     Twitch
     Tumblr
     "$Threads"
+    Strava
   )
 elif [ $Android -eq 7 ]; then
   apps=(
@@ -707,6 +713,20 @@ while true; do
       activityPatches="com.instagram.barcelona/.mainactivity.BarcelonaActivity"
       build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "APKMirror" "threads_patches_args" "$pkgName" "$activityPatches" "" "" ""
       ;;
+    Strava)
+      pkgName="com.strava"
+      appName=("Strava")
+      pkgVersion="418.11"
+      #pkgVersion=""
+      if [ -z "$pkgVersion" ]; then
+        getVersion "$pkgName"
+        pkgVersion="$pkgVersion"
+      fi
+      Type="xapk"
+      Arch=("arm64-v8a, armeabi-v7a, x86, x86_64")
+      activityPatches="com.strava/.SplashActivity"
+      build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "Uptodown" "strava_patches_args" "$pkgName" "$activityPatches" "" "" ""
+      ;;
   esac  
 done
-###########################################################################################################################################
+#########################################################################################################################################
