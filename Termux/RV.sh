@@ -250,14 +250,14 @@ build_app() {
     bash $Simplify/APKMdl.sh "$pkgName" "$pkgVersion" "$Type" "${archRef[0]}" "$os_val" "$dpi_val" "$or_val"  # Download stock apk from APKMirror
     
     if [ "$Type" == "BUNDLE" ] || [ "${orRef[0]}" == "Download APK Bundle" ]; then
-      if [ -n $pkgVersion ]; then
+      if [ -n "$pkgVersion" ]; then
         local stock_apk_path=("$Download/${appNameRef[0]}_v${pkgVersion}-$cpuAbi.apk")
       else
         local stock_apk=$(find "$Download" -type f -name "${appName}_v*-$cpuAbi.apk" -print -quit)
         local stock_apk_path=("$stock_apk")  # -quit= find stops after first match
       fi
     else
-      if [ -n $pkgVersion ]; then
+      if [ -n "$pkgVersion" ]; then
         local stock_apk_path=("$Download/${appNameRef[0]}_v${pkgVersion}-${archRef[0]}.apk")
       else
         local stock_apk=$(find "$Download" -type f -name "${appName}_v*-${arch}.apk" -print -quit)
