@@ -218,6 +218,8 @@ tumblr_patches_args=(
   -e "Change package name" -OackageName="com.tumblr"
 )
 
+threads_patches_args=()
+
 # --- Build App ---
 build_app() {
   # local variables
@@ -333,14 +335,18 @@ build_app() {
   Amazon Prime Video 5.0
   Twitch 5.0
   Tumblr 7.0+
+  Threads arm64 + x64 9.0+
+  Threads arm32 + x86 8.0+
 comment
 
 if  [[ $Android -ge 9  &&  ( "$cpuAbi" == "arm64-v8a" || "$cpuAbi" == "x86_64" ) ]]; then
   Instagram="Instagram"
   #Facebook="Facebook"
   fbMessenger=("Facebook Messenger")
-#elif [[ $Android -ge 8  &&  ( "$cpuAbi" == "armeabi-v7a" || "$cpuAbi" == "x86" ) ]]; then
+  Threads="Threads"
+elif [[ $Android -ge 8  &&  ( "$cpuAbi" == "armeabi-v7a" || "$cpuAbi" == "x86" ) ]]; then
   #Facebook="Facebook"
+  Threads="Threads"
 elif [[ $Android -ge 7  &&  ( "$cpuAbi" == "armeabi-v7a" || "$cpuAbi" == "x86" ) ]]; then
   Instagram="Instagram"
 elif [[ $Android -ge 5  &&  ( "$cpuAbi" == "armeabi-v7a" || "$cpuAbi" == "x86" ) ]]; then
@@ -373,6 +379,7 @@ if [ $Android -ge 10 ]; then
     "$amazonPrimeVideo"
     Twitch
     Tumblr
+    "$Threads"
   )
 elif [ $Android -eq 9 ]; then
   apps=(
@@ -390,6 +397,7 @@ elif [ $Android -eq 9 ]; then
     "$amazonPrimeVideo"
     Twitch
     Tumblr
+    "$Threads"
   )
 elif [ $Android -eq 8 ]; then
   apps=(
@@ -407,6 +415,7 @@ elif [ $Android -eq 8 ]; then
     "$amazonPrimeVideo"
     Twitch
     Tumblr
+    "$Threads"
   )
 elif [ $Android -eq 7 ]; then
   apps=(
@@ -684,6 +693,20 @@ while true; do
       activityPatches="com.tumblr/.ui.activity.JumpoffActivity"
       build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "APKMirror" "tumblr_patches_args" "$pkgName" "$activityPatches" "" "" ""
       ;;
+    Threads)
+      pkgName="com.instagram.barcelona"
+      appName=("Threads")
+      pkgVersion="382.0.0.51.85"
+      #pkgVersion=""
+      if [ -z "$pkgVersion" ]; then
+        getVersion "$pkgName"
+        pkgVersion="$pkgVersion"
+      fi
+      Type="BUNDLE"
+      Arch=("$cpuAbi")
+      activityPatches="com.instagram.barcelona/.mainactivity.BarcelonaActivity"
+      build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "APKMirror" "threads_patches_args" "$pkgName" "$activityPatches" "" "" ""
+      ;;
   esac  
 done
-##########################################################################################################################################
+###########################################################################################################################################
