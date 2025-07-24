@@ -329,6 +329,29 @@ while true; do
       BugReport="https://github.com/rhunk/SnapEnhance/issues/new?template=bug_report.yml"
       build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "APKMirror" "stock_apk_path" "$module_apk_path" "$BugReport" "$pkgName" "$activityPatches"
       ;;
+    Discord)
+      appName=("Discord")
+      pkgName="com.discord"
+      pkgVersion="289.20-Stable"
+      assetsName="Discord_v289.20-Stable-289020-arm64-v8a+armeabi-v7a+x86_64+x86-en-xxhdpi.apks"
+      dlUrl="https://github.com/arghya339/Simplify/releases/download/all/$assetsName"
+      aria2c -x 16 -s 16 --console-log-level=error --summary-interval=0 --download-result=hide -c -o "$assetsName" -d "$Download" "$dlUrl"
+      stock_apks_path=("$Download/$assetsName")
+      apks_without_ext="${assetsName%.*}"
+      stock_apk_path=("$Download/$apks_without_ext.apk")
+      bash $Simplify/dlGitHub.sh "REAndroid" "APKEditor" "latest" ".jar" "$Simplify"
+      APKEditor=$(find "$Simplify" -type f -name "APKEditor-*.jar" -print -quit)
+      $PREFIX/lib/jvm/java-21-openjdk/bin/java -jar $APKEditor m -i $stock_apks_path -o "$stock_apk_path"
+      releasesTagName=$(curl -s "https://api.github.com/repos/revenge-mod/revenge-xposed/releases/latest" | jq -r '.tag_name')  # 1202
+      releasesName=$(curl -s "https://api.github.com/repos/revenge-mod/revenge-xposed/releases/latest" | jq -r '.name')  # 1.2.2
+      dlLink="https://github.com/revenge-mod/revenge-xposed/releases/download/$releasesTagName/app-release.apk"
+      module_apk_path="$LSPatch/revenge-xposed-${releasesName}.apk"
+      curl -L --progress-bar -C - -o "$module_apk_path" "$dlLink"
+      echo -e "$info module_apk_path: $module_apk_path"
+      activityPatches="com.discord/.main.MainDefault"
+      BugReport="https://github.com/revenge-mod/revenge-xposed/issues/new"
+      build_app "$pkgName" "appName" "$pkgVersion" "" "" "" "stock_apk_path" "$module_apk_path" "$BugReport" "$pkgName" "$activityPatches"
+      ;;
     LINE)
       appName=("LINE")
       pkgName="jp.naver.line.android"
