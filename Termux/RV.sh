@@ -488,7 +488,9 @@ while true; do
   # Display the list
   echo -e "$info Available apps:"
   for i in "${!apps[@]}"; do
-    printf "%d. %s\n" "$i" "${apps[$i]}"
+    if [ -n "${apps[$i]}" ] && [ "${apps[$i]}" != "null" ]; then
+      printf "%d. %s\n" "$i" "${apps[$i]}"
+    fi
   done
 
   # Ask for an index, showing the valid range
