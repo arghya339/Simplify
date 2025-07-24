@@ -231,6 +231,7 @@ sign_app() {
 #Requires
 <<comment
   Snapchat Android 5.0+
+  Discord Android 7.0+
   LINE Android 10+
   Phone by Google Android 9+
   1.1.1.1 + WARP Android 5.0+
@@ -248,6 +249,7 @@ if [ $Android -ge 10 ]; then
   apps=(
     Quit
     "${Snapchat[0]}"
+    Discord
     "${LINE[0]}"
     "${googleDialer[0]}"
     "1.1.1.1 + WARP"
@@ -256,6 +258,7 @@ elif [ $Android -eq 9 ]; then
   apps=(
     Quit
     "${Snapchat[0]}"
+    Discord
     "${googleDialer[0]}"
     "1.1.1.1 + WARP"
   )
@@ -263,12 +266,14 @@ elif [ $Android -eq 8 ]; then
   apps=(
     Quit
     "${Snapchat[0]}"
+    Discord
     "1.1.1.1 + WARP"
   )
 elif [ $Android -eq 7 ]; then
   apps=(
     Quit
     "${Snapchat[0]}"
+    Discord
     "1.1.1.1 + WARP"
   )
 elif [ $Android -eq 6 ]; then
