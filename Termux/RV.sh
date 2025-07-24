@@ -230,6 +230,8 @@ myfitnesspal_patches_args=()
 
 crunchyroll_patches_args=()
 
+cricbuzz_patches_args=()
+
 # --- Build App ---
 build_app() {
   # local variables
@@ -359,6 +361,7 @@ build_app() {
   Proton Mail 9.0+
   MyFitnessPal 12+
   Crunchyroll 8.0+
+  Cricbuzz 5.0+
 comment
 
 if  [[ $Android -ge 9  &&  ( "$cpuAbi" == "arm64-v8a" || "$cpuAbi" == "x86_64" ) ]]; then
@@ -407,6 +410,7 @@ if [ $Android -ge 12 ]; then
     Proton\ Mail
     MyFitnessPal
     Crunchyroll
+    Cricbuzz
   )
 elif [ $Android -eq 11 ]; then
   apps=(
@@ -430,6 +434,7 @@ elif [ $Android -eq 11 ]; then
     SoundCloud
     Proton\ Mail
     Crunchyroll
+    Cricbuzz
   )
 elif [ $Android -eq 10 ]; then
   apps=(
@@ -453,6 +458,7 @@ elif [ $Android -eq 10 ]; then
     SoundCloud
     Proton\ Mail
     Crunchyroll
+    Cricbuzz
   )
 elif [ $Android -eq 9 ]; then
   apps=(
@@ -475,6 +481,7 @@ elif [ $Android -eq 9 ]; then
     SoundCloud
     Proton\ Mail
     Crunchyroll
+    Cricbuzz
   )
 elif [ $Android -eq 8 ]; then
   apps=(
@@ -496,6 +503,7 @@ elif [ $Android -eq 8 ]; then
     Strava
     SoundCloud
     Crunchyroll
+    Cricbuzz
   )
 elif [ $Android -eq 7 ]; then
   apps=(
@@ -510,6 +518,7 @@ elif [ $Android -eq 7 ]; then
     "$amazonPrimeVideo"
     Twitch
     Tumblr
+    Cricbuzz
   )
 elif [ $Android -eq 6 ]; then
   apps=(
@@ -521,6 +530,7 @@ elif [ $Android -eq 6 ]; then
     RAR
     "$amazonPrimeVideo"
     Twitch
+    Cricbuzz
   )
 elif [ $Android -eq 5 ]; then
   apps=(
@@ -532,6 +542,7 @@ elif [ $Android -eq 5 ]; then
     RAR
     "$amazonPrimeVideo"
     Twitch
+    Cricbuzz
   )
 elif [ $Android -eq 4 ]; then
   apps=(
@@ -858,6 +869,20 @@ while true; do
       activityPatches="com.crunchyroll.crunchyroid/com.ellation.crunchyroll.presentation.startup.StartupActivity"
       build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "Uptodown" "crunchyroll_patches_args" "$pkgName" "$activityPatches" "" "" ""
       ;;
+    Cricbuzz)
+      pkgName="com.cricbuzz.android"
+      appName=("Cricbuzz Cricket Scores and News")
+      #pkgVersion="6.24.01"
+      pkgVersion=""
+      if [ -z "$pkgVersion" ]; then
+        getVersion "$pkgName"
+        pkgVersion="$pkgVersion"
+      fi
+      Type="xapk"
+      Arch=("arm64-v8a, armeabi-v7a, x86_64")
+      activityPatches="com.cricbuzz.android/.lithium.app.view.activity.NyitoActivity"
+      build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "Uptodown" "cricbuzz_patches_args" "$pkgName" "$activityPatches" "" "" ""
+      ;;
   esac  
 done
-###############################################################################################################################################
+###########################################################################################################################################
