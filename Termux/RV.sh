@@ -228,6 +228,8 @@ protonmail_patches_args=()
 
 myfitnesspal_patches_args=()
 
+crunchyroll_patches_args=()
+
 # --- Build App ---
 build_app() {
   # local variables
@@ -356,6 +358,7 @@ build_app() {
   SoundCloud 8.0+
   Proton Mail 9.0+
   MyFitnessPal 12+
+  Crunchyroll 8.0+
 comment
 
 if  [[ $Android -ge 9  &&  ( "$cpuAbi" == "arm64-v8a" || "$cpuAbi" == "x86_64" ) ]]; then
@@ -403,6 +406,7 @@ if [ $Android -ge 12 ]; then
     SoundCloud
     Proton\ Mail
     MyFitnessPal
+    Crunchyroll
   )
 elif [ $Android -eq 11 ]; then
   apps=(
@@ -425,6 +429,7 @@ elif [ $Android -eq 11 ]; then
     Strava
     SoundCloud
     Proton\ Mail
+    Crunchyroll
   )
 elif [ $Android -eq 10 ]; then
   apps=(
@@ -447,6 +452,7 @@ elif [ $Android -eq 10 ]; then
     Strava
     SoundCloud
     Proton\ Mail
+    Crunchyroll
   )
 elif [ $Android -eq 9 ]; then
   apps=(
@@ -468,6 +474,7 @@ elif [ $Android -eq 9 ]; then
     Strava
     SoundCloud
     Proton\ Mail
+    Crunchyroll
   )
 elif [ $Android -eq 8 ]; then
   apps=(
@@ -488,6 +495,7 @@ elif [ $Android -eq 8 ]; then
     "$Threads"
     Strava
     SoundCloud
+    Crunchyroll
   )
 elif [ $Android -eq 7 ]; then
   apps=(
@@ -835,6 +843,20 @@ while true; do
       Arch=("armeabi-v7a, x86, arm64-v8a, x86_64")
       activityPatches="com.myfitnesspal.android/.splash.SplashActivity"
       build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "Uptodown" "myfitnesspal_patches_args" "$pkgName" "$activityPatches" "" "" ""
+      ;;
+    Crunchyroll)
+      pkgName="com.crunchyroll.crunchyroid"
+      appName=("Crunchyroll")
+      pkgVersion="3.85.2"
+      #pkgVersion=""
+      if [ -z "$pkgVersion" ]; then
+        getVersion "$pkgName"
+        pkgVersion="$pkgVersion"
+      fi
+      Type="xapk"
+      Arch=("arm64-v8a, armeabi-v7a, x86, x86_64")
+      activityPatches="com.crunchyroll.crunchyroid/com.ellation.crunchyroll.presentation.startup.StartupActivity"
+      build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "Uptodown" "crunchyroll_patches_args" "$pkgName" "$activityPatches" "" "" ""
       ;;
   esac  
 done
