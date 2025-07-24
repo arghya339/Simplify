@@ -140,9 +140,9 @@ dlUptodown() {
     if [ -n "$data_version" ]; then
       # Loops through variant for print all list of variant info
       for ((n = 1; n <=variant_count; n += 1)); do
-        arch=$(pup ".content > p:nth-child($n) text{}" <<<"$files_json" | xargs)  # Get variant arch(arm64-v8a) form 'ALL VARIANTS' Response
-        type=$(pup "div.variant:nth-child($((n + 1))) div.v-file span text{}" <<<"$files_json" | xargs)  # Get variant type(xapk/apk) form 'ALL VARIANTS' Response
-        data_file_id=$(pup "div.variant:nth-child($((n + 1))) > .v-report attr{data-file-id}" <<<"$files_json")  # Get variant ID form 'ALL VARIANTS' Response
+        arch=$(pup "div.content > p:nth-of-type($n) text{}" <<<"$files_json" | xargs)  # Get variant arch(arm64-v8a) form 'ALL VARIANTS' Response
+        type=$(pup "div.variant:nth-of-type($n) div.v-file span text{}" <<<"$files_json" | xargs)  # Get variant type(xapk/apk) form 'ALL VARIANTS' Response
+        data_file_id=$(pup "div.variant:nth-of-type($n) > .v-report attr{data-file-id}" <<<"$files_json")  # Get variant ID form 'ALL VARIANTS' Response
         echo -e "[$n] ${Blue}arch: $arch | type: $type | file_id: $data_file_id${Reset}"
       done
       # Loops through variant for extract location Url of target Arch & Type
