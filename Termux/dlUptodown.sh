@@ -147,8 +147,8 @@ dlUptodown() {
       done
       # Loops through variant for extract location Url of target Arch & Type
       for ((n = 1; n <=variant_count; n += 1)); do
-        arch=$(pup ".content > p:nth-child($n) text{}" <<<"$files_json" | xargs)
-        type=$(pup "div.variant:nth-child($((n + 1))) div.v-file span text{}" <<<"$files_json" | xargs)
+        arch=$(pup "div.content > p:nth-of-type($n) text{}" <<<"$files_json" | xargs)
+        type=$(pup "div.variant:nth-of-type($n) div.v-file span text{}" <<<"$files_json" | xargs)
         # Normalize arch string: remove spaces
         arch_clean=$(echo "$arch" | tr -d ' ')
         if [ "$Arch" == "$arch_clean" ] && [ "$Type" == "$type" ]; then
