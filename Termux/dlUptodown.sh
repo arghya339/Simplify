@@ -152,7 +152,7 @@ dlUptodown() {
         # Normalize arch string: remove spaces
         arch_clean=$(echo "$arch" | tr -d ' ')
         if [ "$Arch" == "$arch_clean" ] && [ "$Type" == "$type" ]; then
-          data_file_id=$(pup "div.variant:nth-child($((n + 1))) > .v-report attr{data-file-id}" <<<"$files_json")
+          data_file_id=$(pup "div.variant:nth-of-type($n) > .v-report attr{data-file-id}" <<<"$files_json")
           location_url="$versionLink/${data_file_id}-x"
           data_url=$(curl -sL "$location_url" | grep -oP 'data-url="\K[^"]+' | head -n1)
           dlUrl="https://dw.uptodown.com/dwn/${data_url}"
