@@ -226,6 +226,8 @@ soundcloud_patches_args=()
 
 protonmail_patches_args=()
 
+myfitnesspal_patches_args=()
+
 # --- Build App ---
 build_app() {
   # local variables
@@ -353,6 +355,7 @@ build_app() {
   Strava 8.0+
   SoundCloud 8.0+
   Proton Mail 9.0+
+  MyFitnessPal 12+
 comment
 
 if  [[ $Android -ge 9  &&  ( "$cpuAbi" == "arm64-v8a" || "$cpuAbi" == "x86_64" ) ]]; then
@@ -378,7 +381,52 @@ if  [[ $Android -ge 11  &&  ( "$cpuAbi" == "arm64-v8a" || "$cpuAbi" == "armeabi-
 fi
 
 # Define the array
-if [ $Android -ge 10 ]; then
+if [ $Android -ge 12 ]; then
+  apps=(
+    Quit
+    YouTube
+    Spotify
+    TikTok
+    Google\ Photos
+    "$Instagram"
+    "$Facebook"
+    "${fbMessenger[0]}"
+    Lightroom
+    Photomath
+    Duolingo
+    RAR
+    "$amazonPrimeVideo"
+    Twitch
+    Tumblr
+    "$Threads"
+    Strava
+    SoundCloud
+    Proton\ Mail
+    MyFitnessPal
+  )
+elif [ $Android -eq 11 ]; then
+  apps=(
+    Quit
+    YouTube
+    Spotify
+    TikTok
+    Google\ Photos
+    "$Instagram"
+    "$Facebook"
+    "${fbMessenger[0]}"
+    Lightroom
+    Photomath
+    Duolingo
+    RAR
+    "$amazonPrimeVideo"
+    Twitch
+    Tumblr
+    "$Threads"
+    Strava
+    SoundCloud
+    Proton\ Mail
+  )
+elif [ $Android -eq 10 ]; then
   apps=(
     Quit
     YouTube
@@ -774,6 +822,20 @@ while true; do
       activityPatches="ch.protonmail.android/.MainActivity"
       build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "APKMirror" "protonmail_patches_args" "$pkgName" "$activityPatches" "" "" ""
       ;;
+    MyFitnessPal)
+      pkgName="com.myfitnesspal.android"
+      appName=("Calorie Counter MyFitnessPal")
+      #pkgVersion="24.14.2"
+      pkgVersion=""
+      if [ -z "$pkgVersion" ]; then
+        getVersion "$pkgName"
+        pkgVersion="$pkgVersion"
+      fi
+      Type="apk"
+      Arch=("armeabi-v7a, x86, arm64-v8a, x86_64")
+      activityPatches="com.myfitnesspal.android/.splash.SplashActivity"
+      build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "Uptodown" "myfitnesspal_patches_args" "$pkgName" "$activityPatches" "" "" ""
+      ;;
   esac  
 done
-##############################################################################################################################################
+###############################################################################################################################################
