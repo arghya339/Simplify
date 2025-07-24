@@ -64,9 +64,7 @@ dlUptodown() {
   
   universal=("arm64-v8a, armeabi-v7a, x86, x86_64")
   # Normalize Arch string
-  if [ "$Arch" == "${universal[0]}" ]; then
-    Arch=$(echo "$Arch" | tr -d ' ')  # rm spaces
-  fi
+  Arch=$(echo "$Arch" | tr -d ' ')  # rm spaces
   
   # --- UPTODOWN SEARCH ---
   # Build a slug-based URL (web address with human-readable keyword) ie. "Spotify Lite" → spotify-lite.en.uptodown.com/android) & check if it exists
