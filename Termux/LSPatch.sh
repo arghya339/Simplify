@@ -112,7 +112,7 @@ build_app() {
   fi
   
   local output_apk_path=$(find "$SimplUsr" -type f -name "${stockFileNameWOExt}-*-lspatched.apk")
-  local fileName=$(basename "$output_apk_path")
+  local fileName=$(basename "${output_apk_path}")
 
   if [ -f "$output_apk_path" ]; then
     
@@ -123,13 +123,13 @@ build_app() {
         I*|i*|"")
           checkCoreLSPosed  # Call the check core patch functions
           echo -e "$running Please Wait !! Installing Patched ${appNameRef[0]} LSPatch apk.."
-          bash $Simplify/apkInstall.sh \"$output_apk_path\" "$pkgName" ""
+          bash $Simplify/apkInstall.sh "${output_apk_path}" "$pkgName" ""
           ;;
         M*|m*)
           echo -e "$running Please Wait !! Mounting Patched ${appNameRef[0]} LSPatch apk.."
-          su -mm -c "/system/bin/sh $Simplify/apkMount.sh \"${stock_apk_ref[0]}\" \"$output_apk_path\" \"${appNameRef[0]}\" $pkgName $pkgVersion" &> /dev/null
-          su -mm -c "/system/bin/sh $Simplify/apkMount.sh \"${stock_apk_ref[0]}\" \"$output_apk_path\" \"${appNameRef[0]}\" $pkgName $pkgVersion" | tee "$SimplUsr/${appNameRef[0]}-LSPatch_mount-log.txt"
-          rm "$output_apk_path"
+          su -mm -c "/system/bin/sh $Simplify/apkMount.sh \"${stock_apk_ref[0]}\" "${output_apk_path}" \"${appNameRef[0]}\" $pkgName $pkgVersion" &> /dev/null
+          su -mm -c "/system/bin/sh $Simplify/apkMount.sh \"${stock_apk_ref[0]}\" "${output_apk_path}" \"${appNameRef[0]}\" $pkgName $pkgVersion" | tee "$SimplUsr/${appNameRef[0]}-LSPatch_mount-log.txt"
+          rm "${output_apk_path}"
           ;;
         N*|n*) echo -e "$notice ${appNameRef[0]} LSPatch Installaion skipped!" ;;
         *) echo -e "$info Invalid choice! ${appNameRef[0]} LSPatch Installaion skipped." ;;
@@ -141,7 +141,7 @@ build_app() {
       case $opt in
         y*|Y*|"")
           echo -e "$running Please Wait !! Installing Patched ${appNameRef[0]} LSPatch apk.."
-          bash $Simplify/apkInstall.sh \"$output_apk_path\" "$pkgName" "$activityPatches"
+          bash $Simplify/apkInstall.sh "${output_apk_path}" "$pkgName" "$activityPatches"
           ;;
         n*|N*) echo -e "$notice ${appNameRef[0]} LSPatch Installaion skipped!" ;;
         *) echo -e "$info Invalid choice! ${appNameRef[0]} LSPatch Installaion skipped." ;;
@@ -151,7 +151,7 @@ build_app() {
       case $opt in
         y*|Y*|"")
           echo -e "$running Please Wait !! Sharing Patched ${appNameRef[0]} LSPatch apk.."
-          termux-open --send "$output_apk_path"
+          termux-open --send "${output_apk_path}"
           ;;
         n*|N*) echo -e "$notice ${appNameRef[0]} LSPatch Sharing skipped!"
           echo -e "$info Locate '$fileName' in '/sdcard/Simplify/' dir, Share it with your Friends and Family ;)"
