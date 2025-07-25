@@ -119,8 +119,6 @@ patch_app() {
     echo -e "$info ${Blue}ReVancedCLIJar:${Reset} $ReVancedCLIJar"
     universalPatches=(
       -d "Hex"
-      -d "Spoof app signature"
-      -d "Spoof client"
     )
   else
     universalPatches=(
