@@ -154,7 +154,7 @@ patch_app() {
     rm -rf "$without_ext-temporary-files"  # Remove temporary files directory
   else
     if [ "$appName" == "Instagram" ] || [ "$appName" == "Facebook" ] || [ "$appName" == "Facebook Messenger" ] || [ "$appName" == "Threads" ]; then
-      rm "$without_ext-options.json"
+      [[ -f "$without_ext-options.json" ]] && rm "$without_ext-options.json"
       rm "$without_ext.keystore"
     else
       rm "$without_ext.keystore"
