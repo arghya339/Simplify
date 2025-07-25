@@ -179,7 +179,7 @@ pkgInstall "grep"  # grep update
 if su -c "id" >/dev/null 2>&1; then
   pkgInstall "openssl"  # openssl install/update
   pkgInstall "python"  # python install/update
-  if ! pip list | grep -q "apksigcopier"; then
+  if ! pip list 2>/dev/null | grep -q "apksigcopier"; then
     pip install apksigcopier > /dev/null 2>&1  # install apksigcopier using pip
   fi
 fi
