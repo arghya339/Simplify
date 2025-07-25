@@ -114,6 +114,9 @@ patch_app() {
   local appName=$4
   
   if [ "$appName" == "Instagram" ] || [ "$appName" == "Facebook" ] || [ "$appName" == "Facebook Messenger" ] || [ "$appName" == "Threads" ]; then
+    bash $Simplify/dlGitHub.sh "ReVanced" "revanced-cli" "pre" ".jar" "$RV"
+    ReVancedCLIJar=$(find "$RV" -type f -name "revanced-cli-*-all.jar" -print -quit)
+    echo -e "$info ${Blue}ReVancedCLIJar:${Reset} $ReVancedCLIJar"
     universalPatches=(
       -d "Hex"
       -d "Spoof app signature"
