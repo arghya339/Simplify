@@ -133,12 +133,21 @@ patch_app() {
     )
   fi
   
-  $PREFIX/lib/jvm/java-21-openjdk/bin/java -jar $ReVancedCLIJar patch -p $PatchesRvp \
+  if [ "$appName" == "Instagram" ] || [ "$appName" == "Facebook" ] || [ "$appName" == "Facebook Messenger" ] || [ "$appName" == "Threads" ]; then
+    $PREFIX/lib/jvm/java-21-openjdk/bin/java -jar $ReVancedCLIJar patch -p $PatchesRvp \
     -o "$outputAPK" "${stock_apk_ref[0]}" \
     "${patches[@]}" \
     "${universalPatches[@]}" \
     --custom-aapt2-binary="$HOME/aapt2" \
-    --purge $ripLib -f | tee "$log"
+    --purge -f | tee "$log"
+  else
+    $PREFIX/lib/jvm/java-21-openjdk/bin/java -jar $ReVancedCLIJar patch -p $PatchesRvp \
+      -o "$outputAPK" "${stock_apk_ref[0]}" \
+      "${patches[@]}" \
+      "${universalPatches[@]}" \
+      --custom-aapt2-binary="$HOME/aapt2" \
+      --purge $ripLib -f | tee "$log"
+  fi
   
   if [ ! -f "$outputAPK" ] && [ -f "${stock_apk_ref[0]}" ]; then
     echo -e "$bad Oops, $appName Patching failed !! Logs saved to "$log". Share the Patchlog to developer."
