@@ -100,7 +100,12 @@ dlGitHub() {
       [ -f "$findFile" ] && rm "$findFile"
       # downloading assets
       echo -e "$running Downloading $preAssetsName.."
-      curl -L -C - --progress-bar -o "$dir/$preAssetsName" "https://github.com/$owner/$repo/releases/download/v${lastPreReleases}/$preAssetsName"
+      if [ "$repo" == "revanced-cli" ]; then
+        aria2c -x 16 -s 16 --console-log-level=error --summary-interval=0 --download-result=hide -c -o "$preAssetsName" -d "$dir" "https://github.com/$owner/$repo/releases/download/v${lastPreReleases}/$preAssetsName"
+        echo  # White Space
+      else
+        curl -L -C - --progress-bar -o "$dir/$preAssetsName" "https://github.com/$owner/$repo/releases/download/v${lastPreReleases}/$preAssetsName"
+      fi
       findFile="$dir/$preAssetsName"
     fi
     echo -e "$info findFile: ${Cyan}$findFile${Reset}"
