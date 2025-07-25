@@ -15,7 +15,6 @@ Red="\033[91m"
 Blue="\033[94m"
 Cyan="\033[96m"
 White="\033[37m"
-Gray="\033[1;30m"
 Yellow="\033[93m"
 Reset="\033[0m"
 
@@ -193,8 +192,6 @@ while true; do
   for i in "${!apps[@]}"; do
     if [ -n "${apps[$i]}" ] && [ "${apps[$i]}" != "null" ]; then
       printf "%d. %s\n" "$i" "${apps[$i]}"
-    else
-      echo -e "${Gray}$i. ${apps[$i]}${Reset}"  # Print unsupported apps name in gray color
     fi
   done
 
