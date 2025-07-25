@@ -96,7 +96,7 @@ else
   echo -e "$notice RipLib Disabled!"
 fi
 
-bash $Simplify/dlGitHub.sh "arghya339" "revanced-cli" "pre" ".jar" "$RVX"
+bash $Simplify/dlGitHub.sh "inotia00" "revanced-cli" "latest" ".jar" "$RVX"
 ReVancedCLIJar=$(find "$RVX" -type f -name "revanced-cli-*-all.jar" -print -quit)
 echo -e "$info ${Blue}ReVancedCLIJar:${Reset} $ReVancedCLIJar"
 
