@@ -38,7 +38,11 @@ dlGitHub() {
       echo -e "$info latestReleases: V$latestReleases"
     else
       latestReleases=$(curl -s "https://api.github.com/repos/$owner/$repo/releases/latest" | jq -r '.tag_name | sub("^v"; "")' 2>/dev/null)
-      echo -e "$info latestReleases: v$latestReleases"
+      if [ "$repo" == "ReVancedApp-Actions" ] || [ "$repo" == "Revanced-And-Revanced-Extended-Non-Root" ]; then
+        echo -e "$info latestReleases: $latestReleases"
+      else
+        echo -e "$info latestReleases: v$latestReleases"
+      fi
     fi
     if [ "$repo" == "VancedMicroG" ] || [ "$repo" == "LSPatch" ]; then
       assetsName=$(curl -s "https://api.github.com/repos/$owner/$repo/releases/latest" | jq -r --arg regex "$regex" '.assets[] | select(.name | test($regex)) | .name' 2>/dev/null)
@@ -46,14 +50,22 @@ dlGitHub() {
       fileName="$assetsNameWithoutExt-${latestReleases}$ext"
       echo -e "$info assetsName: $fileName"
       assetsNamePattern=$(echo "$fileName" | sed "s/$latestReleases/*/g")
+    elif [ "$repo" == "ReVancedApp-Actions" ] || [ "$repo" == "Revanced-And-Revanced-Extended-Non-Root" ]; then
+      assetsName="$assets"
+      echo -e "$info assetsName: $assetsName"
     else
       assetsName=$(curl -s "https://api.github.com/repos/$owner/$repo/releases/latest" | jq -r --arg regex "$regex" '.assets[] | select(.name | test($regex)) | .name' 2>/dev/null)
       echo -e "$info assetsName: $assetsName"
       assetsNamePattern=$(echo "$assetsName" | sed "s/$latestReleases/*/g")
     fi
     
-    findFile=$(find "$dir" -type f -name "$assetsNamePattern" -print -quit)
-    fileBaseName=$(basename $findFile)
+    if [ "$repo" == "ReVancedApp-Actions" ] || [ "$repo" == "Revanced-And-Revanced-Extended-Non-Root" ]; then
+      findFile="$dir/$assetsName"
+      fileBaseName=$(basename $findFile)
+    else
+      findFile=$(find "$dir" -type f -name "$assetsNamePattern" -print -quit)
+      fileBaseName=$(basename $findFile)
+    fi
     
     if [ "$repo" == "VancedMicroG" ] || [ "$repo" == "LSPatch" ]; then
       if [ "$fileName" != "$fileBaseName" ]; then
@@ -63,6 +75,12 @@ dlGitHub() {
         curl -L -C - --progress-bar -o "$dir/$fileName" "https://github.com/$owner/$repo/releases/download/v${latestReleases}/$assetsName"
         findFile="$dir/$fileName"
       fi
+    elif [ "$repo" == "ReVancedApp-Actions" ] || [ "$repo" == "Revanced-And-Revanced-Extended-Non-Root" ]; then
+      [ -f "$findFile" ] && rm "$findFile"
+      echo -e "$running Downloading $assetsName.."
+      aria2c -x 16 -s 16 --console-log-level=error --summary-interval=0 --download-result=hide -c -o "$assetsName" -d "$dir" "https://github.com/$owner/$repo/releases/download/${latestReleases}/$assetsName"
+      echo  # White Space
+      findFile="$dir/$assetsName"
     else 
       if [ "$assetsName" != "$fileBaseName" ]; then
         echo -e "$notice diffs: $assetsName ~ $fileBaseName"
