@@ -157,7 +157,7 @@ if [ $Android -ge 10 ]; then
     $Instagram
     $Facebook
     Nobook
-    ${fbMessenger[0]}
+    "${fbMessenger[0]}"
     Twitter
     Reddit
     Adobe\ Lightroom
@@ -168,7 +168,7 @@ if [ $Android -ge 10 ]; then
     Tumblr
     Strava
     SoundCloud
-    ${novaLauncher[0]}
+    "${novaLauncher[0]}"
     Tasker
   )
 elif [ $Android -eq 9 ]; then
@@ -184,7 +184,7 @@ elif [ $Android -eq 9 ]; then
     $Instagram
     $Facebook
     Nobook
-    ${fbMessenger[0]}
+    "${fbMessenger[0]}"
     Twitter
     Reddit
     Adobe\ Lightroom
@@ -194,7 +194,7 @@ elif [ $Android -eq 9 ]; then
     Tumblr
     Strava
     SoundCloud
-    ${novaLauncher[0]}
+    "${novaLauncher[0]}"
     Tasker
   )
 elif [ $Android -eq 8 ]; then
@@ -210,7 +210,7 @@ elif [ $Android -eq 8 ]; then
     $Instagram
     $Facebook
     Nobook
-    ${fbMessenger[0]}
+    "${fbMessenger[0]}"
     Twitter
     Adobe\ Lightroom
     Photomath
@@ -219,7 +219,7 @@ elif [ $Android -eq 8 ]; then
     Tumblr
     Strava
     SoundCloud
-    ${novaLauncher[0]}
+    "${novaLauncher[0]}"
     Tasker
   )
 elif [ $Android -eq 7 ]; then
@@ -233,7 +233,7 @@ elif [ $Android -eq 7 ]; then
     Google\ Photos
     $Instagram
     Nobook
-    ${fbMessenger[0]}
+    "${fbMessenger[0]}"
     Photomath
     RAR
     Twitch
@@ -249,7 +249,7 @@ elif [ $Android -eq 6 ]; then
     TikTok
     Google\ Photos
     Nobook
-    ${fbMessenger[0]}
+    "${fbMessenger[0]}"
     Photomath
     RAR
     Twitch
@@ -263,7 +263,7 @@ elif [ $Android -eq 5 ]; then
     TikTok
     Google\ Photos
     Nobook
-    ${fbMessenger[0]}
+    "${fbMessenger[0]}"
     Photomath
     RAR
     Twitch
