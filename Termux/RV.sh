@@ -57,6 +57,11 @@ if [ "$Android" -ge "6" ]; then
   bash $Simplify/dlGitHub.sh "inotia00" "VancedMicroG" "latest" ".apk" "$SimplUsr"
   VancedMicroG=$(find "$SimplUsr" -type f -name "microg-*.apk" -print -quit)
   echo -e "$info ${Blue}VancedMicroG:${Reset} $VancedMicroG"
+elif [ $Android -eq 5 ]; then
+  VancedMicroG="$SimplUsr/microg-0.2.22.212658.apk"
+  if [ ! -f "$VancedMicroG" ]; then
+    curl -sL "https://github.com/TeamVanced/VancedMicroG/releases/download/v0.2.22.212658-212658001/microg.apk" --progress-bar -C - -o "$VancedMicroG"
+  fi
 fi
 
 if [ "$RipLib" -eq 1 ]; then

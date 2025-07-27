@@ -209,13 +209,13 @@ if [ ! -f "$HOME/aapt2" ]; then
   curl -sL "https://github.com/arghya339/aapt2/releases/download/all/aapt2_$arch" --progress-bar -o "$HOME/aapt2" && chmod +x "$HOME/aapt2"
 fi
 
-curl -L "https://raw.githubusercontent.com/arghya339/Simplify/refs/heads/main/Termux/dlGitHub.sh" --progress-bar -o $Simplify/dlGitHub.sh > /dev/null 2>&1
+curl -sL "https://raw.githubusercontent.com/arghya339/Simplify/refs/heads/main/Termux/dlGitHub.sh" --progress-bar -o $Simplify/dlGitHub.sh
 
-curl -L "https://raw.githubusercontent.com/arghya339/Simplify/refs/heads/main/Termux/APKMdl.sh" --progress-bar -o $Simplify/APKMdl.sh  > /dev/null 2>&1
+curl -sL "https://raw.githubusercontent.com/arghya339/Simplify/refs/heads/main/Termux/APKMdl.sh" --progress-bar -o $Simplify/APKMdl.sh
 
-curl -L "https://raw.githubusercontent.com/arghya339/Simplify/refs/heads/main/Termux/dlUptodown.sh" --progress-bar -o $Simplify/dlUptodown.sh  > /dev/null 2>&1
+curl -sL "https://raw.githubusercontent.com/arghya339/Simplify/refs/heads/main/Termux/dlUptodown.sh" --progress-bar -o $Simplify/dlUptodown.sh
 
-curl -L "https://raw.githubusercontent.com/arghya339/Simplify/refs/heads/main/Termux/apkInstall.sh" --progress-bar -o $Simplify/apkInstall.sh  > /dev/null 2>&1
+curl -sL "https://raw.githubusercontent.com/arghya339/Simplify/refs/heads/main/Termux/apkInstall.sh" --progress-bar -o $Simplify/apkInstall.sh
 
 # --- Download branding.zip ---
 if [ ! -d "$SimplUsr/.branding" ] && [ ! -f "$SimplUsr/branding.zip" ]; then
@@ -468,11 +468,16 @@ while true; do
   clear  # Clear
   # Apply the eye color to the simplify shape and print it
   echo -e "${BoldGreen}$print_simplify${Reset}" && echo ""  # Space
-  echo -e "RV  : ReVanced\nRVS : RV SuperUser\nRVX : ReVanced Extended\nRVXS: RVX SuperUser\nPiko: Piko Twitter\nDrop: Dropped Patches\nLS  : LSPatch\nC   : Configuration\nU   : Unmount Apps\nF   : Feature request\nB   : Bug report\nS   : Support\nA   : About\nQ   : Quit\n"
+  echo -e "D   : Download Patches App\nRV  : ReVanced\nRVS : RV SuperUser\nRVX : ReVanced Extended\nRVXS: RVX SuperUser\nPiko: Piko Twitter\nDrop: Dropped Patches\nLS  : LSPatch\nC   : Configuration\nU   : Unmount Apps\nF   : Feature request\nB   : Bug report\nS   : Support\nA   : About\nQ   : Quit\n"
   echo -n "Select Patches source: " && read source
   case $source in
+    DD|dd)
+      curl -sL -o "$Simplify/dlPatchesApp.sh" "https://raw.githubusercontent.com/arghya339/Simplify/refs/heads/main/Termux/dlPatchesApp.sh"
+      bash "$Simplify/dlPatchesApp.sh"
+      sleep 3
+      ;;
     RV|rv)
-      curl -sL --progress-bar -o "$RV/RV.sh" "https://raw.githubusercontent.com/arghya339/Simplify/refs/heads/main/Termux/RV.sh" > /dev/null 2>&1
+      curl -sL -o "$RV/RV.sh" "https://raw.githubusercontent.com/arghya339/Simplify/refs/heads/main/Termux/RV.sh"
       bash "$RV/RV.sh"
       sleep 3
       ;;
@@ -487,14 +492,14 @@ while true; do
       sleep 3
       ;;
     RVX|rvx)
-      curl -sL --progress-bar -o "$RVX/RVX.sh" "https://raw.githubusercontent.com/arghya339/Simplify/refs/heads/main/Termux/RVX.sh" > /dev/null 2>&1
+      curl -sL -o "$RVX/RVX.sh" "https://raw.githubusercontent.com/arghya339/Simplify/refs/heads/main/Termux/RVX.sh"
       bash "$RVX/RVX.sh"
       sleep 3
       ;;
     RVXS*|rvxs*)
       if su -c "id" >/dev/null 2>&1; then
-        curl -sL --progress-bar -o "$RVX/RVXSU.sh" "https://raw.githubusercontent.com/arghya339/Simplify/refs/heads/main/Termux/RVXSU.sh" > /dev/null 2>&1
-        curl -sL -o "$Simplify/apkMount.sh" "https://raw.githubusercontent.com/arghya339/Simplify/refs/heads/main/Termux/apkMount.sh" &> /dev/null
+        curl -sL -o "$RVX/RVXSU.sh" "https://raw.githubusercontent.com/arghya339/Simplify/refs/heads/main/Termux/RVXSU.sh"
+        curl -sL -o "$Simplify/apkMount.sh" "https://raw.githubusercontent.com/arghya339/Simplify/refs/heads/main/Termux/apkMount.sh"
         bash "$RVX/RVXSU.sh"
       else
         echo -e "$notice SuperUser permission is not granted! RVX SuperUser required SU permission."
@@ -502,12 +507,12 @@ while true; do
       sleep 3
       ;;
     PIKO*|piko*)
-      curl -sL -o "$pikoTwitter/pikoTwitter.sh" "https://raw.githubusercontent.com/arghya339/Simplify/refs/heads/main/Termux/pikoTwitter.sh" > /dev/null 2>&1
+      curl -sL -o "$pikoTwitter/pikoTwitter.sh" "https://raw.githubusercontent.com/arghya339/Simplify/refs/heads/main/Termux/pikoTwitter.sh"
       bash "$pikoTwitter/pikoTwitter.sh"
       sleep 3
       ;;
     DROP*|drop*)
-      curl -sL -o "$Dropped/droppedPatches.sh" "https://raw.githubusercontent.com/arghya339/Simplify/refs/heads/main/Termux/droppedPatches.sh" > /dev/null 2>&1
+      curl -sL -o "$Dropped/droppedPatches.sh" "https://raw.githubusercontent.com/arghya339/Simplify/refs/heads/main/Termux/droppedPatches.sh"
       bash "$Dropped/droppedPatches.sh"
       sleep 3
       ;;
@@ -541,7 +546,7 @@ while true; do
     [Ss]*) support && sleep 3 ;;
     [Aa]*) about && sleep 3 ;;
     [Qq]*) clear && break ;;
-    *) echo -e "$info Invalid input! Please enter RV / RVS / RVX / RVXS / Piko / Drop / LS / C / U / F / B / S / A / Q." && sleep 3 ;;
+    *) echo -e "$info Invalid input! Please enter: D / RV / RVS / RVX / RVXS / Piko / Drop / LS / C / U / F / B / S / A / Q" && sleep 3 ;;
   esac
 done
-######################################################################################################################################
+##########################################################################################################################################

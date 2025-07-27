@@ -61,8 +61,8 @@ PatchesRvp=$(find "$RVX" -type f -name "patches-*.rvp" -print -quit)
 echo -e "$info ${Blue}PatchesRvp:${Reset} $PatchesRvp"
 
 if [ $Android -eq 5 ]; then
-  VancedMicroG="$SimplUsr/VancedMicroG-0.2.22.212658.apk"
-  if [ ! -f "$SVancedMicroG" ]; then
+  VancedMicroG="$SimplUsr/microg-0.2.22.212658.apk"
+  if [ ! -f "$VancedMicroG" ]; then
     curl -sL "https://github.com/TeamVanced/VancedMicroG/releases/download/v0.2.22.212658-212658001/microg.apk" --progress-bar -C - -o "$VancedMicroG"
   fi
 elif [ "$Android" -ge "6" ]; then
@@ -244,7 +244,7 @@ build_app() {
       n*|N*) echo -e "$notice ${appNameRef[0]} RVX Sharing skipped!"
         echo -e "$info Locate '$fileName' in '/sdcard/Simplify/' dir, Share it with your Friends and Family ;)"
         ;;
-        *) echo -e "$info Invalid choice! ${appNameRef[0]} RVX Sharing skipped." ;;
+      *) echo -e "$info Invalid choice! ${appNameRef[0]} RVX Sharing skipped." ;;
     esac
   
   fi
