@@ -320,7 +320,7 @@ while true; do
       dlPatchesApp "${appName}" "$owner" "$repo" "$assets" "$pkgPatches" "$activityPatches"
       ;;
     YouTube\ RV)
-      appName="YouTube"
+      appName="YouTube RV"
       owner="arghya339"
       repo="ReVancedApp-Actions"
       if [ "$FetchPreRelease" -eq 0 ]; then
