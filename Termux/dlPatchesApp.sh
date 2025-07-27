@@ -90,15 +90,15 @@ dlPatchesApp() {
   if [ "$repo" != "VancedMicroG" ]; then
     app_updated_at=$(jq --arg assets "$assets" -r '.[] | select(.assets == $assets) | .updated_at' $dataJson)
     updated_at=$(curl -s "https://api.github.com/repos/$owner/$repo/releases/latest" | jq -r --arg assets "$assets" '.assets[] | select(.name == $assets) | .updated_at')
-  fi
-  if [ "$app_updated_at" == "$updated_at" ] && [ "$repo" != "VancedMicroG" ]; then
-    echo -e "$notice ${Yellow}$appName Already up to date!${Reset}"
-    dlIs="0"
-  elif [[ ( "$app_updated_at" != "$updated_at" || ! -f "$dataJson" ) && "$repo" != "VancedMicroG" ]]; then
-    dlIs="1"
-    echo -e "$running Downloading $appName from GitHub.."
-    bash $Simplify/dlGitHub.sh "$owner" "$repo" "latest" ".apk" "$SimplUsr" "$assets"
-    echo -e "$info ${Green}Downloaded $appName APK found:${Reset} $apk_path"
+    if [ "$app_updated_at" == "$updated_at" ]; then
+      echo -e "$notice ${Yellow}$appName Already up to date!${Reset}"
+      dlIs="0"
+    elif [ "$app_updated_at" != "$updated_at" ] || [! -f "$dataJson" ]; then
+      dlIs="1"
+      echo -e "$running Downloading $appName from GitHub.."
+      bash $Simplify/dlGitHub.sh "$owner" "$repo" "latest" ".apk" "$SimplUsr" "$assets"
+      echo -e "$info ${Green}Downloaded $appName APK found:${Reset} $apk_path"
+    fi
   fi
   if [ $dlIs -eq 1 ] || [ "$repo" == "VancedMicroG" ]; then
     version=$($HOME/aapt2 dump badging $apk_path 2>/dev/null | sed -n "s/.*versionName='\([^']*\)'.*/\1/p")
