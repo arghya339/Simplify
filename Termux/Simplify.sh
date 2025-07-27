@@ -471,7 +471,7 @@ while true; do
   echo -e "D   : Download Patches App\nRV  : ReVanced\nRVS : RV SuperUser\nRVX : ReVanced Extended\nRVXS: RVX SuperUser\nPiko: Piko Twitter\nDrop: Dropped Patches\nLS  : LSPatch\nC   : Configuration\nU   : Unmount Apps\nF   : Feature request\nB   : Bug report\nS   : Support\nA   : About\nQ   : Quit\n"
   echo -n "Select Patches source: " && read source
   case $source in
-    DD|dd)
+    D|d)
       curl -sL -o "$Simplify/dlPatchesApp.sh" "https://raw.githubusercontent.com/arghya339/Simplify/refs/heads/main/Termux/dlPatchesApp.sh"
       bash "$Simplify/dlPatchesApp.sh"
       sleep 3
