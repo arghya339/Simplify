@@ -465,6 +465,7 @@ while true; do
       repo="Nobook"
       bash $Simplify/dlGitHub.sh "$owner" "$repo" "latest" ".apk" "$SimplUsr"
       apk_path=$(find "$SimplUsr" -type f -name "Nobook-*.apk" -print -quit)
+      assets=$(basename "$apk_path")
       pkgPatches="com.ycngmn.nobook"
       activityPatches="com.ycngmn.nobook/.MainActivity"
       dlPatchesApp "${appName}" "$owner" "$repo" "$assets" "$pkgPatches" "$activityPatches"
