@@ -83,8 +83,7 @@ dlPatchesApp() {
   fi
   local $pkgPatches="$5"
   local $activityPatches="$6"
-  local regex=$(echo "$assets" | sed 's/\*_/.*_/')
-  echo -e "$notice DEBUG: appName: $appName, owner: $owner, repo: $repo, assets: $assets, apk_path: $apk_path, pkgPatches: $pkgPatches, activityPatches: $activityPatches, regex: $regex"
+  echo -e "$notice DEBUG: appName: $appName, owner: $owner, repo: $repo, assets: $assets, apk_path: $apk_path, pkgPatches: $pkgPatches, activityPatches: $activityPatches"
 
   
   # read the updated_at value for the specified asset
@@ -96,7 +95,7 @@ dlPatchesApp() {
     
     echo -e "$running Downloading $appName from GitHub.."
     [[ -f "$apk_path" ]] && rm "$apk_path"
-    bash $Simplify/dlGitHub.sh "$owner" "$repo" "latest" ".apk" "$SimplUsr" "$regex"
+    bash $Simplify/dlGitHub.sh "$owner" "$repo" "latest" ".apk" "$SimplUsr" "$assets"
     echo -e "$info ${Green}Downloaded $appName APK found:${Reset} $apk_path"
     version=$($HOME/aapt2 dump badging $apk_path 2>/dev/null | sed -n "s/.*versionName='\([^']*\)'.*/\1/p")
     
