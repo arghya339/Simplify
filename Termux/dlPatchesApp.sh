@@ -78,6 +78,9 @@ dlPatchesApp() {
       tag=$(curl -s "https://api.github.com/repos/$owner/$repo/releases/latest" | jq -r '.tag_name')
     fi
     local url="https://github.com/$owner/$repo/releases/download/$tag/microg.apk"
+  elif [ "$repo" == "Nobook" ]; then
+    tag=$(curl -s "https://api.github.com/repos/$owner/$repo/releases/latest" | jq -r '.tag_name')
+    local url="https://github.com/$owner/$repo/releases/download/$tag/Nobook_$tag.apk"
   else
     local url="https://github.com/$owner/$repo/releases/download/all/$assets"
   fi
