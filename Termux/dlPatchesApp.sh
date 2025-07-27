@@ -69,9 +69,9 @@ dlPatchesApp() {
   local apk_path="$SimplUsr/$assets"
   if [ "$repo" == "VancedMicroG" ]; then
     if [ $Android -eq 5 ]; then
-      local tag="v0.2.22.212658-212658001"
+      tag="v0.2.22.212658-212658001"
     elif [ "$Android" -ge "6" ]; then
-      local tag=$(curl -s "https://api.github.com/repos/$owner/$repo/releases/latest" | jq -r '.tag_name')
+      tag=$(curl -s "https://api.github.com/repos/$owner/$repo/releases/latest" | jq -r '.tag_name')
     fi
     local url="https://github.com/$owner/$repo/releases/download/$tag/microg.apk"
   else
@@ -87,7 +87,7 @@ dlPatchesApp() {
   updated_at=$(curl -s "https://api.github.com/repos/$owner/$repo/releases/latest" | jq -r --arg name "$assets" '.assets[] | select(.name == $name) | .updated_at')
   if [ "$app_updated_at" == "$updated_at" ]; then
     echo -e "$info ${Blue}$appName:${Reset} Already up to date!"
-  else
+  elif [ "$app_updated_at" != "$updated_at" ] || [ ! -f "$dataJson" ]; then
     
     echo -e "$running Downloading $appName from GitHub.."
     [[ -f "$apk_path" ]] && rm "$apk_path"
