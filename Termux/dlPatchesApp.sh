@@ -100,7 +100,7 @@ dlPatchesApp() {
       echo -e "$info ${Green}Downloaded $appName APK found:${Reset} $apk_path"
     fi
   fi
-  if [ $dlIs -eq 1 ] || [ "$repo" == "VancedMicroG" ]; then
+  if [ $dlIs -eq 1 ] || [ "$repo" == "VancedMicroG" ] || [ "$repo" == "Nobook" ]; then
     version=$($HOME/aapt2 dump badging $apk_path 2>/dev/null | sed -n "s/.*versionName='\([^']*\)'.*/\1/p")
     echo -e "[?] ${Yellow}Do you want to install ${appName} $version app? [Y/n] ${Reset}\c" && read opt
     case $opt in
