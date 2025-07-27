@@ -93,7 +93,7 @@ dlPatchesApp() {
     if [ "$app_updated_at" == "$updated_at" ]; then
       echo -e "$notice ${Yellow}$appName Already up to date!${Reset}"
       dlIs="0"
-    elif [ "$app_updated_at" != "$updated_at" ] || [! -f "$dataJson" ]; then
+    elif [ "$app_updated_at" != "$updated_at" ] || [ ! -f "$dataJson" ]; then
       dlIs="1"
       echo -e "$running Downloading $appName from GitHub.."
       bash $Simplify/dlGitHub.sh "$owner" "$repo" "latest" ".apk" "$SimplUsr" "$assets"
