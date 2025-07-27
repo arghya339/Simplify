@@ -84,7 +84,8 @@ dlPatchesApp() {
   local $pkgPatches="$5"
   local $activityPatches="$6"
   local regex=$(echo "$assets" | sed 's/\*_/.*_/')
-  
+  echo -e "$notice DEBUG: appName: $appName, owner: $owner, repo: $repo, assets: $assets, apk_path: $apk_path, pkgPatches: $pkgPatches, activityPatches: $activityPatches, regex: $regex"
+
   
   # read the updated_at value for the specified asset
   app_updated_at=$(jq --arg assets "$assets" -r '.[] | select(.assets == $assets) | .updated_at' $dataJson)
