@@ -761,7 +761,7 @@ while true; do
     Amazon\ Prime\ Video)
       pkgName="com.amazon.avod.thirdpartyclient"
       appName=("Amazon Prime Video")
-      pkgVersion="3.0.403"
+      pkgVersion="3.0.412"
       #pkgVersion=""
       if [ -z "$pkgVersion" ]; then
         getVersion "$pkgName"
