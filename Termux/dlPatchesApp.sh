@@ -89,10 +89,10 @@ dlPatchesApp() {
   # read the updated_at value for the specified asset
   app_updated_at=$(jq --arg assets "$assets" -r '.[] | select(.assets == $assets) | .updated_at' $dataJson)
   updated_at=$(curl -s "https://api.github.com/repos/$owner/$repo/releases/latest" | jq -r --arg assets "$assets" '.assets[] | select(.name == $assets) | .updated_at')
-  if [ "$app_updated_at" == "$updated_at" ]; then
+  if [ "$app_updated_at" == "$updated_at" ] && [ "$repo" != "VancedMicroG" ]; then
     echo -e "$notice ${Yellow}$appName Already up to date!${Reset}"
     dlIs="0"
-  elif [ "$app_updated_at" != "$updated_at" ] || [ ! -f "$dataJson" ]; then
+  elif [[ ( "$app_updated_at" != "$updated_at" || ! -f "$dataJson" ) && "$repo" != "VancedMicroG" ]]; then
     dlIs="1"
     echo -e "$running Downloading $appName from GitHub.."
     bash $Simplify/dlGitHub.sh "$owner" "$repo" "latest" ".apk" "$SimplUsr" "$assets"
