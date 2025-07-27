@@ -91,13 +91,15 @@ dlPatchesApp() {
   updated_at=$(curl -s "https://api.github.com/repos/$owner/$repo/releases/latest" | jq -r --arg assets "$assets" '.assets[] | select(.name == $assets) | .updated_at')
   if [ "$app_updated_at" == "$updated_at" ]; then
     echo -e "$notice ${Yellow}$appName Already up to date!${Reset}"
+    dlIs="0"
   elif [ "$app_updated_at" != "$updated_at" ] || [ ! -f "$dataJson" ]; then
-    
+    dlIs="1"
     echo -e "$running Downloading $appName from GitHub.."
     bash $Simplify/dlGitHub.sh "$owner" "$repo" "latest" ".apk" "$SimplUsr" "$assets"
     echo -e "$info ${Green}Downloaded $appName APK found:${Reset} $apk_path"
     version=$($HOME/aapt2 dump badging $apk_path 2>/dev/null | sed -n "s/.*versionName='\([^']*\)'.*/\1/p")
-    
+  fi
+  if [ $dlIs -eq 1 ] || [ "$repo" == "VancedMicroG" ]; then
     echo -e "[?] ${Yellow}Do you want to install ${appName} $version app? [Y/n] ${Reset}\c" && read opt
     case $opt in
       y*|Y*|"")
@@ -119,7 +121,6 @@ dlPatchesApp() {
         ;;
       *) echo -e "$info Invalid choice! ${appName} Sharing skipped." ;;
     esac
-
   fi
 }
 
