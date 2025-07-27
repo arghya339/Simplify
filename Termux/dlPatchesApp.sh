@@ -88,7 +88,7 @@ dlPatchesApp() {
   
   # read the updated_at value for the specified asset
   app_updated_at=$(jq --arg assets "$assets" -r '.[] | select(.assets == $assets) | .updated_at' $dataJson)
-  updated_at=$(curl -s "https://api.github.com/repos/$owner/$repo/releases/latest" | jq -r --arg name "$assets" '.assets[] | select(.name == $name) | .updated_at')
+  updated_at=$(curl -s "https://api.github.com/repos/$owner/$repo/releases/latest" | jq -r --arg assets "$assets" '.assets[] | select(.assets == $assets) | .updated_at')
   if [ "$app_updated_at" == "$updated_at" ]; then
     echo -e "$info ${Blue}$appName:${Reset} Already up to date!"
   elif [ "$app_updated_at" != "$updated_at" ] || [ ! -f "$dataJson" ]; then
