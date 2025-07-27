@@ -26,6 +26,10 @@ Simplify="$HOME/Simplify"  # /data/data/com.termux/files/home/Simplify dir
 SimplUsr="/sdcard/Simplify"  # /storage/emulated/0/Simplify dir
 mkdir -p "$Simplify" "$SimplUsr"  # Create $Simplify and $SimplUsr dir if it does't exist
 dataJson="$Simplify/data.json"  # Data file to store simplify dlPatchesApp data
+  # Create empty json file if it doesn't exist
+  if [ ! -f "$dataJson" ]; then
+    jq -n '[]' > "$dataJson"
+  fi
 simplifyJson="$Simplify/simplify.json"  # Configuration file to store simplify settings
 ChangeRVXSource="$(jq -r '.ChangeRVXSource' "$simplifyJson" 2>/dev/null)"
 FetchPreRelease=$(jq -r '.FetchPreRelease' "$simplifyJson" 2>/dev/null)
