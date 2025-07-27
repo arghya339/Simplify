@@ -81,8 +81,8 @@ dlPatchesApp() {
   else
     local url="https://github.com/$owner/$repo/releases/download/all/$assets"
   fi
-  local $pkgPatches="$5"
-  local $activityPatches="$6"
+  local pkgPatches="$5"
+  local activityPatches="$6"
   echo -e "$notice DEBUG: appName: $appName, owner: $owner, repo: $repo, assets: $assets, apk_path: $apk_path, pkgPatches: $pkgPatches, activityPatches: $activityPatches"
 
   
