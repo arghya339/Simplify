@@ -352,7 +352,7 @@ while true; do
           if [ "$FetchPreRelease" -eq 0 ]; then
             assets="youtube-stable-$cpuAbi-anddea.apk"  # Use Stable release
           else
-            assets="youtube-beta-stable-$cpuAbi-anddea.apk"  # Use Beta release
+            assets="youtube-beta-$cpuAbi-anddea.apk"  # Use Beta release
           fi
         fi
       elif [ $Android -eq 7 ] || [ $Android -eq 6 ]; then
