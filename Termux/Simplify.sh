@@ -415,8 +415,8 @@ changeRVXSource() {
 pat() {
   while true; do
     if { [ -f "$HOME/.config/gh/hosts.yml" ] && ! grep -q "{}" "$HOME/.config/gh/hosts.yml" 2>/dev/null; } || { [ -f "$simplifyJson" ] && jq -e '.PAT' "$simplifyJson" >/dev/null 2>&1; }; then
-      echo -e "${info} You already have a GitHub token!"
-      echo -e "${Yellow}Do you want to delete it? [Y/n]${Reset} \c" && read userInput
+      echo -e "${notice} You already have a GitHub token!"
+      echo -e "${Yellow}[?] Do you want to delete it? [Y/n]${Reset} \c" && read userInput
       case "$userInput" in
         [Yy]*)
           if { [ -f "$HOME/.config/gh/hosts.yml" ] && ! grep -q "{}" "$HOME/.config/gh/hosts.yml" 2>/dev/null; } || gh auth status 2>/dev/null; then
@@ -425,13 +425,13 @@ pat() {
             jq 'del(.PAT)' "$simplifyJson" > temp.json && mv temp.json "$simplifyJson"  # Delete PAT key from simplify.json
             termux-open-url "https://github.com/settings/tokens"
           fi
-          echo -e "${Green}Successfully deleted your GitHub token!${Reset}"
+          echo -e "$good ${Green}Successfully deleted your GitHub token!${Reset}"
           ;;
         [Nn]*) break ;;
-        *) echo -e "${info} ${Blue}Invalid input! Please enter Yes or No.${Reset}" ;;
+        *) echo -e "${info} Invalid input! Please enter Yes or No." ;;
       esac
     else
-      echo -e "${Yellow}Do you want to increase the GitHub API rate limit by adding a github token? [Y/n]${Reset} \c" && read userInput
+      echo -e "${Yellow}[?] Do you want to increase the GitHub API rate limit by adding a github token? [Y/n]${Reset} \c" && read userInput
       case "$userInput" in
         [Yy]*)
           echo -e "${Yellow}Select a method to create a GitHub access token: (gh) GitHub CLI or (pat) Personal Access Token? [gh/pat]${Reset} \c" && read method
@@ -469,11 +469,11 @@ pat() {
                 termux-open-url "https://github.com/settings/tokens"
               fi
               ;;
-            *) echo -e "${info} ${Blue}Invalid input! Please enter gh or pat.${Reset}" ;;
+            *) echo -e "${info} Invalid input! Please enter gh or pat." ;;
           esac
           ;;
         [Nn]*) break ;;
-        *) echo -e "${info} ${Blue}Invalid input! Please enter Yes or No.${Reset}" ;;
+        *) echo -e "${info} Invalid input! Please enter Yes or No." ;;
       esac
     fi
   done
