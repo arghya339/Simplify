@@ -355,7 +355,7 @@ while true; do
       appName=("Discord")
       pkgName="com.discord"
       pkgVersion="289.20-Stable"
-      assetsName="Discord_v289.20-Stable-289020-arm64-v8a+armeabi-v7a+x86_64+x86-en-xxhdpi.apks"
+      assetsName="com.discord_289.20-Stable-289020_4arch_7dpi_25lang.apks"
       dlUrl="https://github.com/arghya339/Simplify/releases/download/all/$assetsName"
       aria2c -x 16 -s 16 --console-log-level=error --summary-interval=0 --download-result=hide -c -o "$assetsName" -d "$Download" "$dlUrl"
       stock_apks_path=("$Download/$assetsName")
