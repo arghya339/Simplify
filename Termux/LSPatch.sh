@@ -28,7 +28,7 @@ SimplUsr="/sdcard/Simplify"  # /storage/emulated/0/Simplify dir
 mkdir -p "$Simplify" "$LSPatch" "$SimplUsr"  # Create $Simplify, $LSPatch and $SimplUsr dir if it does't exist
 Download="/sdcard/Download"  # Download dir
 simplifyJson="$Simplify/simplify.json"  # Configuration file to store simplify settings
-if [ -f "$HOME/.config/gh/hosts.yml" ] && gh auth status 2>/dev/null; then
+if [ -f "$HOME/.config/gh/hosts.yml" ] && gh auth status > /dev/null 2>&1; then
   # oauth_token: gho_************************************
   token=$(grep -A2 "users:" ~/.config/gh/hosts.yml | grep -v "users:" | grep -A1 "oauth_token:" | awk '/oauth_token:/ {getline; print $2}')
 elif [ -f "$simplifyJson" ] && jq -e '.PAT' "$simplifyJson" >/dev/null 2>&1; then
