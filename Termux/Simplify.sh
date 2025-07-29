@@ -176,7 +176,6 @@ pkgInstall "apksigner"  # apksigner install/update
 pkgInstall "bsdtar"  # bsdtar install/update
 pkgInstall "pv"  # pv install/update
 pkgInstall "grep"  # grep update
-pkgInstall "gh"  # gh cli install/update
 if su -c "id" >/dev/null 2>&1; then
   pkgInstall "openssl"  # openssl install/update
   pkgInstall "python"  # python install/update
@@ -438,6 +437,7 @@ pat() {
           echo -e "${Yellow}Select a method to create a GitHub access token: (gh) GitHub CLI or (pat) Personal Access Token? [gh/pat]${Reset} \c" && read method
           case "$method" in
             [Gg]*)
+              pkgInstall "gh"  # gh install/update
               echo -e "${running} Creating GitHub access token using GitHub CLI.."
               gh auth login  # Authenticate gh cli with GitHub account
               gh_api_response=$(owner="ReVanced" && repo="revanced-patches" && gh api "repos/$owner/$repo/releases/latest" | jq -r '.tag_name')
