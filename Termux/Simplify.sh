@@ -610,6 +610,7 @@ while true; do
               echo -e "$notice ${Yellow}No GitHub token found!${Reset}"
               pat  # Call the pat function to create & add GitHub token
             fi
+            ;;
           [Qq]*) break ;;
           *) echo -e "$info Invalid input! Please enter P / L / D / R / S / T." ;;
         esac
