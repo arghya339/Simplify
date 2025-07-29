@@ -156,7 +156,7 @@ pkgUpdate() {
 # --- pkg install/update function ---
 pkgInstall() {
   local pkg=$1
-  if echo "$installedPKG" | grep -q "$pkg" 2>/dev/null; then
+  if echo "$installedPKG" | grep -q "^$pkg/" 2>/dev/null; then
     pkgUpdate "$pkg"
   else
     echo -e "$running Installing $pkg pkg.."
