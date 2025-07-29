@@ -602,7 +602,7 @@ while true; do
           [Rr]*) if [ "$RipLib" == 1 ]; then echo "RipLib == Enabled"; else echo "RipLib == Disabled"; fi && ripLib ;;
           [Ss]*) if [ "$ChangeRVXSource" == 0 ]; then echo "ChangeRVXSource == No"; else echo "ChangeRVXSource == Yes"; fi && changeRVXSource ;;
           [Tt]*) 
-            if { [ -f "$simplifyJson" ] && jq -e '.PAT' "$simplifyJson" >/dev/null 2>&1; } || { gh auth status 2>/dev/null && [ -f "$HOME/.config/gh/hosts.yml" ]; }; then
+            if { [ -f "$simplifyJson" ] && jq -e '.PAT' "$simplifyJson" >/dev/null 2>&1; } || { gh auth status > /dev/null 2>&1 && [ -f "$HOME/.config/gh/hosts.yml" ]; }; then
               if jq -e '.PAT' "$simplifyJson" >/dev/null 2>&1; then
                 echo -e "$info ${Green}PAT: ghp_************************************${Reset}"
               else
@@ -610,8 +610,8 @@ while true; do
               fi
             else
               echo -e "$notice ${Yellow}No GitHub token found!${Reset}"
-              pat  # Call the pat function to create & add GitHub token
             fi
+            pat  # Call the pat function to create & add GitHub token
             ;;
           [Qq]*) break ;;
           *) echo -e "$info Invalid input! Please enter P / L / D / R / S / T." ;;
