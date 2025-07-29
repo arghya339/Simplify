@@ -419,7 +419,7 @@ pat() {
       echo -e "${Yellow}Do you want to delete it? [Y/n]${Reset} \c" && read userInput
       case "$userInput" in
         [Yy]*)
-          if { [ -f "$HOME/.config/gh/hosts.yml" ] && ! grep -q "{}" "$HOME/.config/gh/hosts.yml" 2>/dev/null; } || ! gh auth status 2>/dev/null; then
+          if { [ -f "$HOME/.config/gh/hosts.yml" ] && ! grep -q "{}" "$HOME/.config/gh/hosts.yml" 2>/dev/null; } || gh auth status 2>/dev/null; then
             gh auth logout  # Logout from gh cli
           elif [ -f "$simplifyJson" ] && jq -e '.PAT' "$simplifyJson" >/dev/null 2>&1; then
             jq 'del(.PAT)' "$simplifyJson" > temp.json && mv temp.json "$simplifyJson"  # Delete PAT key from simplify.json
@@ -600,7 +600,7 @@ while true; do
           [Rr]*) if [ "$RipLib" == 1 ]; then echo "RipLib == Enabled"; else echo "RipLib == Disabled"; fi && ripLib ;;
           [Ss]*) if [ "$ChangeRVXSource" == 0 ]; then echo "ChangeRVXSource == No"; else echo "ChangeRVXSource == Yes"; fi && changeRVXSource ;;
           [Tt]*) 
-            if { [ -f "$simplifyJson" ] && jq -e '.PAT' "$simplifyJson" >/dev/null 2>&1; } || { ! gh auth status 2>/dev/null && [ -f "$HOME/.config/gh/hosts.yml" ]; }; then
+            if { [ -f "$simplifyJson" ] && jq -e '.PAT' "$simplifyJson" >/dev/null 2>&1; } || { gh auth status 2>/dev/null && [ -f "$HOME/.config/gh/hosts.yml" ]; }; then
               if jq -e '.PAT' "$simplifyJson" >/dev/null 2>&1; then
                 echo -e "$info ${Green}PAT: ghp_************************************${Reset}"
               else
