@@ -442,8 +442,9 @@ pat() {
               gh auth login  # Authenticate gh cli with GitHub account
               gh_api_response=$(owner="ReVanced" && repo="revanced-patches" && gh api "repos/$owner/$repo/releases/latest" | jq -r '.tag_name')
               if [[ $gh_api_response == v* ]] && [ $gh_api_response != "null" ]; then
-                echo -e "${Green}Successfully authenticated with GitHub CLI!${Reset}"
-                echo -e "${Yellow}Your GitHub API rate limit has been increased.${Reset}"
+                echo -e "$good ${Green}Successfully authenticated with GitHub CLI!${Reset}"
+                echo -e "$notice ${Yellow}Your GitHub API rate limit has been increased.${Reset}"
+                break
               else
                 echo -e "${bad} ${Red}Failed to authenticate with GitHub CLI! Please try again.${Reset}"
                 gh auth logout  # Logout from gh cli
@@ -458,8 +459,9 @@ pat() {
                 PAT=$(jq -r '.PAT' "$simplifyJson" 2>/dev/null)
                 gh_api_response=$(auth="-H \"Authorization: Bearer $PAT\"" && owner="ReVanced" && repo="revanced-patches" && curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases/latest" | jq -r '.tag_name')
                 if [[ $gh_api_response == v* ]] && [ $gh_api_response != "null" ]; then
-                  echo -e "${Green}Successfully added your GitHub PAT!${Reset}"
-                  echo -e "${Yellow}Your GitHub API rate limit has been increased.${Reset}"
+                  echo -e "$good ${Green}Successfully added your GitHub PAT!${Reset}"
+                  echo -e "$notice ${Yellow}Your GitHub API rate limit has been increased.${Reset}"
+                  break
                 fi
               else
                 echo -e "${bad} ${Red}Invalid PAT! Please try again.${Reset}"
