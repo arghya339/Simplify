@@ -17,6 +17,22 @@ White="\033[37m"
 Yellow="\033[93m"
 Reset="\033[0m"
 
+simplifyJson="$Simplify/simplify.json"  # Configuration file to store simplify settings
+if [[ ( -f "$HOME/.config/gh/hosts.yml" ) && ( ! grep -q "{}" "$HOME/.config/gh/hosts.yml" 2>/dev/null || ! gh auth status 2>/dev/null ) ]]; then
+  # oauth_token: gho_************************************
+  token=$(grep -A2 "users:" ~/.config/gh/hosts.yml | grep -v "users:" | grep -A1 "oauth_token:" | awk '/oauth_token:/ {getline; print $2}')
+elif [ -f "$simplifyJson" ] && jq -e '.PAT' "$simplifyJson" >/dev/null 2>&1; then
+  # PAT: ghp_************************************
+  token=$(jq -r '.PAT' "$simplifyJson" 2>/dev/null)
+else
+  token=""
+fi
+if [ -z "$token" ]; then
+  auth="-H \"Authorization: Bearer $token\""
+else
+  auth=""
+fi
+
 # --- Download required file from GitHub ---
 dlGitHub() {
   local owner=$1
@@ -34,10 +50,10 @@ dlGitHub() {
 
   if [ "$releases" == "latest" ]; then
     if [ "$repo" == "APKEditor" ]; then
-      latestReleases=$(curl -s https://api.github.com/repos/$owner/$repo/releases/latest | jq -r '.tag_name | sub("^V"; "")')  # 1.4.3
+      latestReleases=$(curl -s ${auth} https://api.github.com/repos/$owner/$repo/releases/latest | jq -r '.tag_name | sub("^V"; "")')  # 1.4.3
       echo -e "$info latestReleases: V$latestReleases"
     else
-      latestReleases=$(curl -s "https://api.github.com/repos/$owner/$repo/releases/latest" | jq -r '.tag_name | sub("^v"; "")' 2>/dev/null)
+      latestReleases=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases/latest" | jq -r '.tag_name | sub("^v"; "")' 2>/dev/null)
       if [ "$repo" == "ReVancedApp-Actions" ] || [ "$repo" == "Revanced-And-Revanced-Extended-Non-Root" ]; then
         echo -e "$info latestReleases: $latestReleases"
       else
@@ -45,7 +61,7 @@ dlGitHub() {
       fi
     fi
     if [ "$repo" == "VancedMicroG" ] || [ "$repo" == "LSPatch" ]; then
-      assetsName=$(curl -s "https://api.github.com/repos/$owner/$repo/releases/latest" | jq -r --arg regex "$regex" '.assets[] | select(.name | test($regex)) | .name' 2>/dev/null)
+      assetsName=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases/latest" | jq -r --arg regex "$regex" '.assets[] | select(.name | test($regex)) | .name' 2>/dev/null)
       assetsNameWithoutExt="${assetsName%.*}"
       fileName="$assetsNameWithoutExt-${latestReleases}$ext"
       echo -e "$info assetsName: $fileName"
@@ -54,7 +70,7 @@ dlGitHub() {
       assetsName="$assets"
       echo -e "$info assetsName: $assetsName"
     else
-      assetsName=$(curl -s "https://api.github.com/repos/$owner/$repo/releases/latest" | jq -r --arg regex "$regex" '.assets[] | select(.name | test($regex)) | .name' 2>/dev/null)
+      assetsName=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases/latest" | jq -r --arg regex "$regex" '.assets[] | select(.name | test($regex)) | .name' 2>/dev/null)
       echo -e "$info assetsName: $assetsName"
       assetsNamePattern=$(echo "$assetsName" | sed "s/$latestReleases/*/g")
     fi
@@ -102,11 +118,11 @@ dlGitHub() {
     fi
     echo -e "$info findFile: ${Cyan}$findFile${Reset}"
   else
-    lastPreReleases=$(curl -s "https://api.github.com/repos/$owner/$repo/releases" | jq -r '.[].tag_name | sub("^v"; "") | select(contains("dev"))' | head -n 1 2>/dev/null)
+    lastPreReleases=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases" | jq -r '.[].tag_name | sub("^v"; "") | select(contains("dev"))' | head -n 1 2>/dev/null)
     echo -e "$info lastPreReleases: $lastPreReleases"
     
     # fetch assets from specific release tag
-    preAssetsName=$(curl -s "https://api.github.com/repos/$owner/$repo/releases/tags/v$lastPreReleases" | jq -r --arg ext "$ext" '.assets[] | select(.name | endswith($ext)) | .name' 2>/dev/null)
+    preAssetsName=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases/tags/v$lastPreReleases" | jq -r --arg ext "$ext" '.assets[] | select(.name | endswith($ext)) | .name' 2>/dev/null)
     echo -e "$info preAssetsName: $preAssetsName"
     
     preAssetsNamePattern=$(echo "$preAssetsName" | sed "s/$lastPreReleases/*/g")

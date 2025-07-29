@@ -30,6 +30,20 @@ Download="/sdcard/Download"  # Download dir
 simplifyJson="$Simplify/simplify.json"  # Configuration file to store simplify settings
 FetchPreRelease=$(jq -r '.FetchPreRelease' "$simplifyJson" 2>/dev/null)
 RipLib="$(jq -r '.RipLib' "$simplifyJson" 2>/dev/null)"
+if [[ ( -f "$HOME/.config/gh/hosts.yml" ) && ( ! grep -q "{}" "$HOME/.config/gh/hosts.yml" 2>/dev/null || ! gh auth status 2>/dev/null ) ]]; then
+  # oauth_token: gho_************************************
+  token=$(grep -A2 "users:" ~/.config/gh/hosts.yml | grep -v "users:" | grep -A1 "oauth_token:" | awk '/oauth_token:/ {getline; print $2}')
+elif [ -f "$simplifyJson" ] && jq -e '.PAT' "$simplifyJson" >/dev/null 2>&1; then
+  # PAT: ghp_************************************
+  token=$(jq -r '.PAT' "$simplifyJson" 2>/dev/null)
+else
+  token=""
+fi
+if [ -z "$token" ]; then
+  auth="-H \"Authorization: Bearer $token\""
+else
+  auth=""
+fi
 
 # --- Checking Android Version ---
 if [ $Android -le 7 ]; then
@@ -109,9 +123,9 @@ getVersion() {
   pkgVersion=$(jq -r --arg pkg "$pkgName" '[.[] | .compatiblePackages // empty | .[] | select(.name == $pkg and .versions != null) | .versions[]] | sort | last' $json 2>/dev/null)
   if [ "$pkgVersion" == "null" ]; then
     if [ "$isPreReleases" == "true" ]; then
-      pkgVersion=$(curl -sL "https://api.github.com/repos/crimera/twitter-apk/releases" | jq -r '.[].tag_name' | head -1)  # Last Releases
+      pkgVersion=$(curl -sL ${auth} "https://api.github.com/repos/crimera/twitter-apk/releases" | jq -r '.[].tag_name' | head -1)  # Last Releases
     else
-      pkgVersion=$(curl -sL "https://api.github.com/repos/crimera/twitter-apk/releases/latest" | jq -r '.tag_name')  # Latest Releases
+      pkgVersion=$(curl -sL ${auth} "https://api.github.com/repos/crimera/twitter-apk/releases/latest" | jq -r '.tag_name')  # Latest Releases
     fi
     if [ -z "$pkgVersion" ]; then
       pkgVersion=$($PREFIX/lib/jvm/java-21-openjdk/bin/java -jar $ReVancedCLIJar list-patches --with-packages $PatchesJar | grep -oP 'Requires X \K[\d.]+-release\.\d+' | sort -u | tail -1)

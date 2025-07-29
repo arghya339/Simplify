@@ -412,6 +412,71 @@ changeRVXSource() {
   done
 }
 
+pat() {
+  while true; do
+    if [[ ( -f "$HOME/.config/gh/hosts.yml" && ! grep -q "{}" "$HOME/.config/gh/hosts.yml" 2>/dev/null ) || ( -f "$simplifyJson" && jq -e '.PAT' "$simplifyJson" >/dev/null 2>&1 ) ]]; then
+      echo -e "${info} You already have a GitHub token!"
+      echo -e "${Yellow}Do you want to delete it? [Y/n]${Reset} \c" && read userInput
+      case "$userInput" in
+        [Yy]*)
+          if [[ ( -f "$HOME/.config/gh/hosts.yml" ) && ( ! grep -q "{}" "$HOME/.config/gh/hosts.yml" 2>/dev/null || ! gh auth status 2>/dev/null ) ]]; then
+            gh auth logout  # Logout from gh cli
+          elif [ -f "$simplifyJson" ] && jq -e '.PAT' "$simplifyJson" >/dev/null 2>&1; then
+            jq 'del(.PAT)' "$simplifyJson" > temp.json && mv temp.json "$simplifyJson"  # Delete PAT key from simplify.json
+            termux-open-url "https://github.com/settings/tokens"
+          fi
+          echo -e "${Green}Successfully deleted your GitHub token!${Reset}"
+          ;;
+        [Nn]*) break ;;
+        *) echo -e "${info} ${Blue}Invalid input! Please enter Yes or No.${Reset}" ;;
+      esac
+    else
+      echo -e "${Yellow}Do you want to increase the GitHub API rate limit by adding a github token? [Y/n]${Reset} \c" && read userInput
+      case "$userInput" in
+        [Yy]*)
+          echo -e "${Yellow}Select a method to create a GitHub access token: (gh) GitHub CLI or (pat) Personal Access Token? [gh/pat]${Reset} \c" && read method
+          case "$method" in
+            [Gg]*)
+              pkgInstall "gh"  # gh install/update
+              echo -e "${running} Creating GitHub access token using GitHub CLI.."
+              gh auth login  # Authenticate gh cli with GitHub account
+              gh_api_response=$(owner="ReVanced" && repo="revanced-patches" && gh api "repos/$owner/$repo/releases/latest" | jq -r '.tag_name')
+              if [[ $gh_api_response == v* ]] && [ $gh_api_response != "null" ]; then
+                echo -e "${Green}Successfully authenticated with GitHub CLI!${Reset}"
+                echo -e "${Yellow}Your GitHub API rate limit has been increased.${Reset}"
+              else
+                echo -e "${bad} ${Red}Failed to authenticate with GitHub CLI! Please try again.${Reset}"
+                gh auth logout  # Logout from gh cli
+              fi
+              ;;
+            [Pp]*)
+              echo -e "${running} Creating Personal Access Token.."
+              termux-open-url "https://github.com/settings/tokens/new?scopes=public_repo&description=Simplify"  # Create a PAT with the scope `public_repo`
+              echo -e "${Yellow}Please copy the generated Simplify PAT & paste it here:${Reset} \c" && read -r pat
+              if [[ $pat == ghp_* ]] && [ $pat != "" ]; then
+                jq ".PAT = \"$pat\"" "$simplifyJson" > temp.json && mv temp.json "$simplifyJson"  # Change key value: Reads content of existing json and assigns key new value then redirect new json data to temp.json then rename it to simplify.json
+                PAT=$(jq -r '.PAT' "$simplifyJson" 2>/dev/null)
+                gh_api_response=$(auth="-H \"Authorization: Bearer $PAT\"" && owner="ReVanced" && repo="revanced-patches" && curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases/latest" | jq -r '.tag_name')
+                if [[ $gh_api_response == v* ]] && [ $gh_api_response != "null" ]; then
+                  echo -e "${Green}Successfully added your GitHub PAT!${Reset}"
+                  echo -e "${Yellow}Your GitHub API rate limit has been increased.${Reset}"
+                fi
+              else
+                echo -e "${bad} ${Red}Invalid PAT! Please try again.${Reset}"
+                jq 'del(.PAT)' "$simplifyJson" > temp.json && mv temp.json "$simplifyJson"  # Delete PAT key from simplify.json
+                termux-open-url "https://github.com/settings/tokens"
+              fi
+              ;;
+            *) echo -e "${info} ${Blue}Invalid input! Please enter gh or pat.${Reset}" ;;
+          esac
+          ;;
+        [Nn]*) break ;;
+        *) echo -e "${info} ${Blue}Invalid input! Please enter Yes or No.${Reset}" ;;
+      esac
+    fi
+  done
+}
+
 # --- Feature request prompt ---
 feature() {
   echo -e "${Yellow}Do you want any new feature in this script? [Y/n]${Reset}: \c" && read userInput
@@ -526,7 +591,7 @@ while true; do
       ;;
     [Cc]*)
       while true; do
-        echo -e "P. FetchPreRelease\nL. RipLocale\nD. RipDpi\nR. RipLib\nS. Change RVX Source\nQ. Quit\n"
+        echo -e "P. FetchPreRelease\nL. RipLocale\nD. RipDpi\nR. RipLib\nS. Change RVX Source\nT. Add gh PAT (increases gh api rate limit)\nQ. Quit\n"
         read -r -p "Select: " opt
         case "$opt" in
           [Pp]*) if [ "$FetchPreRelease" == 0 ]; then echo "FetchPreRelease == false"; else echo "FetchPreRelease == true"; fi && fetchPreRelease ;;
@@ -534,8 +599,19 @@ while true; do
           [Dd]*) if [ "$RipDpi" == 1 ]; then echo "RipDpi == Enabled"; else echo "RipDpi == Disabled"; fi && ripDpi ;;
           [Rr]*) if [ "$RipLib" == 1 ]; then echo "RipLib == Enabled"; else echo "RipLib == Disabled"; fi && ripLib ;;
           [Ss]*) if [ "$ChangeRVXSource" == 0 ]; then echo "ChangeRVXSource == No"; else echo "ChangeRVXSource == Yes"; fi && changeRVXSource ;;
+          [Tt]*) 
+            if [[ ( -f "$simplifyJson" && jq -e '.PAT' "$simplifyJson" >/dev/null 2>&1 ) || ( ! gh auth status 2>/dev/null && -f "$HOME/.config/gh/hosts.yml" ) ]]; then
+              if jq -e '.PAT' "$simplifyJson" >/dev/null 2>&1; then
+                echo -e "$info ${Green}PAT: ghp_************************************${Reset}"
+              else
+                echo -e "$info ${Green}oauth_token: gho_************************************${Reset}"
+              fi
+            else
+              echo -e "$notice ${Yellow}No GitHub token found!${Reset}"
+              pat  # Call the pat function to create & add GitHub token
+            fi
           [Qq]*) break ;;
-          *) echo -e "$info Invalid input! Please enter P / L / D / R / S." ;;
+          *) echo -e "$info Invalid input! Please enter P / L / D / R / S / T." ;;
         esac
       done
       sleep 3

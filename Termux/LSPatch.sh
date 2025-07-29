@@ -27,6 +27,21 @@ LSPatch="$Simplify/LSPatch"
 SimplUsr="/sdcard/Simplify"  # /storage/emulated/0/Simplify dir
 mkdir -p "$Simplify" "$LSPatch" "$SimplUsr"  # Create $Simplify, $LSPatch and $SimplUsr dir if it does't exist
 Download="/sdcard/Download"  # Download dir
+simplifyJson="$Simplify/simplify.json"  # Configuration file to store simplify settings
+if [[ ( -f "$HOME/.config/gh/hosts.yml" ) && ( ! grep -q "{}" "$HOME/.config/gh/hosts.yml" 2>/dev/null || ! gh auth status 2>/dev/null ) ]]; then
+  # oauth_token: gho_************************************
+  token=$(grep -A2 "users:" ~/.config/gh/hosts.yml | grep -v "users:" | grep -A1 "oauth_token:" | awk '/oauth_token:/ {getline; print $2}')
+elif [ -f "$simplifyJson" ] && jq -e '.PAT' "$simplifyJson" >/dev/null 2>&1; then
+  # PAT: ghp_************************************
+  token=$(jq -r '.PAT' "$simplifyJson" 2>/dev/null)
+else
+  token=""
+fi
+if [ -z "$token" ]; then
+  auth="-H \"Authorization: Bearer $token\""
+else
+  auth=""
+fi
 
 # --- Checking Android Version ---
 if [ $Android -le 4 ]; then
@@ -349,8 +364,8 @@ while true; do
       bash $Simplify/dlGitHub.sh "REAndroid" "APKEditor" "latest" ".jar" "$Simplify"
       APKEditor=$(find "$Simplify" -type f -name "APKEditor-*.jar" -print -quit)
       $PREFIX/lib/jvm/java-21-openjdk/bin/java -jar $APKEditor m -i $stock_apks_path -o "$stock_apk_path"
-      releasesTagName=$(curl -s "https://api.github.com/repos/revenge-mod/revenge-xposed/releases/latest" | jq -r '.tag_name')  # 1202
-      releasesName=$(curl -s "https://api.github.com/repos/revenge-mod/revenge-xposed/releases/latest" | jq -r '.name')  # 1.2.2
+      releasesTagName=$(curl -s ${auth} "https://api.github.com/repos/revenge-mod/revenge-xposed/releases/latest" | jq -r '.tag_name')  # 1202
+      releasesName=$(curl -s ${auth} "https://api.github.com/repos/revenge-mod/revenge-xposed/releases/latest" | jq -r '.name')  # 1.2.2
       dlLink="https://github.com/revenge-mod/revenge-xposed/releases/download/$releasesTagName/app-release.apk"
       module_apk_path="$LSPatch/revenge-xposed-${releasesName}.apk"
       curl -L --progress-bar -C - -o "$module_apk_path" "$dlLink"
@@ -389,8 +404,8 @@ while true; do
       Type="APK"
       Arch=("$cpuAbi")
       stock_apk_path=("$Download/${appName[0]}_v${pkgVersion}-$cpuAbi.apk")
-      releasesTagName=$(curl -s "https://api.github.com/repos/Xposed-Modules-Repo/io.github.vvb2060.callrecording/releases/latest" | jq -r '.tag_name')  # 2-1.1
-      releasesName=$(curl -s "https://api.github.com/repos/Xposed-Modules-Repo/io.github.vvb2060.callrecording/releases/latest" | jq -r '.name')  # 1.1
+      releasesTagName=$(curl -s ${auth} "https://api.github.com/repos/Xposed-Modules-Repo/io.github.vvb2060.callrecording/releases/latest" | jq -r '.tag_name')  # 2-1.1
+      releasesName=$(curl -s ${auth} "https://api.github.com/repos/Xposed-Modules-Repo/io.github.vvb2060.callrecording/releases/latest" | jq -r '.name')  # 1.1
       dlUrl="https://github.com/Xposed-Modules-Repo/io.github.vvb2060.callrecording/releases/download/${releasesTagName}/app-release.apk"
       curl -L --progress-bar -C - -o "$LSPatch/callrecording-${releasesName}.apk" "$dlUrl"
       module_apk_path=$(find "$LSPatch" -type f -name "callrecording-*.apk")

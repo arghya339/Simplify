@@ -33,6 +33,20 @@ dataJson="$Simplify/data.json"  # Data file to store simplify dlPatchesApp data
 simplifyJson="$Simplify/simplify.json"  # Configuration file to store simplify settings
 ChangeRVXSource="$(jq -r '.ChangeRVXSource' "$simplifyJson" 2>/dev/null)"
 FetchPreRelease=$(jq -r '.FetchPreRelease' "$simplifyJson" 2>/dev/null)
+if [[ ( -f "$HOME/.config/gh/hosts.yml" ) && ( ! grep -q "{}" "$HOME/.config/gh/hosts.yml" 2>/dev/null || ! gh auth status 2>/dev/null ) ]]; then
+  # oauth_token: gho_************************************
+  token=$(grep -A2 "users:" ~/.config/gh/hosts.yml | grep -v "users:" | grep -A1 "oauth_token:" | awk '/oauth_token:/ {getline; print $2}')
+elif [ -f "$simplifyJson" ] && jq -e '.PAT' "$simplifyJson" >/dev/null 2>&1; then
+  # PAT: ghp_************************************
+  token=$(jq -r '.PAT' "$simplifyJson" 2>/dev/null)
+else
+  token=""
+fi
+if [ -z "$token" ]; then
+  auth="-H \"Authorization: Bearer $token\""
+else
+  auth=""
+fi
 
 # --- Checking Android Version ---
 if [ $Android -le 3 ]; then
@@ -75,11 +89,11 @@ dlPatchesApp() {
     if [ $Android -eq 5 ]; then
       tag="v0.2.22.212658-212658001"
     elif [ "$Android" -ge "6" ]; then
-      tag=$(curl -s "https://api.github.com/repos/$owner/$repo/releases/latest" | jq -r '.tag_name')
+      tag=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases/latest" | jq -r '.tag_name')
     fi
     local url="https://github.com/$owner/$repo/releases/download/$tag/microg.apk"
   elif [ "$repo" == "Nobook" ]; then
-    tag=$(curl -s "https://api.github.com/repos/$owner/$repo/releases/latest" | jq -r '.tag_name')
+    tag=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases/latest" | jq -r '.tag_name')
     local url="https://github.com/$owner/$repo/releases/download/$tag/Nobook_$tag.apk"
   else
     local url="https://github.com/$owner/$repo/releases/download/all/$assets"
@@ -91,7 +105,7 @@ dlPatchesApp() {
   # read the updated_at value for the specified asset
   if [ "$repo" == "ReVancedApp-Actions" ] || [ "$repo" == "Revanced-And-Revanced-Extended-Non-Root" ]; then
     app_updated_at=$(jq --arg assets "$assets" -r '.[] | select(.assets == $assets) | .updated_at' $dataJson)
-    updated_at=$(curl -s "https://api.github.com/repos/$owner/$repo/releases/latest" | jq -r --arg assets "$assets" '.assets[] | select(.name == $assets) | .updated_at')
+    updated_at=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases/latest" | jq -r --arg assets "$assets" '.assets[] | select(.name == $assets) | .updated_at')
     if [ "$app_updated_at" == "$updated_at" ]; then
       echo -e "$notice ${Yellow}$appName Already up to date!${Reset}"
       dlIs="0"
