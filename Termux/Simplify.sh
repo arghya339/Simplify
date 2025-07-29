@@ -414,7 +414,7 @@ changeRVXSource() {
 
 pat() {
   while true; do
-    if [[ ( -f "$HOME/.config/gh/hosts.yml" && ! grep -q "{}" "$HOME/.config/gh/hosts.yml" 2>/dev/null ) || ( -f "$simplifyJson" && jq -e '.PAT' "$simplifyJson" >/dev/null 2>&1 ) ]]; then
+    if [[ -f "$HOME/.config/gh/hosts.yml" && ! grep -q "{}" "$HOME/.config/gh/hosts.yml" 2>/dev/null || -f "$simplifyJson" && jq -e '.PAT' "$simplifyJson" >/dev/null 2>&1 ]]; then
       echo -e "${info} You already have a GitHub token!"
       echo -e "${Yellow}Do you want to delete it? [Y/n]${Reset} \c" && read userInput
       case "$userInput" in
