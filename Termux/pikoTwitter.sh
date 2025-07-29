@@ -30,7 +30,7 @@ Download="/sdcard/Download"  # Download dir
 simplifyJson="$Simplify/simplify.json"  # Configuration file to store simplify settings
 FetchPreRelease=$(jq -r '.FetchPreRelease' "$simplifyJson" 2>/dev/null)
 RipLib="$(jq -r '.RipLib' "$simplifyJson" 2>/dev/null)"
-if [[ ( -f "$HOME/.config/gh/hosts.yml" ) && ( ! grep -q "{}" "$HOME/.config/gh/hosts.yml" 2>/dev/null || ! gh auth status 2>/dev/null ) ]]; then
+if { [ -f "$HOME/.config/gh/hosts.yml" ] && ! grep -q "{}" "$HOME/.config/gh/hosts.yml" 2>/dev/null; } || ! gh auth status 2>/dev/null; then
   # oauth_token: gho_************************************
   token=$(grep -A2 "users:" ~/.config/gh/hosts.yml | grep -v "users:" | grep -A1 "oauth_token:" | awk '/oauth_token:/ {getline; print $2}')
 elif [ -f "$simplifyJson" ] && jq -e '.PAT' "$simplifyJson" >/dev/null 2>&1; then

@@ -18,7 +18,7 @@ Yellow="\033[93m"
 Reset="\033[0m"
 
 simplifyJson="$Simplify/simplify.json"  # Configuration file to store simplify settings
-if [[ ( -f "$HOME/.config/gh/hosts.yml" ) && ( ! grep -q "{}" "$HOME/.config/gh/hosts.yml" 2>/dev/null || ! gh auth status 2>/dev/null ) ]]; then
+if { [ -f "$HOME/.config/gh/hosts.yml" ] && ! grep -q "{}" "$HOME/.config/gh/hosts.yml" 2>/dev/null; } || ! gh auth status 2>/dev/null; then
   # oauth_token: gho_************************************
   token=$(grep -A2 "users:" ~/.config/gh/hosts.yml | grep -v "users:" | grep -A1 "oauth_token:" | awk '/oauth_token:/ {getline; print $2}')
 elif [ -f "$simplifyJson" ] && jq -e '.PAT' "$simplifyJson" >/dev/null 2>&1; then
