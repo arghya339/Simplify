@@ -382,7 +382,7 @@ comment
 if  [[ $Android -ge 9  &&  ( "$cpuAbi" == "arm64-v8a" || "$cpuAbi" == "x86_64" ) ]]; then
   Instagram="Instagram"
   #Facebook="Facebook"
-  fbMessenger=("Facebook Messenger")
+  fbMessenger="Facebook\ Messenger"
   Threads="Threads"
 elif [[ $Android -ge 8  &&  ( "$cpuAbi" == "armeabi-v7a" || "$cpuAbi" == "x86" ) ]]; then
   #Facebook="Facebook"
@@ -390,11 +390,11 @@ elif [[ $Android -ge 8  &&  ( "$cpuAbi" == "armeabi-v7a" || "$cpuAbi" == "x86" )
 elif [[ $Android -ge 7  &&  ( "$cpuAbi" == "armeabi-v7a" || "$cpuAbi" == "x86" ) ]]; then
   Instagram="Instagram"
 elif [[ $Android -ge 5  &&  ( "$cpuAbi" == "armeabi-v7a" || "$cpuAbi" == "x86" ) ]]; then
-  fbMessenger=("Facebook Messenger")
+  fbMessenger="Facebook\ Messenger"
 fi
 
 if [ $cpuAbi == "arm64-v8a" ] || [ $cpuAbi == "armeabi-v7a" ]; then
-  amazonPrimeVideo=("Amazon Prime Video")
+  amazonPrimeVideo="Amazon\ Prime\ Video"
 fi
 
 if  [[ $Android -ge 11  &&  ( "$cpuAbi" == "arm64-v8a" || "$cpuAbi" == "armeabi-v7a" ) ]]; then
@@ -409,17 +409,17 @@ if [ $Android -ge 12 ]; then
     Spotify
     TikTok
     Google\ Photos
-    "$Instagram"
-    "$Facebook"
-    "${fbMessenger[0]}"
+    $Instagram
+    $Facebook
+    ${fbMessenger}
     Lightroom
     Photomath
     Duolingo
     RAR
-    "$amazonPrimeVideo"
+    ${amazonPrimeVideo}
     Twitch
     Tumblr
-    "$Threads"
+    $Threads
     Strava
     SoundCloud
     Proton\ Mail
@@ -434,17 +434,17 @@ elif [ $Android -eq 11 ]; then
     Spotify
     TikTok
     Google\ Photos
-    "$Instagram"
-    "$Facebook"
-    "${fbMessenger[0]}"
+    $Instagram
+    $Facebook
+    ${fbMessenger}
     Lightroom
     Photomath
     Duolingo
     RAR
-    "$amazonPrimeVideo"
+    ${amazonPrimeVideo}
     Twitch
     Tumblr
-    "$Threads"
+    $Threads
     Strava
     SoundCloud
     Proton\ Mail
@@ -458,17 +458,17 @@ elif [ $Android -eq 10 ]; then
     Spotify
     TikTok
     Google\ Photos
-    "$Instagram"
-    "$Facebook"
-    "${fbMessenger[0]}"
+    $Instagram
+    $Facebook
+    ${fbMessenger}
     Lightroom
     Photomath
     Duolingo
     RAR
-    "$amazonPrimeVideo"
+    ${amazonPrimeVideo}
     Twitch
     Tumblr
-    "$Threads"
+    $Threads
     Strava
     SoundCloud
     Proton\ Mail
@@ -482,16 +482,16 @@ elif [ $Android -eq 9 ]; then
     Spotify
     TikTok
     Google\ Photos
-    "$Instagram"
-    "$Facebook"
-    "${fbMessenger[0]}"
+    $Instagram
+    $Facebook
+    ${fbMessenger}
     Lightroom
     Photomath
     RAR
-    "$amazonPrimeVideo"
+    ${amazonPrimeVideo}
     Twitch
     Tumblr
-    "$Threads"
+    $Threads
     Strava
     SoundCloud
     Proton\ Mail
@@ -505,16 +505,16 @@ elif [ $Android -eq 8 ]; then
     Spotify
     TikTok
     Google\ Photos
-    "$Instagram"
-    "$Facebook"
-    "${fbMessenger[0]}"
+    $Instagram
+    $Facebook
+    ${fbMessenger}
     Lightroom
     Photomath
     RAR
-    "$amazonPrimeVideo"
+    ${amazonPrimeVideo}
     Twitch
     Tumblr
-    "$Threads"
+    $Threads
     Strava
     SoundCloud
     Crunchyroll
@@ -526,11 +526,11 @@ elif [ $Android -eq 7 ]; then
     Spotify
     TikTok
     Google\ Photos
-    "$Instagram"
-    "${fbMessenger[0]}"
+    $Instagram
+    ${fbMessenger}
     Photomath
     RAR
-    "$amazonPrimeVideo"
+    ${amazonPrimeVideo}
     Twitch
     Tumblr
     Cricbuzz
@@ -540,10 +540,10 @@ elif [ $Android -eq 6 ]; then
     Quit
     TikTok
     Google\ Photos
-    "${fbMessenger[0]}"
+    ${fbMessenger}
     Photomath
     RAR
-    "$amazonPrimeVideo"
+    ${amazonPrimeVideo}
     Twitch
     Cricbuzz
   )
@@ -552,10 +552,10 @@ elif [ $Android -eq 5 ]; then
     Quit
     TikTok
     Google\ Photos
-    "${fbMessenger[0]}"
+    ${fbMessenger}
     Photomath
     RAR
-    "$amazonPrimeVideo"
+    ${amazonPrimeVideo}
     Twitch
     Cricbuzz
   )
