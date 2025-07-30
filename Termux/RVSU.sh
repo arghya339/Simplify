@@ -241,7 +241,7 @@ build_app() {
 comment
 
 if [ "$cpuAbi" == "arm64-v8a" ]; then
-  googleRecorder="Google\ Recorder"
+  googleRecorder="GoogleRecorder"
 fi
 
 if [ $Android -ge 10 ]; then
@@ -339,7 +339,7 @@ while true; do
       log="$SimplUsr/google-photos-rv_patch-log.txt"
       build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "APKMirror" "stock_apk_path" "photos_patches_args" "$outputAPK" "$log"
       ;;
-    Google\ Recorder)
+    GoogleRecorder)
       pkgName="com.google.android.apps.recorder"
       appName=("Google Recorder")
       pkgVersion="4.2.20230801.561280372"
