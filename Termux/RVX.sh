@@ -26,6 +26,8 @@ Simplify="$HOME/Simplify"  # /data/data/com.termux/files/home/Simplify dir
 RVX="$Simplify/RVX"
 SimplUsr="/sdcard/Simplify"  # /storage/emulated/0/Simplify dir
 mkdir -p "$Simplify" "$RVX" "$SimplUsr"  # Create $Simplify, $RVX and $SimplUsr dir if it does't exist
+RVX6_7="$Simplify/RVX6-7"  # RVX for Android 6 and 7
+[[ $Android -eq 7 || $Android -eq 6 ]] && mkdir -p "$RVX6_7"  # Create $RVX6_7 dir if Android version is 6 or 7
 Download="/sdcard/Download"  # Download dir
 BugReportUrl="https://github.com/inotia00/ReVanced_Extended/issues/new?template=bug-report.yml"
 simplifyJson="$Simplify/simplify.json"  # Configuration file to store simplify settings
@@ -133,6 +135,12 @@ patch_app() {
   local log=$4
   local appName="$5"
   local Url=$6
+  
+  if [[ ( $Android -eq 7 || $Android -eq 6 ) && "$appName" == "YouTube" ]]; then
+    bash $Simplify/dlGitHub.sh "kitadai31" "revanced-patches" "$release" ".rvp" "$RVX6_7"
+    PatchesRvp=$(find "$RVX6_7" -type f -name "patches-*.rvp" -print -quit)
+    echo -e "$info ${Blue}PatchesRvp:${Reset} $PatchesRvp"
+  fi
   
   $PREFIX/lib/jvm/java-21-openjdk/bin/java -jar $ReVancedCLIJar patch -p $PatchesRvp \
     -o "$outputAPK" "$stock_apk_path" \
