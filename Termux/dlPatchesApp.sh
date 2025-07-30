@@ -142,17 +142,17 @@ dlPatchesApp() {
 if  [[ $Android -ge 9  &&  ( "$cpuAbi" == "arm64-v8a" || "$cpuAbi" == "x86_64" ) ]]; then
   Instagram="Instagram"
   #Facebook="Facebook"
-  fbMessenger=("Facebook Messenger")
+  fbMessenger="Facebook\ Messenger"
 #elif [[ $Android -ge 8  &&  ( "$cpuAbi" == "armeabi-v7a" || "$cpuAbi" == "x86" ) ]]; then
   #Facebook="Facebook"
 elif [[ $Android -ge 7  &&  ( "$cpuAbi" == "armeabi-v7a" || "$cpuAbi" == "x86" ) ]]; then
   Instagram="Instagram"
 elif [[ $Android -ge 5  &&  ( "$cpuAbi" == "armeabi-v7a" || "$cpuAbi" == "x86" ) ]]; then
-  fbMessenger=("Facebook Messenger")
+  fbMessenger="Facebook\ Messenger"
 fi
 
 if [ $cpuAbi == "arm64-v8a" ] || [ $cpuAbi == "armeabi-v7a" ]; then
-  novaLauncher=("Nova Launcher")
+  novaLauncher="Nova\ Launcher"
 fi
 
 if  [[ $Android -ge 11  &&  ( "$cpuAbi" == "arm64-v8a" || "$cpuAbi" == "armeabi-v7a" ) ]]; then
@@ -172,7 +172,7 @@ if [ $Android -ge 10 ]; then
     $Instagram
     $Facebook
     Nobook
-    "${fbMessenger[0]}"
+    ${fbMessenger}
     Twitter
     Reddit
     Adobe\ Lightroom
@@ -183,7 +183,7 @@ if [ $Android -ge 10 ]; then
     Tumblr
     Strava
     SoundCloud
-    "${novaLauncher[0]}"
+    ${novaLauncher}
     Tasker
   )
 elif [ $Android -eq 9 ]; then
@@ -199,7 +199,7 @@ elif [ $Android -eq 9 ]; then
     $Instagram
     $Facebook
     Nobook
-    "${fbMessenger[0]}"
+    ${fbMessenger}
     Twitter
     Reddit
     Adobe\ Lightroom
@@ -209,7 +209,7 @@ elif [ $Android -eq 9 ]; then
     Tumblr
     Strava
     SoundCloud
-    "${novaLauncher[0]}"
+    ${novaLauncher}
     Tasker
   )
 elif [ $Android -eq 8 ]; then
@@ -225,7 +225,7 @@ elif [ $Android -eq 8 ]; then
     $Instagram
     $Facebook
     Nobook
-    "${fbMessenger[0]}"
+    ${fbMessenger}
     Twitter
     Adobe\ Lightroom
     Photomath
@@ -234,7 +234,7 @@ elif [ $Android -eq 8 ]; then
     Tumblr
     Strava
     SoundCloud
-    "${novaLauncher[0]}"
+    ${novaLauncher}
     Tasker
   )
 elif [ $Android -eq 7 ]; then
@@ -248,7 +248,7 @@ elif [ $Android -eq 7 ]; then
     Google\ Photos
     $Instagram
     Nobook
-    "${fbMessenger[0]}"
+    ${fbMessenger}
     Photomath
     RAR
     Twitch
@@ -264,7 +264,7 @@ elif [ $Android -eq 6 ]; then
     TikTok
     Google\ Photos
     Nobook
-    "${fbMessenger[0]}"
+    ${fbMessenger}
     Photomath
     RAR
     Twitch
@@ -278,7 +278,7 @@ elif [ $Android -eq 5 ]; then
     TikTok
     Google\ Photos
     Nobook
-    "${fbMessenger[0]}"
+    ${fbMessenger}
     Photomath
     RAR
     Twitch
