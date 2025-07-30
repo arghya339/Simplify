@@ -241,7 +241,7 @@ build_app() {
 comment
 
 if [ "$cpuAbi" == "arm64-v8a" ]; then
-  googleRecorder=("Google Recorder")
+  googleRecorder="Google\ Recorder"
 fi
 
 if [ $Android -ge 10 ]; then
@@ -249,7 +249,7 @@ if [ $Android -ge 10 ]; then
     Quit
     YouTube
     Google\ Photos
-    "${googleRecorder[0]}"
+    ${googleRecorder}
   )
 elif [ $Android -eq 9 ]; then
   apps=(
