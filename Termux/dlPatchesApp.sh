@@ -142,17 +142,17 @@ dlPatchesApp() {
 if  [[ $Android -ge 9  &&  ( "$cpuAbi" == "arm64-v8a" || "$cpuAbi" == "x86_64" ) ]]; then
   Instagram="Instagram"
   #Facebook="Facebook"
-  fbMessenger="Facebook\ Messenger"
+  fbMessenger="FacebookMessenger"
 #elif [[ $Android -ge 8  &&  ( "$cpuAbi" == "armeabi-v7a" || "$cpuAbi" == "x86" ) ]]; then
   #Facebook="Facebook"
 elif [[ $Android -ge 7  &&  ( "$cpuAbi" == "armeabi-v7a" || "$cpuAbi" == "x86" ) ]]; then
   Instagram="Instagram"
 elif [[ $Android -ge 5  &&  ( "$cpuAbi" == "armeabi-v7a" || "$cpuAbi" == "x86" ) ]]; then
-  fbMessenger="Facebook\ Messenger"
+  fbMessenger="FacebookMessenger"
 fi
 
 if [ $cpuAbi == "arm64-v8a" ] || [ $cpuAbi == "armeabi-v7a" ]; then
-  novaLauncher="Nova\ Launcher"
+  novaLauncher="NovaLauncher"
 fi
 
 if  [[ $Android -ge 11  &&  ( "$cpuAbi" == "arm64-v8a" || "$cpuAbi" == "armeabi-v7a" ) ]]; then
@@ -483,7 +483,7 @@ while true; do
       activityPatches="com.ycngmn.nobook/.MainActivity"
       dlPatchesApp "${appName}" "$owner" "$repo" "$assets" "$pkgPatches" "$activityPatches"
       ;;
-    Facebook\ Messenger)
+    FacebookMessenger)
       appName="Facebook Messenger"
       owner="FiorenMas"
       repo="Revanced-And-Revanced-Extended-Non-Root"
@@ -626,7 +626,7 @@ while true; do
       activityPatches="com.soundcloud.android/.launcher.LauncherActivity"
       dlPatchesApp "${appName}" "$owner" "$repo" "$assets" "$pkgPatches" "$activityPatches"
       ;;
-    Nova\ Launcher)
+    NovaLauncher)
       appName="Nova Launcher"
       owner="FiorenMas"
       repo="Revanced-And-Revanced-Extended-Non-Root"
