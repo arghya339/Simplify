@@ -382,7 +382,7 @@ comment
 if  [[ $Android -ge 9  &&  ( "$cpuAbi" == "arm64-v8a" || "$cpuAbi" == "x86_64" ) ]]; then
   Instagram="Instagram"
   #Facebook="Facebook"
-  fbMessenger="Facebook\ Messenger"
+  fbMessenger="FacebookMessenger"
   Threads="Threads"
 elif [[ $Android -ge 8  &&  ( "$cpuAbi" == "armeabi-v7a" || "$cpuAbi" == "x86" ) ]]; then
   #Facebook="Facebook"
@@ -390,11 +390,11 @@ elif [[ $Android -ge 8  &&  ( "$cpuAbi" == "armeabi-v7a" || "$cpuAbi" == "x86" )
 elif [[ $Android -ge 7  &&  ( "$cpuAbi" == "armeabi-v7a" || "$cpuAbi" == "x86" ) ]]; then
   Instagram="Instagram"
 elif [[ $Android -ge 5  &&  ( "$cpuAbi" == "armeabi-v7a" || "$cpuAbi" == "x86" ) ]]; then
-  fbMessenger="Facebook\ Messenger"
+  fbMessenger="FacebookMessenger"
 fi
 
 if [ $cpuAbi == "arm64-v8a" ] || [ $cpuAbi == "armeabi-v7a" ]; then
-  amazonPrimeVideo="Amazon\ Prime\ Video"
+  amazonPrimeVideo="AmazonPrimeVideo"
 fi
 
 if  [[ $Android -ge 11  &&  ( "$cpuAbi" == "arm64-v8a" || "$cpuAbi" == "armeabi-v7a" ) ]]; then
@@ -688,7 +688,7 @@ while true; do
       activityPatches="com.facebook.katana/.LoginActivity"
       build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "APKMirror" "facebook_patches_args" "$pkgName" "$activityPatches" "${Os[0]}" "$Dpi" "${Or[0]}"
       ;;
-    Facebook\ Messenger)
+    FacebookMessenger)
       pkgName="com.facebook.orca"
       appName=("Facebook Messenger")
       pkgVersion="517.0.0.41.109"
@@ -758,7 +758,7 @@ while true; do
       activityPatches="com.rarlab.rar/.MainActivity"
       build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "APKMirror" "rar_patches_args" "$pkgName" "$activityPatches" "" "" ""
       ;;
-    Amazon\ Prime\ Video)
+    AmazonPrimeVideo)
       pkgName="com.amazon.avod.thirdpartyclient"
       appName=("Amazon Prime Video")
       pkgVersion="3.0.412"
