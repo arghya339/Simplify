@@ -160,7 +160,7 @@ build_app() {
 comment
 
 if [ $cpuAbi == "arm64-v8a" ] || [ $cpuAbi == "armeabi-v7a" ]; then
-  novaLauncher="Nova\ Launcher"
+  novaLauncher="NovaLauncher"
 fi
 
 if [ $Android -ge 8 ]; then
@@ -199,7 +199,7 @@ while true; do
   fi
 
   case ${apps[$idx]} in
-    Nova\ Launcher)
+    NovaLauncher)
       pkgName="com.teslacoilsw.launcher"
       appName=("Nova Launcher")
       #pkgVersion="8.0.18"
