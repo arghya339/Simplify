@@ -160,26 +160,16 @@ build_app() {
 comment
 
 if [ $cpuAbi == "arm64-v8a" ] || [ $cpuAbi == "armeabi-v7a" ]; then
-  novaLauncher=("Nova Launcher")
+  novaLauncher="Nova\ Launcher"
 fi
 
 if [ $Android -ge 8 ]; then
   apps=(
     Quit
-    "${novaLauncher[0]}"
+    ${novaLauncher}
     Tasker
   )
-elif [ $Android -eq 7 ]; then
-  apps=(
-    Quit
-    Tasker
-  )
-elif [ $Android -eq 6 ]; then
-  apps=(
-    Quit
-    Tasker
-  )
-elif [ $Android -eq 5 ]; then
+elif [ $Android -eq 7 ] || [ $Android -eq 6 ] || [ $Android -eq 5 ]; then
   apps=(
     Quit
     Tasker
