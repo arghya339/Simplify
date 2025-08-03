@@ -85,6 +85,7 @@ getVersion() {
 patch_app() {
   local -n stock_apk_ref=$1
   local outputAPK=$2
+  without_ext="${outputAPK%.*}"  # remove file extension (.apk)
   local log=$3
   local appName=$4
   
@@ -96,6 +97,8 @@ patch_app() {
     echo -e "$bad Oops, $appName Patching failed !! Logs saved to "$log". Share the Patchlog to developer."
     termux-open-url "https://github.com/indrastorms/Dropped-Patches/issues/new"
     termux-open --send "$log"
+  else
+    rm "$without_ext-options.json" && rm "$without_ext.keystore"
   fi
 }
 
