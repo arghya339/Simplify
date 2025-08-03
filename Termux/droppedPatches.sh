@@ -215,7 +215,7 @@ while true; do
     NovaLauncher)
       pkgName="com.teslacoilsw.launcher"
       appName=("Nova Launcher")
-      #pkgVersion="8.0.18"
+      pkgVersion="8.0.18"
       if [ -z "$pkgVersion" ]; then
         getVersion "$pkgName"
         pkgVersion="$pkgVersion"
@@ -224,7 +224,7 @@ while true; do
       Arch=("arm64-v8a + armeabi-v7a")
       novaLauncherFileName=$(basename "$(find "$Download" -type f -name "${appName[0]}_v*-${Arch[0]}.apk" -print -quit)")
       nova_launcher_apk_path=("$Download/$novaLauncherFileName")
-      outputAPK="$SimplUsr/nova-launcher-dropped_v${pkgVersion}-$cpuAbi.apk"
+      outputAPK="$SimplUsr/nova-launcher-dropped_v${pkgVersion}-${Arch[0]}.apk"
       log="$SimplUsr/nova-launcher-dropped_patch-log.txt"
       activityPatches="com.teslacoilsw.launcher/.NovaShortcutHandler"
       build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "nova_launcher_apk_path" "$outputAPK" "$log" "$pkgName" "$activityPatches"
@@ -232,17 +232,17 @@ while true; do
     Tasker)
       pkgName="net.dinglisch.android.taskerm"
       appName=("Tasker")
-      #pkgVersion="6.3.13"
-      pkgVersion=""
+      pkgVersion="6.5.11"
+      #pkgVersion=""
       if [ -z "$pkgVersion" ]; then
         getVersion "$pkgName"
         pkgVersion="$pkgVersion"
       fi
       Type="APK"
-      Arch=("arm64-v8a + armeabi-v7a")
+      Arch=("universal")
       taskerFileName=$(basename "$(find "$Download" -type f -name "${appName[0]}_v*-${Arch[0]}.apk" -print -quit)")
       tasker_apk_path=("$Download/$taskerFileName")
-      outputAPK="$SimplUsr/tasker-dropped_v${pkgVersion}-$cpuAbi.apk"
+      outputAPK="$SimplUsr/tasker-dropped_v${pkgVersion}-${Arch[0]}.apk"
       log="$SimplUsr/tasker-dropped_patch-log.txt"
       activityPatches="net.dinglisch.android.taskerm/.Tasker"
       build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "tasker_apk_path" "$outputAPK" "$log" "$pkgName" "$activityPatches"
