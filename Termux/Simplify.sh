@@ -687,7 +687,7 @@ while true; do
       ;;
     [Mm]*)
       while true; do
-        echo -e "V. Spoof Android Version\nA. Spoof Device Architecture\nQ. Quit\n"
+        echo -e "\nV. Spoof Android Version\nA. Spoof Device Architecture\nQ. Quit\n"
         read -r -p "Select: " misc
         case "$misc" in
           [Vv]*) overwriteVersion ;;
