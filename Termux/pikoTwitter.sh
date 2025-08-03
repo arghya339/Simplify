@@ -160,7 +160,7 @@ activityPatches="com.twitter.android/.StartActivity"
 bash $Simplify/APKMdl.sh "$pkgName" "$pkgVersion" "$Type" "${Arch[0]}"  # Download stock apk from APKMirror
 sleep 0.5  # Wait 500 milliseconds
 second=1
-while ture; do
+while true; do
   if [ -f "${stock_apk_path[0]}" ]; then
     break
   fi
