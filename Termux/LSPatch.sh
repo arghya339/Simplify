@@ -360,7 +360,7 @@ while true; do
         archive_path="$LSPatch/snapenhance-$arch-debug.zip"
         pv "$archive_path" | bsdtar -xf - -C "$LSPatch/"
         rm "$archive_path"
-        module_apk_path=$(find "$LSPatch/snapenhance-$arch-debug/" -type f -name "snapenhance-*-$arch-*.apk" -print -quit)
+        module_apk_path=$(find "$LSPatch" -type f -name "snapenhance-*-$arch-*.apk" -print -quit)
       else
         regex="snapenhance_.*-${arch}-release-signed.apk"
         bash $Simplify/dlGitHub.sh "rhunk" "SnapEnhance" "latest" ".apk" "$LSPatch" "$regex"
