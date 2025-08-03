@@ -76,6 +76,19 @@ bash $Simplify/dlGitHub.sh "JingMatrix" "LSPatch" "latest" ".jar" "$LSPatch"
 LSPatchJar=$(find "$LSPatch" -type f -name "lspatch-*.jar" -print -quit)
 echo -e "$info ${Blue}LSPatchJar:${Reset} $LSPatchJar"
 
+dlArtifacts() {
+  owner=$1
+  repo=$2
+  workflow_name=$3
+  artifacts_name=$4
+  
+  workflow_filename=$(curl -sL https://api.github.com/repos/$owner/$repo/actions/workflows | jq --arg workflow_name "$workflow_name" -r '.workflows[] | select(.name == $workflow_name) | .path' | xargs basename)
+  workflow_run_id=$(curl -sL "https://api.github.com/repos/$owner/$repo/actions/workflows/$workflow_filename/runs?per_page=1" | jq -r '.workflow_runs[0].id')
+  archive_download_url=$(curl -s "https://api.github.com/repos/$owner/$repo/actions/runs/$workflow_run_id/artifacts" | jq --arg artifacts_name "$artifacts_name" -r '.artifacts[] | select(.name == $artifacts_name).archive_download_url')
+
+  curl -L ${auth} --progress-bar -o "$LSPatch/$artifacts_name.zip" "$archive_download_url"
+}
+
 #  --- Patch Apps ---
 patch_app() {
   local stock_apk_path=$1
@@ -340,9 +353,17 @@ while true; do
       else
         arch="all"
       fi
-      regex="snapenhance_.*-${arch}-release-signed.apk"
-      bash $Simplify/dlGitHub.sh "rhunk" "SnapEnhance" "latest" ".apk" "$LSPatch" "$regex"
-      module_apk_path=$(find "$LSPatch" -type f -name "snapenhance_*-${arch}-release-signed.apk")
+      if { [ -f "$HOME/.config/gh/hosts.yml" ] && ! grep -q "{}" "$HOME/.config/gh/hosts.yml" 2>/dev/null; } || { [ -f "$simplifyJson" ] && jq -e '.PAT' "$simplifyJson" >/dev/null 2>&1; }; then
+        dlArtifacts "rhunk" "SnapEnhance" "Debug CI" "snapenhance-$arch-debug"
+        archive_path="$LSPatch/snapenhance-$arch-debug.zip"
+        pv "$archive_path" | bsdtar -xf - -C "$LSPatch/"
+        rm "$archive_path"
+        module_apk_path=$(find "$LSPatch/snapenhance-$arch-debug/" -type f -name "snapenhance-*-$arch-*.apk" -print -quit)
+      else
+        regex="snapenhance_.*-${arch}-release-signed.apk"
+        bash $Simplify/dlGitHub.sh "rhunk" "SnapEnhance" "latest" ".apk" "$LSPatch" "$regex"
+        module_apk_path=$(find "$LSPatch" -type f -name "snapenhance_*-${arch}-release-signed.apk")
+      fi
       echo -e "$info module_apk_path: $module_apk_path"
       activityPatches="com.snapchat.android/.LandingPageActivity"
       BugReport="https://github.com/rhunk/SnapEnhance/issues/new?template=bug_report.yml"

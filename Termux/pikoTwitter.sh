@@ -59,29 +59,21 @@ echo -e "$info ${Blue}ReVancedCLIJar:${Reset} $ReVancedCLIJar"
 
 if [ "$FetchPreRelease" -eq 0 ]; then
   release="latest"  # Use latest release
+  tag=$(curl -sL ${auth} "https://api.github.com/repos/crimera/piko/releases/latest" | jq -r '.tag_name')
 else
   release="pre"  # Use pre-release
+  tag=$(curl -sL ${auth} "https://api.github.com/repos/crimera/piko/releases" | jq -r '.[].tag_name | select(contains("dev"))' | head -n 1)
 fi
 
 bash $Simplify/dlGitHub.sh "crimera" "piko" "$release" ".jar" "$pikoTwitter"
 PatchesJar=$(find "$pikoTwitter" -type f -name "piko-twitter-patches-*.jar" -print -quit)
 echo -e "$info ${Blue}PatchesJar:${Reset} $PatchesJar"
+  curl -sL ${auth} "https://api.github.com/repos/crimera/piko/releases/tags/$tag" | jq -r .body | glow  # Display the release notes
 patchesJarFile=$(basename "$PatchesJar")
 if echo "$patchesJarFile" | grep -q "dev" 2>/dev/null; then
   isPreReleases="true"
 else
   isPreReleases=false
-fi
-
-PatchesJson="$pikoTwitter/patches.json"
-if [ -f "$PatchesJson" ]; then
-  rm $PatchesJson
-fi
-#bash $Simplify/dlGitHub.sh "crimera" "piko" "latest" ".json" "$pikoTwitter"
-bash $Simplify/dlGitHub.sh "crimera" "piko" "pre" ".json" "$pikoTwitter"
-echo -e "$info ${Blue}PatchesJson:${Reset} $PatchesJson"
-if [ -f "$pikoTwitter/patches.json" ]; then
-  jq -r '.[] | .compatiblePackages // empty | .[] | {name: .name, version: .versions[-1]} | "\(.name) \(.version)"' $pikoTwitter/patches.json | sort -u | awk '{a[$1]=$2} END{for (i in a) printf "\"%s\" \"%s\"\n", i, a[i]}'
 fi
 
 #bash $Simplify/dlGitHub.sh "crimera" "revanced-integrations" "latest" ".apk" "$pikoTwitter"
@@ -114,18 +106,17 @@ fi
 # Get compatiblePackages version from json
 getVersion() {
   local pkgName="$1"
-  local json="$pikoTwitter/patches.json"
   
   # Get all versions for the package and sort them, then take the highest version
-  pkgVersion=$(jq -r --arg pkg "$pkgName" '[.[] | .compatiblePackages // empty | .[] | select(.name == $pkg and .versions != null) | .versions[]] | sort | last' $json 2>/dev/null)
-  if [ "$pkgVersion" == "null" ]; then
+  pkgVersion=$(java -jar $ReVancedCLIJar list-versions $PatchesJar -f=$pkgName | sed 's/^[[:space:]]*//; s/ (.*//;' | grep -E '^[0-9]|^Any$' | sort -rV | head -n 2 | head -n 1)
+  if [ "$pkgVersion" == "Any" ] || [ "$pkgVersion" == "null" ]; then
     if [ "$isPreReleases" == "true" ]; then
       pkgVersion=$(curl -sL ${auth} "https://api.github.com/repos/crimera/twitter-apk/releases" | jq -r '.[].tag_name' | head -1)  # Last Releases
     else
       pkgVersion=$(curl -sL ${auth} "https://api.github.com/repos/crimera/twitter-apk/releases/latest" | jq -r '.tag_name')  # Latest Releases
     fi
     if [ -z "$pkgVersion" ]; then
-      pkgVersion=$($PREFIX/lib/jvm/java-21-openjdk/bin/java -jar $ReVancedCLIJar list-patches --with-packages $PatchesJar | grep -oP 'Requires X \K[\d.]+-release\.\d+' | sort -u | tail -1)
+      pkgVersion=$($PREFIX/lib/jvm/java-21-openjdk/bin/java -jar $ReVancedCLIJar list-patches -d=true -f=$pkgName -i=false -o=false -p=false -u -v=true $PatchesJar | grep -oP 'Requires X \K[\d.]+-release\.\d+' | sort -rV | head -n 1)
     fi
   fi
 }

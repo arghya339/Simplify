@@ -28,6 +28,17 @@ Dropped="$Simplify/Dropped"
 SimplUsr="/sdcard/Simplify"  # /storage/emulated/0/Simplify dir
 mkdir -p "$Simplify" "$RVX" "$Dropped" "$SimplUsr"  # Create $Simplify, $RV, $RVX and $SimplUsr dir if it does't exist
 Download="/sdcard/Download"  # Download dir
+if [ -f "$HOME/.config/gh/hosts.yml" ] && gh auth status > /dev/null 2>&1; then
+  # oauth_token: gho_************************************
+  token=$(grep -A2 "users:" ~/.config/gh/hosts.yml | grep -v "users:" | grep -A1 "oauth_token:" | awk '/oauth_token:/ {getline; print $2}')
+  auth="-H \"Authorization: Bearer $token\""
+elif [ -f "$simplifyJson" ] && jq -e '.PAT' "$simplifyJson" >/dev/null 2>&1; then
+  # PAT: ghp_************************************
+  token=$(jq -r '.PAT' "$simplifyJson" 2>/dev/null)
+  auth="-H \"Authorization: Bearer $token\""
+else
+  auth=""
+fi
 
 # --- Checking Android Version ---
 if [ $Android -le 4 ]; then
@@ -62,25 +73,12 @@ done
 echo -e "$info ${Blue}cpuAbi:${Reset} $cpuAbi"
 echo -e "$info ${Blue}ripLib:${Reset} $ripLib"
 
-if [ -f "$Dropped/patches.json" ]; then
-  rm $Dropped/patches.json
-  touch "$Dropped/patches.json"  # Create patches json file
-fi
-$PREFIX/lib/jvm/java-21-openjdk/bin/java -jar $ReVancedCLIJar patches -p="$Dropped/patches.json" $PatchesRvp
-if [ $? == 0 ] && [ -f "$Dropped/patches.json" ]; then
-  echo -e "$info patches.json generated successfully."
-  jq -r '.[] | .compatiblePackages // empty | .[] | {name: .name, version: .versions[-1]} | "\(.name) \(.version)"' $Dropped/patches.json | sort -u | awk '{a[$1]=$2} END{for (i in a) printf "\"%s\" \"%s\"\n", i, a[i]}'
-else
-  echo -e "$bad patches.json was not generated!"
-fi
-
 # Get compatiblePackages version from json
 getVersion() {
   local pkgName="$1"
-  local json="$Dropped/patches.json"
   
   # Get all versions for the package and sort them, then take the highest version
-  pkgVersion=$(jq -r --arg pkg "$pkgName" '[.[] | .compatiblePackages // empty | .[] | select(.name == $pkg and .versions != null) | .versions[]] | sort | last' $json 2>/dev/null)
+  pkgVersion=$($PREFIX/lib/jvm/java-21-openjdk/bin/java -jar $ReVancedCLIJar list-versions $PatchesRvp -f=$pkgName | sed 's/^[[:space:]]*//; s/ (.*//;' | grep -E '^[0-9]|^Any$' | sort -rV | head -n 2 | head -n 1)
 }
 
 #  --- Patch Apps ---
@@ -192,6 +190,9 @@ while true; do
   # Validate and respond
   if [ $idx == 0 ]; then
     break  # break the while loop
+  elif [ $idx == "" ]; then
+    tag=$(curl -sL ${auth} "https://api.github.com/repos/indrastorms/Dropped-Patches/releases/latest" | jq -r '.tag_name')
+    curl -sL ${auth} "https://api.github.com/repos/indrastorms/Dropped-Patches/releases/tags/$tag" | jq -r .body | glow  # Display the release notes
   elif [[ $idx =~ ^[0-9]+$ ]] && (( idx >= 0 && idx <= max )); then
     echo -e "$notice You chose: ${apps[$idx]}"
   else

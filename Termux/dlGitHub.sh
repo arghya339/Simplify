@@ -45,6 +45,32 @@ dlGitHub() {
     regex=".*\\${ext}$"  # Simplified regex pattern
   fi
 
+  dl() {
+    local dlUtility=$1
+    local url=$2
+    local output=$3
+    
+    assets_name=$(basename "$output")
+    echo -e "$running Downloading $assets_name.."
+    
+    while true; do
+      if [ "$dlUtility" == "curl" ]; then
+        curl -L -C - --progress-bar -o "$output" "$url"
+        exit_status=$?
+      elif [ "$dlUtility" == "aria2" ]; then
+        aria2c -x 16 -s 16 --console-log-level=error --summary-interval=0 --download-result=hide -c -o "$(basename "$output")" -d "$(dirname "$output")" "$url"
+        exit_status=$?
+        echo  # White Space
+      fi
+      if [ $exit_status -eq 0 ]; then
+        break  # Exit loop on success
+      else
+        echo -e "${bad} ${Red}Download failed! retrying in 5 seconds..${Reset}"
+        sleep 5  # Wait 5 seconds
+      fi
+    done
+  }
+
   if [ "$releases" == "latest" ]; then
     if [ "$repo" == "APKEditor" ]; then
       latestReleases=$(curl -s ${auth} https://api.github.com/repos/$owner/$repo/releases/latest | jq -r '.tag_name | sub("^V"; "")')  # 1.4.3
@@ -84,33 +110,32 @@ dlGitHub() {
       if [ "$fileName" != "$fileBaseName" ]; then
         echo -e "$notice diffs: $fileName ~ $fileBaseName"
         [ -f "$findFile" ] && rm "$findFile"
-        echo -e "$running Downloading $fileName.."
-        curl -L -C - --progress-bar -o "$dir/$fileName" "https://github.com/$owner/$repo/releases/download/v${latestReleases}/$assetsName"
+        dlUrl="https://github.com/$owner/$repo/releases/download/v${latestReleases}/$assetsName"
         findFile="$dir/$fileName"
+        dl "curl" "$dlUrl" "$findFile"
       fi
     elif [ "$repo" == "ReVancedApp-Actions" ] || [ "$repo" == "Revanced-And-Revanced-Extended-Non-Root" ]; then
       [ -f "$findFile" ] && rm "$findFile"
-      echo -e "$running Downloading $assetsName.."
-      aria2c -x 16 -s 16 --console-log-level=error --summary-interval=0 --download-result=hide -c -o "$assetsName" -d "$dir" "https://github.com/$owner/$repo/releases/download/${latestReleases}/$assetsName"
-      echo  # White Space
+      dlUrl="https://github.com/$owner/$repo/releases/download/${latestReleases}/$assetsName"
       findFile="$dir/$assetsName"
+      dl "aria2" "$dlUrl" "$findFile"
     else 
       if [ "$assetsName" != "$fileBaseName" ]; then
         echo -e "$notice diffs: $assetsName ~ $fileBaseName"
         [ -f "$findFile" ] && rm "$findFile"
         # downloading assets
-        echo -e "$running Downloading $assetsName.."
+        findFile="$dir/$assetsName"
         if [ "$repo" == "APKEditor" ]; then
-          curl -L -C - --progress-bar -o "$dir/$assetsName" "https://github.com/$owner/$repo/releases/download/V${latestReleases}/$assetsName"
+          dlUrl="https://github.com/$owner/$repo/releases/download/V${latestReleases}/$assetsName"
+          dl "curl" "$dlUrl" "$findFile"
         else
-          if [ "$repo" == "revanced-cli" ]; then
-            aria2c -x 16 -s 16 --console-log-level=error --summary-interval=0 --download-result=hide -c -o "$assetsName" -d "$dir" "https://github.com/$owner/$repo/releases/download/v${latestReleases}/$assetsName"
-            echo  # White Space
+          dlUrl="https://github.com/$owner/$repo/releases/download/v${latestReleases}/$assetsName"
+          if [ "$repo" == "revanced-cli" ] || { [ "$repo" == "revanced-patches" ] && { [ "$owner" == "inotia00" ] || [ "$owner" == "anddea" ]; }; }; then
+            dl "aria2" "$dlUrl" "$findFile"
           else
-            curl -L -C - --progress-bar -o "$dir/$assetsName" "https://github.com/$owner/$repo/releases/download/v${latestReleases}/$assetsName"
+            dl "curl" "$dlUrl" "$findFile"
           fi
         fi
-        findFile="$dir/$assetsName"
       fi
     fi
     echo -e "$info findFile: ${Cyan}$findFile${Reset}"
@@ -130,14 +155,13 @@ dlGitHub() {
       echo -e "$notice diffs: $preAssetsName ~ $preFileBaseName"
       [ -f "$findFile" ] && rm "$findFile"
       # downloading assets
-      echo -e "$running Downloading $preAssetsName.."
-      if [ "$repo" == "revanced-cli" ]; then
-        aria2c -x 16 -s 16 --console-log-level=error --summary-interval=0 --download-result=hide -c -o "$preAssetsName" -d "$dir" "https://github.com/$owner/$repo/releases/download/v${lastPreReleases}/$preAssetsName"
-        echo  # White Space
-      else
-        curl -L -C - --progress-bar -o "$dir/$preAssetsName" "https://github.com/$owner/$repo/releases/download/v${lastPreReleases}/$preAssetsName"
-      fi
+      dlUrl="https://github.com/$owner/$repo/releases/download/v${lastPreReleases}/$preAssetsName"
       findFile="$dir/$preAssetsName"
+      if [ "$repo" == "revanced-cli" ] || { [ "$repo" == "revanced-patches" ] && { [ "$owner" == "inotia00" ] || [ "$owner" == "anddea" ]; }; }; then
+        dl "aria2" "$dlUrl" "$findFile"
+      else
+        dl "curl" "$dlUrl" "$findFile"
+      fi
     fi
     echo -e "$info findFile: ${Cyan}$findFile${Reset}"
   fi

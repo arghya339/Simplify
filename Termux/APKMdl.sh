@@ -88,7 +88,7 @@ APKMdl() {
   appName=$(echo "$appName" | sed 's/(Android Automotive)//g; s/(Wear OS)//g; s/(Daydream)//g' | xargs)
   versionLink=$(jq -r ".data[] | select(.pname == \"$PKG_NAME\") | .release.link" <<< "$RESPONSE_JSON" | grep -Eo "/apk/[^\"']+" | grep "/apk/.*$second_last_segment" | head -n 1 | sed -E 's/-[0-9].*//')
   selectedApp=$(basename "$versionLink" | sed 's/-android-automotive//g; s/-wear-os//g; s/-daydream//g')  # google-chrome
-  if [ "$VERSION" != "null" ] && [ -n "$VERSION" ]; then
+  if [ "$VERSION" != "Any" ] || [ "$VERSION" != "null" ] && [ -n "$VERSION" ]; then
     VERSION=$(echo "$VERSION" | tr '.' '-')
     version_link="${appLink}${selectedApp}-${VERSION}-release/"
     if ! curl -sL --doh-url "$cloudflareDOH" -A "$USER_AGENT" -H "Referer: https://www.apkmirror.com/" --head --silent --fail "$version_link" >/dev/null 2>&1; then
@@ -102,7 +102,7 @@ APKMdl() {
       version_link="https://www.apkmirror.com$(jq -r ".data[] | select(.pname == \"$PKG_NAME\") | .release.link" <<< "$RESPONSE_JSON")"
     fi
     VERSION=$(echo "$VERSION" | tr '-' '.')
-  elif [ "$VERSION" == "null" ] || [ -z "$VERSION" ]; then
+  elif [ "$VERSION" == "Any" ] || [ "$VERSION" == "null" ] || [ -z "$VERSION" ]; then
     version_link="https://www.apkmirror.com$(jq -r ".data[] | select(.pname == \"$PKG_NAME\") | .release.link" <<< "$RESPONSE_JSON")"
   fi
   
