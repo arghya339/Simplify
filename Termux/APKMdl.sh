@@ -24,9 +24,14 @@ USER_AGENT="Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like G
 AUTH_TOKEN="YXBpLXRvb2xib3gtZm9yLWdvb2dsZS1wbGF5OkNiVVcgQVVMZyBNRVJXIHU4M3IgS0s0SCBEbmJL"
 cloudflareDOH="https://cloudflare-dns.com/dns-query"
 cloudflareIP="1.1.1.1,1.0.0.1"
+Download="/sdcard/Download"  # Download dir
 Simplify="$HOME/Simplify"
-Download="/sdcard/Download"
-cpuAbi=$(getprop ro.product.cpu.abi)  # Get Android architecture
+simplifyJson="$Simplify/simplify.json"  # Configuration file to store simplify settings
+if jq -e '.DeviceArch != null' "$simplifyJson" >/dev/null 2>&1; then
+  cpuAbi=$(jq -r '.DeviceArch' "$simplifyJson" 2>/dev/null)  # Get Device Architecture from json
+else
+  cpuAbi=$(getprop ro.product.cpu.abi)  # Get Android architecture
+fi
 locale=$(getprop persist.sys.locale | cut -d'-' -f1)  # Get System Languages
 density=$(getprop ro.sf.lcd_density)  # Get the device screen density
   # Check and categorize the density
@@ -46,7 +51,6 @@ density=$(getprop ro.sf.lcd_density)  # Get the device screen density
     lcd_dpi="*dpi"
   fi
 
-simplifyJson="$Simplify/simplify.json"  # Configuration file to store simplify settings
 if [ -f "$simplifyJson" ]; then
   RipLocale="$(jq -r '.RipLocale' "$simplifyJson" 2>/dev/null)"
   RipDpi="$(jq -r '.RipDpi' "$simplifyJson" 2>/dev/null)"
