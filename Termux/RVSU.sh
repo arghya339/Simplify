@@ -187,7 +187,7 @@ build_app() {
       break
     fi
     if [ $second -ge 30 ]; then
-      echo -e "$notice Oops, ${appName[0]} APK not found in $Download dir after waiting 30 seconds!"
+      echo -e "$notice Oops, ${appNameRef[0]} APK not found in $Download dir after waiting 30 seconds!"
       break
     fi
     second=$((second + 1))
