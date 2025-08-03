@@ -109,7 +109,7 @@ getVersion() {
   
   # Get all versions for the package and sort them, then take the highest version
   pkgVersion=$(java -jar $ReVancedCLIJar list-versions $PatchesJar -f=$pkgName | sed 's/^[[:space:]]*//; s/ (.*//;' | grep -E '^[0-9]|^Any$' | sort -rV | head -n 2 | head -n 1)
-  if [ "$pkgVersion" == "Any" ] || [ "$pkgVersion" == "null" ]; then
+  if [ -z "$pkgVersion" ] || [ "$pkgVersion" == "Any" ] || [ "$pkgVersion" == "null" ]; then
     if [ "$isPreReleases" == "true" ]; then
       pkgVersion=$(curl -sL ${auth} "https://api.github.com/repos/crimera/twitter-apk/releases" | jq -r '.[].tag_name' | head -1)  # Last Releases
     else
