@@ -85,8 +85,10 @@ dlArtifacts() {
   workflow_filename=$(curl -sL https://api.github.com/repos/$owner/$repo/actions/workflows | jq --arg workflow_name "$workflow_name" -r '.workflows[] | select(.name == $workflow_name) | .path' | xargs basename)
   workflow_run_id=$(curl -sL "https://api.github.com/repos/$owner/$repo/actions/workflows/$workflow_filename/runs?per_page=1" | jq -r '.workflow_runs[0].id')
   archive_download_url=$(curl -s "https://api.github.com/repos/$owner/$repo/actions/runs/$workflow_run_id/artifacts" | jq --arg artifacts_name "$artifacts_name" -r '.artifacts[] | select(.name == $artifacts_name).archive_download_url')
-
-  curl -L ${auth} --progress-bar -o "$LSPatch/$artifacts_name.zip" "$archive_download_url"
+  
+  if [ -n "$token" ]; then
+    curl -L -H "Authorization: Bearer $token" --progress-bar -o "$LSPatch/$artifacts_name.zip" "$archive_download_url"
+  fi
 }
 
 #  --- Patch Apps ---
