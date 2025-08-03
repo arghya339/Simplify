@@ -482,6 +482,69 @@ pat() {
   done
 }
 
+overwriteVersion() {
+  while true; do
+    echo -e "${Yellow}Enter the Android version you want to spoof or '0' to disabled spoof: ${Reset}\c" && read spoofVersion
+    if [[ $spoofVersion =~ ^[0-9]+$ ]]; then  # Check if the input is a valid version format
+      if [ $spoofVersion -eq 0 ]; then
+        echo -e "$running Disabling Android version spoofing.."
+        jq -e 'del(.AndroidVersion)' "$simplifyJson" > temp.json && mv temp.json "$simplifyJson"  # Delete AndroidVersion key from simplify.json
+        echo -e "$good ${Green}Android version spoofing disabled successfully!${Reset}"
+        break
+      elif [ $spoofVersion -lt 4 ]; then
+        echo -e "$notice Android version $spoofVersion is not supported by ReVanced patches! Please enter a valid version that is <= 4."
+      elif [ $spoofVersion -ge 4 ]; then
+        echo -e "$running Spoofing Android version to $spoofVersion.."
+        jq ".AndroidVersion = $spoofVersion" "$simplifyJson" > temp.json && mv temp.json "$simplifyJson"
+        echo -e "$good ${Green}Android version spoofed successfully!${Reset}"
+        break
+      fi
+    else
+      echo -e "$info Invalid Android version format! Please enter a valid version."
+    fi
+  done
+}
+
+overwriteArch() {
+  while true; do
+    echo -e "0. Disabled spoofing\n8. arm64-v8a\n7. armeabi-v7a\n4. x86_64\n6. x86\n"
+    read -r -p "Select: " arch
+    case "$arch" in
+      0)
+        echo -e "$running Disabling device architecture spoofing.."
+        jq -e 'del(.DeviceArch)' "$simplifyJson" > temp.json && mv temp.json "$simplifyJson"  # Delete DeviceArch key from simplify.json
+        echo -e "$good ${Green}Device architecture spoofing disabled successfully!${Reset}"
+        break
+        ;;
+      8)
+        echo -e "$running Spoofing device architecture to arm64-v8a.."
+        jq ".DeviceArch = \"arm64-v8a\"" "$simplifyJson" > temp.json && mv temp.json "$simplifyJson"
+        echo -e "$good ${Green}Device architecture spoofed to arm64-v8a successfully!${Reset}"
+        break
+        ;;
+      7)
+        echo -e "$running Spoofing device architecture to armeabi-v7a.."
+        jq ".DeviceArch = \"armeabi-v7a\"" "$simplifyJson" > temp.json && mv temp.json "$simplifyJson"
+        echo -e "$good ${Green}Device architecture spoofed to armeabi-v7a successfully!${Reset}"
+        break
+        ;;
+      4)
+        echo -e "$running Spoofing device architecture to x86_64.."
+        jq ".DeviceArch = \"x86_64\"" "$simplifyJson" > temp.json && mv temp.json "$simplifyJson"
+        echo -e "$good ${Green}Device architecture spoofed to x86_64 successfully!${Reset}"
+        break
+        ;;
+      6)
+        echo -e "$running Spoofing device architecture to x86.."
+        jq ".DeviceArch = \"x86\"" "$simplifyJson" > temp.json && mv temp.json "$simplifyJson"
+        echo -e "$good ${Green}Device architecture spoofed to x86 successfully!${Reset}"
+        break
+        ;;
+      *) echo -e "$info Invalid input! Please enter 0, 8, 7, 4, 6." ;;
+    esac
+  done
+}
+
 # --- Feature request prompt ---
 feature() {
   echo -e "${Yellow}Do you want any new feature in this script? [Y/n]${Reset}: \c" && read userInput
@@ -538,7 +601,7 @@ while true; do
   clear  # Clear
   # Apply the eye color to the simplify shape and print it
   echo -e "${BoldGreen}$print_simplify${Reset}" && echo ""  # Space
-  echo -e "D   : Download Patches App\nRV  : ReVanced\nRVS : RV SuperUser\nRVX : ReVanced Extended\nRVXS: RVX SuperUser\nPiko: Piko Twitter\nDrop: Dropped Patches\nLS  : LSPatch\nC   : Configuration\nU   : Unmount Apps\nF   : Feature request\nB   : Bug report\nS   : Support\nA   : About\nQ   : Quit\n"
+  echo -e "D   : Download Patches App\nRV  : ReVanced\nRVS : RV SuperUser\nRVX : ReVanced Extended\nRVXS: RVX SuperUser\nPiko: Piko Twitter\nDrop: Dropped Patches\nLS  : LSPatch\nC   : Configuration\nM   : Miscellaneous\nU   : Unmount Apps\nF   : Feature request\nB   : Bug report\nS   : Support\nA   : About\nQ   : Quit\n"
   echo -n "Select Patches source: " && read source
   case $source in
     D|d)
@@ -622,13 +685,24 @@ while true; do
       done
       sleep 3
       ;;
+    [Mm]*)
+      echo -e "V. Spoof Android Version\n A. Spoof Device Architecture\n Q. Quit\n"
+      read -r -p "Select: " misc
+      case "$misc" in
+        [Vv]*) overwriteVersion ;;
+        [Aa]*) overwriteArch ;;
+        [Qq]*) break ;;
+        *) echo -e "$info Invalid input! Please enter V or A." ;;
+      esac
+      sleep 3
+      ;;
     [Uu]*) Unmount && sleep 3 ;;
     [Ff]*) feature && sleep 3 ;;
     [Bb]*) bug && sleep 3 ;;
     [Ss]*) support && sleep 3 ;;
     [Aa]*) about && sleep 3 ;;
     [Qq]*) clear && break ;;
-    *) echo -e "$info Invalid input! Please enter: D / RV / RVS / RVX / RVXS / Piko / Drop / LS / C / U / F / B / S / A / Q" && sleep 3 ;;
+    *) echo -e "$info Invalid input! Please enter: D / RV / RVS / RVX / RVXS / Piko / Drop / LS / C / M / U / F / B / S / A / Q" && sleep 3 ;;
   esac
 done
-##########################################################################################################################################
+##############################################################################################################################################

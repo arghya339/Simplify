@@ -19,15 +19,23 @@ Yellow="\033[93m"
 Reset="\033[0m"
 
 # --- Global Variables ---
-Android=$(getprop ro.build.version.release)  # Get Android version
-cpuAbi=$(getprop ro.product.cpu.abi)  # Get Android arch
-Model=$(getprop ro.product.model)  # Get Device Model
 Simplify="$HOME/Simplify"  # /data/data/com.termux/files/home/Simplify dir
+simplifyJson="$Simplify/simplify.json"  # Configuration file to store simplify settings
+if jq -e '.AndroidVersion != null' "$simplifyJson" >/dev/null 2>&1; then
+  Android=$(jq -r '.AndroidVersion' "$simplifyJson" 2>/dev/null)  # Get Android version from json
+else
+  Android=$(getprop ro.build.version.release)  # Get Android version
+fi
+if jq -e '.DeviceArch != null' "$simplifyJson" >/dev/null 2>&1; then
+  cpuAbi=$(jq -r '.DeviceArch' "$simplifyJson" 2>/dev/null)  # Get Device Architecture from json
+else
+  cpuAbi=$(getprop ro.product.cpu.abi)  # Get Android arch
+fi
+Model=$(getprop ro.product.model)  # Get Device Model
 LSPatch="$Simplify/LSPatch"
 SimplUsr="/sdcard/Simplify"  # /storage/emulated/0/Simplify dir
 mkdir -p "$Simplify" "$LSPatch" "$SimplUsr"  # Create $Simplify, $LSPatch and $SimplUsr dir if it does't exist
 Download="/sdcard/Download"  # Download dir
-simplifyJson="$Simplify/simplify.json"  # Configuration file to store simplify settings
 if [ -f "$HOME/.config/gh/hosts.yml" ] && gh auth status > /dev/null 2>&1; then
   # oauth_token: gho_************************************
   token=$(grep -A2 "users:" ~/.config/gh/hosts.yml | grep -v "users:" | grep -A1 "oauth_token:" | awk '/oauth_token:/ {getline; print $2}')

@@ -17,11 +17,20 @@ Yellow="\033[93m"
 Reset="\033[0m"
 
 # --- Global Veriable ---
-Android=$(getprop ro.build.version.release)  # Get Android version
-cpuAbi=$(getprop ro.product.cpu.abi)  # Get Android arch
+Simplify="$HOME/Simplify"  # /data/data/com.termux/files/home/Simplify dir
+simplifyJson="$Simplify/simplify.json"  # Configuration file to store simplify settings
+if jq -e '.AndroidVersion != null' "$simplifyJson" >/dev/null 2>&1; then
+  Android=$(jq -r '.AndroidVersion' "$simplifyJson" 2>/dev/null)  # Get Android version from json
+else
+  Android=$(getprop ro.build.version.release)  # Get Android version
+fi
+if jq -e '.DeviceArch != null' "$simplifyJson" >/dev/null 2>&1; then
+  cpuAbi=$(jq -r '.DeviceArch' "$simplifyJson" 2>/dev/null)  # Get Device Architecture from json
+else
+  cpuAbi=$(getprop ro.product.cpu.abi)  # Get Android arch
+fi
 Serial=$(su -c 'getprop ro.serialno')  # Get Serial Number required root
 Model=$(getprop ro.product.model)  # Get Device Model
-Simplify="$HOME/Simplify"
 RVX="$Simplify/RVX"
 SimplUsr="/sdcard/Simplify"
 mkdir -p "$Simplify" "$RVX" "$SimplUsr"
@@ -29,7 +38,6 @@ RVX6_7="$Simplify/RVX6-7"  # RVX for Android 6 and 7
 [[ $Android -eq 7 || $Android -eq 6 ]] && mkdir -p "$RVX6_7"  # Create $RVX6_7 dir if Android version is 6 or 7
 Download="/sdcard/Download"
 BugReportUrl="https://github.com/inotia00/ReVanced_Extended/issues/new?template=bug-report.yml"
-simplifyJson="$Simplify/simplify.json"  # Configuration file to store simplify settings
 FetchPreRelease=$(jq -r '.FetchPreRelease' "$simplifyJson" 2>/dev/null)
 RipLib="$(jq -r '.RipLib' "$simplifyJson" 2>/dev/null)"
 ChangeRVXSource="$(jq -r '.ChangeRVXSource' "$simplifyJson" 2>/dev/null)"
