@@ -109,16 +109,22 @@ getVersion() {
   
   # Get all versions for the package and sort them, then take the highest version
   pkgVersion=$($PREFIX/lib/jvm/java-21-openjdk/bin/java -jar $ReVancedCLIJar list-versions $PatchesJar -f=$pkgName | sed 's/^[[:space:]]*//; s/ (.*//;' | grep -E '^[0-9]|^Any$' | sort -rV | head -n 2 | head -n 1)
+  preVersion=$($PREFIX/lib/jvm/java-21-openjdk/bin/java -jar $ReVancedCLIJar list-versions $PatchesJar -f=$pkgName | sed 's/^[[:space:]]*//; s/ (.*//;' | grep -E '^[0-9]|^Any$' | sort -rV | head -n 2 | tail -n 1)
   if [ -z "$pkgVersion" ] || [ "$pkgVersion" == "Any" ] || [ "$pkgVersion" == "null" ]; then
     if [ "$isPreReleases" == "true" ]; then
       pkgVersion=$(curl -sL ${auth} "https://api.github.com/repos/crimera/twitter-apk/releases" | jq -r '.[].tag_name' | head -1)  # Last Releases
     else
       pkgVersion=$(curl -sL ${auth} "https://api.github.com/repos/crimera/twitter-apk/releases/latest" | jq -r '.tag_name')  # Latest Releases
     fi
+    preVersion=$(curl -sL ${auth} "https://api.github.com/repos/crimera/twitter-apk/releases" | jq -r '.[].tag_name' | head -n 2 | tail -n 1)  # Previous Releases
     if [ -z "$pkgVersion" ]; then
       pkgVersion=$($PREFIX/lib/jvm/java-21-openjdk/bin/java -jar $ReVancedCLIJar list-patches -d=true -f=$pkgName -i=false -o=false -p=false -u -v=true $PatchesJar | grep -oP 'Requires X \K[\d.]+-release\.\d+' | sort -rV | head -n 1)
+      preVersion=$($PREFIX/lib/jvm/java-21-openjdk/bin/java -jar $ReVancedCLIJar list-patches -d=true -f=$pkgName -i=false -o=false -p=false -u -v=true $PatchesJar | grep -oP 'Requires X \K[\d.]+-release\.\d+' | sort -rV | head -n 2 | tail -n 1)
     fi
   fi
+
+  pre_stock_apk_path=$(find "$Download" -type f -name "${appName[0]}_v${preVersion}-*.apk" -print -quit)
+  [[ -f "$pre_stock_apk_path" ]] && rm "$pre_stock_apk_path"  # Remove previous stock apk if exists
 }
 
 #  --- Patch Apps ---
