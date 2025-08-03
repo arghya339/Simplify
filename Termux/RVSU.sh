@@ -180,7 +180,7 @@ build_app() {
   else
     bash $Simplify/dlUptodown.sh "${appNameRef[0]}" "$pkgVersion" "$Type" "${archRef[0]}"  # Download stock apk from Uptodown
   fi
-  
+  sleep 0.5  # Wait 500 milliseconds
   if [ -f "${stock_apk_ref[0]}" ]; then
     echo -e "$good ${Green}Downloaded ${appNameRef[0]} APK found:${Reset} ${stock_apk_ref[0]}"
     echo -e "$running Patching ${appNameRef[0]} RV.."
