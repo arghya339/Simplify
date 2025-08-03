@@ -686,14 +686,16 @@ while true; do
       sleep 3
       ;;
     [Mm]*)
-      echo -e "V. Spoof Android Version\nA. Spoof Device Architecture\nQ. Quit\n"
-      read -r -p "Select: " misc
-      case "$misc" in
-        [Vv]*) overwriteVersion ;;
-        [Aa]*) overwriteArch ;;
-        [Qq]*) break ;;
-        *) echo -e "$info Invalid input! Please enter V or A." ;;
-      esac
+      while true; do
+        echo -e "V. Spoof Android Version\nA. Spoof Device Architecture\nQ. Quit\n"
+        read -r -p "Select: " misc
+        case "$misc" in
+          [Vv]*) overwriteVersion ;;
+          [Aa]*) overwriteArch ;;
+          [Qq]*) break ;;
+          *) echo -e "$info Invalid input! Please enter V or A." ;;
+        esac
+      done
       sleep 3
       ;;
     [Uu]*) Unmount && sleep 3 ;;
