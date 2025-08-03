@@ -107,15 +107,16 @@ build_app() {
   local pkgVersion=$3
   local Type=$4
   local -n archRef=$5
-  local -n stock_apk_path=$6
-  local outputAPK=$7
+  local outputAPK=$6
   local fileName=$(basename $outputAPK)
-  local log=$8
-  local pkgPatches=$9
-  local activityPatches=$10
+  local log=$7
+  local pkgPatches=$8
+  local activityPatches=$9
   
 
   bash $Simplify/APKMdl.sh "$pkgName" "$pkgVersion" "$Type" "${archRef[0]}"  # Download stock apk from APKMirror
+  stockFileName=$(basename "$(find "$Download" -type f -name "${appNameRef[0]}_v*-${archRef[0]}.apk" -print -quit)")
+  local stock_apk_path=("$Download/$stockFileName")
   sleep 0.5  # Wait 500 milliseconds
   second=1
   while true; do
@@ -222,12 +223,10 @@ while true; do
       fi
       Type="APK"
       Arch=("arm64-v8a + armeabi-v7a")
-      novaLauncherFileName=$(basename "$(find "$Download" -type f -name "${appName[0]}_v*-${Arch[0]}.apk" -print -quit)")
-      nova_launcher_apk_path=("$Download/$novaLauncherFileName")
       outputAPK="$SimplUsr/nova-launcher-dropped_v${pkgVersion}-${Arch[0]}.apk"
       log="$SimplUsr/nova-launcher-dropped_patch-log.txt"
       activityPatches="com.teslacoilsw.launcher/.NovaShortcutHandler"
-      build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "nova_launcher_apk_path" "$outputAPK" "$log" "$pkgName" "$activityPatches"
+      build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "$outputAPK" "$log" "$pkgName" "$activityPatches"
       ;;
     Tasker)
       pkgName="net.dinglisch.android.taskerm"
@@ -240,12 +239,10 @@ while true; do
       fi
       Type="APK"
       Arch=("universal")
-      taskerFileName=$(basename "$(find "$Download" -type f -name "${appName[0]}_v*-${Arch[0]}.apk" -print -quit)")
-      tasker_apk_path=("$Download/$taskerFileName")
       outputAPK="$SimplUsr/tasker-dropped_v${pkgVersion}-${Arch[0]}.apk"
       log="$SimplUsr/tasker-dropped_patch-log.txt"
       activityPatches="net.dinglisch.android.taskerm/.Tasker"
-      build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "tasker_apk_path" "$outputAPK" "$log" "$pkgName" "$activityPatches"
+      build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "$outputAPK" "$log" "$pkgName" "$activityPatches"
       ;;
   esac  
 done
