@@ -288,7 +288,7 @@ while true; do
   # Validate and respond
   if [ "$idx" == 0 ]; then
     break  # break the while loop
-  elif [ $idx == "" ]; then
+  elif [ "$idx" == "" ] || [ -z "$idx" ]; then
     if [ $release == "latest" ]; then
       tag=$(curl -sL ${auth} "https://api.github.com/repos/$owner/revanced-patches/releases/latest" | jq -r '.tag_name')
     else

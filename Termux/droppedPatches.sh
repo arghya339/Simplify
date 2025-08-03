@@ -188,9 +188,9 @@ while true; do
   read -rp "Enter the index [0-${max}] of the apps you want to patch: " idx
 
   # Validate and respond
-  if [ $idx == 0 ]; then
+  if [ "$idx" == 0 ]; then
     break  # break the while loop
-  elif [ $idx == "" ]; then
+  elif [ "$idx" == "" ] || [ -z "$idx" ]; then
     tag=$(curl -sL ${auth} "https://api.github.com/repos/indrastorms/Dropped-Patches/releases/latest" | jq -r '.tag_name')
     curl -sL ${auth} "https://api.github.com/repos/indrastorms/Dropped-Patches/releases/tags/$tag" | jq -r .body | glow  # Display the release notes
   elif [[ $idx =~ ^[0-9]+$ ]] && (( idx >= 0 && idx <= max )); then
