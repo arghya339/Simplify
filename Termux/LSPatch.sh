@@ -77,10 +77,10 @@ LSPatchJar=$(find "$LSPatch" -type f -name "lspatch-*.jar" -print -quit)
 echo -e "$info ${Blue}LSPatchJar:${Reset} $LSPatchJar"
 
 dlArtifacts() {
-  owner=$1
-  repo=$2
-  workflow_name=$3
-  artifacts_name=$4
+  local owner=$1
+  local repo=$2
+  local workflow_name=${3}
+  local artifacts_name=$4
   
   workflow_filename=$(curl -sL https://api.github.com/repos/$owner/$repo/actions/workflows | jq --arg workflow_name "$workflow_name" -r '.workflows[] | select(.name == $workflow_name) | .path' | xargs basename)
   workflow_run_id=$(curl -sL "https://api.github.com/repos/$owner/$repo/actions/workflows/$workflow_filename/runs?per_page=1" | jq -r '.workflow_runs[0].id')
