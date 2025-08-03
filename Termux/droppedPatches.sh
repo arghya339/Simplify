@@ -122,8 +122,8 @@ build_app() {
     if [ -f "${stock_apk_path[0]}" ]; then
       break
     fi
-    if [ $second -ge 10 ]; then
-      echo -e "$notice Oops, ${appNameRef[0]} APK not found in $Download dir after waiting 10 seconds!"
+    if [ $second -ge 30 ]; then
+      echo -e "$notice Oops, ${appNameRef[0]} APK not found in $Download dir after waiting 30 seconds!"
       break
     fi
     second=$((second + 1))
