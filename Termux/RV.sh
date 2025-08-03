@@ -576,9 +576,9 @@ while true; do
   read -rp "Enter the index [0-${max}] of the apps you want to patch: " idx
 
   # Validate and respond
-  if [ $idx == 0 ]; then
+  if [ "$idx" == 0 ]; then
     break  # break the while loop
-  elif [ $idx == "" ]; then
+  elif [ "$idx" == "" ] || [ -z "$idx" ]; then
     if [ $release == "latest" ]; then
       tag=$(curl -sL ${auth} "https://api.github.com/repos/ReVanced/revanced-patches/releases/latest" | jq -r '.tag_name')
     else

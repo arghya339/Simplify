@@ -177,7 +177,7 @@ pkgInstall "bsdtar"  # bsdtar install/update
 pkgInstall "pv"  # pv install/update
 pkgInstall "grep"  # grep update
 pkgInstall "sed"  # sed update
-pkgInstall "awk"  # awk update
+#pkgInstall "awk"  # awk update
 pkgInstall "glow"  # glow install/update
 if su -c "id" >/dev/null 2>&1; then
   pkgInstall "openssl"  # openssl install/update
