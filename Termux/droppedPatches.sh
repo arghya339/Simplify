@@ -227,7 +227,7 @@ while true; do
         pkgVersion="$pkgVersion"
       fi
       Type="APK"
-      Arch=("universal")
+      Arch=("arm64-v8a + armeabi-v7a")
       taskerFileName=$(basename "$(find "$Download" -type f -name "${appName[0]}_v*-${Arch[0]}.apk" -print -quit)")
       tasker_apk_path=("$Download/$taskerFileName")
       outputAPK="$SimplUsr/tasker-dropped_v${pkgVersion}-$cpuAbi.apk"
