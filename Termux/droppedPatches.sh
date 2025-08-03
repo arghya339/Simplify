@@ -117,6 +117,18 @@ build_app() {
 
   bash $Simplify/APKMdl.sh "$pkgName" "$pkgVersion" "$Type" "${archRef[0]}"  # Download stock apk from APKMirror
   sleep 0.5  # Wait 500 milliseconds
+  second=1
+  while ture; do
+    if [ -f "${stock_apk_path[0]}" ]; then
+      break
+    fi
+    if [ $second -ge 10 ]; then
+      echo -e "$notice Oops, ${appNameRef[0]} APK not found in $Download dir after waiting 10 seconds!"
+      break
+    fi
+    second=$((second + 1))
+    sleep 1  # Wait 1 seconds
+  done
   if [ -f "${stock_apk_path[0]}" ]; then
     echo -e "$good ${Green}Downloaded ${appNameRef[0]} APK found:${Reset} ${stock_apk_path[0]}"
     echo -e "$running Patching ${appNameRef[0]} Dropped.."
