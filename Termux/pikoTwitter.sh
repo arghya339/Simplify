@@ -125,6 +125,7 @@ getVersion() {
 patch_twitter() {
   local -n stock_apk_ref=$1
   local outputAPK=$2
+  without_ext="${outputAPK%.*}"  # remove file extension (.apk)
   local log="$SimplUsr/piko-twitter_patch-log.txt"
   
   $PREFIX/lib/jvm/java-21-openjdk/bin/java -jar $ReVancedCLIJar patch -b $PatchesJar -m $IntegrationsApk \
@@ -136,6 +137,8 @@ patch_twitter() {
     echo -e "$bad Oops, Piko Twitter Patching failed !! Logs saved to "$log". Share the Patchlog to developer."
     termux-open-url "https://github.com/crimera/piko/issues/new"
     termux-open --send "$log"
+  else
+    rm "$without_ext-options.json" && rm "$without_ext.keystore"
   fi
 }
 
