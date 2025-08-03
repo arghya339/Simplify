@@ -483,6 +483,12 @@ pat() {
 }
 
 overwriteVersion() {
+  if jq -e '.AndroidVersion != null' "$simplifyJson" >/dev/null 2>&1; then
+    Android=$(jq -r '.AndroidVersion' "$simplifyJson" 2>/dev/null)  # Get Android version from json
+    echo -e "$info Android version spoofed to $Android!"
+  else
+    echo -e "$info Android version not spoofed yet!"
+  fi
   while true; do
     echo -e "${Yellow}Enter the Android version you want to spoof or '0' to disabled spoof: ${Reset}\c" && read spoofVersion
     if [[ $spoofVersion =~ ^[0-9]+$ ]]; then  # Check if the input is a valid version format
@@ -506,6 +512,12 @@ overwriteVersion() {
 }
 
 overwriteArch() {
+  if jq -e '.DeviceArch != null' "$simplifyJson" >/dev/null 2>&1; then
+    cpuAbi=$(jq -r '.DeviceArch' "$simplifyJson" 2>/dev/null)  # Get Device Architecture from json
+    echo -e "$info Device architecture spoofed to $cpuAbi!"
+  else
+    echo -e "$info Device architecture not spoofed yet!"
+  fi
   while true; do
     echo -e "0. Disabled spoofing\n8. arm64-v8a\n7. armeabi-v7a\n4. x86_64\n6. x86\n"
     read -r -p "Select: " arch
