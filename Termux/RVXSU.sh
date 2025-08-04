@@ -306,6 +306,7 @@ overwriteArch() {
   else
     echo -e "$info Device architecture not spoofed yet!"
   fi
+  while true; do
     echo -e "0. Disabled spoofing\n8. arm64-v8a\n7. armeabi-v7a\n4. x86_64\n6. x86\n"
     read -r -p "Select: " arch
     case "$arch" in
@@ -341,6 +342,7 @@ overwriteArch() {
         ;;
       *) echo -e "$info Invalid input! Please enter 0, 8, 7, 4, 6." ;;
     esac
+  done
   if jq -e '.DeviceArch != null' "$simplifyJson" >/dev/null 2>&1; then
     cpuAbi=$(jq -r '.DeviceArch' "$simplifyJson" 2>/dev/null)  # Get Device Architecture from json
   else
