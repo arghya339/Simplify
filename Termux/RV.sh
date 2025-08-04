@@ -654,7 +654,9 @@ while true; do
   if [ "$idx" == 0 ]; then
     break  # break the while loop
   elif [ "$idx" == "." ]; then
-    overwriteArch  # Call the overwriteArch function
+    while true; do
+      overwriteArch  # Call the overwriteArch function
+    done
   elif [ "$idx" == "" ] || [ -z "$idx" ]; then
     if [ $release == "latest" ]; then
       tag=$(curl -sL ${auth} "https://api.github.com/repos/ReVanced/revanced-patches/releases/latest" | jq -r '.tag_name')
