@@ -175,7 +175,7 @@ patch_app() {
     termux-open --send "$log"
     rm -rf "$without_ext-temporary-files"  # Remove temporary files directory
   else
-    rm "$without_ext.keystore"
+    [[ -f "$without_ext.keystore" ]] && rm "$without_ext.keystore"
   fi
 }
 
@@ -192,7 +192,7 @@ yt_patches_args=(
   -e "Spoof streaming data" -OuseIOSClient
   -e "Settings for YouTube" -OinsertPosition="@string/about_key" -OrvxSettingsLabel=RVX
   -e "Force hide player buttons background"
-  -e=MaterialYou
+  -e=MaterialYou -e Theme
   -e="Return YouTube Username"
   
   # disable patches
@@ -207,7 +207,7 @@ yt_music_patches_args=(
   -e "Visual preferences icons for YouTube Music" -OsettingsMenuIcon="extension"
   -e "Settings for YouTube Music" -OrvxSettingsLabel="RVX"
   -e "Custom header for YouTube Music"
-  -e="Return YouTube Username"
+  -e="Return YouTube Username" -e "Disable music video in album"
   
   -d "GmsCore support"
 )
