@@ -752,6 +752,7 @@ while true; do
     echo -e "$notice You chose: ${apps[$idx]}"
   elif [[ "$idx" =~ ^[0-9]+\?$ ]]; then
     listOfPatches  # Call the listOfPatches function
+    continue
   elif [[ "$idx" =~ ^[aA][rR][cC][hH] ]]; then
     overwriteArch  # Call the overwriteArch function
   elif [ "$idx" == "" ] || [ -z "$idx" ]; then
