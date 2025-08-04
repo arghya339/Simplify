@@ -728,8 +728,8 @@ fi
 while true; do
   # Display the list
   echo -e "$info Available apps:"
-  echo -e "    . CHANGELOG"
-  echo -e "arch. Spoof Device Arch"
+  echo -e "↵   . CHANGELOG"
+  echo -e "Arch. Spoof Device Arch"
   echo -e "i?  . List of Patches"
   for i in "${!apps[@]}"; do
     if [ -n "${apps[$i]}" ] && [ "${apps[$i]}" != "null" ]; then
