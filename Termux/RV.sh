@@ -420,7 +420,8 @@ getListOfPatches() {
 }
 
 listOfPatches() {
-  case ${apps[$idx]} in
+  local clean_idx=${idx%\?}
+  case "${apps[$clean_idx]}" in
     YouTube)
       pkgName="com.google.android.youtube"
       getListOfPatches "$pkgName"
