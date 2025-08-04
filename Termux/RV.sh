@@ -648,7 +648,7 @@ while true; do
     break  # break the while loop
   elif [[ $idx =~ ^[0-9]+$ ]] && (( idx >= 0 && idx <= max )); then
     echo -e "$notice You chose: ${apps[$idx]}"
-  elif [[ "$idx" =~ ^[aA] ]]; then
+  elif [[ "$idx" =~ ^[aA][rR][cC][hH] ]]; then
     overwriteArch  # Call the overwriteArch function
   elif [ "$idx" == "" ] || [ -z "$idx" ]; then
     if [ $release == "latest" ]; then
