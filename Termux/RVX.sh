@@ -277,6 +277,57 @@ build_app() {
   fi
 }
 
+overwriteArch() {
+  if jq -e '.DeviceArch != null' "$simplifyJson" >/dev/null 2>&1; then
+    cpuAbi=$(jq -r '.DeviceArch' "$simplifyJson" 2>/dev/null)  # Get Device Architecture from json
+    echo -e "$info Device architecture spoofed to $cpuAbi!"
+  else
+    echo -e "$info Device architecture not spoofed yet!"
+  fi
+  while true; do
+    echo -e "0. Disabled spoofing\n8. arm64-v8a\n7. armeabi-v7a\n4. x86_64\n6. x86\n"
+    read -r -p "Select: " arch
+    case "$arch" in
+      0)
+        echo -e "$running Disabling device architecture spoofing.."
+        jq -e 'del(.DeviceArch)' "$simplifyJson" > temp.json && mv temp.json "$simplifyJson"  # Delete DeviceArch key from simplify.json
+        echo -e "$good ${Green}Device architecture spoofing disabled successfully!${Reset}"
+        break
+        ;;
+      8)
+        echo -e "$running Spoofing device architecture to arm64-v8a.."
+        jq ".DeviceArch = \"arm64-v8a\"" "$simplifyJson" > temp.json && mv temp.json "$simplifyJson"
+        echo -e "$good ${Green}Device architecture spoofed to arm64-v8a successfully!${Reset}"
+        break
+        ;;
+      7)
+        echo -e "$running Spoofing device architecture to armeabi-v7a.."
+        jq ".DeviceArch = \"armeabi-v7a\"" "$simplifyJson" > temp.json && mv temp.json "$simplifyJson"
+        echo -e "$good ${Green}Device architecture spoofed to armeabi-v7a successfully!${Reset}"
+        break
+        ;;
+      4)
+        echo -e "$running Spoofing device architecture to x86_64.."
+        jq ".DeviceArch = \"x86_64\"" "$simplifyJson" > temp.json && mv temp.json "$simplifyJson"
+        echo -e "$good ${Green}Device architecture spoofed to x86_64 successfully!${Reset}"
+        break
+        ;;
+      6)
+        echo -e "$running Spoofing device architecture to x86.."
+        jq ".DeviceArch = \"x86\"" "$simplifyJson" > temp.json && mv temp.json "$simplifyJson"
+        echo -e "$good ${Green}Device architecture spoofed to x86 successfully!${Reset}"
+        break
+        ;;
+      *) echo -e "$info Invalid input! Please enter 0, 8, 7, 4, 6." ;;
+    esac
+  done
+  if jq -e '.DeviceArch != null' "$simplifyJson" >/dev/null 2>&1; then
+    cpuAbi=$(jq -r '.DeviceArch' "$simplifyJson" 2>/dev/null)  # Get Device Architecture from json
+  else
+    cpuAbi=$(getprop ro.product.cpu.abi)  # Get Android arch
+  fi
+}
+
 # Define the array
 if [ $Android -ge 9 ]; then
   apps=(
@@ -312,6 +363,8 @@ while true; do
   # Validate and respond
   if [ "$idx" == 0 ]; then
     break  # break the while loop
+  elif [ "$idx" == "." ]; then
+    overwriteArch  # Call the overwriteArch function
   elif [ "$idx" == "" ] || [ -z "$idx" ]; then
     if [ $release == "latest" ]; then
       tag=$(curl -sL ${auth} "https://api.github.com/repos/$owner/revanced-patches/releases/latest" | jq -r '.tag_name')
