@@ -190,19 +190,16 @@ yt_patches_args=(
 spotify_patches_args=(
   -e "Change lyrics provider"
   -e "Custom theme"
-  -e "Change package name" -OpackageName="com.spotify.music"
   
   -d "Hide Create button"
 )
 
 tiktok_patches_args=(
   -e "SIM spoof"
-  -e "Change package name" -OackageName="com.zhiliaoapp.musically"
 )
 
 photos_patches_args=(
   -e "GmsCore support" -OgmsCoreVendorGroupId="com.mgoogle"
-  -e "Change package name" -OackageName="app.revanced.android.apps.photos"
 )
 
 instagram_patches_args=()
@@ -211,34 +208,22 @@ facebook_patches_args=()
 
 fb_messenger_patches_args=()
 
-lightroom_patches_args=(
-  -e "Change package name" -OackageName="com.adobe.lrmobile"
-)
+lightroom_patches_args=()
 
-photomath_patches_args=(
-  -e "Change package name" -OackageName="com.microblink.photomath"
-)
+photomath_patches_args=()
 
-duolingo_patches_args=(
-  -e "Change package name" -OackageName="com.duolingo"
-)
+duolingo_patches_args=()
 
-rar_patches_args=(
-  -e "Change package name" -OackageName="com.rarlab.rar"
-)
+rar_patches_args=()
 
 prime_video_patches_args=(
   -e "Rename shared permissions"
-  -e "Change package name" -OackageName="com.amazon.avod.thirdpartyclient"
 )
 
-twitch_patches_args=(
-  -e "Change package name" -OackageName="tv.twitch.android.app"
-)
+twitch_patches_args=()
 
 tumblr_patches_args=(
   -e "Fix old versions"
-  -e "Change package name" -OackageName="com.tumblr"
 )
 
 threads_patches_args=()
