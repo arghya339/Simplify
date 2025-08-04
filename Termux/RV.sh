@@ -414,6 +414,100 @@ overwriteArch() {
   fi
 }
 
+getListOfPatches() {
+  local pkgName="$1"
+  curl -sL 'https://api.revanced.app/v4/patches/list' | jq --arg pkgName "$pkgName" '.[] | select(.compatiblePackages."'"$pkgName"'" != null)'
+}
+
+listOfPatches() {
+  case ${apps[$idx]} in
+    YouTube)
+      pkgName="com.google.android.youtube"
+      getListOfPatches "$pkgName"
+      ;;
+    Spotify)
+      pkgName="com.spotify.music"
+      getListOfPatches "$pkgName"
+      ;;
+    TikTok)
+      pkgName="com.zhiliaoapp.musically"
+      getListOfPatches "$pkgName"
+      ;;
+    Google\ Photos)
+      pkgName="com.google.android.apps.photos"
+      getListOfPatches "$pkgName"
+      ;;
+    Instagram)
+      pkgName="com.instagram.android"
+      getListOfPatches "$pkgName"
+      ;;
+    Facebook)
+      pkgName="com.facebook.katana"
+      getListOfPatches "$pkgName"
+      ;;
+    FacebookMessenger)
+      pkgName="com.facebook.orca"
+      getListOfPatches "$pkgName"
+      ;;
+    Threads)
+      pkgName="com.instagram.barcelona"
+      getListOfPatches "$pkgName"
+      ;;
+    Lightroom)
+      pkgName="com.adobe.lrmobile"
+      getListOfPatches "$pkgName"
+      ;;
+    Photomath)
+      pkgName="com.microblink.photomath"
+      getListOfPatches "$pkgName"
+      ;;
+    Duolingo)
+      pkgName="com.duolingo"
+      getListOfPatches "$pkgName"
+      ;;
+    RAR)
+      pkgName="com.rarlab.rar"
+      getListOfPatches "$pkgName"
+      ;;
+    AmazonPrimeVideo)
+      pkgName="com.amazon.avod.thirdpartyclient"
+      getListOfPatches "$pkgName"
+      ;;
+    Twitch)
+      pkgName="tv.twitch.android.app"
+      getListOfPatches "$pkgName"
+      ;;
+    Tumblr)
+      pkgName="com.tumblr"
+      getListOfPatches "$pkgName"
+      ;;
+    Strava)
+      pkgName="com.strava"
+      getListOfPatches "$pkgName"
+      ;;
+    SoundCloud)
+      pkgName="com.soundcloud.android"
+      getListOfPatches "$pkgName"
+      ;;
+    Proton\ Mail)
+      pkgName="ch.protonmail.android"
+      getListOfPatches "$pkgName"
+      ;;
+    MyFitnessPal)
+      pkgName="com.myfitnesspal.android"
+      getListOfPatches "$pkgName"
+      ;;
+    Crunchyroll)
+      pkgName="com.crunchyroll.crunchyroid"
+      getListOfPatches "$pkgName"
+      ;;
+    Cricbuzz)
+      pkgName="com.cricbuzz.android"
+      getListOfPatches "$pkgName"
+      ;;
+  esac
+}
+
 # Req
 <<comment
   YouTube 8.0+
@@ -633,9 +727,16 @@ fi
 while true; do
   # Display the list
   echo -e "$info Available apps:"
+  echo -e "    . CHANGELOG"
+  echo -e "arch. Spoof Device Arch"
+  echo -e "i?  . List of Patches"
   for i in "${!apps[@]}"; do
     if [ -n "${apps[$i]}" ] && [ "${apps[$i]}" != "null" ]; then
-      printf "%d. %s\n" "$i" "${apps[$i]}"
+      if [ "$i" -le 9 ]; then
+        printf "%d   . %s\n" "$i" "${apps[$i]}"
+      else
+        printf "%d  . %s\n" "$i" "${apps[$i]}"
+      fi
     fi
   done
 
@@ -648,6 +749,8 @@ while true; do
     break  # break the while loop
   elif [[ $idx =~ ^[0-9]+$ ]] && (( idx >= 0 && idx <= max )); then
     echo -e "$notice You chose: ${apps[$idx]}"
+  elif [[ "$idx" =~ ^[0-9]+\?$ ]]; then
+    listOfPatches  # Call the listOfPatches function
   elif [[ "$idx" =~ ^[aA][rR][cC][hH] ]]; then
     overwriteArch  # Call the overwriteArch function
   elif [ "$idx" == "" ] || [ -z "$idx" ]; then
