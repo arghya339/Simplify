@@ -185,7 +185,7 @@ yt_patches_args=(
   -e "Custom Shorts action buttons" -OiconType="round"
   -e "Custom branding icon for YouTube" -OappIcon="$SimplUsr/.branding/youtube/launcher/google_family" -OchangeSplashIcon=true -OrestoreOldSplashAnimation=false
   -e "Custom header for YouTube" -OcustomHeader="$SimplUsr/.branding/youtube/header/google_family"
-  -e "Custom branding name for YouTube" -OappName="YouTube RVX"
+  -e "Custom branding name for YouTube" -OappName="YouTube"
   -e "Hide shortcuts" -Oshorts=false
   -e "Visual preferences icons for YouTube" -OsettingsMenuIcon="extension"
   -e "Overlay buttons" -OiconType=thin
@@ -202,7 +202,7 @@ yt_patches_args=(
 yt_music_patches_args=(
   -e "Custom branding icon for YouTube Music" -OappIcon="$SimplUsr/.branding/music/launcher/google_family"
   -e "Custom header for YouTube Music" -OcustomHeader="$SimplUsr/.branding/music/header/google_family"
-  -e "Custom branding name for YouTube Music" -OappNameNotification="YouTube Music RVX" -OappNameLauncher="YT Music RVX"
+  -e "Custom branding name for YouTube Music" -OappNameNotification="YouTube Music" -OappNameLauncher="YT Music"
   -e "Dark theme" -OmaterialYou=true
   -e "Visual preferences icons for YouTube Music" -OsettingsMenuIcon="extension"
   -e "Settings for YouTube Music" -OrvxSettingsLabel="RVX"
