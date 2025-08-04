@@ -360,7 +360,9 @@ while true; do
   # Validate and respond
   if [ "$idx" == 0 ]; then
     break  # break the while loop
-  elif [ "$idx" == "." ]; then
+  elif [[ "$idx" =~ ^[0-9]+$ ]] && (( idx >= 0 && idx <= max )); then
+    echo -e "$notice You chose: ${apps[$idx]}"
+  elif [ "$idx" = "." ]; then
     overwriteArch  # Call the overwriteArch function
   elif [ "$idx" == "" ] || [ -z "$idx" ]; then
     if [ $release == "latest" ]; then
@@ -369,8 +371,6 @@ while true; do
       tag=$(curl -sL ${auth} "https://api.github.com/repos/ReVanced/revanced-patches/releases" | jq -r '.[].tag_name | select(contains("dev"))' | head -n 1)
     fi
     curl -sL ${auth} "https://api.github.com/repos/ReVanced/revanced-patches/releases/tags/$tag" | jq -r .body | glow  # Display the release notes
-  elif [[ "$idx" =~ ^[0-9]+$ ]] && (( idx >= 0 && idx <= max )); then
-    echo -e "$notice You chose: ${apps[$idx]}"
   else
     echo -e "$info \"$idx\" is not a valid index! Please select index [0-${max}]." >&2
   fi
