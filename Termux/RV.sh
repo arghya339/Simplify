@@ -420,88 +420,88 @@ getListOfPatches() {
 }
 
 listOfPatches() {
-  case ${apps[${idx%\?}]} in
-    YouTube\?)
+  case ${apps[$idx]} in
+    YouTube)
       pkgName="com.google.android.youtube"
       getListOfPatches "$pkgName"
       ;;
-    Spotify\?)
+    Spotify)
       pkgName="com.spotify.music"
       getListOfPatches "$pkgName"
       ;;
-    TikTok\?)
+    TikTok)
       pkgName="com.zhiliaoapp.musically"
       getListOfPatches "$pkgName"
       ;;
-    "Google Photos"?)
+    Google\ Photos)
       pkgName="com.google.android.apps.photos"
       getListOfPatches "$pkgName"
       ;;
-    Instagram\?)
+    Instagram)
       pkgName="com.instagram.android"
       getListOfPatches "$pkgName"
       ;;
-    Facebook\?)
+    Facebook)
       pkgName="com.facebook.katana"
       getListOfPatches "$pkgName"
       ;;
-    FacebookMessenger\?)
+    FacebookMessenger)
       pkgName="com.facebook.orca"
       getListOfPatches "$pkgName"
       ;;
-    Threads\?)
+    Threads)
       pkgName="com.instagram.barcelona"
       getListOfPatches "$pkgName"
       ;;
-    Lightroom\?)
+    Lightroom)
       pkgName="com.adobe.lrmobile"
       getListOfPatches "$pkgName"
       ;;
-    Photomath\?)
+    Photomath)
       pkgName="com.microblink.photomath"
       getListOfPatches "$pkgName"
       ;;
-    Duolingo\?)
+    Duolingo)
       pkgName="com.duolingo"
       getListOfPatches "$pkgName"
       ;;
-    RAR\?)
+    RAR)
       pkgName="com.rarlab.rar"
       getListOfPatches "$pkgName"
       ;;
-    AmazonPrimeVideo\?)
+    AmazonPrimeVideo)
       pkgName="com.amazon.avod.thirdpartyclient"
       getListOfPatches "$pkgName"
       ;;
-    Twitch\?)
+    Twitch)
       pkgName="tv.twitch.android.app"
       getListOfPatches "$pkgName"
       ;;
-    Tumblr\?)
+    Tumblr)
       pkgName="com.tumblr"
       getListOfPatches "$pkgName"
       ;;
-    Strava\?)
+    Strava)
       pkgName="com.strava"
       getListOfPatches "$pkgName"
       ;;
-    SoundCloud\?)
+    SoundCloud)
       pkgName="com.soundcloud.android"
       getListOfPatches "$pkgName"
       ;;
-    "Proton Mail"?)
+    Proton\ Mail)
       pkgName="ch.protonmail.android"
       getListOfPatches "$pkgName"
       ;;
-    MyFitnessPal\?)
+    MyFitnessPal)
       pkgName="com.myfitnesspal.android"
       getListOfPatches "$pkgName"
       ;;
-    Crunchyroll\?)
+    Crunchyroll)
       pkgName="com.crunchyroll.crunchyroid"
       getListOfPatches "$pkgName"
       ;;
-    Cricbuzz\?)
+    Cricbuzz)
       pkgName="com.cricbuzz.android"
       getListOfPatches "$pkgName"
       ;;
