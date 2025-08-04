@@ -746,6 +746,7 @@ while true; do
     continue
   elif [[ "$idx" =~ ^[aA][rR][cC][hH] ]]; then
     overwriteArch  # Call the overwriteArch function
+    continue
   elif [ "$idx" == "" ] || [ -z "$idx" ]; then
     if [ $release == "latest" ]; then
       tag=$(curl -sL ${auth} "https://api.github.com/repos/ReVanced/revanced-patches/releases/latest" | jq -r '.tag_name')
