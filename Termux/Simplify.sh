@@ -694,7 +694,7 @@ while true; do
       ;;
     [Cc]*)
       while true; do
-        echo -e "P. FetchPreRelease\nL. RipLocale\nD. RipDpi\nR. RipLib\nS. Change RVX Source\nT. Add gh PAT (increases gh api rate limit)\nQ. Quit\n"
+        echo -e "P. FetchPreRelease\nL. RipLocale\nD. RipDpi\nR. RipLib\nS. Change RVX Source\nT. Add gh PAT (increases gh api rate limit)\nO. Import Custom PatchesOptions from file\nQ. Quit\n"
         read -r -p "Select: " opt
         case "$opt" in
           [Pp]*) if [ "$FetchPreRelease" == 0 ]; then echo "FetchPreRelease == false"; else echo "FetchPreRelease == true"; fi && fetchPreRelease ;;
@@ -716,7 +716,7 @@ while true; do
             ;;
           [Oo]*) if [ "$ReadPatchesFile" == 1 ]; then echo "ReadPatchesFile == Enabled"; else echo "ReadPatchesFile == Disabled"; fi &&  read_patches_file ;;
           [Qq]*) break ;;
-          *) echo -e "$info Invalid input! Please enter P / L / D / R / S / T." ;;
+          *) echo -e "$info Invalid input! Please enter P / L / D / R / S / T / O /Q." ;;
         esac
       done
       sleep 3
