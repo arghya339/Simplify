@@ -281,15 +281,15 @@ if [ "$ReadPatchesFile" -eq 1 ]; then
   default_content=(
     # [0] YouTube
     '-e "GmsCore support" -O gmsCoreVendorGroupId="com.mgoogle"
-    -e "Custom branding" -O appName="YouTube RV" -O iconPath="/sdcard/Simplify/.branding/youtube/launcher/google_family"
-    -e "Change header" -O header="/sdcard/Simplify/.branding/youtube/header/google_family"
-    -e "Change package name" -O packageName="app.revanced.android.youtube"
-    -d "Announcements"'
+-e "Custom branding" -O appName="YouTube RV" -O iconPath="/sdcard/Simplify/.branding/youtube/launcher/google_family"
+-e "Change header" -O header="/sdcard/Simplify/.branding/youtube/header/google_family"
+-e "Change package name" -O packageName="app.revanced.android.youtube"
+-d "Announcements"'
     
     # [1] Spotify
     '-e "Change lyrics provider"
-    -e "Custom theme"
-    -d "Hide Create button"'
+-e "Custom theme"
+-d "Hide Create button"'
     
     # [2] TikTok
     '-e "SIM spoof"'
