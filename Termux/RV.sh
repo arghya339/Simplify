@@ -160,7 +160,9 @@ patch_app() {
       --purge $ripLib -f | tee "$log"
   fi
   
-  if [ ! -f "$outputAPK" ] && [ -f "${stock_apk_ref[0]}" ]; then
+  if grep -q "OutOfMemory" "$log"; then
+    echo -e "$bad ${Red}OutOfMemoryError${Reset}: ${Yellow}Device RAM overloaded!${Reset}\n ${Blue}Solutions${Reset}:\n   1. ${Yellow}Close background apps.${Reset}\n   2. ${Yellow}Use device with ≥4GB ~ ≥6GB RAM for patching apk.${Reset}"
+  elif [ ! -f "$outputAPK" ] && [ -f "${stock_apk_ref[0]}" ]; then
     echo -e "$bad Oops, $appName Patching failed !! Logs saved to "$log". Share the Patchlog to developer."
     termux-open-url "https://github.com/ReVanced/revanced-patches/issues/new?template=bug_report.yml"
     termux-open --send "$log"
