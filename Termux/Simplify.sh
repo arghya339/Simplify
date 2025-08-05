@@ -636,7 +636,7 @@ while true; do
   clear  # Clear
   # Apply the eye color to the simplify shape and print it
   echo -e "${BoldGreen}$print_simplify${Reset}" && echo ""  # Space
-  echo -e "D   : Download Patches App\nRV  : ReVanced\nRVS : RV SuperUser\nRVX : ReVanced Extended\nRVXS: RVX SuperUser\nPiko: Piko Twitter\nDrop: Dropped Patches\nLS  : LSPatch\nC   : Configuration\nM   : Miscellaneous\nU   : Unmount Apps\nF   : Feature request\nB   : Bug report\nS   : Support\nA   : About\nQ   : Quit\n"
+  echo -e "D   : Download Patches App\nRV  : ReVanced\nRVS : RV SuperUser\nRVX : ReVanced Extended\nRVXS: RVX SuperUser\nPiko: Piko Twitter\nDrop: Dropped Patches\nLS  : LSPatch\nC   : Configuration\nM   : Miscellaneous\nU   : Unmount Apps\nF   : Feature request\nB   : Bug report\nS   : Support\nA   : About\nO   : Import Custom PatchesOptions from file\nQ   : Quit\n"
   echo -n "Select Patches source: " && read source
   case $source in
     D|d)
@@ -716,7 +716,7 @@ while true; do
             ;;
           [Oo]*) if [ "$ReadPatchesFile" == 1 ]; then echo "ReadPatchesFile == Enabled"; else echo "ReadPatchesFile == Disabled"; fi &&  read_patches_file ;;
           [Qq]*) break ;;
-          *) echo -e "$info Invalid input! Please enter P / L / D / R / S / T." ;;
+          *) echo -e "$info Invalid input! Please enter P / L / D / R / S / T / O / Q." ;;
         esac
       done
       sleep 3
