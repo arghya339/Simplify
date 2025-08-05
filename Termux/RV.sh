@@ -133,6 +133,11 @@ patch_app() {
     universalPatches=(
       -d "Hex"
     )
+  elif [ "$appName" == "TikTok" ]; then
+    universalPatches=(
+      -e "Spoof SIM country" -OnetworkCountryIso="US (United States)" -OsimCountryIso="US (United States)"
+      -e "Disable Pairip license check"
+    )
   else
     universalPatches=(
       -e "Change version code" -OversionCode="2147483647" 
@@ -340,7 +345,7 @@ build_app() {
     echo -e "[?] ${Yellow}Do you want to install ${appNameRef[0]} RV app? [Y/n] ${Reset}\c" && read opt
     case $opt in
       y*|Y*|"")
-        if [ $pkgName == "com.instagram.android" ] || [ $pkgName == "com.facebook.katana" ] || [ $pkgName == "com.facebook.orca" ] || [ $pkgName == "com.instagram.barcelona" ]; then
+        if [ $pkgName == "com.instagram.android" ] || [ $pkgName == "com.facebook.katana" ] || [ $pkgName == "com.facebook.orca" ] || [ $pkgName == "com.instagram.barcelona" ] || [ $pkgName == "com.zhiliaoapp.musically" ]; then
           echo -e "$notice ${Yellow}Warning! Disable auto updates for the patched app to avoid unexpected issues.${Reset}"
         fi
         echo -e "$running Please Wait !! Installing Patched ${appNameRef[0]} RV apk.."
@@ -413,7 +418,9 @@ getListOfPatches() {
   local pkgName="$1"
   curl -sL 'https://api.revanced.app/v4/patches/list' | jq --arg pkgName "$pkgName" '.[] | select(.compatiblePackages."'"$pkgName"'" != null)'
   Patches=$(curl -sL 'https://api.revanced.app/v4/patches/list' | jq --arg pkgName "$pkgName" '.[] | select(.compatiblePackages."'"$pkgName"'" != null)')
-  if [ -z "$Patches" ]; then
+  if [ "$pkgName" == "app.revanced" ]; then
+    $PREFIX/lib/jvm/java-21-openjdk/bin/java -jar $ReVancedCLIJar list-patches -d=true -f=$pkgName -i=true -o=true -p=false -u=true -v=false $PatchesRvp  # get only universal-patches list
+  elif [ -z "$Patches" ]; then
     # java -jar revanced-cli-*-all.jar list-patches patches-*.rvp -h
     # -d=--with-descriptions, -f=--filter-package-name, -i=--index, -o=--with-options, -p=--with-packages, -u=--with-universal-patches, -v, --with-versions
     $PREFIX/lib/jvm/java-21-openjdk/bin/java -jar $ReVancedCLIJar list-patches -d=true -f=$pkgName -i=true -o=true -p=false -u -v=false $PatchesRvp
@@ -423,6 +430,10 @@ getListOfPatches() {
 listOfPatches() {
   local clean_idx=${idx%\?}
   case "${apps[$clean_idx]}" in
+    Quit)
+      pkgName="app.revanced"
+      getListOfPatches "$pkgName"
+      ;;
     YouTube)
       pkgName="com.google.android.youtube"
       getListOfPatches "$pkgName"
@@ -731,7 +742,7 @@ while true; do
   echo -e "$info Available apps:"
   echo -e "↵   . CHANGELOG"
   echo -e "Arch. Spoof Device Arch"
-  echo -e "i?  . List of Patches"
+  echo -e "i?  . List of Patches (0?=universal-patches)"
   for i in "${!apps[@]}"; do
     if [ -n "${apps[$i]}" ] && [ "${apps[$i]}" != "null" ]; then
       if [ "$i" -le 9 ]; then
