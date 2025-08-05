@@ -869,7 +869,7 @@ while true; do
     FacebookMessenger)
       pkgName="com.facebook.orca"
       appName=("Facebook Messenger")
-      pkgVersion="517.0.0.41.109"
+      pkgVersion="518.0.0.53.109"
       #pkgVersion=""
       if [ -z "$pkgVersion" ]; then
         getVersion "$pkgName"
