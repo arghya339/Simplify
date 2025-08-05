@@ -122,6 +122,7 @@ getVersion() {
 patch_app() {
   local -n stock_apk_ref=$1
   local -n patches=$2  # nameref (-n) accept an array name as parameter
+  echo -e "$notice DEBUG - patches: ${patches[@]}"
   local outputAPK=$3
   without_ext="${outputAPK%.*}"  # remove file extension (.apk)
   local log="$SimplUsr/$appName-RV_patch-log.txt"
@@ -359,7 +360,7 @@ if [ "$ReadPatchesFile" -eq 1 ]; then
       fi
     fi
   done
-  
+  echo -e "$notice DEBUG - yt_patches_args: ${yt_patches_args[@]}"
 fi
 
 # --- Build App ---
