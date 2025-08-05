@@ -137,6 +137,7 @@ isRipLocale=1  # Default value (true/on/1) for RipLocale, it's delete locale fro
 isRipDpi=1  # Default value (true/on/1) for RipDpi, it's delete dpi from patches apk file except device specific dpi by default
 isRipLib=1  # Default value (true/on/1) for RipLib, it's delete lib dir from patches apk file except device specific arch lib by default
 isChangeRVXSource=0  # Default value (false/off/0) for ChangeRVXSource, means patches source remain unchange ie. official source (inotia00) for RVX Patches
+isReadPatchesFile=0  # Default value (false/off/0) for ReadPatchesFile, means recommended PatchesOptions loading from script.
 
 # --- Checking Android Version ---
 if [ $Android -le 4 ]; then
@@ -308,6 +309,7 @@ if [ ! -f "$simplifyJson" ]; then
   jq ".RipDpi = $isRipDpi" "$simplifyJson" > temp.json && mv temp.json "$simplifyJson"
   jq ".RipLib = $isRipLib" "$simplifyJson" > temp.json && mv temp.json "$simplifyJson"  # Change key value: Reads content of existing json and assigns key new value then redirect new json data to temp.json then rename it to simplify.json
   jq ".ChangeRVXSource = $isChangeRVXSource" "$simplifyJson" > temp.json && mv temp.json "$simplifyJson"  # Change key value: Reads content of existing json and assigns key new value then redirect new json data to temp.json then rename it to simplify.json
+  jq ".ReadPatchesFile = $isReadPatchesFile" "$simplifyJson" > temp.json && mv temp.json "$simplifyJson"
 fi
 
 fetchPreRelease() {
@@ -479,6 +481,27 @@ pat() {
         *) echo -e "${info} Invalid input! Please enter Yes or No." ;;
       esac
     fi
+  done
+}
+
+read_patches_file() {
+  while true; do
+    read -r -p "ReadPatchesFile [E/d]: " opt
+    case "$opt" in
+      [Ee]*)
+        isReadPatchesFile=1  # Enable ReadPatchesFile
+        jq ".ReadPatchesFile = $isReadPatchesFile" "$simplifyJson" > temp.json && mv temp.json "$simplifyJson"  # Change key value: Reads content of existing json and assigns key new value then redirect new json data to temp.json then rename it to simplify.json
+        echo -e "$info ReadPatchesFile is Enabled! Custom PatchesOptions Loading from File."
+        break
+        ;;
+      [Dd]*)
+        isReadPatchesFile=0  # Disable ReadPatchesFile
+        jq ".ReadPatchesFile = $isReadPatchesFile" "$simplifyJson" > temp.json && mv temp.json "$simplifyJson"  # Change key value: Reads content of existing json and assigns key new value then redirect new json data to temp.json then rename it to simplify.json
+        echo -e "$info ReadPatchesFile is Disabled! Recommended PatchesOptions Loading from Script."
+        break
+        ;;
+      *) echo -e "${info} Invalid input! Please enter E or D." ;;
+    esac
   done
 }
 
@@ -691,6 +714,7 @@ while true; do
             fi
             pat  # Call the pat function to create & add GitHub token
             ;;
+          [Oo]*) if [ "$ReadPatchesFile" == 1 ]; then echo "ReadPatchesFile == Enabled"; else echo "ReadPatchesFile == Disabled"; fi &&  read_patches_file ;;
           [Qq]*) break ;;
           *) echo -e "$info Invalid input! Please enter P / L / D / R / S / T." ;;
         esac

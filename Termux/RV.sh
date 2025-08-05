@@ -39,6 +39,7 @@ mkdir -p "$Simplify" "$RV" "$RVX" "$SimplUsr"  # Create $Simplify, $RV, $RVX and
 Download="/sdcard/Download"  # Download dir
 FetchPreRelease=$(jq -r '.FetchPreRelease' "$simplifyJson" 2>/dev/null)
 RipLib="$(jq -r '.RipLib' "$simplifyJson" 2>/dev/null)"
+ReadPatchesFile="$(jq -r '.ReadPatchesFile' "$simplifyJson" 2>/dev/null)"
 if [ -f "$HOME/.config/gh/hosts.yml" ] && gh auth status > /dev/null 2>&1; then
   # oauth_token: gho_************************************
   token=$(grep -A2 "users:" ~/.config/gh/hosts.yml | grep -v "users:" | grep -A1 "oauth_token:" | awk '/oauth_token:/ {getline; print $2}')
@@ -246,6 +247,120 @@ myfitnesspal_patches_args=()
 crunchyroll_patches_args=()
 
 cricbuzz_patches_args=()
+
+
+# When $ReadPatchesFile value is 1
+if [ "$ReadPatchesFile" -eq 1 ]; then
+  
+  # Array to stores filenames
+  filenames=(
+    yt_patches_args.txt
+    spotify_patches_args.txt
+    tiktok_patches_args.txt
+    photos_patches_args.txt
+    instagram_patches_args.txt
+    facebook_patches_args.txt
+    fb_messenger_patches_args.txt
+    lightroom_patches_args.txt
+    photomath_patches_args.txt
+    duolingo_patches_args.txt
+    rar_patches_args.txt
+    prime_video_patches_args.txt
+    twitch_patches_args.txt
+    tumblr_patches_args.txt
+    threads_patches_args.txt
+    strava_patches_args.txt
+    soundcloud_patches_args.txt
+    protonmail_patches_args.txt
+    myfitnesspal_patches_args.txt
+    crunchyroll_patches_args.txt
+    cricbuzz_patches_args.txt
+  )
+  
+  # Default content for new files
+  default_content=(
+    # [0] YouTube
+    '-e "GmsCore support" -O gmsCoreVendorGroupId="com.mgoogle"
+    -e "Custom branding" -O appName="YouTube RV" -O iconPath="/sdcard/Simplify/.branding/youtube/launcher/google_family"
+    -e "Change header" -O header="/sdcard/Simplify/.branding/youtube/header/google_family"
+    -e "Change package name" -O packageName="app.revanced.android.youtube"
+    -d "Announcements"'
+    
+    # [1] Spotify
+    '-e "Change lyrics provider"
+    -e "Custom theme"
+    -d "Hide Create button"'
+    
+    # [2] TikTok
+    '-e "SIM spoof"'
+    
+    # [3] Photos
+    '-e "GmsCore support" -OgmsCoreVendorGroupId="com.mgoogle"'
+    
+    # [4] Instagram, [5] Facebook, [6] FbMessenger, [7] Lightroom, [8] Photomath, [9] Duolingo, [10] RAR | No default patches
+    '' '' '' '' '' '' ''
+    
+    # [11] PrimeVideo
+    '-e "Rename shared permissions"'
+    
+    # [12] Twitch | No default patches
+    ''
+    
+    # [13] Tumblr
+    '-e "Fix old versions"'
+    
+    # [14] Threads, [15] Strava, [16] SoundCloud, [17] ProtonMail, [18] MyFitnessPal, [19] Crunchyroll, [20] Cricbuzz | No default patches
+    '' '' '' '' '' '' ''
+  )
+  
+  # Array to stores arrays-names
+  arraynames=(
+    yt_patches_args
+    spotify_patches_args
+    tiktok_patches_args
+    photos_patches_args
+    instagram_patches_args
+    facebook_patches_args
+    fb_messenger_patches_args
+    lightroom_patches_args
+    photomath_patches_args
+    duolingo_patches_args
+    rar_patches_args
+    prime_video_patches_args
+    twitch_patches_args
+    tumblr_patches_args
+    threads_patches_args
+    strava_patches_args
+    soundcloud_patches_args
+    protonmail_patches_args
+    myfitnesspal_patches_args
+    crunchyroll_patches_args
+    cricbuzz_patches_args
+  )
+  
+  # Create Empty Files if it doesn’t exist
+  for ((i=0; i<${#filenames[@]}; i++)); do
+    if [ ! -e "$SimplUsr/${filenames[$i]}" ]; then
+      #touch "$SimplUsr/${filenames[$i]}"
+      printf "%s\n" "${default_content[i]}" > "$SimplUsr/${filenames[$i]}"
+    fi
+  done
+  
+  # Read Files into Arrays
+  for (( i=0; i<${#filenames[@]}; i++ )); do
+    if [ -f "$SimplUsr/${filenames[$i]}" ]; then
+      if [ -s "$SimplUsr/${filenames[$i]}" ]; then
+        declare -n current_array="${arraynames[$i]}"               # Reference the array
+        current_array=()                                           # Clear it
+        readarray -t current_array < "$SimplUsr/${filenames[$i]}"  # Read file content & store it to current_array
+        unset -n current_array                                     # Remove nameReference
+      else
+        eval "${arraynames[$i]}=()"
+      fi
+    fi
+  done
+  
+fi
 
 # --- Build App ---
 build_app() {
