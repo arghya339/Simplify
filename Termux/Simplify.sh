@@ -147,6 +147,15 @@ if [ $Android -le 4 ]; then
   return 1
 fi
 
+# --- pkg uninstall function ---
+pkgUninstall() {
+  local pkg=$1
+  if echo "$installedPKG" | grep -q "^$pkg/" 2>/dev/null; then
+    echo -e "$running Uninstalling $pkg pkg.."
+    pkg uninstall "$pkg" -y > /dev/null 2>&1
+  fi
+}
+
 # --- pkg upgrade function ---
 pkgUpdate() {
   local pkg=$1
@@ -180,7 +189,6 @@ pkgInstall "bsdtar"  # bsdtar install/update
 pkgInstall "pv"  # pv install/update
 pkgInstall "grep"  # grep update
 pkgInstall "sed"  # sed update
-#pkgInstall "awk"  # awk update
 pkgInstall "glow"  # glow install/update
 if su -c "id" >/dev/null 2>&1; then
   pkgInstall "openssl"  # openssl install/update
@@ -826,6 +834,20 @@ while true; do
                     [ -d "$SimplUsr" ] && rm -rf "$SimplUsr"
                     [ -f "$HOME/.Simplify.sh" ] && rm -f "$HOME/.Simplify.sh"
                     [ -f "$PREFIX/bin/simplify" ] && rm -f "$PREFIX/bin/simplify"
+                    pkgUninstall "aria2"  # aria2 uninstall
+                    pkgUninstall "jq"  # jq uninstall
+                    pkgUninstall "pup"  # pup uninstall
+                    pkgUninstall "openjdk-21"  # java uninstall
+                    pkgUninstall "apksigner"  # apksigner uninstall
+                    pkgUninstall "bsdtar"  # bsdtar uninstall
+                    pkgUninstall "pv"  # pv uninstall
+                    pkgUninstall "glow"  # glow uninstall
+                    if su -c "id" >/dev/null 2>&1; then
+                      if ! pip list 2>/dev/null | grep -q "apksigcopier"; then
+                        pip uninstall apksigcopier > /dev/null 2>&1  # uninstall apksigcopier using pip
+                      fi
+                      pkgUninstall "python"  # python uninstall
+                    fi
                     clear
                     echo -e "$good ${Green}Simplify has been uninstalled successfully :(${Reset}"
                     echo -e "💔 ${Blue}We're sorry to see you go. Feel free to reinstall anytime!${Reset}"
