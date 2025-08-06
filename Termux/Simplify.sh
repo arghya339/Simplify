@@ -113,7 +113,7 @@ fi
 
 # --- Global Variables ---
 Android=$(getprop ro.build.version.release)  # Get Android version
-arch=$(getprop ro.product.cpu.abi)  # Get Android arch
+cpuAbi=$(getprop ro.product.cpu.abi)  # Get Android arch
 serial=$(su -c 'getprop ro.serialno')  # Get Serial Number required root
 model=$(getprop ro.product.model)  # Get Device Model
 outdatedPKG=$(apt list --upgradable 2>/dev/null)  # list of outdated pkg
@@ -212,7 +212,7 @@ fi
 # --- Download and give execute (--x) permission to AAPT2 Binary ---
 if [ ! -f "$HOME/aapt2" ]; then
   echo -e "$running Downloading aapt2 binary from GitHub.."
-  curl -sL "https://github.com/arghya339/aapt2/releases/download/all/aapt2_$arch" --progress-bar -o "$HOME/aapt2" && chmod +x "$HOME/aapt2"
+  curl -sL "https://github.com/arghya339/aapt2/releases/download/all/aapt2_$cpuAbi" --progress-bar -o "$HOME/aapt2" && chmod +x "$HOME/aapt2"
 fi
 
 curl -sL "https://raw.githubusercontent.com/arghya339/Simplify/refs/heads/main/Termux/dlGitHub.sh" --progress-bar -o $Simplify/dlGitHub.sh
