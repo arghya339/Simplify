@@ -807,7 +807,7 @@ while true; do
       ;;
     [Mm]*)
       while true; do
-        echo -e "\nV. Spoof Android Version\nA. Spoof Device Architecture\nD. Delete patches apk file\nL. Delete Patch Log\nU. Uninstall Patches Apps\nQ. Quit\n"
+        echo -e "\nV. Spoof Android Version\nA. Spoof Device Architecture\nD. Delete patches apk file\nL. Delete Patch Log\nU. Uninstall Patches Apps\nS. Uninstall Simplify\nQ. Quit\n"
         read -r -p "Select: " misc
         case "$misc" in
           [Vv]*) overwriteVersion ;;
@@ -815,8 +815,29 @@ while true; do
           [Dd]*) DeletePatchesApk ;;
           [Ll]*) DeletePatchLog ;;
           [Uu]*) UninstallPatchesApp ;;
+          [Ss]*)
+            echo -ne "${Yellow}Are you sure you want to uninstall Simplify? [Y/n]${Reset}: " && read -r userInput
+            case "$userInput" in
+              [Yy]*)
+                echo -ne "${Red}Type '://' to confirm uninstallation: ${Reset}" && read -r finalInput
+                case "$finalInput" in
+                  "://")
+                    [ -d "$Simplify" ] && rm -rf "$Simplify"
+                    [ -d "$SimplUsr" ] && rm -rf "$SimplUsr"
+                    [ -f "$HOME/.Simplify.sh" ] && rm -f "$HOME/.Simplify.sh"
+                    [ -f "$PREFIX/bin/simplify" ] && rm -f "$PREFIX/bin/simplify"
+                    echo -e "$good ${Green}Simplify has been uninstalled successfully :(${Reset}"
+                    echo -e "💔 ${Blue}We're sorry to see you go. Feel free to reinstall anytime!${Reset}"
+                    termux-open-url "https://github.com/arghya339/Simplify/"
+                    ;;
+                esac
+                ;;
+              [Nn]*) echo -e "$notice ${Yellow}Uninstallation cancelled! Simplify will remain installed.${Reset}" ;;
+              *) echo -e "$info ${Blue}Invalid input! Uninstallation skipped.${Reset}" ;;
+            esac
+            ;;
           [Qq]*) break ;;
-          *) echo -e "$info Invalid input! Please enter V or A or D or L or U." ;;
+          *) echo -e "$info Invalid input! Please enter V or A or D or L or U or S." ;;
         esac
       done
       sleep 3
