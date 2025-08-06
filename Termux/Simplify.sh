@@ -72,18 +72,19 @@ Reset="\033[0m"
 
 # Construct the simplify shape using string concatenation
 print_simplify=$(cat <<'EOF'
-     .------------------------------.
-     | ▄▀▀ █ █▄ ▄█ █▀▄ █   █ █▀ ▀▄▀ |
-     | ▄██ █ █ ▀ █ █▀  █▄▄ █ █▀  █  |
-     |      >_𝒟𝑒𝓋𝑒𝓁𝑜𝓅𝑒𝓇: @𝒶𝓇𝑔𝒽𝓎𝒶𝟥𝟥𝟫 |
-     '------------------------------'\n    https://github.com/arghya339/Simplify
+    https://github.com/arghya339/Simplify
+      .------------------------------.
+      | ▄▀▀ █ █▄ ▄█ █▀▄ █   █ █▀ ▀▄▀ |
+      | ▄██ █ █ ▀ █ █▀  █▄▄ █ █▀  █  |
+      |      >_𝒟𝑒𝓋𝑒𝓁𝑜𝓅𝑒𝓇: @𝒶𝓇𝑔𝒽𝓎𝒶𝟥𝟥𝟫 |
+      '------------------------------'
 EOF
 )
 
 <<comment
 # Construct the simplify shape using string concatenation
 print_simplify=$(cat <<'EOF'
- ▄▀▀ █ █▄ ▄█ █▀▄ █   █ █▀ ▀▄▀\n ▄██ █ █ ▀ █ █▀  █▄▄ █ █▀  █\n      >_𝒟𝑒𝓋𝑒𝓁𝑜𝓅𝑒𝓇: @𝒶𝓇𝑔𝒽𝓎𝒶𝟥𝟥𝟫\n https://github.com/arghya339/Simplify
+   https://github.com/arghya339/Simplify\n       ▄▀▀ █ █▄ ▄█ █▀▄ █   █ █▀ ▀▄▀\n       ▄██ █ █ ▀ █ █▀  █▄▄ █ █▀  █\n            >_𝒟𝑒𝓋𝑒𝓁𝑜𝓅𝑒𝓇: @𝒶𝓇𝑔𝒽𝓎𝒶𝟥𝟥𝟫
 EOF
 )
 comment
