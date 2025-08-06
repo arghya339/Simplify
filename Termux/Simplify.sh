@@ -572,6 +572,16 @@ overwriteArch() {
   done
 }
 
+DeletePatchesApk() {
+  local nameArr=("YouTube" "YT Music" "Spotify" "TikTok" "Google Photos" "Instagram" "Facebook" "Facebook Messenger" "Reddit" "X" "Adobe Lightroom Mobile" "Photomath" "Duolingo" "RAR" "Amazon Prime Video" "Twitch" "Tumblr" "Threads" "Strava" "SoundCloud" "Proton Mail" "Calorie Counter MyFitnessPal" "NovaLauncher" "Tasker" "Crunchyroll" "Cricbuzz Cricket Scores and News")
+  for app in "${nameArr[@]}"; do
+    find "$SimplUsr" -type f -name "${app}-RV_v[0-9.]*-${cpuAbi}.apk" \
+      -exec echo "Deleting: {}" \; \
+      -exec rm -f {} \; 2>/dev/null
+  done
+  echo "Cleanup complete!"
+}
+
 # --- Feature request prompt ---
 feature() {
   echo -e "${Yellow}Do you want any new feature in this script? [Y/n]${Reset}: \c" && read userInput
@@ -715,13 +725,14 @@ while true; do
       ;;
     [Mm]*)
       while true; do
-        echo -e "\nV. Spoof Android Version\nA. Spoof Device Architecture\nQ. Quit\n"
+        echo -e "\nV. Spoof Android Version\nA. Spoof Device Architecture\nD. Delete patches apk file\nQ. Quit\n"
         read -r -p "Select: " misc
         case "$misc" in
           [Vv]*) overwriteVersion ;;
           [Aa]*) overwriteArch ;;
+          [Dd]*) DeletePatchesApk ;;
           [Qq]*) break ;;
-          *) echo -e "$info Invalid input! Please enter V or A." ;;
+          *) echo -e "$info Invalid input! Please enter V or A or D." ;;
         esac
       done
       sleep 3
