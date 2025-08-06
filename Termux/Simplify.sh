@@ -592,6 +592,63 @@ DeletePatchLog() {
   echo "Cleanup complete!"
 }
 
+UninstallPatchesApp() {
+  local pkgArr=(
+    "com.google.android.youtube"
+    "com.google.android.apps.youtube.music"
+    "com.spotify.music"
+    "com.zhiliaoapp.musically"
+    "com.google.android.apps.photos"
+    "com.instagram.android"
+    "com.facebook.katana"
+    "com.facebook.orca"
+    "com.reddit.frontpage"
+    "com.twitter.android"
+    "com.adobe.lrmobile"
+    "com.microblink.photomath"
+    "com.duolingo"
+    "com.rarlab.rar"
+    "com.amazon.avod.thirdpartyclient"
+    "tv.twitch.android.app"
+    "com.tumblr"
+    "com.instagram.barcelona"
+    "com.strava"
+    "com.soundcloud.android"
+    "ch.protonmail.android"
+    "com.myfitnesspal.android"
+    "com.teslacoilsw.launcher"
+    "net.dinglisch.android.taskerm"
+    "com.crunchyroll.crunchyroid"
+    "com.cricbuzz.android"
+  )
+  local nameArr=(
+    "YouTube" "YT Music" "Spotify" "TikTok" "Google Photos" "Instagram" "Facebook" "Facebook Messenger" "Reddit" "X" "Adobe Lightroom Mobile" "Photomath" "Duolingo" "RAR" "Amazon Prime Video" 
+    "Twitch" "Tumblr" "Threads" "Strava" "SoundCloud" "Proton Mail" "Calorie Counter MyFitnessPal" "NovaLauncher" "Tasker" "Crunchyroll" "Cricbuzz Cricket Scores and News"
+  )
+  
+  while true; do
+    
+    # Display menu
+    echo "Available apps:"
+    for i in "${!nameArr[@]}"; do
+      echo "$i. ${nameArr[i]}"
+    done
+
+    # Get user input
+    read -p "Enter index [0-$(( ${#nameArr[@]} - 1 ))] or 'Q' to quit: " idx
+    
+    [[ "$idx" =~ [Qq] ]] && break
+    
+    # Validate and process selection
+    if [[ "$idx" =~ ^[0-9]+$ ]] && [ "$idx" -lt "${#nameArr[@]}" ]; then
+      echo "Opening App info Activity for: ${nameArr[idx]}"
+      am start -a android.settings.APPLICATION_DETAILS_SETTINGS -d package:"${pkgArr[idx]}" > /dev/null 2>&1
+    else
+      echo "Invalid selection! Please enter a number between 0 and $((${#nameArr[@]} - 1))."
+    fi
+  done
+}
+
 # --- Feature request prompt ---
 feature() {
   echo -e "${Yellow}Do you want any new feature in this script? [Y/n]${Reset}: \c" && read userInput
@@ -735,15 +792,16 @@ while true; do
       ;;
     [Mm]*)
       while true; do
-        echo -e "\nV. Spoof Android Version\nA. Spoof Device Architecture\nD. Delete patches apk file\nL. Delete Patch Log\nQ. Quit\n"
+        echo -e "\nV. Spoof Android Version\nA. Spoof Device Architecture\nD. Delete patches apk file\nL. Delete Patch Log\nU. Uninstall Patches Apps\nQ. Quit\n"
         read -r -p "Select: " misc
         case "$misc" in
           [Vv]*) overwriteVersion ;;
           [Aa]*) overwriteArch ;;
           [Dd]*) DeletePatchesApk ;;
           [Ll]*) DeletePatchLog ;;
+          [Uu]*) UninstallPatchesApp ;;
           [Qq]*) break ;;
-          *) echo -e "$info Invalid input! Please enter V or A or D or L." ;;
+          *) echo -e "$info Invalid input! Please enter V or A or D or L or U." ;;
         esac
       done
       sleep 3
