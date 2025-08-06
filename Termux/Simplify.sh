@@ -250,10 +250,10 @@ Unmount() {
   su -c '/data/data/com.termux/files/usr/bin/bash -c '\''
   pkgArr=("com.google.android.youtube" "com.google.android.apps.youtube.music" "com.google.android.apps.photos")
   nameArr=("YouTube" "YouTube Music" "Google Photos")
-  
+
   if [ -d "/data/adb/revanced" ]; then
     while true; do
-      nameList=()
+      nameList=()  # Clear nameList array first
       index=0  # This ensures sequential numbering
     
       # Build available apps list
@@ -265,7 +265,7 @@ Unmount() {
       done
 
       # Exit if no apps available
-      [ ${#nameList[@]} -eq 0 ] && { echo "No apps available"; break; }
+      [ ${#nameList[@]} -eq 0 ] && { echo "No apps available!"; break; }
     
       # Display menu
       echo "Available apps:"
