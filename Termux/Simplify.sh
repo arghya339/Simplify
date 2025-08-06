@@ -641,11 +641,26 @@ UninstallPatchesApp() {
     
     # Validate and process selection
     if [[ "$idx" =~ ^[0-9]+$ ]] && [ "$idx" -lt "${#nameArr[@]}" ]; then
-      echo "Opening App info Activity for: ${nameArr[idx]}"
-      am start -a android.settings.APPLICATION_DETAILS_SETTINGS -d package:"${pkgArr[idx]}" > /dev/null 2>&1
+      if su -c "id" >/dev/null 2>&1; then
+        echo "Uninstalling: ${nameArr[idx]}"
+        if [ "$(su -c 'getenforce 2>/dev/null')" = "Enforcing" ]; then
+          su -c "setenforce 0"  # set SELinux to Permissive mode to unblock unauthorized operations
+          su -c "pm uninstall --user 0 ${pkgArr[idx]}"
+          su -c "setenforce 1"  # set SELinux to Enforcing mode to block unauthorized operations
+        else
+          su -c "pm uninstall --user 0 ${pkgArr[idx]}"
+        fi
+      elif "$HOME/rish" -c "id" >/dev/null 2>&1; then
+        echo "Uninstalling: ${nameArr[idx]}"
+        ~/rish -c "pm uninstall --user 0 ${pkgArr[idx]}"
+      else
+        echo "Opening App info Activity for: ${nameArr[idx]}"
+        am start -a android.settings.APPLICATION_DETAILS_SETTINGS -d package:"${pkgArr[idx]}" > /dev/null 2>&1
+      fi
     else
       echo "Invalid selection! Please enter a number between 0 and $((${#nameArr[@]} - 1))."
     fi
+
   done
 }
 
