@@ -251,14 +251,13 @@ Unmount() {
   pkgArr=("com.google.android.youtube" "com.google.android.apps.youtube.music" "com.google.android.apps.photos")
   nameArr=("YouTube" "YouTube Music" "Google Photos")
   if [ -d "/data/adb/revanced" ]; then
-    for i in "${!pkgArr[@]}"; do 
+    while true; do
+      for i in "${!pkgArr[@]}"; do 
         DIR="/data/adb/revanced/${pkgArr[$i]}/"
         if [ -e "$DIR" ]; then
           nameList[$i]="${nameArr[$i]}"
         fi
-    done
-
-    while true; do
+      done
       # Display the list
       echo -e "$info Available apps:"
       for i in "${!nameList[@]}"; do
