@@ -250,49 +250,45 @@ Unmount() {
   su -c '/data/data/com.termux/files/usr/bin/bash -c '\''
   pkgArr=("com.google.android.youtube" "com.google.android.apps.youtube.music" "com.google.android.apps.photos")
   nameArr=("YouTube" "YouTube Music" "Google Photos")
+  
   if [ -d "/data/adb/revanced" ]; then
     while true; do
-      nameList=()  # Clear nameList array first
+      nameList=()
+      index=0  # This ensures sequential numbering
+    
+      # Build available apps list
       for i in "${!pkgArr[@]}"; do 
-        DIR="/data/adb/revanced/${pkgArr[$i]}/"
-        if [ -e "$DIR" ]; then
-          nameList[$i]="${nameArr[$i]}"
+        if [ -e "/data/adb/revanced/${pkgArr[$i]}/" ]; then
+          nameList[$index]="${nameArr[$i]}"
+          ((index++))
         fi
       done
-      # Display the list
-      echo -e "$info Available apps:"
+
+      # Exit if no apps available
+      [ ${#nameList[@]} -eq 0 ] && { echo "No apps available"; break; }
+    
+      # Display menu
+      echo "Available apps:"
       for i in "${!nameList[@]}"; do
-        printf "%d. %s\n" "$i" "${nameList[$i]}"
+        echo "$i. ${nameList[$i]}"
       done
 
-      # Ask for an index, showing the valid range
-      max=$(( ${#nameList[@]} - 1 ))  # highest legal index
-      read -rp "Enter the index [0-${max}] of apps you want to unmount or 'Q' to Quit: " idx
-
-      # Validate and respond
-      if [[ "$idx" == [Qq]* ]]; then
-        break  # break the while loop
-      elif [[ "$idx" =~ ^[0-9]+$ ]] && (( idx >= 0 && idx <= max )); then
-        echo -e "$notice You chose: ${nameList[$idx]}"
+      # Get user input
+      read -p "Enter index [0-$(( ${#nameList[@]} - 1 ))] or 'Q' to quit: " idx
+    
+      [[ "$idx" =~ [Qq] ]] && break
+    
+      # Validate and process selection
+      if [[ "$idx" =~ ^[0-9]+$ ]] && [ "$idx" -lt "${#nameList[@]}" ]; then
+        for i in "${!nameArr[@]}"; do
+          if [ "${nameArr[$i]}" = "${nameList[$idx]}" ]; then
+            su -mm -c "/system/bin/sh /data/adb/post-fs-data.d/${pkgArr[$i]}.sh"
+            break
+          fi
+        done
       else
-        echo -e "$info \"$idx\" is not a valid index! Please select index [0-${max}]." >&2
+        echo "Invalid selection!"
       fi
-  
-      case "${nameList[$idx]}" in
-        YouTube)
-          pkgName="com.google.android.youtube"
-          su -mm -c "/system/bin/sh /data/adb/post-fs-data.d/$pkgName.sh"
-          ;;
-        "YouTube Music")
-          pkgName="com.google.android.apps.youtube.music"
-          su -mm -c "/system/bin/sh /data/adb/post-fs-data.d/$pkgName.sh"
-          ;;
-        "Google Photos")
-          pkgName="com.google.android.apps.photos"
-          su -mm -c "/system/bin/sh /data/adb/post-fs-data.d/$pkgName.sh"
-          ;;
-        *) echo -e "$info Invalid selection! Please select a valid app." ;;
-      esac
     done
   fi
   '\'''
