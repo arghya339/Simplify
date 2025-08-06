@@ -826,6 +826,7 @@ while true; do
                     [ -d "$SimplUsr" ] && rm -rf "$SimplUsr"
                     [ -f "$HOME/.Simplify.sh" ] && rm -f "$HOME/.Simplify.sh"
                     [ -f "$PREFIX/bin/simplify" ] && rm -f "$PREFIX/bin/simplify"
+                    clear
                     echo -e "$good ${Green}Simplify has been uninstalled successfully :(${Reset}"
                     echo -e "💔 ${Blue}We're sorry to see you go. Feel free to reinstall anytime!${Reset}"
                     termux-open-url "https://github.com/arghya339/Simplify/"
