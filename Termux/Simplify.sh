@@ -132,6 +132,7 @@ RipLocale="$(jq -r '.RipLocale' "$simplifyJson" 2>/dev/null)"
 RipDpi="$(jq -r '.RipDpi' "$simplifyJson" 2>/dev/null)"
 RipLib="$(jq -r '.RipLib' "$simplifyJson" 2>/dev/null)"
 ChangeRVXSource="$(jq -r '.ChangeRVXSource' "$simplifyJson" 2>/dev/null)"
+ReadPatchesFile="$(jq -r '.ReadPatchesFile' "$simplifyJson" 2>/dev/null)"
 isPreRelease=0  # Default value (false/off/0) for isPreRelease, it's enabled latest release for Patches source
 isRipLocale=1  # Default value (true/on/1) for RipLocale, it's delete locale from patches apk file except device specific locale by default
 isRipDpi=1  # Default value (true/on/1) for RipDpi, it's delete dpi from patches apk file except device specific dpi by default
