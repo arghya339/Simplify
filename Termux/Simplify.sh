@@ -254,13 +254,7 @@ Unmount() {
     for i in "${!pkgArr[@]}"; do 
         DIR="/data/adb/revanced/${pkgArr[$i]}/"
         if [ -e "$DIR" ]; then
-          if [ "$i" == "0" ]; then
-            nameList[$i]="${nameArr[0]}"
-          elif [ "$i" == "1" ]; then
-            nameList[$i]="${nameArr[1]}"
-          elif [ "$i" == "2" ]; then
-            nameList[$i]="${nameArr[2]}"
-          fi
+          nameList[$i]="${nameArr[$i]}"
         fi
     done
 
