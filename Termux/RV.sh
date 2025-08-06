@@ -350,10 +350,14 @@ if [ "$ReadPatchesFile" -eq 1 ]; then
   for (( i=0; i<${#filenames[@]}; i++ )); do
     if [ -f "$SimplUsr/${filenames[$i]}" ]; then
       if [ -s "$SimplUsr/${filenames[$i]}" ]; then
-        declare -n current_array="${arraynames[$i]}"               # Reference the array
-        current_array=()                                           # Clear it
-        readarray -t current_array < "$SimplUsr/${filenames[$i]}"  # Read file content & store it to current_array
-        unset -n current_array                                     # Remove nameReference
+        eval "${arraynames[$i]}=()"  # Clear target array
+        mapfile -t lines < "$SimplUsr/${filenames[$i]}"  # Read file into lines array
+        # Process each line
+        for line in "${lines[@]}"; do
+          [ -z "$line" ] && continue  # Skip empty lines
+          eval "args=($line)"  # Use eval to properly split arguments while preserving quotes
+          eval "${arraynames[$i]}+=(\"\${args[@]}\")"  # Add to target array
+        done
       else
         eval "${arraynames[$i]}=()"
       fi
