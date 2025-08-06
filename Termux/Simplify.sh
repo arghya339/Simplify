@@ -252,6 +252,7 @@ Unmount() {
   nameArr=("YouTube" "YouTube Music" "Google Photos")
   if [ -d "/data/adb/revanced" ]; then
     while true; do
+      nameList=()  # Clear nameList array first
       for i in "${!pkgArr[@]}"; do 
         DIR="/data/adb/revanced/${pkgArr[$i]}/"
         if [ -e "$DIR" ]; then
