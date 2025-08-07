@@ -182,6 +182,7 @@ if [ $Android -ge 10 ]; then
     YouTube\ Music
     InnerTune
     Spotify
+    spotube
     TikTok
     Google\ Photos
     $Instagram
@@ -213,6 +214,7 @@ elif [ $Android -eq 9 ]; then
     YouTube\ Music
     InnerTune
     Spotify
+    spotube
     TikTok
     Google\ Photos
     $Instagram
@@ -243,6 +245,7 @@ elif [ $Android -eq 8 ]; then
     YouTube\ Music
     InnerTune
     Spotify
+    spotube
     TikTok
     Google\ Photos
     $Instagram
@@ -271,6 +274,7 @@ elif [ $Android -eq 7 ]; then
     YouTube\ Music
     InnerTune
     Spotify
+    spotube
     TikTok
     Google\ Photos
     $Instagram
@@ -496,6 +500,8 @@ while true; do
       activityPatches="com.spotify.music/.MainActivity"
       dlPatchesApp "${appName}" "$owner" "$repo" "$assets" "$pkgPatches" "$activityPatches"
       ;;
+    spotube)
+      termux-open-url "https://spotube.krtirtho.dev/downloads/nightly"
     TikTok)
       appName="TikTok"
       owner="FiorenMas"
