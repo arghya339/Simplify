@@ -83,7 +83,7 @@ dlGitHub() {
         echo -e "$info latestReleases: v$latestReleases"
       fi
     fi
-    if [ "$repo" == "VancedMicroG" ] || [ "$repo" == "LSPatch" ]; then
+    if [ "$repo" == "VancedMicroG" ] || [ "$repo" == "LSPatch" ] || [ "$repo" == "YTPro" ]; then
       assetsName=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases/latest" | jq -r --arg regex "$regex" '.assets[] | select(.name | test($regex)) | .name' 2>/dev/null)
       assetsNameWithoutExt="${assetsName%.*}"
       fileName="$assetsNameWithoutExt-${latestReleases}$ext"
