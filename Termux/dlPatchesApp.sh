@@ -89,7 +89,7 @@ dlPatchesApp() {
       tag=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases/latest" | jq -r '.tag_name')
     fi
     local url="https://github.com/$owner/$repo/releases/download/$tag/microg.apk"
-  elif [ "$repo" == "Nobook" ]; then
+  elif [ "$repo" == "Nobook" ] || [ "$repo" == "FreeTubeAndroid" ]; then
     tag=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases/latest" | jq -r '.tag_name')
     local url="https://github.com/$owner/$repo/releases/download/$tag/Nobook_$tag.apk"
   elif [ "$repo" == "YTPro" ]; then
@@ -116,7 +116,7 @@ dlPatchesApp() {
       echo -e "$info ${Green}Downloaded $appName APK found:${Reset} $apk_path"
     fi
   fi
-  if [ $dlIs -eq 1 ] || [ "$repo" == "VancedMicroG" ] || [ "$repo" == "Nobook" ] || [ "$repo" == "YTPro" ]; then
+  if [ $dlIs -eq 1 ] || [ "$repo" == "VancedMicroG" ] || [ "$repo" == "Nobook" ] || [ "$repo" == "YTPro" ] || [ "$repo" == "FreeTubeAndroid" ]; then
     version=$($HOME/aapt2 dump badging $apk_path 2>/dev/null | sed -n "s/.*versionName='\([^']*\)'.*/\1/p")
     echo -e "[?] ${Yellow}Do you want to install ${appName} $version app? [Y/n] ${Reset}\c" && read opt
     case $opt in
@@ -169,6 +169,7 @@ if [ $Android -ge 10 ]; then
     YouTube\ RV
     YouTube
     YTPro
+    FreeTubeAndroid
     YouTube\ Music
     Spotify
     TikTok
@@ -197,6 +198,7 @@ elif [ $Android -eq 9 ]; then
     YouTube\ RV
     YouTube
     YTPro
+    FreeTubeAndroid
     YouTube\ Music
     Spotify
     TikTok
@@ -224,6 +226,7 @@ elif [ $Android -eq 8 ]; then
     YouTube\ RV
     YouTube
     YTPro
+    FreeTubeAndroid
     YouTube\ Music
     Spotify
     TikTok
@@ -249,6 +252,7 @@ elif [ $Android -eq 7 ]; then
     Vanced\ MicroG
     YouTube
     YTPro
+    FreeTubeAndroid
     YouTube\ Music
     Spotify
     TikTok
@@ -390,6 +394,17 @@ while true; do
       assets=$(basename "$apk_path")
       pkgPatches="com.google.android.youtube.pro"
       activityPatches="com.google.android.youtube.pro/.MainActivity"
+      dlPatchesApp "${appName}" "$owner" "$repo" "$assets" "$pkgPatches" "$activityPatches"
+      ;;
+    FreeTubeAndroid)
+      appName="FreeTubeAndroid"
+      owner="MarmadileManteater"
+      repo="FreeTubeAndroid"
+      bash $Simplify/dlGitHub.sh "$owner" "$repo" "latest" ".apk" "$SimplUsr"
+      apk_path=$(find "$SimplUsr" -type f -name "freetube-*-Android.apk" -print -quit)
+      assets=$(basename "$apk_path")
+      pkgPatches="io.freetubeapp.freetube"
+      activityPatches="io.freetubeapp.freetube/.MainActivity"
       dlPatchesApp "${appName}" "$owner" "$repo" "$assets" "$pkgPatches" "$activityPatches"
       ;;
     YouTube\ Music)
