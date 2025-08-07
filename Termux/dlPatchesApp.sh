@@ -99,6 +99,8 @@ dlPatchesApp() {
       assets="freetube-$tag-Android.apk"
     elif [ "$repo" == "Tubular" ]; then
       assets="tubular_$tag.apk"
+    elif [ "$repo" == "InnerTune" ]; then
+      assets="InnerTune_${tag}_full_$cpuAbi.apk"
     fi
     local url="https://github.com/$owner/$repo/releases/download/$tag/$assets"
   else
@@ -122,7 +124,7 @@ dlPatchesApp() {
       echo -e "$info ${Green}Downloaded $appName APK found:${Reset} $apk_path"
     fi
   fi
-  if [ $dlIs -eq 1 ] || [ "$repo" == "VancedMicroG" ] || [ "$repo" == "Nobook" ] || [ "$repo" == "YTPro" ] || [ "$repo" == "FreeTubeAndroid" ] || [ "$repo" == "Tubular" ]; then
+  if [ $dlIs -eq 1 ] || [ "$repo" == "VancedMicroG" ] || [ "$repo" == "Nobook" ] || [ "$repo" == "YTPro" ] || [ "$repo" == "FreeTubeAndroid" ] || [ "$repo" == "Tubular" ] || [ "$repo" == "InnerTune" ]; then
     version=$($HOME/aapt2 dump badging $apk_path 2>/dev/null | sed -n "s/.*versionName='\([^']*\)'.*/\1/p")
     echo -e "[?] ${Yellow}Do you want to install ${appName} $version app? [Y/n] ${Reset}\c" && read opt
     case $opt in
@@ -178,6 +180,7 @@ if [ $Android -ge 10 ]; then
     FreeTubeAndroid
     Tubular
     YouTube\ Music
+    InnerTune
     Spotify
     TikTok
     Google\ Photos
@@ -208,6 +211,7 @@ elif [ $Android -eq 9 ]; then
     FreeTubeAndroid
     Tubular
     YouTube\ Music
+    InnerTune
     Spotify
     TikTok
     Google\ Photos
@@ -237,6 +241,7 @@ elif [ $Android -eq 8 ]; then
     FreeTubeAndroid
     Tubular
     YouTube\ Music
+    InnerTune
     Spotify
     TikTok
     Google\ Photos
@@ -264,6 +269,7 @@ elif [ $Android -eq 7 ]; then
     FreeTubeAndroid
     Tubular
     YouTube\ Music
+    InnerTune
     Spotify
     TikTok
     Google\ Photos
@@ -463,6 +469,17 @@ while true; do
       fi
       pkgPatches="app.rvx.android.apps.youtube.music"
       activityPatches="com.google.android.apps.youtube.music/.activities.MusicActivity"
+      dlPatchesApp "${appName}" "$owner" "$repo" "$assets" "$pkgPatches" "$activityPatches"
+      ;;
+    InnerTune)
+      appName="InnerTune"
+      owner="z-huang"
+      repo="InnerTune"
+      bash $Simplify/dlGitHub.sh "$owner" "$repo" "latest" ".apk" "$SimplUsr"
+      apk_path=$(find "$SimplUsr" -type f -name "InnerTune_v*_full_$cpuAbi.apk" -print -quit)
+      assets=$(basename "$apk_path")
+      pkgPatches="com.zionhuang.music"
+      activityPatches="com.zionhuang.music/.MainActivity"
       dlPatchesApp "${appName}" "$owner" "$repo" "$assets" "$pkgPatches" "$activityPatches"
       ;;
     Spotify)
