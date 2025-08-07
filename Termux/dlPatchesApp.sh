@@ -106,13 +106,22 @@ dlPatchesApp() {
       assets="tubular_$tag.apk"
     elif [ "$repo" == "InnerTune" ]; then
       assets="InnerTune_${tag}_full_$cpuAbi.apk"
-    elif [ "$repo" == "Seal" ]; then
+    elif [ "$repo" == "Seal" ] || [ "$repo" == "ytdlnis" ]; then
       if [ "$release" == "latest" ]; then
         tag=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases/latest" | jq -r '.tag_name | sub("^v"; "")' 2>/dev/null)  # 1.13.1
-        assets="Seal-$tag-$cpuAbi-release.apk"
+        if [ "$repo" == "Seal" ]; then
+          assets="Seal-$tag-$cpuAbi-release.apk"
+        else
+          assets="YTDLnis-$tag-$cpuAbi-release.apk"
+        fi
       else
-        tag=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases" | jq -r '.[].tag_name | sub("^v"; "") | select(contains("alpha"))' | head -n 1 2>/dev/null)  # 2.0.0-alpha.5
-        assets="Seal-$tag-githubPreview-$cpuAbi-release.apk"
+        if [ "$repo" == "Seal" ]; then
+          tag=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases" | jq -r '.[].tag_name | sub("^v"; "") | select(contains("alpha"))' | head -n 1 2>/dev/null)  # 2.0.0-alpha.5
+          assets="Seal-$tag-githubPreview-$cpuAbi-release.apk"
+        else
+          tag=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases" | jq -r '.[].tag_name | sub("^v"; "") | select(contains("beta"))' | head -n 1 2>/dev/null)  # 2.0.0-alpha.5
+          assets="YTDLnis-$tag-$cpuAbi-release.apk"
+        fi
       fi
     fi
     local url="https://github.com/$owner/$repo/releases/download/$tag/$assets"
@@ -137,7 +146,7 @@ dlPatchesApp() {
       echo -e "$info ${Green}Downloaded $appName APK found:${Reset} $apk_path"
     fi
   fi
-  if [ $dlIs -eq 1 ] || [ "$repo" == "VancedMicroG" ] || [ "$repo" == "Nobook" ] || [ "$repo" == "YTPro" ] || [ "$repo" == "FreeTubeAndroid" ] || [ "$repo" == "Tubular" ] || [ "$repo" == "InnerTune" ] || [ "$repo" == "Seal" ]; then
+  if [ $dlIs -eq 1 ] || [ "$repo" == "VancedMicroG" ] || [ "$repo" == "Nobook" ] || [ "$repo" == "YTPro" ] || [ "$repo" == "FreeTubeAndroid" ] || [ "$repo" == "Tubular" ] || [ "$repo" == "InnerTune" ] || [ "$repo" == "Seal" ] || [ "$repo" == "ytdlnis" ]; then
     version=$($HOME/aapt2 dump badging $apk_path 2>/dev/null | sed -n "s/.*versionName='\([^']*\)'.*/\1/p")
     echo -e "[?] ${Yellow}Do you want to install ${appName} $version app? [Y/n] ${Reset}\c" && read opt
     case $opt in
@@ -195,6 +204,7 @@ if [ $Android -ge 10 ]; then
     YouTube\ Music
     InnerTune
     Seal
+    ytdlnis
     Spotify
     spotube
     TikTok
@@ -228,6 +238,7 @@ elif [ $Android -eq 9 ]; then
     YouTube\ Music
     InnerTune
     Seal
+    ytdlnis
     Spotify
     spotube
     TikTok
@@ -260,6 +271,7 @@ elif [ $Android -eq 8 ]; then
     YouTube\ Music
     InnerTune
     Seal
+    ytdlnis
     Spotify
     spotube
     TikTok
@@ -290,6 +302,7 @@ elif [ $Android -eq 7 ]; then
     YouTube\ Music
     InnerTune
     Seal
+    ytdlnis
     Spotify
     spotube
     TikTok
@@ -520,6 +533,24 @@ while true; do
       assets=$(basename "$apk_path")
       pkgPatches="com.junkfood.seal"
       activityPatches="com.junkfood.seal/.MainActivity"
+      dlPatchesApp "${appName}" "$owner" "$repo" "$assets" "$pkgPatches" "$activityPatches"
+      ;;
+    ytdlnis)
+      appName="ytdlnis"
+      owner="deniscerri"
+      repo="ytdlnis"
+      if [ "$release" == "latest" ]; then
+        regex="YTDLnis-.*-$cpuAbi-release.apk"
+        bash $Simplify/dlGitHub.sh "$owner" "$repo" "$release" ".apk" "$SimplUsr" "$regex"
+        apk_path=$(find "$SimplUsr" -type f -name "YTDLnis-*-$cpuAbi-release.apk" -print -quit)
+      else
+        regex="YTDLnis-.*-beta-$cpuAbi-release.apk"
+        bash $Simplify/dlGitHub.sh "$owner" "$repo" "$release" ".apk" "$SimplUsr" "$regex"
+        apk_path=$(find "$SimplUsr" -type f -name "YTDLnis-*-beta-$cpuAbi-release.apk" -print -quit)
+      fi
+      assets=$(basename "$apk_path")
+      pkgPatches="com.deniscerri.ytdl"
+      activityPatches="com.deniscerri.ytdl/.Default"
       dlPatchesApp "${appName}" "$owner" "$repo" "$assets" "$pkgPatches" "$activityPatches"
       ;;
     Spotify)
