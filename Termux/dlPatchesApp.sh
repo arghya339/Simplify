@@ -500,8 +500,7 @@ while true; do
       activityPatches="com.spotify.music/.MainActivity"
       dlPatchesApp "${appName}" "$owner" "$repo" "$assets" "$pkgPatches" "$activityPatches"
       ;;
-    spotube)
-      termux-open-url "https://spotube.krtirtho.dev/downloads/nightly"
+    spotube) termux-open-url "https://spotube.krtirtho.dev/downloads/nightly" ;;
     TikTok)
       appName="TikTok"
       owner="FiorenMas"
