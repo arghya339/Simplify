@@ -89,12 +89,18 @@ dlPatchesApp() {
       tag=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases/latest" | jq -r '.tag_name')
     fi
     local url="https://github.com/$owner/$repo/releases/download/$tag/microg.apk"
-  elif [ "$repo" == "Nobook" ] || [ "$repo" == "FreeTubeAndroid" ]; then
+  elif [ "$repo" == "Nobook" ] || [ "$repo" == "YTPro" ] || [ "$repo" == "FreeTubeAndroid" ] || [ "$repo" == "Tubular" ]; then
     tag=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases/latest" | jq -r '.tag_name')
-    local url="https://github.com/$owner/$repo/releases/download/$tag/Nobook_$tag.apk"
-  elif [ "$repo" == "YTPro" ]; then
-    tag=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases/latest" | jq -r '.tag_name')
-    local url="https://github.com/$owner/$repo/releases/download/$tag/YTPRO.apk"
+    if [ "$repo" == "Nobook" ]; then
+      assets="Nobook_$tag.apk"
+    elif [ "$repo" == "YTPro" ]; then
+      assets="YTPRO.apk"
+    elif [ "$repo" == "FreeTubeAndroid" ]; then
+      assets="freetube-$tag-Android.apk"
+    elif [ "$repo" == "Tubular" ]; then
+      assets="tubular_$tag.apk"
+    fi
+    local url="https://github.com/$owner/$repo/releases/download/$tag/$assets"
   else
     local url="https://github.com/$owner/$repo/releases/download/all/$assets"
   fi
@@ -116,7 +122,7 @@ dlPatchesApp() {
       echo -e "$info ${Green}Downloaded $appName APK found:${Reset} $apk_path"
     fi
   fi
-  if [ $dlIs -eq 1 ] || [ "$repo" == "VancedMicroG" ] || [ "$repo" == "Nobook" ] || [ "$repo" == "YTPro" ] || [ "$repo" == "FreeTubeAndroid" ]; then
+  if [ $dlIs -eq 1 ] || [ "$repo" == "VancedMicroG" ] || [ "$repo" == "Nobook" ] || [ "$repo" == "YTPro" ] || [ "$repo" == "FreeTubeAndroid" ] || [ "$repo" == "Tubular" ]; then
     version=$($HOME/aapt2 dump badging $apk_path 2>/dev/null | sed -n "s/.*versionName='\([^']*\)'.*/\1/p")
     echo -e "[?] ${Yellow}Do you want to install ${appName} $version app? [Y/n] ${Reset}\c" && read opt
     case $opt in
@@ -170,6 +176,7 @@ if [ $Android -ge 10 ]; then
     YouTube
     YTPro
     FreeTubeAndroid
+    Tubular
     YouTube\ Music
     Spotify
     TikTok
@@ -199,6 +206,7 @@ elif [ $Android -eq 9 ]; then
     YouTube
     YTPro
     FreeTubeAndroid
+    Tubular
     YouTube\ Music
     Spotify
     TikTok
@@ -227,6 +235,7 @@ elif [ $Android -eq 8 ]; then
     YouTube
     YTPro
     FreeTubeAndroid
+    Tubular
     YouTube\ Music
     Spotify
     TikTok
@@ -253,6 +262,7 @@ elif [ $Android -eq 7 ]; then
     YouTube
     YTPro
     FreeTubeAndroid
+    Tubular
     YouTube\ Music
     Spotify
     TikTok
@@ -272,6 +282,7 @@ elif [ $Android -eq 6 ]; then
     Vanced\ MicroG
     YouTube
     YTPro
+    Tubular
     YouTube\ Music
     TikTok
     Google\ Photos
@@ -286,6 +297,7 @@ elif [ $Android -eq 5 ]; then
   apps=(
     Quit
     YTPro
+    Tubular
     Vanced\ MicroG
     YouTube\ Music
     TikTok
@@ -405,6 +417,17 @@ while true; do
       assets=$(basename "$apk_path")
       pkgPatches="io.freetubeapp.freetube"
       activityPatches="io.freetubeapp.freetube/.MainActivity"
+      dlPatchesApp "${appName}" "$owner" "$repo" "$assets" "$pkgPatches" "$activityPatches"
+      ;;
+    Tubular)
+      appName="Tubular"
+      owner="polymorphicshade"
+      repo="Tubular"
+      bash $Simplify/dlGitHub.sh "$owner" "$repo" "latest" ".apk" "$SimplUsr"
+      apk_path=$(find "$SimplUsr" -type f -name "tubular_v*.apk" -print -quit)
+      assets=$(basename "$apk_path")
+      pkgPatches="org.polymorphicshade.tubular"
+      activityPatches="org.polymorphicshade.tubular/org.schabi.newpipe.MainActivity"
       dlPatchesApp "${appName}" "$owner" "$repo" "$assets" "$pkgPatches" "$activityPatches"
       ;;
     YouTube\ Music)
