@@ -92,6 +92,9 @@ dlPatchesApp() {
   elif [ "$repo" == "Nobook" ]; then
     tag=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases/latest" | jq -r '.tag_name')
     local url="https://github.com/$owner/$repo/releases/download/$tag/Nobook_$tag.apk"
+  elif [ "$repo" == "YTPro" ]; then
+    tag=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases/latest" | jq -r '.tag_name')
+    local url="https://github.com/$owner/$repo/releases/download/$tag/YTPRO.apk"
   else
     local url="https://github.com/$owner/$repo/releases/download/all/$assets"
   fi
@@ -113,7 +116,7 @@ dlPatchesApp() {
       echo -e "$info ${Green}Downloaded $appName APK found:${Reset} $apk_path"
     fi
   fi
-  if [ $dlIs -eq 1 ] || [ "$repo" == "VancedMicroG" ] || [ "$repo" == "Nobook" ]; then
+  if [ $dlIs -eq 1 ] || [ "$repo" == "VancedMicroG" ] || [ "$repo" == "Nobook" ] || [ "$repo" == "YTPro" ]; then
     version=$($HOME/aapt2 dump badging $apk_path 2>/dev/null | sed -n "s/.*versionName='\([^']*\)'.*/\1/p")
     echo -e "[?] ${Yellow}Do you want to install ${appName} $version app? [Y/n] ${Reset}\c" && read opt
     case $opt in
@@ -165,6 +168,7 @@ if [ $Android -ge 10 ]; then
     Vanced\ MicroG
     YouTube\ RV
     YouTube
+    YTPro
     YouTube\ Music
     Spotify
     TikTok
@@ -192,6 +196,7 @@ elif [ $Android -eq 9 ]; then
     Vanced\ MicroG
     YouTube\ RV
     YouTube
+    YTPro
     YouTube\ Music
     Spotify
     TikTok
@@ -218,6 +223,7 @@ elif [ $Android -eq 8 ]; then
     Vanced\ MicroG
     YouTube\ RV
     YouTube
+    YTPro
     YouTube\ Music
     Spotify
     TikTok
@@ -242,6 +248,7 @@ elif [ $Android -eq 7 ]; then
     Quit
     Vanced\ MicroG
     YouTube
+    YTPro
     YouTube\ Music
     Spotify
     TikTok
@@ -260,6 +267,7 @@ elif [ $Android -eq 6 ]; then
     Quit
     Vanced\ MicroG
     YouTube
+    YTPro
     YouTube\ Music
     TikTok
     Google\ Photos
@@ -273,6 +281,7 @@ elif [ $Android -eq 6 ]; then
 elif [ $Android -eq 5 ]; then
   apps=(
     Quit
+    YTPro
     Vanced\ MicroG
     YouTube\ Music
     TikTok
@@ -370,6 +379,17 @@ while true; do
       fi
       pkgPatches="app.rvx.android.youtube"
       activityPatches="com.google.android.youtube/.app.honeycomb.Shell\$HomeActivity"
+      dlPatchesApp "${appName}" "$owner" "$repo" "$assets" "$pkgPatches" "$activityPatches"
+      ;;
+    YTPro)
+      appName="YTPro"
+      owner="prateek-chaubey"
+      repo="YTPro"
+      bash $Simplify/dlGitHub.sh "$owner" "$repo" "latest" ".apk" "$SimplUsr"
+      apk_path=$(find "$SimplUsr" -type f -name "YTPRO_*.apk" -print -quit)
+      assets=$(basename "$apk_path")
+      pkgPatches="com.google.android.youtube.pro"
+      activityPatches="com.google.android.youtube.pro/.MainActivity"
       dlPatchesApp "${appName}" "$owner" "$repo" "$assets" "$pkgPatches" "$activityPatches"
       ;;
     YouTube\ Music)
