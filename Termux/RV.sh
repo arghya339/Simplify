@@ -252,31 +252,6 @@ cricbuzz_patches_args=()
 # When $ReadPatchesFile value is 1
 if [ "$ReadPatchesFile" -eq 1 ]; then
   
-  # Array to stores filenames
-  filenames=(
-    yt_patches_args.txt
-    spotify_patches_args.txt
-    tiktok_patches_args.txt
-    photos_patches_args.txt
-    instagram_patches_args.txt
-    facebook_patches_args.txt
-    fb_messenger_patches_args.txt
-    lightroom_patches_args.txt
-    photomath_patches_args.txt
-    duolingo_patches_args.txt
-    rar_patches_args.txt
-    prime_video_patches_args.txt
-    twitch_patches_args.txt
-    tumblr_patches_args.txt
-    threads_patches_args.txt
-    strava_patches_args.txt
-    soundcloud_patches_args.txt
-    protonmail_patches_args.txt
-    myfitnesspal_patches_args.txt
-    crunchyroll_patches_args.txt
-    cricbuzz_patches_args.txt
-  )
-  
   # Default content for new files
   default_content=(
     # [0] YouTube
@@ -339,19 +314,19 @@ if [ "$ReadPatchesFile" -eq 1 ]; then
   )
   
   # Create Empty Files if it doesn’t exist
-  for ((i=0; i<${#filenames[@]}; i++)); do
-    if [ ! -e "$SimplUsr/${filenames[$i]}" ]; then
-      #touch "$SimplUsr/${filenames[$i]}"
-      printf "%s\n" "${default_content[i]}" > "$SimplUsr/${filenames[$i]}"
+  for ((i=0; i<${#arraynames[@]}; i++)); do
+    if [ ! -e "$SimplUsr/${arraynames[$i]}.txt" ]; then
+      #touch "$SimplUsr/${arraynames[$i]}.txt"
+      printf "%s\n" "${default_content[i]}" > "$SimplUsr/${arraynames[$i]}.txt"
     fi
   done
   
   # Read Files into Arrays
-  for (( i=0; i<${#filenames[@]}; i++ )); do
-    if [ -f "$SimplUsr/${filenames[$i]}" ]; then
-      if [ -s "$SimplUsr/${filenames[$i]}" ]; then
+  for (( i=0; i<${#arraynames[@]}; i++ )); do
+    if [ -f "$SimplUsr/${arraynames[$i]}.txt" ]; then
+      if [ -s "$SimplUsr/${arraynames[$i]}.txt" ]; then
         eval "${arraynames[$i]}=()"  # Clear target array
-        mapfile -t lines < "$SimplUsr/${filenames[$i]}"  # Read file into lines array
+        mapfile -t lines < "$SimplUsr/${arraynames[$i]}.txt"  # Read file into lines array
         # Process each line
         for line in "${lines[@]}"; do
           [ -z "$line" ] && continue  # Skip empty lines
