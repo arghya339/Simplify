@@ -116,11 +116,15 @@ dlGitHub() {
         findFile="$dir/$fileName"
         dl "curl" "$dlUrl" "$findFile"
       fi
-    elif [ "$repo" == "ReVancedApp-Actions" ] || [ "$repo" == "Revanced-And-Revanced-Extended-Non-Root" ]; then
+    elif [ "$repo" == "ReVancedApp-Actions" ] || [ "$repo" == "Revanced-And-Revanced-Extended-Non-Root" ] || [ "$repo" == "FreeTubeAndroid" ]; then
       [ -f "$findFile" ] && rm "$findFile"
       dlUrl="https://github.com/$owner/$repo/releases/download/${latestReleases}/$assetsName"
       findFile="$dir/$assetsName"
-      dl "aria2" "$dlUrl" "$findFile"
+      if [ "$repo" == "ReVancedApp-Actions" ] || [ "$repo" == "Revanced-And-Revanced-Extended-Non-Root" ]; then
+        dl "aria2" "$dlUrl" "$findFile"
+      else
+        dl "curl" "$dlUrl" "$findFile"
+      fi
     else 
       if [ "$assetsName" != "$fileBaseName" ]; then
         echo -e "$notice diffs: $assetsName ~ $fileBaseName"
