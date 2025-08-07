@@ -511,6 +511,9 @@ overwriteArch() {
 getListOfPatches() {
   local pkgName="$1"
   curl -sL 'https://api.revanced.app/v4/patches/list' | jq --arg pkgName "$pkgName" '.[] | select(.compatiblePackages."'"$pkgName"'" != null)'
+  if [ "$ReadPatchesFile" -eq 1 ]; then
+    $PREFIX/lib/jvm/java-21-openjdk/bin/java -jar $ReVancedCLIJar list-patches -d=true -f=$pkgName -i=true -o=true -p=false -u -v=false $PatchesRvp | tee "$SimplUsr/${pkgName}_list-patches.txt"
+  fi
   Patches=$(curl -sL 'https://api.revanced.app/v4/patches/list' | jq --arg pkgName "$pkgName" '.[] | select(.compatiblePackages."'"$pkgName"'" != null)')
   if [ "$pkgName" == "app.revanced" ]; then
     $PREFIX/lib/jvm/java-21-openjdk/bin/java -jar $ReVancedCLIJar list-patches -d=true -f=$pkgName -i=true -o=true -p=false -u=true -v=false $PatchesRvp  # get only universal-patches list
