@@ -248,8 +248,7 @@ crunchyroll_patches_args=()
 
 cricbuzz_patches_args=()
 
-
-# When $ReadPatchesFile value is 1
+# When $ReadPatchesFile is Enabled
 if [ "$ReadPatchesFile" -eq 1 ]; then
   
   # Default content for new files
