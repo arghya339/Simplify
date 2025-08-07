@@ -475,7 +475,8 @@ while true; do
       appName="InnerTune"
       owner="z-huang"
       repo="InnerTune"
-      bash $Simplify/dlGitHub.sh "$owner" "$repo" "latest" ".apk" "$SimplUsr"
+      regex="InnerTune_v.*_full_$cpuAbi.apk"
+      bash $Simplify/dlGitHub.sh "$owner" "$repo" "latest" ".apk" "$SimplUsr" "$regex"
       apk_path=$(find "$SimplUsr" -type f -name "InnerTune_v*_full_$cpuAbi.apk" -print -quit)
       assets=$(basename "$apk_path")
       pkgPatches="com.zionhuang.music"
