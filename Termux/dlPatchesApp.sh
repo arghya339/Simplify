@@ -386,7 +386,7 @@ while true; do
       owner="prateek-chaubey"
       repo="YTPro"
       bash $Simplify/dlGitHub.sh "$owner" "$repo" "latest" ".apk" "$SimplUsr"
-      apk_path=$(find "$SimplUsr" -type f -name "YTPRO_*.apk" -print -quit)
+      apk_path=$(find "$SimplUsr" -type f -name "YTPRO-*.apk" -print -quit)
       assets=$(basename "$apk_path")
       pkgPatches="com.google.android.youtube.pro"
       activityPatches="com.google.android.youtube.pro/.MainActivity"
