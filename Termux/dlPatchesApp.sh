@@ -44,6 +44,11 @@ elif [ -f "$simplifyJson" ] && jq -e '.PAT' "$simplifyJson" >/dev/null 2>&1; the
 else
   auth=""
 fi
+if [ $FetchPreRelease -eq 1 ]; then
+  release="pre"
+else
+  release="latest"
+fi
 
 # --- Checking Android Version ---
 if [ $Android -le 3 ]; then
@@ -101,6 +106,14 @@ dlPatchesApp() {
       assets="tubular_$tag.apk"
     elif [ "$repo" == "InnerTune" ]; then
       assets="InnerTune_${tag}_full_$cpuAbi.apk"
+    elif [ "$repo" == "Seal" ]; then
+      if [ "$release" == "latest" ]; then
+        tag=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases/latest" | jq -r '.tag_name | sub("^v"; "")' 2>/dev/null)  # 1.13.1
+        assets="Seal-$tag-$cpuAbi-release.apk"
+      else
+        tag=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases" | jq -r '.[].tag_name | sub("^v"; "") | select(contains("alpha"))' | head -n 1 2>/dev/null)  # 2.0.0-alpha.5
+        assets="Seal-$tag-githubPreview-$cpuAbi-release.apk"
+      fi
     fi
     local url="https://github.com/$owner/$repo/releases/download/$tag/$assets"
   else
@@ -124,7 +137,7 @@ dlPatchesApp() {
       echo -e "$info ${Green}Downloaded $appName APK found:${Reset} $apk_path"
     fi
   fi
-  if [ $dlIs -eq 1 ] || [ "$repo" == "VancedMicroG" ] || [ "$repo" == "Nobook" ] || [ "$repo" == "YTPro" ] || [ "$repo" == "FreeTubeAndroid" ] || [ "$repo" == "Tubular" ] || [ "$repo" == "InnerTune" ]; then
+  if [ $dlIs -eq 1 ] || [ "$repo" == "VancedMicroG" ] || [ "$repo" == "Nobook" ] || [ "$repo" == "YTPro" ] || [ "$repo" == "FreeTubeAndroid" ] || [ "$repo" == "Tubular" ] || [ "$repo" == "InnerTune" ] || [ "$repo" == "Seal" ]; then
     version=$($HOME/aapt2 dump badging $apk_path 2>/dev/null | sed -n "s/.*versionName='\([^']*\)'.*/\1/p")
     echo -e "[?] ${Yellow}Do you want to install ${appName} $version app? [Y/n] ${Reset}\c" && read opt
     case $opt in
@@ -181,6 +194,7 @@ if [ $Android -ge 10 ]; then
     Tubular
     YouTube\ Music
     InnerTune
+    Seal
     Spotify
     spotube
     TikTok
@@ -213,6 +227,7 @@ elif [ $Android -eq 9 ]; then
     Tubular
     YouTube\ Music
     InnerTune
+    Seal
     Spotify
     spotube
     TikTok
@@ -244,6 +259,7 @@ elif [ $Android -eq 8 ]; then
     Tubular
     YouTube\ Music
     InnerTune
+    Seal
     Spotify
     spotube
     TikTok
@@ -273,6 +289,7 @@ elif [ $Android -eq 7 ]; then
     Tubular
     YouTube\ Music
     InnerTune
+    Seal
     Spotify
     spotube
     TikTok
@@ -485,6 +502,24 @@ while true; do
       assets=$(basename "$apk_path")
       pkgPatches="com.zionhuang.music"
       activityPatches="com.zionhuang.music/.MainActivity"
+      dlPatchesApp "${appName}" "$owner" "$repo" "$assets" "$pkgPatches" "$activityPatches"
+      ;;
+    Seal)
+      appName="Seal"
+      owner="JunkFood02"
+      repo="Seal"
+      if [ "$release" == "latest" ]; then
+        regex="Seal-.*-$cpuAbi-release.apk"
+        bash $Simplify/dlGitHub.sh "$owner" "$repo" "$release" ".apk" "$SimplUsr" "$regex"
+        apk_path=$(find "$SimplUsr" -type f -name "Seal-*-$cpuAbi-release.apk" -print -quit)
+      else
+        regex="Seal-.*-githubPreview-$cpuAbi-release.apk"
+        bash $Simplify/dlGitHub.sh "$owner" "$repo" "$release" ".apk" "$SimplUsr" "$regex"
+        apk_path=$(find "$SimplUsr" -type f -name "Seal-*-githubPreview-$cpuAbi-release.apk" -print -quit)
+      fi
+      assets=$(basename "$apk_path")
+      pkgPatches="com.junkfood.seal"
+      activityPatches="com.junkfood.seal/.MainActivity"
       dlPatchesApp "${appName}" "$owner" "$repo" "$assets" "$pkgPatches" "$activityPatches"
       ;;
     Spotify)
