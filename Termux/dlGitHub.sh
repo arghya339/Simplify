@@ -106,7 +106,7 @@ dlGitHub() {
       fileBaseName=$(basename $findFile)
     fi
     
-    if [ "$repo" == "VancedMicroG" ] || [ "$repo" == "LSPatch" ]; then
+    if [ "$repo" == "VancedMicroG" ] || [ "$repo" == "LSPatch" ] || [ "$repo" == "YTPro" ]; then
       if [ "$fileName" != "$fileBaseName" ]; then
         echo -e "$notice diffs: $fileName ~ $fileBaseName"
         [ -f "$findFile" ] && rm "$findFile"
