@@ -273,54 +273,54 @@ sign_app() {
 comment
 
 if [ "$cpuAbi" == "arm64-v8a" ] || [ "$cpuAbi" == "armeabi-v7a" ]; then
-  Snapchat=("Snapchat")
-  LINE=("LINE")
+  Snapchat="Snapchat"
+  LINE="LINE"
   if su -c "id" >/dev/null 2>&1; then
-    googleDialer=("Phone by Google")
+    googleDialer="PhoneByGoogle"
   fi
 fi
 
 if [ $Android -ge 10 ]; then
   apps=(
     Quit
-    "${Snapchat[0]}"
+    ${Snapchat}
     Discord
-    "${LINE[0]}"
-    "${googleDialer[0]}"
+    ${LINE}
+    ${googleDialer}
     "1.1.1.1 + WARP"
   )
 elif [ $Android -eq 9 ]; then
   apps=(
     Quit
-    "${Snapchat[0]}"
+    ${Snapchat}
     Discord
-    "${googleDialer[0]}"
+    ${googleDialer}
     "1.1.1.1 + WARP"
   )
 elif [ $Android -eq 8 ]; then
   apps=(
     Quit
-    "${Snapchat[0]}"
+    ${Snapchat}
     Discord
     "1.1.1.1 + WARP"
   )
 elif [ $Android -eq 7 ]; then
   apps=(
     Quit
-    "${Snapchat[0]}"
+    ${Snapchat}
     Discord
     "1.1.1.1 + WARP"
   )
 elif [ $Android -eq 6 ]; then
   apps=(
     Quit
-    "${Snapchat[0]}"
+    ${Snapchat}
     "1.1.1.1 + WARP"
   )
 elif [ $Android -eq 5 ]; then
   apps=(
     Quit
-    "${Snapchat[0]}"
+    ${Snapchat}
     "1.1.1.1 + WARP"
   )
 fi
@@ -418,7 +418,7 @@ while true; do
       BugReport="https://github.com/yagiyuu/LineXtra/issues"
       build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "APKMirror" "stock_apk_path" "$module_apk_path" "$BugReport" "$pkgName" "$activityPatches"
       ;;
-    Phone\ by\ Google)
+    PhoneByGoogle)
       appName=("Phone by Google")
       pkgName="com.google.android.dialer"
       if [ $Android -ge 11 ]; then
