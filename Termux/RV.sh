@@ -1067,7 +1067,7 @@ while true; do
     Twitch)
       pkgName="tv.twitch.android.app"
       appName=("Twitch")
-      pkgVersion="16.9.1"
+      pkgVersion="25.3.0"
       #pkgVersion=""
       if [ -z "$pkgVersion" ]; then
         getVersion "$pkgName"
