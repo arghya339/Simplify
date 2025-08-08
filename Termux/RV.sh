@@ -947,13 +947,13 @@ while true; do
     Instagram)
       pkgName="com.instagram.android"
       appName=("Instagram")
-      pkgVersion="378.0.0.52.68"
+      pkgVersion="392.2.0.58.78"
       #pkgVersion=""
       if [ -z "$pkgVersion" ]; then
         getVersion "$pkgName"
         pkgVersion="$pkgVersion"
       fi
-      Type="APK"
+      Type="BUNDLE"
       Arch=("$cpuAbi")
       activityPatches="com.instagram.android/.activity.MainTabActivity"
       build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "APKMirror" "instagram_patches_args" "$pkgName" "$activityPatches" "" "" ""
