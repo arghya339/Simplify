@@ -607,6 +607,7 @@ while true; do
       elif [ $cpuAbi == armeabi-v7a ]; then
         cpuAbi=armeabi_v7a
       fi
+      mkdir -p "$SimplUsr/Spotube-playstore-all-arch"
       pv "$apks_path" | bsdtar -xf - -C "$SimplUsr/Spotube-playstore-all-arch" --include "base-$locale.apk" "base-$cpuAbi.apk" "base-$lcd_dpi.apk"
       cpuAbi=$(getprop ro.product.cpu.abi)
       rm "$apks_path"
