@@ -618,7 +618,7 @@ while true; do
       rm -rf "$SimplUsr/Spotube-playstore-all-arch"
       apk_path="$SimplUsr/Spotube-playstore-all-arch-signed.apk"
       $PREFIX/lib/jvm/java-21-openjdk/bin/java -jar $PREFIX/share/java/apksigner.jar sign --ks $Simplify/ks.keystore --ks-pass pass:123456 --ks-key-alias ReVancedKey --key-pass pass:123456 --out "$apk_path" "$SimplUsr/Spotube-playstore-all-arch.apk"
-      rm "$SimplUsr/Spotube-playstore-all-arch.apk" && rm "$SimplUsr/Spotube-playstore-all-arch.apk.idsig"
+      rm "$SimplUsr/Spotube-playstore-all-arch.apk" && rm "${apk_path}.idsig"
       assets=$(basename "$apk_path")
       pkgPatches="oss.krtirtho.spotube.nightly"
       activityPatches="oss.krtirtho.spotube.nightly/com.ryanheise.audioservice.AudioServiceActivity"
