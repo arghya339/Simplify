@@ -608,7 +608,7 @@ while true; do
         cpuAbi=armeabi_v7a
       fi
       mkdir -p "$SimplUsr/Spotube-playstore-all-arch"
-      pv "$apks_path" | bsdtar -xf - -C "$SimplUsr/Spotube-playstore-all-arch" --include "splits/base-$locale.apk" "splits/base-$cpuAbi.apk" "splits/base-$lcd_dpi.apk"
+      pv "$apks_path" | bsdtar -xf - -C "$SimplUsr/Spotube-playstore-all-arch" --include "splits/base-master.apk" --include "splits/base-$cpuAbi.apk" --include "splits/base-${lcd_dpi}.apk" --include "splits/base-$locale.apk"
       cpuAbi=$(getprop ro.product.cpu.abi)
       rm "$apks_path"
       bash $Simplify/dlGitHub.sh "REAndroid" "APKEditor" "latest" ".jar" "$Simplify"
