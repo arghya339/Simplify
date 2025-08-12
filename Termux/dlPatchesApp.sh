@@ -594,6 +594,7 @@ while true; do
       assets_name="Spotube-playstore-all-arch.aab"
       aab_path="$SimplUsr/$assets_name"
       aria2c -x 16 -s 16 --console-log-level=error --summary-interval=0 --download-result=hide -c -o "$assets_name" -d "$SimplUsr" "$url"
+      echo  # White Space
       bundletoolJar=$(find "$Simplify" -type f -name "bundletool-all-*.jar" -print -quit 2>/dev/null)
       if [ ! -f "$bundletoolJar" ]; then
         bash $Simplify/dlGitHub.sh "google" "bundletool" "latest" ".jar" "$Simplify"
@@ -602,10 +603,10 @@ while true; do
       apks_path="$SimplUsr/Spotube-playstore-all-arch.apks"
       $PREFIX/lib/jvm/java-21-openjdk/bin/java -jar $bundletoolJar build-apks --bundle=$aab_path --output=$apks_path --aapt2=~/aapt2
       rm "$aab_path"
-      if [ $cpuAbi == arm64-v8a ]; then
-        cpuAbi=arm64_v8a
-      elif [ $cpuAbi == armeabi-v7a ]; then
-        cpuAbi=armeabi_v7a
+      if [ "$cpuAbi" == "arm64-v8a" ]; then
+        cpuAbi="arm64_v8a"
+      elif [ "$cpuAbi" == "armeabi-v7a" ]; then
+        cpuAbi="armeabi_v7a"
       fi
       mkdir -p "$SimplUsr/Spotube-playstore-all-arch"
       pv "$apks_path" | bsdtar -xf - -C "$SimplUsr/Spotube-playstore-all-arch" --include "splits/base-master.apk" --include "splits/base-$cpuAbi.apk" --include "splits/base-${lcd_dpi}.apk" --include "splits/base-$locale.apk"
@@ -613,7 +614,7 @@ while true; do
       rm "$apks_path"
       bash $Simplify/dlGitHub.sh "REAndroid" "APKEditor" "latest" ".jar" "$Simplify"
       APKEditor=$(find "$Simplify" -type f -name "APKEditor-*.jar" -print -quit)
-      $PREFIX/lib/jvm/java-21-openjdk/bin/java -jar $APKEditor m -i "$SimplUsr/Spotube-playstore-all-arch" -o "$SimplUsr/Spotube-playstore-all-arch.apk"
+      $PREFIX/lib/jvm/java-21-openjdk/bin/java -jar $APKEditor m -i "$SimplUsr/Spotube-playstore-all-arch/splits" -o "$SimplUsr/Spotube-playstore-all-arch.apk"
       rm -rf "$SimplUsr/Spotube-playstore-all-arch"
       apk_path="$SimplUsr/Spotube-playstore-all-arch-signed.apk"
       $PREFIX/lib/jvm/java-21-openjdk/bin/java -jar $PREFIX/share/java/apksigner.jar sign --ks $Simplify/ks.keystore --ks-pass pass:123456 --ks-key-alias ReVancedKey --key-pass pass:123456 --out "$apk_path" "$SimplUsr/Spotube-playstore-all-arch.apk"
