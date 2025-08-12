@@ -245,6 +245,8 @@ else
   photos_patches_args+=(-e "GmsCore support" -O gmsCoreVendorGroupId="com.mgoogle")
 fi
 
+recorder_patches_args=()
+
 instagram_patches_args=()
 
 facebook_patches_args=()
@@ -636,6 +638,10 @@ listOfPatches() {
       pkgName="com.google.android.apps.photos"
       getListOfPatches "$pkgName"
       ;;
+    GoogleRecorder)
+      pkgName="com.google.android.apps.recorder"
+      getListOfPatches "$pkgName"
+      ;;
     Instagram)
       pkgName="com.instagram.android"
       getListOfPatches "$pkgName"
@@ -713,6 +719,7 @@ listOfPatches() {
   Spotify 7.0+
   TikTok 5.0+
   Google Photos 5.0+
+  Google Recorder 10+
   Instagram arm64 + x64 9.0+
   Instagram arm32 + x86 7.0+
   Facebook arm64 + x64 9.0+
@@ -736,6 +743,9 @@ listOfPatches() {
   Cricbuzz 5.0+
 comment
 
+if su -c "id" >/dev/null 2>&1 && [ "$cpuAbi" == "arm64-v8a" ]; then
+  googleRecorder="GoogleRecorder"
+fi
 if  [[ $Android -ge 9  &&  ( "$cpuAbi" == "arm64-v8a" || "$cpuAbi" == "x86_64" ) ]]; then
   Instagram="Instagram"
   #Facebook="Facebook"
@@ -767,6 +777,7 @@ if [ $Android -ge 12 ]; then
     Spotify
     TikTok
     Google\ Photos
+    $googleRecorder
     $Instagram
     $Facebook
     ${fbMessenger}
@@ -792,6 +803,7 @@ elif [ $Android -eq 11 ]; then
     Spotify
     TikTok
     Google\ Photos
+    $googleRecorder
     $Instagram
     $Facebook
     ${fbMessenger}
@@ -816,6 +828,7 @@ elif [ $Android -eq 10 ]; then
     Spotify
     TikTok
     Google\ Photos
+    $googleRecorder
     $Instagram
     $Facebook
     ${fbMessenger}
@@ -1029,11 +1042,22 @@ while true; do
       fi
       Type="APK"
       Arch=("$cpuAbi")
-      photos_apk_path=("$Download/${appName[0]}_v${pkgVersion}-${Arch[0]}.apk")
-      outputAPK="$SimplUsr/google-photos-rv_v${pkgVersion}-$cpuAbi.apk"
       pkgPatches="app.revanced.android.apps.photos"
       activityPatches="com.google.android.apps.photos/.home.HomeActivity"
       build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "APKMirror" "photos_patches_args" "$pkgPatches" "$activityPatches" "" "" ""
+      ;;
+    GoogleRecorder)
+      pkgName="com.google.android.apps.recorder"
+      appName=("Google Recorder")
+      pkgVersion="4.2.20230801.561280372"
+      #pkgVersion=""
+      if [ -z "$pkgVersion" ]; then
+        getVersion "$pkgName"
+        pkgVersion="$pkgVersion"
+      fi
+      Type="APK"
+      Arch=("$cpuAbi")
+      build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "APKMirror" "recorder_patches_args" "$pkgName" "" "" "" ""
       ;;
     Instagram)
       pkgName="com.instagram.android"
