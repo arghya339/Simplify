@@ -116,7 +116,7 @@ dlGitHub() {
         findFile="$dir/$fileName"
         dl "curl" "$dlUrl" "$findFile"
       fi
-    elif [ "$repo" == "ReVancedApp-Actions" ] || [ "$repo" == "Revanced-And-Revanced-Extended-Non-Root" ] || [ "$repo" == "FreeTubeAndroid" ]; then
+    elif [ "$repo" == "ReVancedApp-Actions" ] || [ "$repo" == "Revanced-And-Revanced-Extended-Non-Root" ] || [ "$repo" == "FreeTubeAndroid" ] || [ "$repo" == "bundletool" ]; then
       [ -f "$findFile" ] && rm "$findFile"
       dlUrl="https://github.com/$owner/$repo/releases/download/${latestReleases}/$assetsName"
       findFile="$dir/$assetsName"
