@@ -23,6 +23,9 @@ Android=$(getprop ro.build.version.release)  # Get Android version
 cpuAbi=$(getprop ro.product.cpu.abi)  # Get Android arch
 Model=$(getprop ro.product.model)  # Get Device Model
 locale=$(getprop persist.sys.locale | cut -d'-' -f1)  # Get System Languages
+if [ -z $locale ]; then
+  locale=$(getprop ro.product.locale | cut -d'-' -f1)  # Get Languages
+fi
 density=$(getprop ro.sf.lcd_density)  # Get the device screen density
   # Check and categorize the density
   if [ "$density" -le 120 ]; then
