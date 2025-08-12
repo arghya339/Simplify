@@ -31,6 +31,7 @@ if jq -e '.DeviceArch != null' "$simplifyJson" >/dev/null 2>&1; then
 else
   cpuAbi=$(getprop ro.product.cpu.abi)  # Get Android arch
 fi
+Serial=$(su -c 'getprop ro.serialno')  # Get Serial Number required root
 Model=$(getprop ro.product.model)  # Get Device Model
 RV="$Simplify/RV"
 RVX="$Simplify/RVX"
@@ -58,7 +59,7 @@ if [ $Android -le 3 ]; then
   return 1
 fi
 
-echo -e "$info ${Blue}Target device:${Reset} $Model"
+echo -e "$info ${Blue}Target device:${Reset} $Model $Serial"
 
 bash $Simplify/dlGitHub.sh "inotia00" "revanced-cli" "latest" ".jar" "$RVX"
 ReVancedCLIJar=$(find "$RVX" -type f -name "revanced-cli-*-all.jar" -print -quit)
@@ -73,16 +74,42 @@ bash $Simplify/dlGitHub.sh "ReVanced" "revanced-patches" "$release" ".rvp" "$RV"
 PatchesRvp=$(find "$RV" -type f -name "patches-*.rvp" -print -quit)
 echo -e "$info ${Blue}PatchesRvp:${Reset} $PatchesRvp"
 
-if [ "$Android" -ge "6" ]; then
-  bash $Simplify/dlGitHub.sh "inotia00" "VancedMicroG" "latest" ".apk" "$SimplUsr"
-  VancedMicroG=$(find "$SimplUsr" -type f -name "microg-*.apk" -print -quit)
-  echo -e "$info ${Blue}VancedMicroG:${Reset} $VancedMicroG"
-elif [ $Android -eq 5 ]; then
-  VancedMicroG="$SimplUsr/microg-0.2.22.212658.apk"
-  if [ ! -f "$VancedMicroG" ]; then
-    curl -sL "https://github.com/TeamVanced/VancedMicroG/releases/download/v0.2.22.212658-212658001/microg.apk" --progress-bar -C - -o "$VancedMicroG"
+if ! su -c "id" >/dev/null 2>&1; then
+  if [ "$Android" -ge "6" ]; then
+    bash $Simplify/dlGitHub.sh "inotia00" "VancedMicroG" "latest" ".apk" "$SimplUsr"
+    VancedMicroG=$(find "$SimplUsr" -type f -name "microg-*.apk" -print -quit)
+    echo -e "$info ${Blue}VancedMicroG:${Reset} $VancedMicroG"
+  elif [ $Android -eq 5 ]; then
+    VancedMicroG="$SimplUsr/microg-0.2.22.212658.apk"
+    if [ ! -f "$VancedMicroG" ]; then
+      curl -sL "https://github.com/TeamVanced/VancedMicroG/releases/download/v0.2.22.212658-212658001/microg.apk" --progress-bar -C - -o "$VancedMicroG"
+    fi
   fi
 fi
+
+# --- Check if CorePatch Installed ---
+checkCoreLSPosed() {
+  if [ "$(su -c 'getenforce 2>/dev/null')" = "Enforcing" ]; then
+    su -c "setenforce 0"  # set SELinux to Permissive mode to unblock unauthorized operations
+    LSPosedPkg=$(su -c "pm list packages | grep org.lsposed.manager" 2>/dev/null)  # LSPosed packages list
+    CorePatchPkg=$(su -c "pm list packages | grep com.coderstory.toolkit" 2>/dev/null)  # CorePatch packages list
+    su -c "setenforce 1"  # set SELinux to Enforcing mode to block unauthorized operations
+  else
+    LSPosedPkg=$(su -c "pm list packages | grep 'org.lsposed.manager'" 2>/dev/null)  # LSPosed packages list
+    CorePatchPkg=$(su -c "pm list packages | grep 'com.coderstory.toolkit'" 2>/dev/null)  # CorePatch packages list
+  fi
+
+  if [ -z $LSPosedPkg ]; then
+    echo -e "$info Please install LSPosed Manager by flashing LSPosed Zyzisk Module from Magisk. Then try again!"
+    termux-open-url "https://github.com/JingMatrix/LSPosed/releases"
+    return 1
+  fi
+  if [ -z $CorePatchPkg ]; then
+    echo -e "$info Please install and Enable CorePatch LSPosed Module in System Framework. Then try again!"
+    termux-open-url "https://github.com/LSPosed/CorePatch/releases"
+    return 1
+  fi
+}
 
 if [ "$RipLib" -eq 1 ]; then
   # --- Architecture Detection ---
@@ -186,7 +213,6 @@ patch_app() {
 # --- Collect the enable/disable patches name with options in arrays ---
 yt_patches_args=(
   # enable patches with their options
-  -e "GmsCore support" -O gmsCoreVendorGroupId="com.mgoogle"
   -e "Custom branding" -O appName="YouTube RV" -O iconPath="$SimplUsr/.branding/youtube/launcher/google_family"
   -e "Change header" -O header="$SimplUsr/.branding/youtube/header/google_family"
   -e "Change package name" -O packageName="app.revanced.android.youtube"
@@ -194,6 +220,12 @@ yt_patches_args=(
   # disable patches
   -d "Announcements"
 )
+
+if su -c "id" >/dev/null 2>&1; then
+  yt_patches_args+=(-d "GmsCore support")
+else
+  yt_patches_args+=(-e "GmsCore support" -O gmsCoreVendorGroupId="com.mgoogle")
+fi
 
 spotify_patches_args=(
   -e "Change lyrics provider"
@@ -206,9 +238,13 @@ tiktok_patches_args=(
   -e "SIM spoof"
 )
 
-photos_patches_args=(
-  -e "GmsCore support" -OgmsCoreVendorGroupId="com.mgoogle"
-)
+photos_patches_args=()
+
+if su -c "id" >/dev/null 2>&1; then
+  photos_patches_args+=(-d "GmsCore support")
+else
+  photos_patches_args+=(-e "GmsCore support" -O gmsCoreVendorGroupId="com.mgoogle")
+fi
 
 instagram_patches_args=()
 
@@ -254,8 +290,7 @@ if [ "$ReadPatchesFile" -eq 1 ]; then
   # Default content for new files
   default_content=(
     # [0] YouTube
-    '-e "GmsCore support" -O gmsCoreVendorGroupId="com.mgoogle"
--e "Custom branding" -O appName="YouTube RV" -O iconPath="/sdcard/Simplify/.branding/youtube/launcher/google_family"
+    '-e "Custom branding" -O appName="YouTube RV" -O iconPath="/sdcard/Simplify/.branding/youtube/launcher/google_family"
 -e "Change header" -O header="/sdcard/Simplify/.branding/youtube/header/google_family"
 -e "Change package name" -O packageName="app.revanced.android.youtube"
 -d "Announcements"'
@@ -269,7 +304,7 @@ if [ "$ReadPatchesFile" -eq 1 ]; then
     '-e "SIM spoof"'
     
     # [3] Photos
-    '-e "GmsCore support" -OgmsCoreVendorGroupId="com.mgoogle"'
+    ''
     
     # [4] Instagram, [5] Facebook, [6] FbMessenger, [7] Lightroom, [8] Photomath, [9] Duolingo, [10] RAR | No default patches
     '' '' '' '' '' '' ''
@@ -317,6 +352,15 @@ if [ "$ReadPatchesFile" -eq 1 ]; then
     if [ ! -e "$SimplUsr/${arraynames[$i]}.txt" ]; then
       #touch "$SimplUsr/${arraynames[$i]}.txt"
       printf "%s\n" "${default_content[i]}" > "$SimplUsr/${arraynames[$i]}.txt"
+      if su -c "id" >/dev/null 2>&1; then
+        if [ "${arraynames[$i]}" == "yt_patches_args" ] || [ "${arraynames[$i]}" == "photos_patches_args" ]; then
+          echo "-d \"GmsCore support\"" >> "$SimplUsr/${arraynames[$i]}.txt"
+        fi
+      else
+        if [ "${arraynames[$i]}" == "yt_patches_args" ] || [ "${arraynames[$i]}" == "photos_patches_args" ]; then
+          echo "-e \"GmsCore support\" -O gmsCoreVendorGroupId=\"com.mgoogle\"" >> "$SimplUsr/${arraynames[$i]}.txt"
+        fi
+      fi
     fi
   done
   
@@ -339,6 +383,33 @@ if [ "$ReadPatchesFile" -eq 1 ]; then
   done
   
 fi
+
+commonPrompt() {
+    echo -e "[?] ${Yellow}Do you want to install ${appNameRef[0]} RV app? [Y/n] ${Reset}\c" && read opt
+    case $opt in
+      y*|Y*|"")
+        if [ $pkgName == "com.instagram.android" ] || [ $pkgName == "com.facebook.katana" ] || [ $pkgName == "com.facebook.orca" ] || [ $pkgName == "com.instagram.barcelona" ] || [ $pkgName == "com.zhiliaoapp.musically" ]; then
+          echo -e "$notice ${Yellow}Warning! Disable auto updates for the patched app to avoid unexpected issues.${Reset}"
+        fi
+        echo -e "$running Please Wait !! Installing Patched ${appNameRef[0]} RV apk.."
+        bash $Simplify/apkInstall.sh "$outputAPK" "$pkgPatches" "$activityPatches"
+        ;;
+      n*|N*) echo -e "$notice ${appNameRef[0]} RV Installaion skipped!" ;;
+      *) echo -e "$info Invalid choice! ${appNameRef[0]} RV Installaion skipped." ;;
+    esac
+    
+    echo -e "[?] ${Yellow}Do you want to Share ${appNameRef[0]} RV app? [Y/n] ${Reset}\c" && read opt
+    case $opt in
+      y*|Y*|"")
+        echo -e "$running Please Wait !! Sharing Patched ${appNameRef[0]} RV apk.."
+        termux-open --send "$outputAPK"
+        ;;
+      n*|N*) echo -e "$notice ${appNameRef[0]} RV Sharing skipped!"
+        echo -e "$info Locate '$fileName' in '/sdcard/Simplify/' dir, Share it with your Friends and Family ;)"
+        ;;
+        *) echo -e "$info Invalid choice! ${appNameRef[0]} RV Sharing skipped." ;;
+    esac
+}
 
 # --- Build App ---
 build_app() {
@@ -421,45 +492,61 @@ build_app() {
   fi
   
   if [ -f "$outputAPK" ]; then
-    
-    if [ $pkgName == "com.google.android.youtube" ] || [ $pkgName == "com.google.android.apps.youtube.music" ] || [ $pkgName == "com.google.android.apps.photos" ]; then
-      echo -e "$info VancedMicroG is used to run MicroG services without root. \nYouTube and YouTube Music won't work without it. \nIf you already have VancedMicroG, You don't need to install it."
-      echo -e "[?] ${Yellow}Do you want to install VancedMicroG app? [Y/n]${Reset} \c" && read opt
-      case $opt in
-        y*|Y*|"")
-          echo -e "$running Please Wait !! Installing VancedMicroG apk.."
-          bash $Simplify/apkInstall.sh "$VancedMicroG" "com.mgoogle.android.gms" "org.microg.gms.ui.SettingsActivity"
-          ;;
-        n*|N*) echo -e "$notice VancedMicroG Installaion skipped!" ;;
-        *) echo -e "$info Invalid choice! VancedMicroG Installaion skipped." ;;
-      esac
-    fi
-
-    echo -e "[?] ${Yellow}Do you want to install ${appNameRef[0]} RV app? [Y/n] ${Reset}\c" && read opt
-    case $opt in
-      y*|Y*|"")
-        if [ $pkgName == "com.instagram.android" ] || [ $pkgName == "com.facebook.katana" ] || [ $pkgName == "com.facebook.orca" ] || [ $pkgName == "com.instagram.barcelona" ] || [ $pkgName == "com.zhiliaoapp.musically" ]; then
-          echo -e "$notice ${Yellow}Warning! Disable auto updates for the patched app to avoid unexpected issues.${Reset}"
+    if [ "$pkgName" == "com.google.android.youtube" ] || [ "$pkgName" == "com.google.android.apps.photos" ] || [ "$pkgName" == "com.google.android.apps.recorder" ]; then
+      if su -c "id" >/dev/null 2>&1; then
+        
+        if [ "$pkgName" == "com.google.android.youtube" ]; then
+          echo -e "[?] ${Yellow}Please select installation type - 'M' for Mount or 'I' for SU-Install or 'N' for Installation cancel. [M/i/N]: ${Reset}\c" && read opt
+          case $opt in
+            I*|i*|"")
+              checkCoreLSPosed  # Call the check core patch functions
+              echo -e "$running Copy signature from ${appNameRef[0]}.."
+              cs "${stock_apk_path[0]}" "$outputAPK" "$SimplUsr/${appNameRef[0]}-RV-CS_v${pkgVersion}-${archRef[0]}.apk"
+              echo -e "$running Please Wait !! Installing Patched ${appNameRef[0]} RV CS apk.."
+              bash $Simplify/apkInstall.sh "$SimplUsr/${appNameRef[0]}-RV-CS_v${pkgVersion}-${archRef[0]}.apk" "$pkgName" ""
+              ;;
+            M*|m*)
+              echo -e "$running Please Wait !! Mounting Patched ${appNameRef[0]} RV apk.."
+              su -mm -c "/system/bin/sh $Simplify/apkMount.sh \"${stock_apk_path[0]}\" $outputAPK \"${appNameRef[0]}\" $pkgName $pkgVersion" &> /dev/null
+              su -mm -c "/system/bin/sh $Simplify/apkMount.sh \"${stock_apk_path[0]}\" $outputAPK \"${appNameRef[0]}\" $pkgName $pkgVersion" | tee "$SimplUsr/${appNameRef[0]}-RV_mount-log.txt"
+              rm $outputAPK
+              ;;
+            N*|n*) echo -e "$notice ${appNameRef[0]} RV Installaion skipped!" ;;
+            *) echo -e "$info Invalid choice! ${appNameRef[0]} RV Installaion skipped." ;;
+          esac
+        elif [ "$pkgName" == "com.google.android.apps.photos" ] || [ "$pkgName" == "com.google.android.apps.recorder" ]; then
+          echo -e "[?] ${Yellow}Do you want to Mount ${appNameRef[0]} RV app? [Y/n] ${Reset}\c" && read opt
+          case $opt in
+            y*|Y*|"")
+              echo -e "$running Please Wait !! Mounting Patched ${appNameRef[0]} RV apk.."
+              su -mm -c "/system/bin/sh $Simplify/apkMount.sh \"${stock_apk_path[0]}\" $outputAPK \"${appNameRef[0]}\" $pkgName $pkgVersion" &> /dev/null
+              su -mm -c "/system/bin/sh $Simplify/apkMount.sh \"${stock_apk_path[0]}\" $outputAPK \"${appNameRef[0]}\" $pkgName $pkgVersion" | tee "$SimplUsr/${appNameRef[0]}-RV_mount-log.txt"
+              rm $outputAPK
+              ;;
+            n*|N*) echo -e "$notice ${appNameRef[0]} RV Installaion skipped!" ;;
+            *) echo -e "$info Invalid choice! ${appNameRef[0]} RV Installaion skipped." ;;
+          esac
         fi
-        echo -e "$running Please Wait !! Installing Patched ${appNameRef[0]} RV apk.."
-        bash $Simplify/apkInstall.sh "$outputAPK" "$pkgPatches" "$activityPatches"
-        ;;
-      n*|N*) echo -e "$notice ${appNameRef[0]} RV Installaion skipped!" ;;
-      *) echo -e "$info Invalid choice! ${appNameRef[0]} RV Installaion skipped." ;;
-    esac
+      
+      else
+        
+        echo -e "$info VancedMicroG is used to run MicroG services without root. \nYouTube and YouTube Music won't work without it. \nIf you already have VancedMicroG, You don't need to install it."
+        echo -e "[?] ${Yellow}Do you want to install VancedMicroG app? [Y/n]${Reset} \c" && read opt
+        case $opt in
+          y*|Y*|"")
+            echo -e "$running Please Wait !! Installing VancedMicroG apk.."
+            bash $Simplify/apkInstall.sh "$VancedMicroG" "com.mgoogle.android.gms" "org.microg.gms.ui.SettingsActivity"
+            ;;
+          n*|N*) echo -e "$notice VancedMicroG Installaion skipped!" ;;
+          *) echo -e "$info Invalid choice! VancedMicroG Installaion skipped." ;;
+        esac
+        commonPrompt
+        
+      fi
     
-    echo -e "[?] ${Yellow}Do you want to Share ${appNameRef[0]} RV app? [Y/n] ${Reset}\c" && read opt
-    case $opt in
-      y*|Y*|"")
-        echo -e "$running Please Wait !! Sharing Patched ${appNameRef[0]} RV apk.."
-        termux-open --send "$outputAPK"
-        ;;
-      n*|N*) echo -e "$notice ${appNameRef[0]} RV Sharing skipped!"
-        echo -e "$info Locate '$fileName' in '/sdcard/Simplify/' dir, Share it with your Friends and Family ;)"
-        ;;
-        *) echo -e "$info Invalid choice! ${appNameRef[0]} RV Sharing skipped." ;;
-    esac
-  
+    else
+      commonPrompt
+    fi
   fi
 }
 
@@ -889,7 +976,11 @@ while true; do
         getVersion "$pkgName"
         pkgVersion="$pkgVersion"
       fi
-      Type="BUNDLE"
+      if su -c "id" >/dev/null 2>&1; then
+        Type="APK"
+      else
+        Type="BUNDLE"
+      fi
       Arch=("universal")
       pkgPatches="app.revanced.android.youtube"
       activityPatches="com.google.android.youtube/.app.honeycomb.Shell\$HomeActivity"
