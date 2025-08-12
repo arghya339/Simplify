@@ -22,6 +22,24 @@ Reset="\033[0m"
 Android=$(getprop ro.build.version.release)  # Get Android version
 cpuAbi=$(getprop ro.product.cpu.abi)  # Get Android arch
 Model=$(getprop ro.product.model)  # Get Device Model
+locale=$(getprop persist.sys.locale | cut -d'-' -f1)  # Get System Languages
+density=$(getprop ro.sf.lcd_density)  # Get the device screen density
+  # Check and categorize the density
+  if [ "$density" -le 120 ]; then
+    lcd_dpi="ldpi"  # Low Density
+  elif [ "$density" -le 160 ]; then
+    lcd_dpi="mdpi"  # Medium Density
+  elif [ "$density" -le 240 ]; then
+    lcd_dpi="hdpi"  # High Density
+  elif [ "$density" -le 320 ]; then
+    lcd_dpi="xhdpi"  # Extra High Density
+  elif [ "$density" -le 480 ]; then
+    lcd_dpi="xxhdpi"  # Extra Extra High Density
+  elif [ "$density" -gt 480 ] || [ "$density" -ge 640 ]; then
+    lcd_dpi="xxxhdpi"  # Extra Extra Extra High Density
+  else
+    lcd_dpi="*dpi"
+  fi
 Simplify="$HOME/Simplify"  # /data/data/com.termux/files/home/Simplify dir
 SimplUsr="/sdcard/Simplify"  # /storage/emulated/0/Simplify dir
 mkdir -p "$Simplify" "$SimplUsr"  # Create $Simplify and $SimplUsr dir if it does't exist
@@ -94,7 +112,7 @@ dlPatchesApp() {
       tag=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases/latest" | jq -r '.tag_name')
     fi
     local url="https://github.com/$owner/$repo/releases/download/$tag/microg.apk"
-  elif [ "$repo" == "Nobook" ] || [ "$repo" == "YTPro" ] || [ "$repo" == "FreeTubeAndroid" ] || [ "$repo" == "Tubular" ]; then
+  elif [ "$repo" == "Nobook" ] || [ "$repo" == "YTPro" ] || [ "$repo" == "FreeTubeAndroid" ] || [ "$repo" == "Tubular" ] || [ "$repo" == "InnerTune" ] || [ "$repo" == "Seal" ] || [ "$repo" == "ytdlnis" ]; then
     tag=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases/latest" | jq -r '.tag_name')
     if [ "$repo" == "Nobook" ]; then
       assets="Nobook_$tag.apk"
@@ -125,6 +143,8 @@ dlPatchesApp() {
       fi
     fi
     local url="https://github.com/$owner/$repo/releases/download/$tag/$assets"
+  elif [ "$repo" == "spotube" ]; then
+    local url="https://github.com/KRTirtho/spotube/releases/download/nightly/Spotube-android-all-arch.apk"
   else
     local url="https://github.com/$owner/$repo/releases/download/all/$assets"
   fi
@@ -146,7 +166,7 @@ dlPatchesApp() {
       echo -e "$info ${Green}Downloaded $appName APK found:${Reset} $apk_path"
     fi
   fi
-  if [ $dlIs -eq 1 ] || [ "$repo" == "VancedMicroG" ] || [ "$repo" == "Nobook" ] || [ "$repo" == "YTPro" ] || [ "$repo" == "FreeTubeAndroid" ] || [ "$repo" == "Tubular" ] || [ "$repo" == "InnerTune" ] || [ "$repo" == "Seal" ] || [ "$repo" == "ytdlnis" ]; then
+  if [ $dlIs -eq 1 ] || [ "$repo" == "VancedMicroG" ] || [ "$repo" == "Nobook" ] || [ "$repo" == "YTPro" ] || [ "$repo" == "FreeTubeAndroid" ] || [ "$repo" == "Tubular" ] || [ "$repo" == "InnerTune" ] || [ "$repo" == "Seal" ] || [ "$repo" == "ytdlnis" ] || [ "$repo" == "spotube" ]; then
     version=$($HOME/aapt2 dump badging $apk_path 2>/dev/null | sed -n "s/.*versionName='\([^']*\)'.*/\1/p")
     echo -e "[?] ${Yellow}Do you want to install ${appName} $version app? [Y/n] ${Reset}\c" && read opt
     case $opt in
@@ -566,7 +586,42 @@ while true; do
       activityPatches="com.spotify.music/.MainActivity"
       dlPatchesApp "${appName}" "$owner" "$repo" "$assets" "$pkgPatches" "$activityPatches"
       ;;
-    spotube) termux-open-url "https://spotube.krtirtho.dev/downloads/nightly" ;;
+    spotube)
+      appName="spotube"
+      owner="KRTirtho"
+      repo="spotube"
+      url="https://github.com/KRTirtho/spotube/releases/download/nightly/Spotube-playstore-all-arch.aab"
+      assets_name="Spotube-playstore-all-arch.aab"
+      aab_path="$SimplUsr/$assets_name"
+      aria2c -x 16 -s 16 --console-log-level=error --summary-interval=0 --download-result=hide -c -o "$assets_name" -d "$SimplUsr" "$url"
+      bundletoolJar=$(find "$Simplify" -type f -name "bundletool-all-*.jar" -print -quit 2>/dev/null)
+      if [ ! -f "$bundletoolJar" ]; then
+        bash $Simplify/dlGitHub.sh "google" "bundletool" "latest" ".jar" "$Simplify"
+        bundletoolJar=$(find "$Simplify" -type f -name "bundletool-all-*.jar" -print -quit)
+      fi
+      apks_path="$SimplUsr/Spotube-playstore-all-arch.apks"
+      $PREFIX/lib/jvm/java-21-openjdk/bin/java -jar $bundletoolJar build-apks --bundle=$aab_path --output=$apks_path --aapt2=~/aapt2
+      rm "$aab_path"
+      if [ $cpuAbi == arm64-v8a ]; then
+        cpuAbi=arm64_v8a
+      elif [ $cpuAbi == armeabi-v7a ]; then
+        cpuAbi=armeabi_v7a
+      fi
+      pv "$apks_path" | bsdtar -xf - -C "$SimplUsr/Spotube-playstore-all-arch" --include "base-$locale.apk" "base-$cpuAbi.apk" "base-$lcd_dpi.apk"
+      cpuAbi=$(getprop ro.product.cpu.abi)
+      rm "$apks_path"
+      bash $Simplify/dlGitHub.sh "REAndroid" "APKEditor" "latest" ".jar" "$Simplify"
+      APKEditor=$(find "$Simplify" -type f -name "APKEditor-*.jar" -print -quit)
+      $PREFIX/lib/jvm/java-21-openjdk/bin/java -jar $APKEditor m -i "$SimplUsr/Spotube-playstore-all-arch" -o "$SimplUsr/Spotube-playstore-all-arch.apk"
+      rm -rf "$SimplUsr/Spotube-playstore-all-arch"
+      apk_path="$SimplUsr/Spotube-playstore-all-arch-signed.apk"
+      $PREFIX/lib/jvm/java-21-openjdk/bin/java -jar $PREFIX/share/java/apksigner.jar sign --ks $Simplify/ks.keystore --ks-pass pass:123456 --ks-key-alias ReVancedKey --key-pass pass:123456 --out "$apk_path" "$SimplUsr/Spotube-playstore-all-arch.apk"
+      rm "$SimplUsr/Spotube-playstore-all-arch.apk" && rm rm "$SimplUsr/Spotube-playstore-all-arch.apk.idsig"
+      assets=$(basename "$apk_path")
+      pkgPatches="oss.krtirtho.spotube.nightly"
+      activityPatches="oss.krtirtho.spotube.nightly/com.ryanheise.audioservice.AudioServiceActivity"
+      dlPatchesApp "${appName}" "$owner" "$repo" "$assets" "$pkgPatches" "$activityPatches"
+      ;;
     TikTok)
       appName="TikTok"
       owner="FiorenMas"
