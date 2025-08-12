@@ -22,7 +22,7 @@ Reset="\033[0m"
 Android=$(getprop ro.build.version.release)  # Get Android version
 cpuAbi=$(getprop ro.product.cpu.abi)  # Get Android arch
 Model=$(getprop ro.product.model)  # Get Device Model
-locale=$(getprop persist.sys.locale | cut -d'-' -f1)  # Get System Languages
+locale=$(getprop persist.sys.locale | cut -d'-' -f2 | cut -d']' -f1 | tr '[:upper:]' '[:lower:]')  # Get System Languages
 density=$(getprop ro.sf.lcd_density)  # Get the device screen density
   # Check and categorize the density
   if [ "$density" -le 120 ]; then
@@ -608,7 +608,7 @@ while true; do
         cpuAbi=armeabi_v7a
       fi
       mkdir -p "$SimplUsr/Spotube-playstore-all-arch"
-      pv "$apks_path" | bsdtar -xf - -C "$SimplUsr/Spotube-playstore-all-arch" --include "base-$locale.apk" "base-$cpuAbi.apk" "base-$lcd_dpi.apk"
+      pv "$apks_path" | bsdtar -xf - -C "$SimplUsr/Spotube-playstore-all-arch" --include "splits/base-$locale.apk" "splits/base-$cpuAbi.apk" "splits/base-$lcd_dpi.apk"
       cpuAbi=$(getprop ro.product.cpu.abi)
       rm "$apks_path"
       bash $Simplify/dlGitHub.sh "REAndroid" "APKEditor" "latest" ".jar" "$Simplify"
