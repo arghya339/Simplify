@@ -729,7 +729,7 @@ while true; do
   clear  # Clear
   # Apply the eye color to the simplify shape and print it
   echo -e "${BoldGreen}$print_simplify${Reset}" && echo ""  # Space
-  echo -e "D   : Download Patches App\nRV  : ReVanced\nRVX : ReVanced Extended\nRVXS: RVX SuperUser\nPiko: Piko Twitter\nDrop: Dropped Patches\nLS  : LSPatch\nC   : Configuration\nM   : Miscellaneous\nU   : Unmount Apps\nF   : Feature request\nB   : Bug report\nS   : Support\nA   : About\nQ   : Quit\n"
+  echo -e "D   : Download Patches App\nRV  : ReVanced\nRVX : ReVanced Extended\nPiko: Piko Twitter\nDrop: Dropped Patches\nLS  : LSPatch\nC   : Configuration\nM   : Miscellaneous\nU   : Unmount Apps\nF   : Feature request\nB   : Bug report\nS   : Support\nA   : About\nQ   : Quit\n"
   echo -n "Select Patches source: " && read source
   case $source in
     D|d)
@@ -745,16 +745,6 @@ while true; do
     RVX|rvx)
       curl -sL -o "$RVX/RVX.sh" "https://raw.githubusercontent.com/arghya339/Simplify/refs/heads/main/Termux/RVX.sh"
       bash "$RVX/RVX.sh"
-      sleep 3
-      ;;
-    RVXS*|rvxs*)
-      if su -c "id" >/dev/null 2>&1; then
-        curl -sL -o "$RVX/RVXSU.sh" "https://raw.githubusercontent.com/arghya339/Simplify/refs/heads/main/Termux/RVXSU.sh"
-        curl -sL -o "$Simplify/apkMount.sh" "https://raw.githubusercontent.com/arghya339/Simplify/refs/heads/main/Termux/apkMount.sh"
-        bash "$RVX/RVXSU.sh"
-      else
-        echo -e "$notice SuperUser permission is not granted! RVX SuperUser required SU permission."
-      fi
       sleep 3
       ;;
     PIKO*|piko*)
@@ -863,7 +853,7 @@ while true; do
     [Ss]*) support && sleep 3 ;;
     [Aa]*) about && sleep 3 ;;
     [Qq]*) clear && break ;;
-    *) echo -e "$info Invalid input! Please enter: D / RV / RVX / RVXS / Piko / Drop / LS / C / M / U / F / B / S / A / Q" && sleep 3 ;;
+    *) echo -e "$info Invalid input! Please enter: D / RV / RVX / Piko / Drop / LS / C / M / U / F / B / S / A / Q" && sleep 3 ;;
   esac
 done
-########################################################################################################################################
+#################################################################################################################################
