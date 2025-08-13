@@ -59,7 +59,11 @@ if [ $Android -le 3 ]; then
   return 1
 fi
 
-echo -e "$info ${Blue}Target device:${Reset} $Model $Serial"
+if su -c "id" >/dev/null 2>&1; then
+  echo -e "$info ${Blue}Target device:${Reset} $Model ($Serial)"
+else
+  echo -e "$info ${Blue}Target device:${Reset} $Model"
+fi
 
 bash $Simplify/dlGitHub.sh "inotia00" "revanced-cli" "latest" ".jar" "$RVX"
 ReVancedCLIJar=$(find "$RVX" -type f -name "revanced-cli-*-all.jar" -print -quit)
