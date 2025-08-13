@@ -729,35 +729,35 @@ while true; do
   clear  # Clear
   # Apply the eye color to the simplify shape and print it
   echo -e "${BoldGreen}$print_simplify${Reset}" && echo ""  # Space
-  echo -e "D   : Download Patches App\nRV  : ReVanced\nRVX : ReVanced Extended\nPiko: Piko Twitter\nDrop: Dropped Patches\nLS  : LSPatch\nC   : Configuration\nM   : Miscellaneous\nF   : Feature request\nB   : Bug report\nS   : Support\nA   : About\nQ   : Quit\n"
+  echo -e "Dl: Download Patches App\nR : ReVanced\nX : ReVanced Extended\nP : Piko Twitter\nD : Dropped Patches\nL : LSPatch\nC : Configuration\nM : Miscellaneous\nF : Feature request\nB : Bug report\nS : Support\nA : About\nQ : Quit\n"
   echo -n "Select Patches source: " && read source
   case $source in
-    D|d)
+    DL|dl)
       curl -sL -o "$Simplify/dlPatchesApp.sh" "https://raw.githubusercontent.com/arghya339/Simplify/refs/heads/main/Termux/dlPatchesApp.sh"
       bash "$Simplify/dlPatchesApp.sh"
       sleep 3
       ;;
-    RV|rv)
+    [Rr])
       curl -sL -o "$RV/RV.sh" "https://raw.githubusercontent.com/arghya339/Simplify/refs/heads/main/Termux/RV.sh"
       bash "$RV/RV.sh"
       sleep 3
       ;;
-    RVX|rvx)
+    [Xx])
       curl -sL -o "$RVX/RVX.sh" "https://raw.githubusercontent.com/arghya339/Simplify/refs/heads/main/Termux/RVX.sh"
       bash "$RVX/RVX.sh"
       sleep 3
       ;;
-    PIKO*|piko*)
+    [Pp])
       curl -sL -o "$pikoTwitter/pikoTwitter.sh" "https://raw.githubusercontent.com/arghya339/Simplify/refs/heads/main/Termux/pikoTwitter.sh"
       bash "$pikoTwitter/pikoTwitter.sh"
       sleep 3
       ;;
-    DROP*|drop*)
+    [Dd])
       curl -sL -o "$Dropped/droppedPatches.sh" "https://raw.githubusercontent.com/arghya339/Simplify/refs/heads/main/Termux/droppedPatches.sh"
       bash "$Dropped/droppedPatches.sh"
       sleep 3
       ;;
-    LS*|ls*)
+    [Ll])
       curl -sL -o "$LSPatch/LSPatch.sh" "https://raw.githubusercontent.com/arghya339/Simplify/refs/heads/main/Termux/LSPatch.sh"
       if su -c "id" >/dev/null 2>&1; then
         curl -sL -o "$Simplify/apkMount.sh" "https://raw.githubusercontent.com/arghya339/Simplify/refs/heads/main/Termux/apkMount.sh"
@@ -853,7 +853,7 @@ while true; do
     [Ss]*) support && sleep 3 ;;
     [Aa]*) about && sleep 3 ;;
     [Qq]*) clear && break ;;
-    *) echo -e "$info Invalid input! Please enter: D / RV / RVX / Piko / Drop / LS / C / M / F / B / S / A / Q" && sleep 3 ;;
+    *) echo -e "$info Invalid input! Please enter: Dl / R / X / P / D / L / C / M / F / B / S / A / Q" && sleep 3 ;;
   esac
 done
-#############################################################################################################################
+####################################################################################################################
