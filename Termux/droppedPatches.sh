@@ -202,6 +202,7 @@ fi
 while true; do
   # Display the list
   echo -e "$info Available apps:"
+  echo -e "↵. CHANGELOG"
   for i in "${!apps[@]}"; do
     if [ -n "${apps[$i]}" ] && [ "${apps[$i]}" != "null" ]; then
       printf "%d. %s\n" "$i" "${apps[$i]}"

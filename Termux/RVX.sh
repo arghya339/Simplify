@@ -236,6 +236,80 @@ fi
 
 reddit_patches_args=()
 
+if [ "$ReadPatchesFile" -eq 1 ]; then
+  
+  # Default content for new files
+  default_content=(
+    # [0] YouTube
+    '-e "Custom Shorts action buttons" -OiconType="round"
+-e "Custom branding icon for YouTube" -OappIcon="/sdcard/Simplify/.branding/youtube/launcher/google_family" -OchangeSplashIcon=true -OrestoreOldSplashAnimation=false
+-e "Custom header for YouTube" -OcustomHeader="/sdcard/Simplify/.branding/youtube/header/google_family"
+-e "Custom branding name for YouTube" -OappName="YouTube RVX"
+-e "Hide shortcuts" -Oshorts=false
+-e "Visual preferences icons for YouTube" -OsettingsMenuIcon="extension"
+-e "Overlay buttons" -OiconType=thin
+-e "Spoof streaming data" -OuseIOSClient
+-e "Settings for YouTube" -OinsertPosition="@string/about_key" -OrvxSettingsLabel=RVX
+-e "Force hide player buttons background"
+-e=MaterialYou -e Theme
+-e="Return YouTube Username"'
+
+    # [1] YT Music
+    '-e "Custom branding icon for YouTube Music" -OappIcon="/sdcard/Simplify/.branding/music/launcher/google_family"
+-e "Custom header for YouTube Music" -OcustomHeader="/sdcard/Simplify/.branding/music/header/google_family"
+-e "Custom branding name for YouTube Music" -OappNameNotification="YouTube Music RVX" -OappNameLauncher="YT Music RVX"
+-e "Dark theme" -OmaterialYou=true
+-e "Visual preferences icons for YouTube Music" -OsettingsMenuIcon="extension"
+-e "Settings for YouTube Music" -OrvxSettingsLabel="RVX"
+-e "Custom header for YouTube Music"
+-e="Return YouTube Username" -e "Disable music video in album"'
+
+    # [3] Reddit | No default patches
+    ''
+  )
+
+  # Array to stores arrays-names
+  arraynames=(
+    yt_patches_args
+    yt_music_patches_args
+    reddit_patches_args
+  )
+
+  # Create Empty Files if it doesn’t exist
+  for ((i=0; i<${#arraynames[@]}; i++)); do
+    if [ ! -e "$SimplUsr/${arraynames[$i]}.txt" ]; then
+      #touch "$SimplUsr/${arraynames[$i]}.txt"
+      printf "%s\n" "${default_content[i]}" > "$SimplUsr/${arraynames[$i]}.txt"
+      if [ "${arraynames[$i]}" == "yt_patches_args" ] || [ "${arraynames[$i]}" == "yt_music_patches_args" ]; then
+        if su -c "id" >/dev/null 2>&1; then
+          echo "-d \"GmsCore support\"" >> "$SimplUsr/${arraynames[$i]}.txt"
+        else
+          echo "-e \"GmsCore support\" -O gmsCoreVendorGroupId=\"com.mgoogle\" -OcheckGmsCore=true" >> "$SimplUsr/${arraynames[$i]}.txt"
+        fi
+      fi
+    fi
+  done
+  
+  # Read Files into Arrays
+  for (( i=0; i<${#arraynames[@]}; i++ )); do
+    if [ -f "$SimplUsr/${arraynames[$i]}.txt" ]; then
+      if [ -s "$SimplUsr/${arraynames[$i]}.txt" ]; then
+        eval "${arraynames[$i]}=()"  # Clear target array
+        mapfile -t lines < "$SimplUsr/${arraynames[$i]}.txt"  # Read file into lines array
+        # Process each line
+        for line in "${lines[@]}"; do
+          [ -z "$line" ] && continue  # Skip empty lines
+          eval "args=($line)"  # Use eval to properly split arguments while preserving quotes
+          eval "${arraynames[$i]}+=(\"\${args[@]}\")"  # Add to target array
+        done
+      else
+        eval "${arraynames[$i]}=()"
+      fi
+    fi
+  done
+  
+fi
+
 commonPrompt() {
     echo -e "[?] ${Yellow}Do you want to install ${appNameRef[0]} RVX app? [Y/n] ${Reset}\c" && read opt
     case $opt in
@@ -397,6 +471,32 @@ overwriteArch() {
   fi
 }
 
+getListOfPatches() {
+  local pkgName=$1
+  $PREFIX/lib/jvm/java-21-openjdk/bin/java -jar $ReVancedCLIJar list-patches -d=true -f=$pkgName -i=true -o=true -p=false -u -v=false $PatchesRvp
+  if [ "$ReadPatchesFile" -eq 1 ]; then
+    $PREFIX/lib/jvm/java-21-openjdk/bin/java -jar $ReVancedCLIJar list-patches -d=true -f=$pkgName -i=true -o=true -p=false -u -v=false $PatchesRvp > "$SimplUsr/${pkgName}_list-patches.txt"
+  fi
+}
+
+listOfPatches() {
+  local clean_idx=${idx%\?}
+  case "${apps[$clean_idx]}" in
+    YouTube)
+      pkgName="com.google.android.youtube"
+      getListOfPatches "$pkgName"
+      ;;
+    TY\ Music)
+      pkgName="com.google.android.apps.youtube.music"
+      getListOfPatches "$pkgName"
+      ;;
+    Reddit)
+      pkgName="com.reddit.frontpage"
+      getListOfPatches "$pkgName"
+      ;;
+  esac
+}
+
 # Define the array
 if [ $Android -ge 9 ]; then
   apps=(
@@ -423,6 +523,7 @@ while true; do
   echo -e "$info Available apps:"
   echo -e "↵   . CHANGELOG"
   echo -e "Arch. Spoof Device Arch"
+  echo -e "i?  . List of Patches"
   for i in "${!apps[@]}"; do
     printf "%d   . %s\n" "$i" "${apps[$i]}"
   done
@@ -436,6 +537,9 @@ while true; do
     break  # break the while loop
   elif [[ "$idx" =~ ^[0-9]+$ ]] && (( idx >= 0 && idx <= max )); then
     echo -e "$notice You chose: ${apps[$idx]}"
+  elif [[ "$idx" =~ ^[0-9]+\?$ ]]; then
+    listOfPatches  # Call the listOfPatches function
+    continue
   elif [[ "$idx" =~ ^[aA][rR][cC][hH] ]]; then
     overwriteArch  # Call the overwriteArch function
   elif [ "$idx" == "" ] || [ -z "$idx" ]; then

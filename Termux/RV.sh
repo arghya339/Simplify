@@ -353,12 +353,10 @@ if [ "$ReadPatchesFile" -eq 1 ]; then
     if [ ! -e "$SimplUsr/${arraynames[$i]}.txt" ]; then
       #touch "$SimplUsr/${arraynames[$i]}.txt"
       printf "%s\n" "${default_content[i]}" > "$SimplUsr/${arraynames[$i]}.txt"
-      if su -c "id" >/dev/null 2>&1; then
-        if [ "${arraynames[$i]}" == "yt_patches_args" ] || [ "${arraynames[$i]}" == "photos_patches_args" ]; then
+      if [ "${arraynames[$i]}" == "yt_patches_args" ] || [ "${arraynames[$i]}" == "photos_patches_args" ]; then
+        if su -c "id" >/dev/null 2>&1; then
           echo "-d \"GmsCore support\"" >> "$SimplUsr/${arraynames[$i]}.txt"
-        fi
-      else
-        if [ "${arraynames[$i]}" == "yt_patches_args" ] || [ "${arraynames[$i]}" == "photos_patches_args" ]; then
+        else
           echo "-e \"GmsCore support\" -O gmsCoreVendorGroupId=\"com.mgoogle\"" >> "$SimplUsr/${arraynames[$i]}.txt"
         fi
       fi
