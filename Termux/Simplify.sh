@@ -729,7 +729,7 @@ while true; do
   clear  # Clear
   # Apply the eye color to the simplify shape and print it
   echo -e "${BoldGreen}$print_simplify${Reset}" && echo ""  # Space
-  echo -e "D   : Download Patches App\nRV  : ReVanced\nRVX : ReVanced Extended\nPiko: Piko Twitter\nDrop: Dropped Patches\nLS  : LSPatch\nC   : Configuration\nM   : Miscellaneous\nU   : Unmount Apps\nF   : Feature request\nB   : Bug report\nS   : Support\nA   : About\nQ   : Quit\n"
+  echo -e "D   : Download Patches App\nRV  : ReVanced\nRVX : ReVanced Extended\nPiko: Piko Twitter\nDrop: Dropped Patches\nLS  : LSPatch\nC   : Configuration\nM   : Miscellaneous\nF   : Feature request\nB   : Bug report\nS   : Support\nA   : About\nQ   : Quit\n"
   echo -n "Select Patches source: " && read source
   case $source in
     D|d)
@@ -796,7 +796,7 @@ while true; do
       ;;
     [Mm]*)
       while true; do
-        echo -e "\nV. Spoof Android Version\nA. Spoof Device Architecture\nD. Delete patches apk file\nL. Delete Patch Log\nU. Uninstall Patches Apps\nS. Uninstall Simplify\nQ. Quit\n"
+        echo -e "\nV. Spoof Android Version\nA. Spoof Device Architecture\nD. Delete patches apk file\nL. Delete Patch Log\nU. Uninstall Patches Apps\nM. Unmount Apps\nS. Uninstall Simplify\nQ. Quit\n"
         read -r -p "Select: " misc
         case "$misc" in
           [Vv]*) overwriteVersion ;;
@@ -804,6 +804,7 @@ while true; do
           [Dd]*) DeletePatchesApk ;;
           [Ll]*) DeletePatchLog ;;
           [Uu]*) UninstallPatchesApp ;;
+          [Mm]*) Unmount && sleep 3 ;;
           [Ss]*)
             echo -ne "${Yellow}Are you sure you want to uninstall Simplify? [Y/n]${Reset}: " && read -r userInput
             case "$userInput" in
@@ -842,18 +843,17 @@ while true; do
             esac
             ;;
           [Qq]*) break ;;
-          *) echo -e "$info Invalid input! Please enter V or A or D or L or U or S." ;;
+          *) echo -e "$info Invalid input! Please enter V or A or D or L or U or M or S." ;;
         esac
       done
       sleep 3
       ;;
-    [Uu]*) Unmount && sleep 3 ;;
     [Ff]*) feature && sleep 3 ;;
     [Bb]*) bug && sleep 3 ;;
     [Ss]*) support && sleep 3 ;;
     [Aa]*) about && sleep 3 ;;
     [Qq]*) clear && break ;;
-    *) echo -e "$info Invalid input! Please enter: D / RV / RVX / Piko / Drop / LS / C / M / U / F / B / S / A / Q" && sleep 3 ;;
+    *) echo -e "$info Invalid input! Please enter: D / RV / RVX / Piko / Drop / LS / C / M / F / B / S / A / Q" && sleep 3 ;;
   esac
 done
-#################################################################################################################################
+#############################################################################################################################
