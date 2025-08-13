@@ -491,7 +491,7 @@ listOfPatches() {
       pkgName="com.google.android.youtube"
       getListOfPatches "$pkgName"
       ;;
-    TY\ Music)
+    YT\ Music)
       pkgName="com.google.android.apps.youtube.music"
       getListOfPatches "$pkgName"
       ;;
