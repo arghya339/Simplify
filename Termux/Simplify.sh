@@ -313,7 +313,7 @@ config() {
     jq -n "{}" > "$simplifyJson"
   fi
 
-  if ! jq --arg key "$key" 'has($key)' "$simplifyJson" >/dev/null; then
+  if ! jq -e --arg key "$key" 'has($key)' "$simplifyJson" >/dev/null; then
     jq --arg key "$key" --arg value "$value" '.[$key] = $value' "$simplifyJson" > temp.json && mv temp.json "$simplifyJson"
   fi
 
