@@ -526,25 +526,25 @@ change_yt_ytm_app_icon_header() {
     case "$opt" in
       [Gg]*)
         branding="google_family"
-        jq ".Branding = $branding" "$simplifyJson" > temp.json && mv temp.json "$simplifyJson"
+        jq ".Branding = \"$branding\"" "$simplifyJson" > temp.json && mv temp.json "$simplifyJson"
         echo -e "$good ${Green}appIconHeader successfully set to google_family!${Reset}"
         break
         ;;
       [Pp]*)
         branding=pink
-        jq ".Branding = $branding" "$simplifyJson" > temp.json && mv temp.json "$simplifyJson"
+        jq ".Branding = \"$branding\"" "$simplifyJson" > temp.json && mv temp.json "$simplifyJson"
         echo -e "$good ${Green}appIconHeader successfully set to pink!${Reset}"
         break
         ;;
       [Vv]*)
         branding="vanced_light"
-        jq ".Branding = $branding" "$simplifyJson" > temp.json && mv temp.json "$simplifyJson"
+        jq ".Branding = \"$branding\"" "$simplifyJson" > temp.json && mv temp.json "$simplifyJson"
         echo -e "$good ${Green}appIconHeader successfully set to vanced_light!${Reset}"
         break
         ;;
       [Rr]*)
         branding="revancify_blue"
-        jq ".Branding = $branding" "$simplifyJson" > temp.json && mv temp.json "$simplifyJson"
+        jq ".Branding = \"$branding\"" "$simplifyJson" > temp.json && mv temp.json "$simplifyJson"
         echo -e "$good ${Green}appIconHeader successfully set to revancify_blue!${Reset}"
         break
         ;;
