@@ -44,6 +44,7 @@ FetchPreRelease=$(jq -r '.FetchPreRelease' "$simplifyJson" 2>/dev/null)
 RipLib="$(jq -r '.RipLib' "$simplifyJson" 2>/dev/null)"
 ChangeRVXSource="$(jq -r '.ChangeRVXSource' "$simplifyJson" 2>/dev/null)"
 ReadPatchesFile="$(jq -r '.ReadPatchesFile' "$simplifyJson" 2>/dev/null)"
+Branding=$(jq -r '.Branding' "$simplifyJson" 2>/dev/null)
 if [ -f "$HOME/.config/gh/hosts.yml" ] && gh auth status > /dev/null 2>&1; then
   # oauth_token: gho_************************************
   token=$(grep -A2 "users:" ~/.config/gh/hosts.yml | grep -v "users:" | grep -A1 "oauth_token:" | awk '/oauth_token:/ {getline; print $2}')
@@ -203,8 +204,8 @@ patch_app() {
 yt_patches_args=(
   # enable patches with their options
   -e "Custom Shorts action buttons" -OiconType="round"
-  -e "Custom branding icon for YouTube" -OappIcon="$SimplUsr/.branding/youtube/launcher/google_family" -OchangeSplashIcon=true -OrestoreOldSplashAnimation=false
-  -e "Custom header for YouTube" -OcustomHeader="$SimplUsr/.branding/youtube/header/google_family"
+  -e "Custom branding icon for YouTube" -OappIcon="$SimplUsr/.branding/youtube/launcher/$Branding" -OchangeSplashIcon=true -OrestoreOldSplashAnimation=false
+  -e "Custom header for YouTube" -OcustomHeader="$SimplUsr/.branding/youtube/header/$Branding"
   -e "Custom branding name for YouTube" -OappName="YouTube RVX"
   -e "Hide shortcuts" -Oshorts=false
   -e "Visual preferences icons for YouTube" -OsettingsMenuIcon="extension"
@@ -223,8 +224,8 @@ else
 fi
 
 yt_music_patches_args=(
-  -e "Custom branding icon for YouTube Music" -OappIcon="$SimplUsr/.branding/music/launcher/google_family"
-  -e "Custom header for YouTube Music" -OcustomHeader="$SimplUsr/.branding/music/header/google_family"
+  -e "Custom branding icon for YouTube Music" -OappIcon="$SimplUsr/.branding/music/launcher/$Branding"
+  -e "Custom header for YouTube Music" -OcustomHeader="$SimplUsr/.branding/music/header/$Branding"
   -e "Custom branding name for YouTube Music" -OappNameNotification="YouTube Music RVX" -OappNameLauncher="YT Music RVX"
   -e "Dark theme" -OmaterialYou=true
   -e "Visual preferences icons for YouTube Music" -OsettingsMenuIcon="extension"

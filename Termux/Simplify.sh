@@ -134,12 +134,14 @@ RipDpi="$(jq -r '.RipDpi' "$simplifyJson" 2>/dev/null)"
 RipLib="$(jq -r '.RipLib' "$simplifyJson" 2>/dev/null)"
 ChangeRVXSource="$(jq -r '.ChangeRVXSource' "$simplifyJson" 2>/dev/null)"
 ReadPatchesFile="$(jq -r '.ReadPatchesFile' "$simplifyJson" 2>/dev/null)"
+Branding=$(jq -r '.Branding' "$simplifyJson" 2>/dev/null)
 isPreRelease=0  # Default value (false/off/0) for isPreRelease, it's enabled latest release for Patches source
 isRipLocale=1  # Default value (true/on/1) for RipLocale, it's delete locale from patches apk file except device specific locale by default
 isRipDpi=1  # Default value (true/on/1) for RipDpi, it's delete dpi from patches apk file except device specific dpi by default
 isRipLib=1  # Default value (true/on/1) for RipLib, it's delete lib dir from patches apk file except device specific arch lib by default
 isChangeRVXSource=0  # Default value (false/off/0) for ChangeRVXSource, means patches source remain unchange ie. official source (inotia00) for RVX Patches
 isReadPatchesFile=0  # Default value (false/off/0) for ReadPatchesFile, means recommended PatchesOptions loading from script.
+branding="google_family"
 
 # --- Checking Android Version ---
 if [ $Android -le 4 ]; then
@@ -303,15 +305,26 @@ Unmount() {
   '\'''
 }
 
-if [ ! -f "$simplifyJson" ]; then
-  echo -e "$running Creating Configuration file.."
-  jq -n "{ \"FetchPreRelease\": "$isPreRelease" }" > "$simplifyJson"  # Create new json file with {data} using jq null flags
-  jq ".RipLocale = $isRipLocale" "$simplifyJson" > temp.json && mv temp.json "$simplifyJson"
-  jq ".RipDpi = $isRipDpi" "$simplifyJson" > temp.json && mv temp.json "$simplifyJson"
-  jq ".RipLib = $isRipLib" "$simplifyJson" > temp.json && mv temp.json "$simplifyJson"  # Change key value: Reads content of existing json and assigns key new value then redirect new json data to temp.json then rename it to simplify.json
-  jq ".ChangeRVXSource = $isChangeRVXSource" "$simplifyJson" > temp.json && mv temp.json "$simplifyJson"  # Change key value: Reads content of existing json and assigns key new value then redirect new json data to temp.json then rename it to simplify.json
-  jq ".ReadPatchesFile = $isReadPatchesFile" "$simplifyJson" > temp.json && mv temp.json "$simplifyJson"
-fi
+config() {
+  local key="$1"
+  local value="$2"
+  
+  if [ ! -f "$simplifyJson" ]; then
+    jq -n "{}" > "$simplifyJson"
+  fi
+
+  if ! jq --arg key "$key" 'has($key)' "$simplifyJson" >/dev/null; then
+    jq --arg key "$key" --arg value "$value" '.[$key] = $value' "$simplifyJson" > temp.json && mv temp.json "$simplifyJson"
+  fi
+
+}
+config "FetchPreRelease" "$isPreRelease"
+config "RipLocale" "$isRipLocale"
+config "RipDpi" "$isRipDpi"
+config "RipLib" "$isRipLib"
+config "ChangeRVXSource" "$isChangeRVXSource"
+config "ReadPatchesFile" "$isReadPatchesFile"
+config "Branding" "$branding"
 
 fetchPreRelease() {
   while true; do
@@ -502,6 +515,40 @@ read_patches_file() {
         break
         ;;
       *) echo -e "${info} Invalid input! Please enter E or D." ;;
+    esac
+  done
+}
+
+change_yt_ytm_app_icon_header() {
+  while true; do
+    echo -e "G. google_family\nP. pink\nV. vanced_light\nR. revancify_blue\n"
+    read -r -p "changeYouTubeYTMusicAppIconHeader [G/P/V/R]: " opt
+    case "$opt" in
+      [Gg]*)
+        branding="google_family"
+        jq ".Branding = $branding" "$simplifyJson" > temp.json && mv temp.json "$simplifyJson"
+        echo -e "$good ${Green}appIconHeader successfully set to google_family!${Reset}"
+        break
+        ;;
+      [Pp]*)
+        branding=pink
+        jq ".Branding = $branding" "$simplifyJson" > temp.json && mv temp.json "$simplifyJson"
+        echo -e "$good ${Green}appIconHeader successfully set to pink!${Reset}"
+        break
+        ;;
+      [Vv]*)
+        branding="vanced_light"
+        jq ".Branding = $branding" "$simplifyJson" > temp.json && mv temp.json "$simplifyJson"
+        echo -e "$good ${Green}appIconHeader successfully set to vanced_light!${Reset}"
+        break
+        ;;
+      [Rr]*)
+        branding="revancify_blue"
+        jq ".Branding = $branding" "$simplifyJson" > temp.json && mv temp.json "$simplifyJson"
+        echo -e "$good ${Green}appIconHeader successfully set to revancify_blue!${Reset}"
+        break
+        ;;
+      *) echo -e "$info Invalid input! Please enter G or P or V or R." ;;
     esac
   done
 }
@@ -767,7 +814,7 @@ while true; do
       ;;
     [Cc]*)
       while true; do
-        echo -e "P. FetchPreRelease\nL. RipLocale\nD. RipDpi\nR. RipLib\nS. Change RVX Source\nT. Add gh PAT (increases gh api rate limit)\nO. Import Custom PatchesOptions from file\nQ. Quit\n"
+        echo -e "P. FetchPreRelease\nL. RipLocale\nD. RipDpi\nR. RipLib\nS. Change RVX Source\nT. Add gh PAT (increases gh api rate limit)\nO. Import Custom PatchesOptions from file\nB. Change YouTube & YT Music AppIcon & Header\nQ. Quit\n"
         read -r -p "Select: " opt
         case "$opt" in
           [Pp]*) if [ "$FetchPreRelease" == 0 ]; then echo "FetchPreRelease == false"; else echo "FetchPreRelease == true"; fi && fetchPreRelease ;;
@@ -787,9 +834,10 @@ while true; do
             fi
             pat  # Call the pat function to create & add GitHub token
             ;;
-          [Oo]*) if [ "$ReadPatchesFile" == 1 ]; then echo "ReadPatchesFile == Enabled"; else echo "ReadPatchesFile == Disabled"; fi &&  read_patches_file ;;
+          [Oo]*) if [ "$ReadPatchesFile" == 1 ]; then echo "ReadPatchesFile == Enabled"; else echo "ReadPatchesFile == Disabled"; fi && read_patches_file ;;
+          [Bb]*) echo "changeYouTubeYTMusicAppIconHeader == $Branding" && change_yt_ytm_app_icon_header ;;
           [Qq]*) break ;;
-          *) echo -e "$info Invalid input! Please enter P / L / D / R / S / T / O /Q." ;;
+          *) echo -e "$info Invalid input! Please enter P / L / D / R / S / T / O / B / Q." ;;
         esac
       done
       sleep 3
