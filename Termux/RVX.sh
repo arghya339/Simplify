@@ -220,7 +220,11 @@ yt_patches_args=(
 if su -c "id" >/dev/null 2>&1; then
   yt_patches_args+=(-d "GmsCore support")
 else
-  yt_patches_args+=(-e "GmsCore support" -OgmsCoreVendorGroupId="com.mgoogle" -OcheckGmsCore=true -OpackageNameYouTube="app.rvx.android.youtube")
+  if [[ ( $Android -eq 7 || $Android -eq 6 ) && "$appName" == "YouTube" ]]; then
+    yt_patches_args+=(-e "GmsCore support" -OgmsCoreVendorGroupId="app.revanced" -OcheckGmsCore=true -OpackageNameYouTube="app.rvx.android.youtube")
+  else
+    yt_patches_args+=(-e "GmsCore support" -OgmsCoreVendorGroupId="com.mgoogle" -OcheckGmsCore=true -OpackageNameYouTube="app.rvx.android.youtube")
+  fi
 fi
 
 yt_music_patches_args=(
@@ -290,7 +294,11 @@ if [ "$ReadPatchesFile" -eq 1 ]; then
         if su -c "id" >/dev/null 2>&1; then
           echo "-d \"GmsCore support\"" >> "$SimplUsr/${arraynames[$i]}.txt"
         else
-          echo "-e \"GmsCore support\" -O gmsCoreVendorGroupId=\"com.mgoogle\" -OcheckGmsCore=true" >> "$SimplUsr/${arraynames[$i]}.txt"
+          if [[ ( $Android -eq 7 || $Android -eq 6 ) && "$appName" == "YouTube" ]]; then
+            echo "-e \"GmsCore support\" -O gmsCoreVendorGroupId=\"app.revanced\" -OcheckGmsCore=true" >> "$SimplUsr/${arraynames[$i]}.txt"
+          else
+            echo "-e \"GmsCore support\" -O gmsCoreVendorGroupId=\"com.mgoogle\" -OcheckGmsCore=true" >> "$SimplUsr/${arraynames[$i]}.txt"
+          fi
         fi
       fi
     fi
