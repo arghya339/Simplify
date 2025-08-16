@@ -582,9 +582,11 @@ while true; do
         if [ "$ChangeRVXSource" == 0 ]; then
           pkgVersion="20.12.46"
           Type="APK"
+          stock_apk_path=("$Download/YouTube_v${pkgVersion}-$Arch.apk")
         else
           pkgVersion="20.21.37"
           Type="APK"
+          stock_apk_path=("$Download/YouTube_v${pkgVersion}-$Arch.apk")
         fi
         if [ -z "$pkgVersion" ]; then
           getVersion "$pkgName"
