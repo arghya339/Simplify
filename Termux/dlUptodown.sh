@@ -246,14 +246,14 @@ dlUptodown() {
       if [ $RipLocale -eq 1 ] && [ $RipDpi -eq 1 ] && [ $RipLib -eq 1 ]; then
         pv "$outputPath" | bsdtar -xf - -C "$Download/${appName}_v${appVersion}-${cpuAbi}/" --include "$pkgName.apk" "config.${cpuAbi//-/_}.apk" "config.${locale}.apk" "config.${dpi}.apk"
         if [ ! -e "$Download/${appName}_v${appVersion}-${cpuAbi}/config.${dpi}.apk" ] || [ ! -e "$Download/${appName}_v${VERSION}-${cpuAbi}/split_config.${locale}.apk" ] || [ ! -e "$Download/${appName}_v${VERSION}-${cpuAbi}/split_config.${cpuAbi//-/_}.apk" ]; then  # check if file exists
-          pv "$outputPath" | bsdtar -xf - -C "$Download/${appName}_v${appVersion}-${cpuAbi}/" --include "$pkgName.apk" "config.${cpuAbi//-/_}.apk" "config.${locale}.apk" "config.*dpi.apk"
+          pv "$outputPath" | bsdtar -xf - -C "$Download/${appName}_v${appVersion}-${cpuAbi}/"
         fi
       elif [ $RipLocale -eq 0 ] && [ $RipDpi -eq 0 ] && [ $RipLib -eq 0 ]; then
         pv "$outputPath" | bsdtar -xf - -C "$Download/${appName}_v${appVersion}-${cpuAbi}/"
       else
         pv "$outputPath" | bsdtar -xf - -C "$Download/${appName}_v${appVersion}-${cpuAbi}/" --include "$pkgName.apk" "config.${cpuAbi//-/_}.apk" "config.${locale}.apk" "config.${dpi}.apk"
         if [ ! -e "$Download/${appName}_v${appVersion}-${cpuAbi}/config.${dpi}.apk" ] || [ ! -e "$Download/${appName}_v${VERSION}-${cpuAbi}/split_config.${locale}.apk" ] || [ ! -e "$Download/${appName}_v${VERSION}-${cpuAbi}/split_config.${cpuAbi//-/_}.apk" ]; then  # check if file exists
-          pv "$outputPath" | bsdtar -xf - -C "$Download/${appName}_v${appVersion}-${cpuAbi}/" --include "$pkgName.apk" "config.${cpuAbi//-/_}.apk" "config.${locale}.apk" "config.*dpi.apk"
+          pv "$outputPath" | bsdtar -xf - -C "$Download/${appName}_v${appVersion}-${cpuAbi}/"
         fi
       fi
       rm "$outputPath"
