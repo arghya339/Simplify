@@ -570,11 +570,21 @@ while true; do
   case "${apps[$idx]}" in
     YouTube)
       pkgName="com.google.android.youtube"
+      Arch="universal"
+      if su -c "id" >/dev/null 2>&1; then
+        Type="APK"
+        stock_apk_path=("$Download/YouTube_v${pkgVersion}-$Arch.apk")
+      else
+        Type="BUNDLE"
+        stock_apk_path=("$Download/YouTube_v${pkgVersion}-$cpuAbi.apk")
+      fi
       if [ $Android -ge 8 ]; then
         if [ "$ChangeRVXSource" == 0 ]; then
           pkgVersion="20.12.46"
+          Type="APK"
         else
           pkgVersion="20.21.37"
+          Type="APK"
         fi
         if [ -z "$pkgVersion" ]; then
           getVersion "$pkgName"
@@ -583,14 +593,6 @@ while true; do
       elif [ $Android -eq 7 ] || [ $Android -eq 6 ]; then
         pkgVersion="17.34.36"
         BugReportUrl="https://github.com/kitadai31/revanced-patches-android6-7/issues/new?template=bug_report.yml"
-      fi
-      Arch="universal"
-      if su -c "id" >/dev/null 2>&1; then
-        Type="APK"
-        stock_apk_path=("$Download/YouTube_v${pkgVersion}-$Arch.apk")
-      else
-        Type="BUNDLE"
-        stock_apk_path=("$Download/YouTube_v${pkgVersion}-$cpuAbi.apk")
       fi
       outputAPK="$SimplUsr/youtube-rvx_v${pkgVersion}-$cpuAbi.apk"
       log="$SimplUsr/yt-rvx-patch_log.txt"
