@@ -324,14 +324,14 @@ APKMdl() {
       echo -e "$running Extracting APKM content.."
       if [ $RipLocale -eq 1 ] && [ $RipDpi -eq 1 ] && [ $RipLib -eq 1 ]; then
         pv "$outputPath" | bsdtar -xf - -C "$Download/${appName}_v${VERSION}-${cpuAbi}/" --include "base.apk" "split_config.${cpuAbi//-/_}.apk" "split_config.${locale}.apk" "split_config.${lcd_dpi}.apk"
-        if [ ! -e "$Download/${appName}_v${VERSION}-${cpuAbi}/split_config.${lcd_dpi}.apk" ]; then  # check if file exists
+        if [ ! -e "$Download/${appName}_v${VERSION}-${cpuAbi}/split_config.${lcd_dpi}.apk" ] || [ ! -e "$Download/${appName}_v${VERSION}-${cpuAbi}/split_config.${locale}.apk" ] || [ ! -e "$Download/${appName}_v${VERSION}-${cpuAbi}/split_config.${cpuAbi//-/_}.apk" ]; then  # check if file exists
           pv "$outputPath" | bsdtar -xf - -C "$Download/${appName}_v${VERSION}-${cpuAbi}/" --include "base.apk" "split_config.${cpuAbi//-/_}.apk" "split_config.${locale}.apk" "split_config.*dpi.apk"
         fi
       elif [ $RipLocale -eq 0 ] && [ $RipDpi -eq 0 ] && [ $RipLib -eq 0 ]; then
         pv "$outputPath" | bsdtar -xf - -C "$Download/${appName}_v${VERSION}-${cpuAbi}/"
       else
         pv "$outputPath" | bsdtar -xf - -C "$Download/${appName}_v${VERSION}-${cpuAbi}/" --include "base.apk" "split_config.${cpuAbi//-/_}.apk" "split_config.${locale}.apk" "split_config.${lcd_dpi}.apk"
-        if [ ! -e "$Download/${appName}_v${VERSION}-${cpuAbi}/split_config.${lcd_dpi}.apk" ]; then  # check if file exists
+        if [ ! -e "$Download/${appName}_v${VERSION}-${cpuAbi}/split_config.${lcd_dpi}.apk" ] || [ ! -e "$Download/${appName}_v${VERSION}-${cpuAbi}/split_config.${locale}.apk" ] || [ ! -e "$Download/${appName}_v${VERSION}-${cpuAbi}/split_config.${cpuAbi//-/_}.apk" ]; then  # check if file exists
           pv "$outputPath" | bsdtar -xf - -C "$Download/${appName}_v${VERSION}-${cpuAbi}/" --include "base.apk" "split_config.${cpuAbi//-/_}.apk" "split_config.${locale}.apk" "split_config.*dpi.apk"
         fi
       fi
