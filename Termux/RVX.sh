@@ -178,7 +178,7 @@ patch_app() {
   local Url=$6
   
   if [[ ( $Android -eq 7 || $Android -eq 6 ) && "$appName" == "YouTube" ]]; then
-    bash $Simplify/dlGitHub.sh "kitadai31" "revanced-patches" "$release" ".rvp" "$RVX6_7"
+    bash $Simplify/dlGitHub.sh "kitadai31" "revanced-patches-android6-7" "$release" ".rvp" "$RVX6_7"
     PatchesRvp=$(find "$RVX6_7" -type f -name "patches-*.rvp" -print -quit)
     echo -e "$info ${Blue}PatchesRvp:${Reset} $PatchesRvp"
   fi
