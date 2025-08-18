@@ -128,13 +128,6 @@ LSPatch="$Simplify/LSPatch"
 mkdir -p "$Simplify" "$RV" "$RVX" "$pikoTwitter" "$Dropped" "$LSPatch" "$SimplUsr"
 Download="/sdcard/Download"
 simplifyJson="$Simplify/simplify.json"  # Configuration file to store simplify settings
-FetchPreRelease=$(jq -r '.FetchPreRelease' "$simplifyJson" 2>/dev/null)
-RipLocale="$(jq -r '.RipLocale' "$simplifyJson" 2>/dev/null)"
-RipDpi="$(jq -r '.RipDpi' "$simplifyJson" 2>/dev/null)"
-RipLib="$(jq -r '.RipLib' "$simplifyJson" 2>/dev/null)"
-ChangeRVXSource="$(jq -r '.ChangeRVXSource' "$simplifyJson" 2>/dev/null)"
-ReadPatchesFile="$(jq -r '.ReadPatchesFile' "$simplifyJson" 2>/dev/null)"
-Branding=$(jq -r '.Branding' "$simplifyJson" 2>/dev/null)
 isPreRelease=0  # Default value (false/off/0) for isPreRelease, it's enabled latest release for Patches source
 isRipLocale=1  # Default value (true/on/1) for RipLocale, it's delete locale from patches apk file except device specific locale by default
 isRipDpi=1  # Default value (true/on/1) for RipDpi, it's delete dpi from patches apk file except device specific dpi by default
@@ -814,6 +807,13 @@ while true; do
       ;;
     [Cc]*)
       while true; do
+        FetchPreRelease=$(jq -r '.FetchPreRelease' "$simplifyJson" 2>/dev/null)
+        RipLocale="$(jq -r '.RipLocale' "$simplifyJson" 2>/dev/null)"
+        RipDpi="$(jq -r '.RipDpi' "$simplifyJson" 2>/dev/null)"
+        RipLib="$(jq -r '.RipLib' "$simplifyJson" 2>/dev/null)"
+        ChangeRVXSource="$(jq -r '.ChangeRVXSource' "$simplifyJson" 2>/dev/null)"
+        ReadPatchesFile="$(jq -r '.ReadPatchesFile' "$simplifyJson" 2>/dev/null)"
+        Branding=$(jq -r '.Branding' "$simplifyJson" 2>/dev/null)
         echo -e "P. FetchPreRelease\nL. RipLocale\nD. RipDpi\nR. RipLib\nS. Change RVX Source\nT. Add gh PAT (increases gh api rate limit)\nO. Import Custom PatchesOptions from file\nB. Change YouTube & YT Music AppIcon & Header\nQ. Quit\n"
         read -r -p "Select: " opt
         case "$opt" in
