@@ -326,13 +326,13 @@ fetchPreRelease() {
       [Tt]*)
         isPreRelease=1  # FetchPreRelease  == true
         jq ".FetchPreRelease = $isPreRelease" "$simplifyJson" > temp.json && mv temp.json "$simplifyJson"  # Change key value: Reads content of existing json and assigns key new value then redirect new json data to temp.json then rename it to simplify.json
-        echo -e "$info FetchPreRelease is True. Last Pre Release Patches will be fetched."
+        echo -e "$good ${Green}FetchPreRelease is True! Last Pre Release Patches will be fetched.${Reset}"
         break
         ;;
       [Ff]*)
         isPreRelease=0  # FetchPreRelease  == false
         jq ".FetchPreRelease = $isPreRelease" "$simplifyJson" > temp.json && mv temp.json "$simplifyJson"  # Change key value: Reads content of existing json and assigns key new value then redirect new json data to temp.json then rename it to simplify.json
-        echo -e "$info FetchPreRelease is False. Latest Release Patches will be fetched."
+        echo -e "$good ${Green}FetchPreRelease is False! Latest Release Patches will be fetched.${Reset}"
         break
         ;;
       *) echo -e "${info} Invalid input! Please enter T or F." ;;
@@ -347,13 +347,13 @@ ripLocale() {
       [Ee]*)
         isRipLocale=1  # Enable RipLocale
         jq ".RipLocale = $isRipLocale" "$simplifyJson" > temp.json && mv temp.json "$simplifyJson"  # Change key value: Reads content of existing json and assigns key new value then redirect new json data to temp.json then rename it to simplify.json
-        echo -e "$info RipLocale is Enabled! Device specific locale will be kept in patches apk file."
+        echo -e "$good ${Green}RipLocale is Enabled! Device specific locale will be kept in patches apk file.${Reset}"
         break
         ;;
       [Dd]*)
         isRipLocale=0  # Disable RipLocale
         jq ".RipLocale = $isRipLocale" "$simplifyJson" > temp.json && mv temp.json "$simplifyJson"  # Change key value: Reads content of existing json and assigns key new value then redirect new json data to temp.json then rename it to simplify.json
-        echo -e "$info RipLocale is Disabled! All locale will be kept in patches apk file."
+        echo -e "$good ${Green}RipLocale is Disabled! All locale will be kept in patches apk file.${Reset}"
         break
         ;;
       *) echo -e "${info} Invalid input! Please enter E or D." ;;
@@ -368,13 +368,13 @@ ripDpi() {
       [Ee]*)
         isRipDpi=1  # Enable RipDpi
         jq ".RipDpi = $isRipDpi" "$simplifyJson" > temp.json && mv temp.json "$simplifyJson"  # Change key value: Reads content of existing json and assigns key new value then redirect new json data to temp.json then rename it to simplify.json
-        echo -e "$info RipDpi is Enabled! Device specific dpi will be kept in patches apk file."
+        echo -e "$good ${Green}RipDpi is Enabled! Device specific dpi will be kept in patches apk file.${Reset}"
         break
         ;;
       [Dd]*)
         isRipDpi=0  # Disable RipDpi
         jq ".RipDpi = $isRipDpi" "$simplifyJson" > temp.json && mv temp.json "$simplifyJson"  # Change key value: Reads content of existing json and assigns key new value then redirect new json data to temp.json then rename it to simplify.json
-        echo -e "$info RipDpi is Disabled! All dpi will be kept in patches apk file."
+        echo -e "$good ${Green}RipDpi is Disabled! All dpi will be kept in patches apk file.${Reset}"
         break
         ;;
       *) echo -e "${info} Invalid input! Please enter E or D." ;;
@@ -389,13 +389,13 @@ ripLib() {
       [Ee]*)
         isRipLib=1  # Enable RipLib
         jq ".RipLib = $isRipLib" "$simplifyJson" > temp.json && mv temp.json "$simplifyJson"  # Change key value: Reads content of existing json and assigns key new value then redirect new json data to temp.json then rename it to simplify.json
-        echo -e "$info RipLib is Enabled. Device specific arch lib will be kept in patches apk file."
+        echo -e "$good ${Green}RipLib is Enabled! Device specific arch lib will be kept in patches apk file.${Reset}"
         break
         ;;
       [Dd]*)
         isRipLib=0  # Disable RipLib
         jq ".RipLib = $isRipLib" "$simplifyJson" > temp.json && mv temp.json "$simplifyJson"  # Change key value: Reads content of existing json and assigns key new value then redirect new json data to temp.json then rename it to simplify.json
-        echo -e "$info RipLib is Disabled. All lib dir will be kept in patches apk file."
+        echo -e "$good ${Green}RipLib is Disabled! All lib dir will be kept in patches apk file.${Reset}"
         break
         ;;
       *) echo -e "${info} Invalid input! Please enter E or D." ;;
@@ -410,13 +410,13 @@ changeRVXSource() {
       [Yy]*)
         isChangeRVXSource=1  # ChangeRVXSource: anddea
         jq ".ChangeRVXSource = $isChangeRVXSource" "$simplifyJson" > temp.json && mv temp.json "$simplifyJson"  # Change key value: Reads content of existing json and assigns key new value then redirect new json data to temp.json then rename it to simplify.json
-        echo -e "$info ChangeRVXSource == Yes. RVX Patches source will be changed to anddea."
+        echo -e "$good ${Green}ChangeRVXSource == Yes! RVX Patches source will be changed to anddea.${Reset}"
         break
         ;;
       [Nn]*)
         isChangeRVXSource=0  # ChangeRVXSource: inotia00
         jq ".ChangeRVXSource = $isChangeRVXSource" "$simplifyJson" > temp.json && mv temp.json "$simplifyJson"  # Change key value: Reads content of existing json and assigns key new value then redirect new json data to temp.json then rename it to simplify.json
-        echo -e "$info ChangeRVXSource == No. RVX Patches source will remain official (inotia00)."
+        echo -e "$good ${Green}ChangeRVXSource == No! RVX Patches source will remain official (inotia00).${Reset}"
         break
         ;;
       *) echo -e "${info} Invalid input! Please enter Y or N." ;;
@@ -498,13 +498,13 @@ read_patches_file() {
       [Ee]*)
         isReadPatchesFile=1  # Enable ReadPatchesFile
         jq ".ReadPatchesFile = $isReadPatchesFile" "$simplifyJson" > temp.json && mv temp.json "$simplifyJson"  # Change key value: Reads content of existing json and assigns key new value then redirect new json data to temp.json then rename it to simplify.json
-        echo -e "$info ReadPatchesFile is Enabled! Custom PatchesOptions Loading from File."
+        echo -e "$good ${Green}ReadPatchesFile is Enabled! Custom PatchesOptions Loading from File.${Reset}"
         break
         ;;
       [Dd]*)
         isReadPatchesFile=0  # Disable ReadPatchesFile
         jq ".ReadPatchesFile = $isReadPatchesFile" "$simplifyJson" > temp.json && mv temp.json "$simplifyJson"  # Change key value: Reads content of existing json and assigns key new value then redirect new json data to temp.json then rename it to simplify.json
-        echo -e "$info ReadPatchesFile is Disabled! Recommended PatchesOptions Loading from Script."
+        echo -e "$good ${Green}ReadPatchesFile is Disabled! Recommended PatchesOptions Loading from Script.${Reset}"
         break
         ;;
       *) echo -e "${info} Invalid input! Please enter E or D." ;;
