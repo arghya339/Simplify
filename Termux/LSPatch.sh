@@ -445,7 +445,7 @@ while true; do
     1.1.1.1\ +\ WARP)
       appName=("1.1.1.1 + WARP")
       pkgName="com.cloudflare.onedotonedotonedotone"
-      #pkgVersion="6.38.4"
+      #pkgVersion="6.38.5"
       pkgVersion=""
       Type="BUNDLE"
       Arch=("universal")
