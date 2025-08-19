@@ -308,13 +308,14 @@ config() {
   
   jq --arg key "$key" --arg value "$value" '.[$key] = $value' "$simplifyJson" > temp.json && mv temp.json "$simplifyJson"
 }
-config "FetchPreRelease" "$isPreRelease"
-config "RipLocale" "$isRipLocale"
-config "RipDpi" "$isRipDpi"
-config "RipLib" "$isRipLib"
-config "ChangeRVXSource" "$isChangeRVXSource"
-config "ReadPatchesFile" "$isReadPatchesFile"
-config "Branding" "$branding"
+all_key=("FetchPreRelease" "RipLocale" "RipDpi" "RipLib" "ChangeRVXSource" "ReadPatchesFile" "Branding")
+all_value=("$isPreRelease" "$isRipLocale" "$isRipDpi" "$isRipLib" "$isChangeRVXSource" "$isReadPatchesFile" "$branding")
+# Loop through all keys and set values if they don't exist
+for i in "${!all_key[@]}"; do
+  if ! jq -e --arg key "${all_key[i]}" 'has($key)' "$simplifyJson" >/dev/null; then
+    config "${all_key[i]}" "${all_value[i]}"
+  fi
+done
 
 fetchPreRelease() {
   while true; do
