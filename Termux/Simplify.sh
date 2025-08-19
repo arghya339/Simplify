@@ -305,11 +305,8 @@ config() {
   if [ ! -f "$simplifyJson" ]; then
     jq -n "{}" > "$simplifyJson"
   fi
-
-  if ! jq -e --arg key "$key" 'has($key)' "$simplifyJson" >/dev/null; then
-    jq --arg key "$key" --arg value "$value" '.[$key] = $value' "$simplifyJson" > temp.json && mv temp.json "$simplifyJson"
-  fi
-
+  
+  jq --arg key "$key" --arg value "$value" '.[$key] = $value' "$simplifyJson" > temp.json && mv temp.json "$simplifyJson"
 }
 config "FetchPreRelease" "$isPreRelease"
 config "RipLocale" "$isRipLocale"
@@ -325,13 +322,13 @@ fetchPreRelease() {
     case "$opt" in
       [Tt]*)
         isPreRelease=1  # FetchPreRelease  == true
-        jq ".FetchPreRelease = $isPreRelease" "$simplifyJson" > temp.json && mv temp.json "$simplifyJson"  # Change key value: Reads content of existing json and assigns key new value then redirect new json data to temp.json then rename it to simplify.json
+        config "FetchPreRelease" "$isPreRelease"
         echo -e "$good ${Green}FetchPreRelease is True! Last Pre Release Patches will be fetched.${Reset}"
         break
         ;;
       [Ff]*)
         isPreRelease=0  # FetchPreRelease  == false
-        jq ".FetchPreRelease = $isPreRelease" "$simplifyJson" > temp.json && mv temp.json "$simplifyJson"  # Change key value: Reads content of existing json and assigns key new value then redirect new json data to temp.json then rename it to simplify.json
+        config "FetchPreRelease" "$isPreRelease"
         echo -e "$good ${Green}FetchPreRelease is False! Latest Release Patches will be fetched.${Reset}"
         break
         ;;
@@ -346,13 +343,13 @@ ripLocale() {
     case "$opt" in
       [Ee]*)
         isRipLocale=1  # Enable RipLocale
-        jq ".RipLocale = $isRipLocale" "$simplifyJson" > temp.json && mv temp.json "$simplifyJson"  # Change key value: Reads content of existing json and assigns key new value then redirect new json data to temp.json then rename it to simplify.json
+        config "RipLocale" "$isRipLocale"
         echo -e "$good ${Green}RipLocale is Enabled! Device specific locale will be kept in patches apk file.${Reset}"
         break
         ;;
       [Dd]*)
         isRipLocale=0  # Disable RipLocale
-        jq ".RipLocale = $isRipLocale" "$simplifyJson" > temp.json && mv temp.json "$simplifyJson"  # Change key value: Reads content of existing json and assigns key new value then redirect new json data to temp.json then rename it to simplify.json
+        config "RipLocale" "$isRipLocale"
         echo -e "$good ${Green}RipLocale is Disabled! All locale will be kept in patches apk file.${Reset}"
         break
         ;;
@@ -367,13 +364,13 @@ ripDpi() {
     case "$opt" in
       [Ee]*)
         isRipDpi=1  # Enable RipDpi
-        jq ".RipDpi = $isRipDpi" "$simplifyJson" > temp.json && mv temp.json "$simplifyJson"  # Change key value: Reads content of existing json and assigns key new value then redirect new json data to temp.json then rename it to simplify.json
+        config "RipDpi" "$isRipDpi"
         echo -e "$good ${Green}RipDpi is Enabled! Device specific dpi will be kept in patches apk file.${Reset}"
         break
         ;;
       [Dd]*)
         isRipDpi=0  # Disable RipDpi
-        jq ".RipDpi = $isRipDpi" "$simplifyJson" > temp.json && mv temp.json "$simplifyJson"  # Change key value: Reads content of existing json and assigns key new value then redirect new json data to temp.json then rename it to simplify.json
+        config "RipDpi" "$isRipDpi"
         echo -e "$good ${Green}RipDpi is Disabled! All dpi will be kept in patches apk file.${Reset}"
         break
         ;;
@@ -388,13 +385,13 @@ ripLib() {
     case "$opt" in
       [Ee]*)
         isRipLib=1  # Enable RipLib
-        jq ".RipLib = $isRipLib" "$simplifyJson" > temp.json && mv temp.json "$simplifyJson"  # Change key value: Reads content of existing json and assigns key new value then redirect new json data to temp.json then rename it to simplify.json
+        config "RipLib" "$isRipLib"
         echo -e "$good ${Green}RipLib is Enabled! Device specific arch lib will be kept in patches apk file.${Reset}"
         break
         ;;
       [Dd]*)
         isRipLib=0  # Disable RipLib
-        jq ".RipLib = $isRipLib" "$simplifyJson" > temp.json && mv temp.json "$simplifyJson"  # Change key value: Reads content of existing json and assigns key new value then redirect new json data to temp.json then rename it to simplify.json
+        config "RipLib" "$isRipLib"
         echo -e "$good ${Green}RipLib is Disabled! All lib dir will be kept in patches apk file.${Reset}"
         break
         ;;
@@ -409,13 +406,13 @@ changeRVXSource() {
     case "$opt" in
       [Yy]*)
         isChangeRVXSource=1  # ChangeRVXSource: anddea
-        jq ".ChangeRVXSource = $isChangeRVXSource" "$simplifyJson" > temp.json && mv temp.json "$simplifyJson"  # Change key value: Reads content of existing json and assigns key new value then redirect new json data to temp.json then rename it to simplify.json
+        config "ChangeRVXSource" "$isChangeRVXSource"
         echo -e "$good ${Green}ChangeRVXSource == Yes! RVX Patches source will be changed to anddea.${Reset}"
         break
         ;;
       [Nn]*)
         isChangeRVXSource=0  # ChangeRVXSource: inotia00
-        jq ".ChangeRVXSource = $isChangeRVXSource" "$simplifyJson" > temp.json && mv temp.json "$simplifyJson"  # Change key value: Reads content of existing json and assigns key new value then redirect new json data to temp.json then rename it to simplify.json
+        config "ChangeRVXSource" "$isChangeRVXSource"
         echo -e "$good ${Green}ChangeRVXSource == No! RVX Patches source will remain official (inotia00).${Reset}"
         break
         ;;
@@ -467,7 +464,7 @@ pat() {
               termux-open-url "https://github.com/settings/tokens/new?scopes=public_repo&description=Simplify"  # Create a PAT with the scope `public_repo`
               echo -e "${Yellow}Please copy the generated Simplify PAT & paste it here:${Reset} \c" && read -r pat
               if [[ $pat == ghp_* ]] && [ $pat != "" ]; then
-                jq ".PAT = \"$pat\"" "$simplifyJson" > temp.json && mv temp.json "$simplifyJson"  # Change key value: Reads content of existing json and assigns key new value then redirect new json data to temp.json then rename it to simplify.json
+                config "PAT" "$pat"
                 PAT=$(jq -r '.PAT' "$simplifyJson" 2>/dev/null)
                 gh_api_response=$(auth="-H \"Authorization: Bearer $PAT\"" && owner="ReVanced" && repo="revanced-patches" && curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases/latest" | jq -r '.tag_name')
                 if [[ $gh_api_response == v* ]] && [ $gh_api_response != "null" ]; then
@@ -497,13 +494,13 @@ read_patches_file() {
     case "$opt" in
       [Ee]*)
         isReadPatchesFile=1  # Enable ReadPatchesFile
-        jq ".ReadPatchesFile = $isReadPatchesFile" "$simplifyJson" > temp.json && mv temp.json "$simplifyJson"  # Change key value: Reads content of existing json and assigns key new value then redirect new json data to temp.json then rename it to simplify.json
+        config "ReadPatchesFile" "$isReadPatchesFile"
         echo -e "$good ${Green}ReadPatchesFile is Enabled! Custom PatchesOptions Loading from File.${Reset}"
         break
         ;;
       [Dd]*)
         isReadPatchesFile=0  # Disable ReadPatchesFile
-        jq ".ReadPatchesFile = $isReadPatchesFile" "$simplifyJson" > temp.json && mv temp.json "$simplifyJson"  # Change key value: Reads content of existing json and assigns key new value then redirect new json data to temp.json then rename it to simplify.json
+        config "ReadPatchesFile" "$isReadPatchesFile"
         echo -e "$good ${Green}ReadPatchesFile is Disabled! Recommended PatchesOptions Loading from Script.${Reset}"
         break
         ;;
@@ -519,25 +516,25 @@ change_yt_ytm_app_icon_header() {
     case "$opt" in
       [Gg]*)
         branding="google_family"
-        jq ".Branding = \"$branding\"" "$simplifyJson" > temp.json && mv temp.json "$simplifyJson"
+        config "Branding" "$branding"
         echo -e "$good ${Green}appIconHeader successfully set to google_family!${Reset}"
         break
         ;;
       [Pp]*)
         branding=pink
-        jq ".Branding = \"$branding\"" "$simplifyJson" > temp.json && mv temp.json "$simplifyJson"
+        config "Branding" "$branding"
         echo -e "$good ${Green}appIconHeader successfully set to pink!${Reset}"
         break
         ;;
       [Vv]*)
         branding="vanced_light"
-        jq ".Branding = \"$branding\"" "$simplifyJson" > temp.json && mv temp.json "$simplifyJson"
+        config "Branding" "$branding"
         echo -e "$good ${Green}appIconHeader successfully set to vanced_light!${Reset}"
         break
         ;;
       [Rr]*)
         branding="revancify_blue"
-        jq ".Branding = \"$branding\"" "$simplifyJson" > temp.json && mv temp.json "$simplifyJson"
+        config "Branding" "$branding"
         echo -e "$good ${Green}appIconHeader successfully set to revancify_blue!${Reset}"
         break
         ;;
@@ -565,7 +562,7 @@ overwriteVersion() {
         echo -e "$notice Android version $spoofVersion is not supported by ReVanced patches! Please enter a valid version that is <= 4."
       elif [ $spoofVersion -ge 4 ]; then
         echo -e "$running Spoofing Android version to $spoofVersion.."
-        jq ".AndroidVersion = $spoofVersion" "$simplifyJson" > temp.json && mv temp.json "$simplifyJson"
+        config "AndroidVersion" "$spoofVersion"
         echo -e "$good ${Green}Android version spoofed successfully!${Reset}"
         break
       fi
@@ -594,25 +591,25 @@ overwriteArch() {
         ;;
       8)
         echo -e "$running Spoofing device architecture to arm64-v8a.."
-        jq ".DeviceArch = \"arm64-v8a\"" "$simplifyJson" > temp.json && mv temp.json "$simplifyJson"
+        config "DeviceArch" "arm64-v8a"
         echo -e "$good ${Green}Device architecture spoofed to arm64-v8a successfully!${Reset}"
         break
         ;;
       7)
         echo -e "$running Spoofing device architecture to armeabi-v7a.."
-        jq ".DeviceArch = \"armeabi-v7a\"" "$simplifyJson" > temp.json && mv temp.json "$simplifyJson"
+        config "DeviceArch" "armeabi-v7a"
         echo -e "$good ${Green}Device architecture spoofed to armeabi-v7a successfully!${Reset}"
         break
         ;;
       4)
         echo -e "$running Spoofing device architecture to x86_64.."
-        jq ".DeviceArch = \"x86_64\"" "$simplifyJson" > temp.json && mv temp.json "$simplifyJson"
+        config "DeviceArch" "x86_64"
         echo -e "$good ${Green}Device architecture spoofed to x86_64 successfully!${Reset}"
         break
         ;;
       6)
         echo -e "$running Spoofing device architecture to x86.."
-        jq ".DeviceArch = \"x86\"" "$simplifyJson" > temp.json && mv temp.json "$simplifyJson"
+        config "DeviceArch" "x86"
         echo -e "$good ${Green}Device architecture spoofed to x86 successfully!${Reset}"
         break
         ;;
