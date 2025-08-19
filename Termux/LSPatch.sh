@@ -139,7 +139,19 @@ build_app() {
   elif [ "$web" == "Uptodown" ]; then
     bash $Simplify/dlUptodown.sh "${appNameRef[0]}" "$pkgVersion" "$Type" "${archRef[0]}"  # Download stock apk from Uptodown
   fi
-
+  sleep 0.5  # Wait 500 milliseconds
+  second=1
+  while true; do
+    if [ -f "${stock_apk_ref[0]}" ]; then
+      break
+    fi
+    if [ $second -ge 30 ]; then
+      echo -e "$notice Oops, ${appNameRef[0]} APK not found in $Download dir after waiting 30 seconds!"
+      break
+    fi
+    second=$((second + 1))
+    sleep 1  # Wait 1 seconds
+  done
   if [ -f "${stock_apk_ref[0]}" ]; then
     echo -e "$good ${Green}Downloaded ${appNameRef[0]} APK found:${Reset} ${stock_apk_ref[0]}"
     echo -e "$running Patching ${appNameRef[0]} LSPatch.."
@@ -218,7 +230,19 @@ sign_app() {
   else
     bash $Simplify/dlUptodown.sh "${appNameRef[0]}" "$pkgVersion" "$Type" "${archRef[0]}"  # Download stock apk from Uptodown
   fi
-  
+  sleep 0.5  # Wait 500 milliseconds
+  second=1
+  while true; do
+    if [ -f "${stock_apk_ref[0]}" ]; then
+      break
+    fi
+    if [ $second -ge 30 ]; then
+      echo -e "$notice Oops, ${appNameRef[0]} APK not found in $Download dir after waiting 30 seconds!"
+      break
+    fi
+    second=$((second + 1))
+    sleep 1  # Wait 1 seconds
+  done
   if [ -f "${stock_apk_ref[0]}" ]; then
     echo -e "$good ${Green}Downloaded ${appNameRef[0]} APK found:${Reset} ${stock_apk_ref[0]}"
     echo -e "$running Checking ${appNameRef[0]} Certificate.."
