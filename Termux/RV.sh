@@ -777,7 +777,7 @@ if [ $Android -ge 12 ]; then
   apps=(
     Quit
     YouTube
-    Spotify
+    #Spotify
     TikTok
     Google\ Photos
     $googleRecorder
@@ -803,7 +803,7 @@ elif [ $Android -eq 11 ]; then
   apps=(
     Quit
     YouTube
-    Spotify
+    #Spotify
     TikTok
     Google\ Photos
     $googleRecorder
@@ -828,7 +828,7 @@ elif [ $Android -eq 10 ]; then
   apps=(
     Quit
     YouTube
-    Spotify
+    #Spotify
     TikTok
     Google\ Photos
     $googleRecorder
@@ -853,7 +853,7 @@ elif [ $Android -eq 9 ]; then
   apps=(
     Quit
     YouTube
-    Spotify
+    #Spotify
     TikTok
     Google\ Photos
     $Instagram
@@ -876,7 +876,7 @@ elif [ $Android -eq 8 ]; then
   apps=(
     Quit
     YouTube
-    Spotify
+    #Spotify
     TikTok
     Google\ Photos
     $Instagram
@@ -897,7 +897,7 @@ elif [ $Android -eq 8 ]; then
 elif [ $Android -eq 7 ]; then
   apps=(
     Quit
-    Spotify
+    #Spotify
     TikTok
     Google\ Photos
     $Instagram
