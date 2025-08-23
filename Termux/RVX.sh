@@ -624,7 +624,8 @@ while true; do
       pkgName="com.google.android.apps.youtube.music"
       if [ $Android -ge 8 ]; then
         if [ "$ChangeRVXSource" == 0 ]; then
-          pkgVersion="8.12.53"
+          #pkgVersion="8.30.54"
+          pkgVersion=
         else
           pkgVersion="8.24.53"
         fi
