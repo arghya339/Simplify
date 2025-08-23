@@ -218,7 +218,6 @@ patch_app() {
 # --- Collect the enable/disable patches name with options in arrays ---
 yt_patches_args=(
   # enable patches with their options
-  -e "Custom branding" -O appName="YouTube RV" -O iconPath="$SimplUsr/.branding/youtube/launcher/$Branding"
   -e "Change header" -O header="$SimplUsr/.branding/youtube/header/$Branding"
   
   # disable patches
@@ -226,9 +225,15 @@ yt_patches_args=(
 )
 
 if su -c "id" >/dev/null 2>&1; then
-  yt_patches_args+=(-d "GmsCore support")
+  yt_patches_args+=(
+    -d "GmsCore support"
+    -e "Custom branding" -O appName=YouTube -O iconPath="$SimplUsr/.branding/youtube/launcher/$Branding"
+  )
 else
-  yt_patches_args+=(-e "GmsCore support" -O gmsCoreVendorGroupId="com.mgoogle")
+  yt_patches_args+=(
+    -e "GmsCore support" -O gmsCoreVendorGroupId="com.mgoogle"
+    -e "Custom branding" -O appName="YouTube RV" -O iconPath="$SimplUsr/.branding/youtube/launcher/$Branding"
+  )
 fi
 
 spotify_patches_args=(
@@ -296,8 +301,7 @@ if [ "$ReadPatchesFile" -eq 1 ]; then
   # Default content for new files
   default_content=(
     # [0] YouTube
-    '-e "Custom branding" -O appName="YouTube RV" -O iconPath="/sdcard/Simplify/.branding/youtube/launcher/google_family"
--e "Change header" -O header="/sdcard/Simplify/.branding/youtube/header/google_family"
+    '-e "Change header" -O header="/sdcard/Simplify/.branding/youtube/header/google_family"
 -e "Change package name" -O packageName="app.revanced.android.youtube"
 -d "Announcements"'
     
@@ -361,8 +365,14 @@ if [ "$ReadPatchesFile" -eq 1 ]; then
       if [ "${arraynames[$i]}" == "yt_patches_args" ] || [ "${arraynames[$i]}" == "photos_patches_args" ]; then
         if su -c "id" >/dev/null 2>&1; then
           echo "-d \"GmsCore support\"" >> "$SimplUsr/${arraynames[$i]}.txt"
+          if [ "${arraynames[$i]}" == "yt_patches_args" ]; then
+            echo "-e \"Custom branding\" -O appName=YouTube -O iconPath=\"/sdcard/Simplify/.branding/youtube/launcher/google_family\"" >> "$SimplUsr/${arraynames[$i]}.txt"
+          fi
         else
           echo "-e \"GmsCore support\" -O gmsCoreVendorGroupId=\"com.mgoogle\"" >> "$SimplUsr/${arraynames[$i]}.txt"
+          if [ "${arraynames[$i]}" == "yt_patches_args" ]; then
+            echo "-e \"Custom branding\" -O appName=\"YouTube RV\" -O iconPath=\"/sdcard/Simplify/.branding/youtube/launcher/google_family\"" >> "$SimplUsr/${arraynames[$i]}.txt"
+          fi
         fi
       fi
     fi

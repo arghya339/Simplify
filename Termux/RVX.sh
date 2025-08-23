@@ -206,7 +206,6 @@ yt_patches_args=(
   -e "Custom Shorts action buttons" -OiconType="round"
   -e "Custom branding icon for YouTube" -OappIcon="$SimplUsr/.branding/youtube/launcher/$Branding" -OchangeSplashIcon=true -OrestoreOldSplashAnimation=false
   -e "Custom header for YouTube" -OcustomHeader="$SimplUsr/.branding/youtube/header/$Branding"
-  -e "Custom branding name for YouTube" -OappName="YouTube RVX"
   -e "Hide shortcuts" -Oshorts=false
   -e "Visual preferences icons for YouTube" -OsettingsMenuIcon="extension"
   -e "Overlay buttons" -OiconType=thin
@@ -218,30 +217,39 @@ yt_patches_args=(
 )
 
 if su -c "id" >/dev/null 2>&1; then
-  yt_patches_args+=(-d "GmsCore support")
+  yt_patches_args+=(
+    -d "GmsCore support"
+    -e "Custom branding name for YouTube" -OappName=YouTube
+  )
 else
   if [ $Android -eq 7 ] || [ $Android -eq 6 ]; then
     yt_patches_args+=(-e "GmsCore support" -OgmsCoreVendorGroupId="app.revanced" -OcheckGmsCore=true -OpackageNameYouTube="app.rvx.android.youtube")
   else
     yt_patches_args+=(-e "GmsCore support" -OgmsCoreVendorGroupId="com.mgoogle" -OcheckGmsCore=true -OpackageNameYouTube="app.rvx.android.youtube")
   fi
+  yt_patches_args+=(-e "Custom branding name for YouTube" -OappName="YouTube RVX")
 fi
 
 yt_music_patches_args=(
   -e "Custom branding icon for YouTube Music" -OappIcon="$SimplUsr/.branding/music/launcher/$Branding"
   -e "Custom header for YouTube Music" -OcustomHeader="$SimplUsr/.branding/music/header/$Branding"
-  -e "Custom branding name for YouTube Music" -OappNameNotification="YouTube Music RVX" -OappNameLauncher="YT Music RVX"
   -e "Dark theme" -OmaterialYou=true
   -e "Visual preferences icons for YouTube Music" -OsettingsMenuIcon="extension"
-  -e "Settings for YouTube Music" -OrvxSettingsLabel="RVX"
+  -e "Settings for YouTube Music" -OinsertPosition="settings_header_about_youtube_music" -OrvxSettingsLabel="RVX"
   -e "Custom header for YouTube Music"
   -e="Return YouTube Username" -e "Disable music video in album"
 )
 
 if su -c "id" >/dev/null 2>&1; then
-  yt_music_patches_args+=(-d "GmsCore support")
+  yt_music_patches_args+=(
+    -d "GmsCore support"
+    -e "Custom branding name for YouTube Music" -OappNameNotification="YouTube Music" -OappNameLauncher="YT Music"
+  )
 else
-  yt_music_patches_args+=(-e "GmsCore support" -OgmsCoreVendorGroupId="com.mgoogle" -OcheckGmsCore=true -OpackageNameYouTubeMusic="app.rvx.android.apps.youtube.music")
+  yt_music_patches_args+=(
+    -e "GmsCore support" -OgmsCoreVendorGroupId="com.mgoogle" -OcheckGmsCore=true -OpackageNameYouTubeMusic="app.rvx.android.apps.youtube.music"
+    -e "Custom branding name for YouTube Music" -OappNameNotification="YouTube Music RVX" -OappNameLauncher="YT Music RVX"
+  )
 fi
 
 reddit_patches_args=()
@@ -254,7 +262,6 @@ if [ "$ReadPatchesFile" -eq 1 ]; then
     '-e "Custom Shorts action buttons" -OiconType="round"
 -e "Custom branding icon for YouTube" -OappIcon="/sdcard/Simplify/.branding/youtube/launcher/google_family" -OchangeSplashIcon=true -OrestoreOldSplashAnimation=false
 -e "Custom header for YouTube" -OcustomHeader="/sdcard/Simplify/.branding/youtube/header/google_family"
--e "Custom branding name for YouTube" -OappName="YouTube RVX"
 -e "Hide shortcuts" -Oshorts=false
 -e "Visual preferences icons for YouTube" -OsettingsMenuIcon="extension"
 -e "Overlay buttons" -OiconType=thin
@@ -267,10 +274,9 @@ if [ "$ReadPatchesFile" -eq 1 ]; then
     # [1] YT Music
     '-e "Custom branding icon for YouTube Music" -OappIcon="/sdcard/Simplify/.branding/music/launcher/google_family"
 -e "Custom header for YouTube Music" -OcustomHeader="/sdcard/Simplify/.branding/music/header/google_family"
--e "Custom branding name for YouTube Music" -OappNameNotification="YouTube Music RVX" -OappNameLauncher="YT Music RVX"
 -e "Dark theme" -OmaterialYou=true
 -e "Visual preferences icons for YouTube Music" -OsettingsMenuIcon="extension"
--e "Settings for YouTube Music" -OrvxSettingsLabel="RVX"
+-e "Settings for YouTube Music" -OinsertPosition="settings_header_about_youtube_music" -OrvxSettingsLabel="RVX"
 -e "Custom header for YouTube Music"
 -e="Return YouTube Username" -e "Disable music video in album"'
 
@@ -293,11 +299,22 @@ if [ "$ReadPatchesFile" -eq 1 ]; then
       if [ "${arraynames[$i]}" == "yt_patches_args" ] || [ "${arraynames[$i]}" == "yt_music_patches_args" ]; then
         if su -c "id" >/dev/null 2>&1; then
           echo "-d \"GmsCore support\"" >> "$SimplUsr/${arraynames[$i]}.txt"
+          if [ "${arraynames[$i]}" == "yt_patches_args" ]; then
+            echo "-e \"Custom branding name for YouTube\" -OappName=YouTube" >> "$SimplUsr/${arraynames[$i]}.txt"
+          else
+            echo "-e \"Custom branding name for YouTube Music\" -OappNameNotification=\"YouTube Music\" -OappNameLauncher=\"YT Music\"" >> "$SimplUsr/${arraynames[$i]}.txt"
+          fi
         else
-          if [[ ( $Android -eq 7 || $Android -eq 6 ) && "${arraynames[$i]}" == "yt_patches_args" ]]; then
-            echo "-e \"GmsCore support\" -O gmsCoreVendorGroupId=\"app.revanced\" -OcheckGmsCore=true" >> "$SimplUsr/${arraynames[$i]}.txt"
+          if [ "${arraynames[$i]}" == "yt_patches_args" ]; then
+            if [[ ( $Android -eq 7 || $Android -eq 6 ) && "${arraynames[$i]}" == "yt_patches_args" ]]; then
+              echo "-e \"GmsCore support\" -O gmsCoreVendorGroupId=\"app.revanced\" -OcheckGmsCore=true" >> "$SimplUsr/${arraynames[$i]}.txt"
+            else
+              echo "-e \"GmsCore support\" -O gmsCoreVendorGroupId=\"com.mgoogle\" -OcheckGmsCore=true" >> "$SimplUsr/${arraynames[$i]}.txt"
+            fi
+            echo "-e \"Custom branding name for YouTube\" -OappName=\"YouTube RVX\"" >> "$SimplUsr/${arraynames[$i]}.txt"
           else
             echo "-e \"GmsCore support\" -O gmsCoreVendorGroupId=\"com.mgoogle\" -OcheckGmsCore=true" >> "$SimplUsr/${arraynames[$i]}.txt"
+            echo "-e \"Custom branding name for YouTube Music\" -OappNameNotification=\"YouTube Music RVX\" -OappNameLauncher=\"YT Music RVX\"" >> "$SimplUsr/${arraynames[$i]}.txt"
           fi
         fi
       fi
