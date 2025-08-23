@@ -302,7 +302,6 @@ if [ "$ReadPatchesFile" -eq 1 ]; then
   default_content=(
     # [0] YouTube
     '-e "Change header" -O header="/sdcard/Simplify/.branding/youtube/header/google_family"
--e "Change package name" -O packageName="app.revanced.android.youtube"
 -d "Announcements"'
     
     # [1] Spotify
