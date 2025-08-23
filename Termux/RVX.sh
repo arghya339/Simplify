@@ -307,13 +307,13 @@ if [ "$ReadPatchesFile" -eq 1 ]; then
         else
           if [ "${arraynames[$i]}" == "yt_patches_args" ]; then
             if [[ ( $Android -eq 7 || $Android -eq 6 ) && "${arraynames[$i]}" == "yt_patches_args" ]]; then
-              echo "-e \"GmsCore support\" -O gmsCoreVendorGroupId=\"app.revanced\" -OcheckGmsCore=true" >> "$SimplUsr/${arraynames[$i]}.txt"
+              echo "-e \"GmsCore support\" -O gmsCoreVendorGroupId=\"app.revanced\" -OcheckGmsCore=true -OpackageNameYouTube=\"app.rvx.android.youtube\"" >> "$SimplUsr/${arraynames[$i]}.txt"
             else
-              echo "-e \"GmsCore support\" -O gmsCoreVendorGroupId=\"com.mgoogle\" -OcheckGmsCore=true" >> "$SimplUsr/${arraynames[$i]}.txt"
+              echo "-e \"GmsCore support\" -O gmsCoreVendorGroupId=\"com.mgoogle\" -OcheckGmsCore=true -OpackageNameYouTube=\"app.rvx.android.youtube\"" >> "$SimplUsr/${arraynames[$i]}.txt"
             fi
             echo "-e \"Custom branding name for YouTube\" -OappName=\"YouTube RVX\"" >> "$SimplUsr/${arraynames[$i]}.txt"
           else
-            echo "-e \"GmsCore support\" -O gmsCoreVendorGroupId=\"com.mgoogle\" -OcheckGmsCore=true" >> "$SimplUsr/${arraynames[$i]}.txt"
+            echo "-e \"GmsCore support\" -O gmsCoreVendorGroupId=\"com.mgoogle\" -OcheckGmsCore=true -OpackageNameYouTubeMusic=\"app.rvx.android.apps.youtube.music\"" >> "$SimplUsr/${arraynames[$i]}.txt"
             echo "-e \"Custom branding name for YouTube Music\" -OappNameNotification=\"YouTube Music RVX\" -OappNameLauncher=\"YT Music RVX\"" >> "$SimplUsr/${arraynames[$i]}.txt"
           fi
         fi
