@@ -33,15 +33,14 @@ apkInstall() {
   elif "$HOME/rish" -c "id" >/dev/null 2>&1; then
     local activityClass=$($HOME/rish -c "pm resolve-activity --brief $pkgName" | tail -n 1)
   else
-    local activityClass="$pkgName/$activity"
+    local activityClass="$activity"
   fi
+  local OEM=$(getprop ro.product.manufacturer)
   local Model=$(getprop ro.product.model)
+  local Android=$(getprop ro.build.version.release | cut -d. -f1)
   
   if su -c "id" >/dev/null 2>&1; then
     su -c "cp '$outputAPK' '/data/local/tmp/$outputFileName'"
-    if [ "$pkgName" == "com.google.android.youtube" ] || [ "$pkgName" == "com.google.android.apps.youtube.music" ]; then
-      rm "$outputAPK"
-    fi
     # Temporary Disable SELinux Enforcing during installation if it not in Permissive
     if [ "$(su -c 'getenforce 2>/dev/null')" = "Enforcing" ]; then
       su -c "setenforce 0"  # set SELinux to Permissive mode to unblock unauthorized operations
@@ -54,37 +53,35 @@ apkInstall() {
     if [ $? != 0 ]; then
       su -c "monkey -p $pkgName -c android.intent.category.LAUNCHER 1" > /dev/null 2>&1
     fi
-    su -c "rm '/data/local/tmp/$outputFileName'"
+    su -c "rm -f '/data/local/tmp/$outputFileName'"
   elif "$HOME/rish" -c "id" >/dev/null 2>&1; then
     ~/rish -c "cp '$outputAPK' '/data/local/tmp/$outputFileName'" > /dev/null 2>&1  # copy apk to System dir
     ./rish -c "pm install -r -i com.android.vending '/data/local/tmp/$outputFileName'" > /dev/null 2>&1  # -r=reinstall --force-uplow=downgrade
-    INSTALL_STATUS=$?  # Capture exit status of the install command
     am start -n "$activityClass" &> /dev/null  # launch app after update
     if [ $? != 0 ]; then
       ~/rish -c "monkey -p $pkgName -c android.intent.category.LAUNCHER 1" > /dev/null 2>&1
     fi
     $HOME/rish -c "rm '/data/local/tmp/$outputFileName'"  # Cleanup tmp APK
-  elif [ "$OEM" == "Xiaomi" ] || [ "$OEM" == "Poco" ] || [ $arch == "x86_64" ]; then
-    if [ "$OEM" == "Xiaomi" ] || [ "$OEM" == "Poco" ]; then
-      echo -e $notice "${Yellow}MIUI Optimization detected! Please manually install app from${Reset} ${Blue}file://$outputAPK${Reset}"
-    else
-      echo -e $notice "${Yellow}There was a problem open the app package using Termux API! Please manually install app from${Reset} Files: $Model > ${Blue}Simplify${Reset} > $outputAPK"
+  elif [ "$OEM" == "Xiaomi" ] || [ "$OEM" == "Poco" ]; then
+    echo -e $notice "${Yellow}MIUI Optimization detected! Please manually install app from${Reset} Files: $Model > ${Blue}Simplify${Reset} > $outputAPK"
+    am start -n "com.google.android.documentsui/com.android.documentsui.files.FilesActivity" > /dev/null 2>&1  # Open Android Files by Google
+    if [ $? -ne 0 ] || [ $? -eq 2 ]; then
+      am start -n "com.android.documentsui/com.android.documentsui.files.FilesActivity" > /dev/null 2>&1  # Open Android Files
     fi
-    am start -n "com.google.android.documentsui/com.android.documentsui.files.FilesActivity" > /dev/null 2>&1  # Open Android Files
-  elif [ "$Android" -le "13" ]; then
+  elif [ "$Android" -le "7" ]; then
     am start -a android.intent.action.VIEW -t application/vnd.android.package-archive -d "file://$outputAPK" > /dev/null 2>&1  # Activity Manager
     INSTALL_STATUS=$?
     if [ "$INSTALL_STATUS" != "0" ]; then
       termux-open "$outputAPK"
       FALLBACK_INSTALL_STATUS=$?
     fi
-    if [ "$INSTALL_STATUS" == "0" ] || [ "$FALLBACK_INSTALL_STATUS" == "0" ]; then
+    if [ "$INSTALL_STATUS" -eq "0" ] || [ "$FALLBACK_INSTALL_STATUS" -eq "0" ]; then
       am start -n "$activityClass" &> /dev/null  # launch app after update
     else
       echo -e $notice "${Yellow}There was a problem open the app package using Termux API! Please manually install app from${Reset} Files: $Model > ${Blue}Simplify${Reset} > $outputFileName"
     fi
   else
-    termux-open "$outputAPK"  # install apk using Session installer
+    termux-open --view "$outputAPK"  # install apk using Session installer
     INSTALL_STATUS=$?
     if [ "$INSTALL_STATUS" != "0" ]; then
       am start -a android.intent.action.VIEW -t application/vnd.android.package-archive -d "file://$outputAPK" > /dev/null 2>&1  # Activity Manager
