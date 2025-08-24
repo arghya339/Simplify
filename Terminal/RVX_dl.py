@@ -178,7 +178,7 @@ if __name__ == "__main__":
         # If missing, use the hardcoded version
         if not reddit_versions:
             print("Reddit versions are missing in patches.json. Using hardcoded version.")
-            reddit_versions = ["2025.05.0-2194266"]
+            reddit_versions = ["2025.12.1"]
 
         downloaded_reddit_apk = download_apk(base_download_url, reddit_package_name, reddit_versions, download_dir=download_dir) # Pass download_dir here
         if downloaded_reddit_apk:

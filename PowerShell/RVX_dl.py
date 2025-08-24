@@ -261,7 +261,7 @@ if __name__ == "__main__":
         reddit_package_name = "com.reddit.frontpage"
 
         # --- Hardcode Reddit versions here ---
-        reddit_versions = ["2025.05.0-2194266"]  # Replace with the actual versions
+        reddit_versions = ["2025.12.1"]  # Replace with the actual versions
 
         if reddit_versions:
             downloaded_reddit_apk = download_apk(
