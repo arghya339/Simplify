@@ -61,7 +61,7 @@ apkInstall() {
     if [ $? != 0 ]; then
       ~/rish -c "monkey -p $pkgName -c android.intent.category.LAUNCHER 1" > /dev/null 2>&1
     fi
-    $HOME/rish -c "rm '/data/local/tmp/$outputFileName'"  # Cleanup tmp APK
+    $HOME/rish -c "rm -f '/data/local/tmp/$outputFileName'"  # Cleanup tmp APK
   elif [ "$OEM" == "Xiaomi" ] || [ "$OEM" == "Poco" ]; then
     echo -e $notice "${Yellow}MIUI Optimization detected! Please manually install app from${Reset} Files: $Model > ${Blue}Simplify${Reset} > $outputAPK"
     am start -n "com.google.android.documentsui/com.android.documentsui.files.FilesActivity" > /dev/null 2>&1  # Open Android Files by Google
