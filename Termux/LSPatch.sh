@@ -125,24 +125,62 @@ build_app() {
   local Type=$4
   local -n archRef=$5
   local web=$6
-  local -n stock_apk_ref=$7
-  local stockFileName=$(basename "${stock_apk_ref[0]}")
-  local stockFileNameWOExt="${stockFileName%.*}"
-  local module_apk_path=$8
-  local BugReportUrl=$9
-  local pkgPatches=$10
-  local activityPatches=$11
+  local module_apk_path=$7
+  local BugReportUrl=$8
+  local pkgPatches=$9
+  local activityPatches=$10
 
-
-  if [ "$web" == "APKMirror" ]; then
-    bash $Simplify/APKMdl.sh "$pkgName" "$pkgVersion" "$Type" "${archRef[0]}"  # Download stock apk from APKMirror
-  elif [ "$web" == "Uptodown" ]; then
-    bash $Simplify/dlUptodown.sh "${appNameRef[0]}" "$pkgVersion" "$Type" "${archRef[0]}"  # Download stock apk from Uptodown
+  if [ "${appNameRef[0]}" == "Discord" ]; then
+    assetsName="com.discord_289.20-Stable-289020_4arch_7dpi_25lang.apks"
+    dlUrl="https://github.com/arghya339/Simplify/releases/download/all/$assetsName"
+    while true; do
+      aria2c -x 16 -s 16 --console-log-level=error --summary-interval=0 --download-result=hide -c -o "$assetsName" -d "$Download" "$dlUrl"
+      if [ $? -eq 0 ]; then
+        echo  # White Space
+        break
+      fi
+      echo -e "${bad} ${Red}Download failed! retrying in 5 seconds..${Reset}"
+      sleep 5
+    done
+    stock_apks_path=("$Download/$assetsName")
+    apks_without_ext="${assetsName%.*}"
+    stock_apk_path=("$Download/$apks_without_ext.apk")
+    bash $Simplify/dlGitHub.sh "REAndroid" "APKEditor" "latest" ".jar" "$Simplify"
+    APKEditor=$(find "$Simplify" -type f -name "APKEditor-*.jar" -print -quit)
+    $PREFIX/lib/jvm/java-21-openjdk/bin/java -jar $APKEditor m -i $stock_apks_path -o "$stock_apk_path"
+    rm -f "$stock_apks_path"
+    echo  # Space
+  else
+    if [ "$web" == "APKMirror" ]; then
+      bash $Simplify/APKMdl.sh "$pkgName" "$pkgVersion" "$Type" "${archRef[0]}"  # Download stock apk from APKMirror
+      if [ "$Type" == "BUNDLE" ]; then
+        if [ -n "$pkgVersion" ] && [ "$pkgVersion" != "null" ]; then
+          local stock_apk_path=("$Download/${appNameRef[0]}_v${pkgVersion}-$cpuAbi.apk")
+        elif [ -z "$pkgVersion" ] || [ "$pkgVersion" == "null" ]; then
+          local stock_apk=$(find "$Download" -type f -name "${appNameRef[0]}_v*-$cpuAbi.apk" -print -quit)
+          local stock_apk_path=("$stock_apk")  # -quit= find stops after first match
+        fi
+      elif [ "$Type" == "APK" ]; then
+        if [ -n "$pkgVersion" ] && [ "$pkgVersion" != "null" ]; then
+          local stock_apk_path=("$Download/${appNameRef[0]}_v${pkgVersion}-${archRef[0]}.apk")
+        elif [ -z "$pkgVersion" ] || [ "$pkgVersion" == "null" ]; then
+          local stock_apk=$(find "$Download" -type f -name "${appNameRef[0]}_v*-${archRef[0]}.apk" -print -quit)
+          local stock_apk_path=("$stock_apk")
+        fi
+      fi
+    else
+      bash $Simplify/dlUptodown.sh "${appNameRef[0]}" "$pkgVersion" "$Type" "${archRef[0]}"  # Download stock apk from Uptodown
+      if [ "$Type" == "xapk" ]; then
+        local stock_apk_path=("$Download/${appNameRef[0]}_v${pkgVersion}-$cpuAbi.apk")
+      elif [ "$Type" == "apk" ]; then
+        local stock_apk_path=("$Download/${appNameRef[0]}_v${pkgVersion}-${archRef[0]}.apk")
+      fi
+    fi
   fi
   sleep 0.5  # Wait 500 milliseconds
   second=1
   while true; do
-    if [ -f "${stock_apk_ref[0]}" ]; then
+    if [ -f "${stock_apk_path[0]}" ]; then
       break
     fi
     if [ $second -ge 30 ]; then
@@ -152,10 +190,12 @@ build_app() {
     second=$((second + 1))
     sleep 1  # Wait 1 seconds
   done
-  if [ -f "${stock_apk_ref[0]}" ]; then
-    echo -e "$good ${Green}Downloaded ${appNameRef[0]} APK found:${Reset} ${stock_apk_ref[0]}"
+  local stockFileName=$(basename "${stock_apk_path[0]}")
+  local stockFileNameWOExt="${stockFileName%.*}"
+  if [ -f "${stock_apk_path[0]}" ]; then
+    echo -e "$good ${Green}Downloaded ${appNameRef[0]} APK found:${Reset} ${stock_apk_path[0]}"
     echo -e "$running Patching ${appNameRef[0]} LSPatch.."
-    patch_app "${stock_apk_ref[0]}" "$module_apk_path" "${appNameRef[0]}" "$BugReportUrl"
+    patch_app "${stock_apk_path[0]}" "$module_apk_path" "${appNameRef[0]}" "$BugReportUrl"
   fi
   
   local output_apk_path=$(find "$SimplUsr" -type f -name "${stockFileNameWOExt}-*-lspatched.apk")
@@ -174,8 +214,8 @@ build_app() {
           ;;
         M*|m*)
           echo -e "$running Please Wait !! Mounting Patched ${appNameRef[0]} LSPatch apk.."
-          su -mm -c "/system/bin/sh $Simplify/apkMount.sh \"${stock_apk_ref[0]}\" "${output_apk_path}" \"${appNameRef[0]}\" $pkgName $pkgVersion" &> /dev/null
-          su -mm -c "/system/bin/sh $Simplify/apkMount.sh \"${stock_apk_ref[0]}\" "${output_apk_path}" \"${appNameRef[0]}\" $pkgName $pkgVersion" | tee "$SimplUsr/${appNameRef[0]}-LSPatch_mount-log.txt"
+          su -mm -c "/system/bin/sh $Simplify/apkMount.sh \"${stock_apk_path[0]}\" "${output_apk_path}" \"${appNameRef[0]}\" $pkgName $pkgVersion" &> /dev/null
+          su -mm -c "/system/bin/sh $Simplify/apkMount.sh \"${stock_apk_path[0]}\" "${output_apk_path}" \"${appNameRef[0]}\" $pkgName $pkgVersion" | tee "$SimplUsr/${appNameRef[0]}-LSPatch_mount-log.txt"
           rm "${output_apk_path}"
           ;;
         N*|n*) echo -e "$notice ${appNameRef[0]} LSPatch Installaion skipped!" ;;
@@ -218,22 +258,38 @@ sign_app() {
   local Type=$4
   local -n ArchRef=$5
   local web=$6
-  local -n stock_apk_ref=$7
-  local stockFileName=$(basename "${stock_apk_ref[0]}")
-  local stockFileNameWOExt="${stockFileName%.*}"
-  local pkgPatches=$8
-  local activityPatches=$9
-  
+  local pkgPatches=$7
+  local activityPatches=$8
   
   if [ "$web" == "APKMirror" ]; then
-    bash $Simplify/APKMdl.sh "$pkgName" "$pkgVersion" "$Type" "${archRef[0]}"  # Download stock apk from APKMirror
+    bash $Simplify/APKMdl.sh "$pkgName" "$pkgVersion" "$Type" "${ArchRef[0]}"  # Download stock apk from APKMirror
+    if [ "$Type" == "BUNDLE" ]; then
+      if [ -n "$pkgVersion" ] && [ "$pkgVersion" != "null" ]; then
+        local stock_apk_path=("$Download/${appNameRef[0]}_v${pkgVersion}-$cpuAbi.apk")
+      elif [ -z "$pkgVersion" ] || [ "$pkgVersion" == "null" ]; then
+        local stock_apk=$(find "$Download" -type f -name "${appNameRef[0]}_v*-$cpuAbi.apk" -print -quit)
+        local stock_apk_path=("$stock_apk")  # -quit= find stops after first match
+      fi
+    elif [ "$Type" == "APK" ]; then
+      if [ -n "$pkgVersion" ] && [ "$pkgVersion" != "null" ]; then
+        local stock_apk_path=("$Download/${appNameRef[0]}_v${pkgVersion}-${ArchRef[0]}.apk")
+      elif [ -z "$pkgVersion" ] || [ "$pkgVersion" == "null" ]; then
+        local stock_apk=$(find "$Download" -type f -name "${appNameRef[0]}_v*-${ArchRef[0]}.apk" -print -quit)
+        local stock_apk_path=("$stock_apk")
+      fi
+    fi
   else
-    bash $Simplify/dlUptodown.sh "${appNameRef[0]}" "$pkgVersion" "$Type" "${archRef[0]}"  # Download stock apk from Uptodown
+    bash $Simplify/dlUptodown.sh "${appNameRef[0]}" "$pkgVersion" "$Type" "${ArchRef[0]}"  # Download stock apk from Uptodown
+    if [ "$Type" == "xapk" ]; then
+      local stock_apk_path=("$Download/${appNameRef[0]}_v${pkgVersion}-$cpuAbi.apk")
+    elif [ "$Type" == "apk" ]; then
+      local stock_apk_path=("$Download/${appNameRef[0]}_v${pkgVersion}-${ArchRef[0]}.apk")
+    fi
   fi
   sleep 0.5  # Wait 500 milliseconds
   second=1
   while true; do
-    if [ -f "${stock_apk_ref[0]}" ]; then
+    if [ -f "${stock_apk_path[0]}" ]; then
       break
     fi
     if [ $second -ge 30 ]; then
@@ -243,15 +299,17 @@ sign_app() {
     second=$((second + 1))
     sleep 1  # Wait 1 seconds
   done
-  if [ -f "${stock_apk_ref[0]}" ]; then
-    echo -e "$good ${Green}Downloaded ${appNameRef[0]} APK found:${Reset} ${stock_apk_ref[0]}"
+  local stockFileName=$(basename "${stock_apk_path[0]}")
+  local stockFileNameWOExt="${stockFileName%.*}"
+  if [ -f "${stock_apk_path[0]}" ]; then
+    echo -e "$good ${Green}Downloaded ${appNameRef[0]} APK found:${Reset} ${stock_apk_path[0]}"
     echo -e "$running Checking ${appNameRef[0]} Certificate.."
-    checkOwner=$($PREFIX/lib/jvm/java-21-openjdk/bin/keytool -printcert -jarfile "${stock_apk_ref[0]}" | grep -oP 'Owner: \K.*')
+    checkOwner=$($PREFIX/lib/jvm/java-21-openjdk/bin/keytool -printcert -jarfile "${stock_apk_path[0]}" | grep -oP 'Owner: \K.*')
     if [ -z "$checkOwner" ]; then
       echo -e "$notice keytool error: SHA-256 digest error!"
       local output_apk_path="$SimplUsr/$stockFileNameWOExt-signed.apk"
       local fileName=$(basename "${output_apk_path}")
-      $PREFIX/lib/jvm/java-21-openjdk/bin/java -jar $PREFIX/share/java/apksigner.jar sign --ks $Simplify/ks.keystore --ks-pass pass:123456 --ks-key-alias ReVancedKey --key-pass pass:123456 --out "${output_apk_path}" "${stock_apk_ref[0]}"
+      $PREFIX/lib/jvm/java-21-openjdk/bin/java -jar $PREFIX/share/java/apksigner.jar sign --ks $Simplify/ks.keystore --ks-pass pass:123456 --ks-key-alias ReVancedKey --key-pass pass:123456 --out "${output_apk_path}" "${stock_apk_path[0]}"
       rm "$output_apk_path.idsig"
       $PREFIX/lib/jvm/java-21-openjdk/bin/keytool -printcert -jarfile "${output_apk_path}" | grep -oP 'Owner: \K.*' 2>/dev/null
       if [ $? == 0 ]; then
@@ -379,7 +437,6 @@ while true; do
       #pkgVersion=""
       Type="BUNDLE"
       Arch=("arm64-v8a + armeabi-v7a")
-      stock_apk_path=("$Download/${appName[0]}_v${pkgVersion}-$cpuAbi.apk")
       if [ "$cpuAbi" == "arm64-v8a" ]; then
         arch="armv8"
       elif [ "$cpuAbi" == "armeabi-v7a" ]; then
@@ -401,21 +458,12 @@ while true; do
       echo -e "$info module_apk_path: $module_apk_path"
       activityPatches="com.snapchat.android/.LandingPageActivity"
       BugReport="https://github.com/rhunk/SnapEnhance/issues/new?template=bug_report.yml"
-      build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "APKMirror" "stock_apk_path" "$module_apk_path" "$BugReport" "$pkgName" "$activityPatches"
+      build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "APKMirror" "$module_apk_path" "$BugReport" "$pkgName" "$activityPatches"
       ;;
     Discord)
       appName=("Discord")
       pkgName="com.discord"
       pkgVersion="289.20-Stable"
-      assetsName="com.discord_289.20-Stable-289020_4arch_7dpi_25lang.apks"
-      dlUrl="https://github.com/arghya339/Simplify/releases/download/all/$assetsName"
-      aria2c -x 16 -s 16 --console-log-level=error --summary-interval=0 --download-result=hide -c -o "$assetsName" -d "$Download" "$dlUrl"
-      stock_apks_path=("$Download/$assetsName")
-      apks_without_ext="${assetsName%.*}"
-      stock_apk_path=("$Download/$apks_without_ext.apk")
-      bash $Simplify/dlGitHub.sh "REAndroid" "APKEditor" "latest" ".jar" "$Simplify"
-      APKEditor=$(find "$Simplify" -type f -name "APKEditor-*.jar" -print -quit)
-      $PREFIX/lib/jvm/java-21-openjdk/bin/java -jar $APKEditor m -i $stock_apks_path -o "$stock_apk_path"
       releasesTagName=$(curl -s ${auth} "https://api.github.com/repos/revenge-mod/revenge-xposed/releases/latest" | jq -r '.tag_name')  # 1202
       releasesName=$(curl -s ${auth} "https://api.github.com/repos/revenge-mod/revenge-xposed/releases/latest" | jq -r '.name')  # 1.2.2
       dlLink="https://github.com/revenge-mod/revenge-xposed/releases/download/$releasesTagName/app-release.apk"
@@ -424,7 +472,7 @@ while true; do
       echo -e "$info module_apk_path: $module_apk_path"
       activityPatches="com.discord/.main.MainDefault"
       BugReport="https://github.com/revenge-mod/revenge-xposed/issues/new"
-      build_app "$pkgName" "appName" "$pkgVersion" "" "" "" "stock_apk_path" "$module_apk_path" "$BugReport" "$pkgName" "$activityPatches"
+      build_app "$pkgName" "appName" "$pkgVersion" "" "" "" "$module_apk_path" "$BugReport" "$pkgName" "$activityPatches"
       ;;
     LINE)
       appName=("LINE")
@@ -433,14 +481,13 @@ while true; do
       #pkgVersion=""
       Type="BUNDLE"
       Arch=("arm64-v8a + armeabi-v7a")
-      stock_apk_path=("$Download/${appName[0]}_v${pkgVersion}-$cpuAbi.apk")
       regex="LineXtra-.*-all-release.apk"
       bash $Simplify/dlGitHub.sh "yagiyuu" "LineXtra" "latest" ".apk" "$LSPatch" "$regex"
       module_apk_path=$(find "$LSPatch" -type f -name "LineXtra-*-all-release.apk")
       echo -e "$info module_apk_path: $module_apk_path"
       activityPatches="jp.naver.line.android/.activity.SplashActivity"
       BugReport="https://github.com/yagiyuu/LineXtra/issues"
-      build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "APKMirror" "stock_apk_path" "$module_apk_path" "$BugReport" "$pkgName" "$activityPatches"
+      build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "APKMirror" "$module_apk_path" "$BugReport" "$pkgName" "$activityPatches"
       ;;
     PhoneByGoogle)
       appName=("Phone by Google")
@@ -455,7 +502,6 @@ while true; do
       fi
       Type="APK"
       Arch=("$cpuAbi")
-      stock_apk_path=("$Download/${appName[0]}_v${pkgVersion}-$cpuAbi.apk")
       releasesTagName=$(curl -s ${auth} "https://api.github.com/repos/Xposed-Modules-Repo/io.github.vvb2060.callrecording/releases/latest" | jq -r '.tag_name')  # 2-1.1
       releasesName=$(curl -s ${auth} "https://api.github.com/repos/Xposed-Modules-Repo/io.github.vvb2060.callrecording/releases/latest" | jq -r '.name')  # 1.1
       dlUrl="https://github.com/Xposed-Modules-Repo/io.github.vvb2060.callrecording/releases/download/${releasesTagName}/app-release.apk"
@@ -464,7 +510,7 @@ while true; do
       echo -e "$info module_apk_path: $module_apk_path"
       activityPatches="com.google.android.dialer/.extensions.GoogleDialtactsActivity"
       BugReport="https://github.com/vvb2060/CallRecording/issues/new"
-      build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "APKMirror" "stock_apk_path" "$module_apk_path" "$BugReport" "$pkgName" "$activityPatches"
+      build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "APKMirror" "$module_apk_path" "$BugReport" "$pkgName" "$activityPatches"
       ;;
     1.1.1.1\ +\ WARP)
       appName=("1.1.1.1 + WARP")
@@ -473,10 +519,8 @@ while true; do
       pkgVersion=""
       Type="BUNDLE"
       Arch=("universal")
-      apk_path=$(find "$Download" -type f -name "${appName[0]}_v*-$cpuAbi.apk")
-      stock_apk_path=("$apk_path")
       activityPatches=""
-      sign_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "APKMirror" "stock_apk_path" "$pkgName" "$activityPatches"
+      sign_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "APKMirror" "$pkgName" "$activityPatches"
       ;;
   esac
 done
