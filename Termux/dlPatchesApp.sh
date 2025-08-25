@@ -210,7 +210,7 @@ dlPatchesApp() {
         # Build apks from aab using bundletool
         apks_path="$SimplUsr/Spotube-playstore-all-arch.apks"
         echo -e "$running Build apks from aab.."
-        $PREFIX/lib/jvm/java-21-openjdk/bin/java -jar $bundletoolJar build-apks --bundle=$aab_path --output=$apks_path --aapt2=~/aapt2 2>/dev/null
+        $PREFIX/lib/jvm/java-21-openjdk/bin/java -jar $bundletoolJar build-apks --bundle=$aab_path --output=$apks_path --aapt2=~/aapt2 2>&1 | grep -v "WARNING: The APKs won't be signed"
         rm -f "$aab_path"
         
         # Extract apks file
