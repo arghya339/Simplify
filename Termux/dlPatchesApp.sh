@@ -247,7 +247,6 @@ dlPatchesApp() {
         appInstall
       fi
     fi
-  fi
 }
 
 if  [[ $Android -ge 9  &&  ( "$cpuAbi" == "arm64-v8a" || "$cpuAbi" == "x86_64" ) ]]; then
