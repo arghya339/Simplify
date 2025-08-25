@@ -106,10 +106,11 @@ appInstall() {
     case $opt in
       y*|Y*|"")
         echo -e "$running Please Wait !! Installing Patched ${appName} apk.."
-        bash $Simplify/apkInstall.sh "$apk_path" "$pkgPatches" "$activityPatches"
         if [ "$repo" == "ReVancedApp-Actions" ] || [ "$repo" == "Revanced-And-Revanced-Extended-Non-Root" ]; then
+          bash $Simplify/apkInstall.sh "$apk_path" "$pkgPatches" "$activityPatches"
           data "$assets" "$updated_at" "$version"
         else
+          bash $Simplify/apkInstall.sh "$apk_path" "$pkgApp" "$activityApp"
           data "$appName" "" "$tag"
         fi
         ;;
