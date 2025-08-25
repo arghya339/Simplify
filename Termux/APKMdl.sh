@@ -32,11 +32,19 @@ if jq -e '.DeviceArch != null' "$simplifyJson" >/dev/null 2>&1; then
 else
   cpuAbi=$(getprop ro.product.cpu.abi)  # Get Android architecture
 fi
-locale=$(getprop persist.sys.locale | cut -d'-' -f1)  # Get System Languages
-if [ -z $locale ]; then
-  locale=$(getprop ro.product.locale | cut -d'-' -f1)  # Get Languages
+RipLocale="$(jq -r '.RipLocale' "$simplifyJson" 2>/dev/null)"
+RipDpi="$(jq -r '.RipDpi' "$simplifyJson" 2>/dev/null)"
+RipLib="$(jq -r '.RipLib' "$simplifyJson" 2>/dev/null)"
+if [ $RipLocale -eq 1 ]; then
+  locale=$(getprop persist.sys.locale | cut -d'-' -f1)  # Get System Languages
+  if [ -z $locale ]; then
+    locale=$(getprop ro.product.locale | cut -d'-' -f1)  # Get Languages
+  fi
+elif [ $RipLocale -eq 0 ]; then
+  locale="[a-z][a-z]"
 fi
-density=$(getprop ro.sf.lcd_density)  # Get the device screen density
+if [ $RipDpi -eq 1 ]; then
+  density=$(getprop ro.sf.lcd_density)  # Get the device screen density
   # Check and categorize the density
   if [ "$density" -le 120 ]; then
     lcd_dpi="ldpi"  # Low Density
@@ -53,13 +61,8 @@ density=$(getprop ro.sf.lcd_density)  # Get the device screen density
   else
     lcd_dpi="*dpi"
   fi
-
-if [ -f "$simplifyJson" ]; then
-  RipLocale="$(jq -r '.RipLocale' "$simplifyJson" 2>/dev/null)"
-  RipDpi="$(jq -r '.RipDpi' "$simplifyJson" 2>/dev/null)"
-  RipLib="$(jq -r '.RipLib' "$simplifyJson" 2>/dev/null)"
-else
-  RipLocale="" && RipDpi="" && RipLib=""
+elif [ $RipDpi -eq 0 ]; then
+  lcd_dpi="*dpi"
 fi
 
 APKMdl() {
@@ -322,13 +325,18 @@ APKMdl() {
       APKEditor=$(find "$Simplify" -type f -name "APKEditor-*.jar" -print -quit)
       mkdir -p "$Download/${appName}_v${VERSION}-${cpuAbi}"
       echo -e "$running Extracting APKM content.."
-      if [ $RipLocale -eq 1 ] && [ $RipDpi -eq 1 ] && [ $RipLib -eq 1 ]; then
-        pv "$outputPath" | bsdtar -xf - -C "$Download/${appName}_v${VERSION}-${cpuAbi}/" --include "base.apk" "split_config.${cpuAbi//-/_}.apk" "split_config.${locale}.apk" "split_config.${lcd_dpi}.apk"
-        if [ ! -e "$Download/${appName}_v${VERSION}-${cpuAbi}/split_config.${lcd_dpi}.apk" ] || [ ! -e "$Download/${appName}_v${VERSION}-${cpuAbi}/split_config.${locale}.apk" ] || [ ! -e "$Download/${appName}_v${VERSION}-${cpuAbi}/split_config.${cpuAbi//-/_}.apk" ]; then  # check if file exists
-          pv "$outputPath" | bsdtar -xf - -C "$Download/${appName}_v${VERSION}-${cpuAbi}/"
+      if [ -f $simplifyJson ]; then
+        if [ $RipLib -eq 1 ]; then
+          pv "$outputPath" | bsdtar -xf - -C "$Download/${appName}_v${VERSION}-${cpuAbi}/" --include "base.apk" "split_config.${cpuAbi//-/_}.apk" "split_config.${locale}.apk" "split_config.${lcd_dpi}.apk"
+          if [ ! -e "$Download/${appName}_v${VERSION}-${cpuAbi}/split_config.${lcd_dpi}.apk" ] || [ ! -e "$Download/${appName}_v${VERSION}-${cpuAbi}/split_config.${locale}.apk" ] || [ ! -e "$Download/${appName}_v${VERSION}-${cpuAbi}/split_config.${cpuAbi//-/_}.apk" ]; then  # check if file exists
+            pv "$outputPath" | bsdtar -xf - -C "$Download/${appName}_v${VERSION}-${cpuAbi}/"
+          fi
+        elif [ $RipLib -eq 0 ]; then
+          pv "$outputPath" | bsdtar -xf - -C "$Download/${appName}_v${VERSION}-${cpuAbi}/" --include "base.apk" "split_config.arm64_v8a.apk" "split_config.armeabi_v7a.apk" "split_config.x86_64.apk" "split_config.x86.apk" "split_config.${locale}.apk" "split_config.${lcd_dpi}.apk"
+          if [ ! -e "$Download/${appName}_v${VERSION}-${cpuAbi}/split_config.${lcd_dpi}.apk" ] || [ ! -e "$Download/${appName}_v${VERSION}-${cpuAbi}/split_config.${locale}.apk" ]; then  # check if file exists
+            pv "$outputPath" | bsdtar -xf - -C "$Download/${appName}_v${VERSION}-${cpuAbi}/"
+          fi
         fi
-      elif [ $RipLocale -eq 0 ] && [ $RipDpi -eq 0 ] && [ $RipLib -eq 0 ]; then
-        pv "$outputPath" | bsdtar -xf - -C "$Download/${appName}_v${VERSION}-${cpuAbi}/"
       else
         pv "$outputPath" | bsdtar -xf - -C "$Download/${appName}_v${VERSION}-${cpuAbi}/" --include "base.apk" "split_config.${cpuAbi//-/_}.apk" "split_config.${locale}.apk" "split_config.${lcd_dpi}.apk"
         if [ ! -e "$Download/${appName}_v${VERSION}-${cpuAbi}/split_config.${lcd_dpi}.apk" ] || [ ! -e "$Download/${appName}_v${VERSION}-${cpuAbi}/split_config.${locale}.apk" ] || [ ! -e "$Download/${appName}_v${VERSION}-${cpuAbi}/split_config.${cpuAbi//-/_}.apk" ]; then  # check if file exists
