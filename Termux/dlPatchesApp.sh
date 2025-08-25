@@ -148,7 +148,7 @@ dlApp() {
   else
     echo -e "$running Downloading $appName from GitHub.."
     bash $Simplify/dlGitHub.sh "$owner" "$repo" "latest" ".apk" "$SimplUsr" "$regex"
-    apk_path=$(find "$SimplUsr" -type f -name "$assets" -print -quit)
+    apk_path=$(find "$SimplUsr" -type f -name "$file_pattern" -print -quit)
     if [ -f "$apk_path" ]; then
       echo -e "$info ${Green}Downloaded $appName APK found:${Reset} $apk_path"
       updated_at=""
