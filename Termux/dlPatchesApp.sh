@@ -456,7 +456,11 @@ while true; do
   echo -e "$info Available apps:"
   for i in "${!apps[@]}"; do
     if [ -n "${apps[$i]}" ] && [ "${apps[$i]}" != "null" ]; then
-      printf "%d. %s\n" "$i" "${apps[$i]}"
+      if [ "$i" -le 9 ]; then
+        printf "%d . %s\n" "$i" "${apps[$i]}"
+      else
+        printf "%d. %s\n" "$i" "${apps[$i]}"
+      fi
     fi
   done
 
