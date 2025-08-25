@@ -113,6 +113,9 @@ appInstall() {
           bash $Simplify/apkInstall.sh "$apk_path" "$pkgApp" "$activityApp"
           data "$appName" "" "$tag"
         fi
+        if su -c "id" >/dev/null 2>&1 || "$HOME/rish" -c "id" >/dev/null 2>&1; then
+          rm -f "$apk_path"
+        fi
         ;;
       n*|N*) echo -e "$notice ${appName} Installaion skipped!" ;;
       *) echo -e "$info Invalid choice! ${appName} Installaion skipped." ;;
