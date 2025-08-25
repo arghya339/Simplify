@@ -181,7 +181,7 @@ patch_app() {
       -e "Remove screenshot restriction"
     )
   fi
-  
+  echo -e "$running Patching ${appName} RV.."
   if [ "$appName" == "Instagram" ] || [ "$appName" == "Facebook" ] || [ "$appName" == "Facebook Messenger" ] || [ "$appName" == "Threads" ]; then
     $PREFIX/lib/jvm/java-21-openjdk/bin/java -jar $ReVancedCLIJar patch -p $PatchesRvp \
     -o "$outputAPK" "${stock_apk_ref[0]}" \
@@ -207,10 +207,10 @@ patch_app() {
     rm -rf "$without_ext-temporary-files"  # Remove temporary files directory
   else
     if [ "$appName" == "Instagram" ] || [ "$appName" == "Facebook" ] || [ "$appName" == "Facebook Messenger" ] || [ "$appName" == "Threads" ]; then
-      [[ -f "$without_ext-options.json" ]] && rm "$without_ext-options.json"
-      rm "$without_ext.keystore"
+      [[ -f "$without_ext-options.json" ]] && rm -f "$without_ext-options.json"
+      rm -f "$without_ext.keystore"
     else
-      rm "$without_ext.keystore"
+      rm -f "$without_ext.keystore"
     fi
   fi
 }
@@ -500,7 +500,6 @@ build_app() {
   done
   if [ -f "${stock_apk_path[0]}" ]; then
     echo -e "$good ${Green}Downloaded ${appNameRef[0]} APK found:${Reset} ${stock_apk_path[0]}"
-    echo -e "$running Patching ${appNameRef[0]} RV.."
     patch_app "stock_apk_path" "$appPatchesArgs" "$outputAPK" "${appNameRef[0]}"
   fi
   

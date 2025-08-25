@@ -106,8 +106,9 @@ patch_app() {
     echo -e "$bad Oops, $appName Patching failed !! Logs saved to "$log". Share the Patchlog to developer."
     termux-open-url "https://github.com/indrastorms/Dropped-Patches/issues/new"
     termux-open --send "$log"
+    rm -rf "$without_ext-temporary-files"  # Remove temporary files directory
   else
-    rm "$without_ext-options.json" && rm "$without_ext.keystore"
+    rm -f "$without_ext-options.json" && rm -f "$without_ext.keystore"
   fi
 }
 

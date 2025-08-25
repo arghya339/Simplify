@@ -61,7 +61,17 @@ echo -e "$info ${Blue}Target device:${Reset} $Model"
 ReVancedCLIJar="$pikoTwitter/revanced-cli-4.6.2-all.jar"
 if [ ! -f "$ReVancedCLIJar" ]; then
   echo -e "$running Downloading revanced-cli-4.6.2-all.jar.."
-  curl -L --progress-bar -C - -o "$ReVancedCLIJar" "https://github.com/inotia00/revanced-cli/releases/download/v4.6.2/revanced-cli-4.6.2-all.jar"
+  url="https://github.com/inotia00/revanced-cli/releases/download/v4.6.2/revanced-cli-4.6.2-all.jar"
+  while true; do
+    #curl -L --progress-bar -C - -o "$ReVancedCLIJar" "$url"
+    aria2c -x 16 -s 16 --console-log-level=error --summary-interval=0 --download-result=hide -c -o "$(basename "$ReVancedCLIJar")" -d "$(dirname "$ReVancedCLIJar")" "$url"
+    if [ $? -eq 0 ]; then
+      echo  # White Space
+      break
+    fi
+    echo -e "${bad} ${Red}Download failed! retrying in 5 seconds..${Reset}"
+    sleep 5  # Wait 5 seconds
+  done
 fi
 echo -e "$info ${Blue}ReVancedCLIJar:${Reset} $ReVancedCLIJar"
 
@@ -151,8 +161,9 @@ patch_twitter() {
     echo -e "$bad Oops, Piko Twitter Patching failed !! Logs saved to "$log". Share the Patchlog to developer."
     termux-open-url "https://github.com/crimera/piko/issues/new"
     termux-open --send "$log"
+    rm -rf "$without_ext-temporary-files"  # Remove temporary files directory
   else
-    rm "$without_ext-options.json" && rm "$without_ext.keystore"
+    rm -f "$without_ext-options.json" && rm -f "$without_ext.keystore"
   fi
 }
 
@@ -165,13 +176,13 @@ if [ -z "$pkgVersion" ]; then
 fi
 Type="BUNDLE"
 Arch=("universal")
-xFileName=$(basename "$(find "$Download" -type f -name "${appName[0]}_v*-$cpuAbi.apk" -print -quit)")
-stock_apk_path=("$Download/$xFileName")
 outputAPK="$SimplUsr/piko-twitter_v${pkgVersion}-$cpuAbi.apk"
 fileName=$(basename $outputAPK)
 activityPatches="com.twitter.android/.StartActivity"
 
 bash $Simplify/APKMdl.sh "$pkgName" "$pkgVersion" "$Type" "${Arch[0]}"  # Download stock apk from APKMirror
+xFileName=$(basename "$(find "$Download" -type f -name "${appName[0]}_v*-$cpuAbi.apk" -print -quit)")
+stock_apk_path=("$Download/$xFileName")
 sleep 0.5  # Wait 500 milliseconds
 second=1
 while true; do

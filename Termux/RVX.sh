@@ -196,7 +196,7 @@ patch_app() {
     termux-open --send "$log"
     rm -rf "$without_ext-temporary-files"  # Remove temporary files directory
   else
-    [[ -f "$without_ext.keystore" ]] && rm "$without_ext.keystore"
+    [[ -f "$without_ext.keystore" ]] && rm -f "$without_ext.keystore"
   fi
 }
 
