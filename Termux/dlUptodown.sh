@@ -58,7 +58,7 @@ if [ $RipDpi -eq 1 ]; then
     dpi="*dpi"
   fi
 elif [ $RipDpi -eq 0 ]; then
-  lcd_dpi="*dpi"
+  dpi="*dpi"
 fi
 
 dlUptodown() {
