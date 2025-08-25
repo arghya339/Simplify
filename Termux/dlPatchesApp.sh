@@ -142,7 +142,7 @@ dlApp() {
   local activityApp="$8"
   
 
-  version=$(jq --arg assets "$appName" -r '.[] | select(.assets == $appName) | .version' $dataJson)
+  version=$(jq --arg appName "$appName" -r '.[] | select(.assets == $appName) | .version' $dataJson)
   if [ "$tag" == "$version" ]; then
     echo -e "$notice ${Yellow}$appName Already up to date!${Reset}"
   else
