@@ -240,10 +240,14 @@ dlPatchesApp() {
         echo -e "$running Sign apk.."
         $PREFIX/lib/jvm/java-21-openjdk/bin/java -jar $PREFIX/share/java/apksigner.jar sign --ks $Simplify/ks.keystore --ks-pass pass:123456 --ks-key-alias ReVancedKey --key-pass pass:123456 --out "$apk_path" "$SimplUsr/Spotube-playstore-all-arch.apk"
         $PREFIX/lib/jvm/java-21-openjdk/bin/keytool -printcert -jarfile "${apk_path}" | grep -oP 'Owner: \K.*' 2>/dev/null
-        if [ $? -ne 0 ]; then
+        if [ $? -eq 0 ]; then
+          rm -f "$SimplUsr/Spotube-playstore-all-arch.apk" && rm -f "${apk_path}.idsig"
+        elif [ $? -ne 0 ]; then
           $PREFIX/lib/jvm/java-21-openjdk/bin/java -jar $PREFIX/share/java/apksigner.jar verify --print-certs "${apk_path}" | grep -oP 'Signer #1 certificate DN: \K.*'
+          if [ $? -eq 0 ]; then
+            rm -f "$SimplUsr/Spotube-playstore-all-arch.apk" && rm -f "${apk_path}.idsig"
+          fi
         fi
-        rm -f "$SimplUsr/Spotube-playstore-all-arch.apk" && rm -f "${apk_path}.idsig"
         mv "$SimplUsr/Spotube-playstore-all-arch-signed.apk" "$SimplUsr/Spotube-playstore-all-arch.apk" && apk_path="$SimplUsr/Spotube-playstore-all-arch.apk"
         assets=$(basename "$apk_path")
       fi
