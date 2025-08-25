@@ -167,6 +167,7 @@ dlPatchesApp() {
   if [ "$repo" == "spotube" ]; then
     local url="https://github.com/KRTirtho/spotube/releases/download/nightly/Spotube-android-all-arch.apk"
     updated_at=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases/nightly" | jq -r --arg assets "$assets" '.assets[] | select(.name == $assets) | .updated_at')
+    assets="Spotube-android-all-arch.apk"
   else
     local url="https://github.com/$owner/$repo/releases/download/all/$assets"
     updated_at=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases/latest" | jq -r --arg assets "$assets" '.assets[] | select(.name == $assets) | .updated_at')
