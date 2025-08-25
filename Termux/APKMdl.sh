@@ -166,7 +166,7 @@ APKMdl() {
     found_os="$os"
     found_dpi="$dpi"
     found_link="$link"
-    echo -e "$notice Only one variant found! auto selected:"
+    echo -e "$notice Only one variant found! auto selected: [0]"
     echo "Version : $found_version"
     echo "Type    : $found_type"
     echo "Arch    : $found_arch"
@@ -189,7 +189,7 @@ APKMdl() {
           found_os="$os"
           found_dpi="$dpi"
           found_link="$link"
-          echo -e "$info autoSelectedVeriant:"
+          echo -e "$info autoSelectedVeriant: [$i]"
           echo "Version : $found_version"
           echo "Type    : $found_type" # Print selected Type
           echo "Arch    : $found_arch"
@@ -205,7 +205,7 @@ APKMdl() {
         found_os="$os"
         found_dpi="$dpi"
         found_link="$link"
-        echo -e "$info autoSelectedVeriant:"
+        echo -e "$info autoSelectedVeriant: [$i]"
         echo "Version : $found_version"
         echo "Type    : $found_type" # Print selected Type
         echo "Arch    : $found_arch"
