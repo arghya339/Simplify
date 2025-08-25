@@ -242,13 +242,15 @@ dlPatchesApp() {
         $PREFIX/lib/jvm/java-21-openjdk/bin/keytool -printcert -jarfile "${apk_path}" | grep -oP 'Owner: \K.*' 2>/dev/null
         if [ $? -eq 0 ]; then
           rm -f "$SimplUsr/Spotube-playstore-all-arch.apk" && rm -f "${apk_path}.idsig"
+          mv "$SimplUsr/Spotube-playstore-all-arch-signed.apk" "$SimplUsr/Spotube-playstore-all-arch.apk"
         elif [ $? -ne 0 ]; then
           $PREFIX/lib/jvm/java-21-openjdk/bin/java -jar $PREFIX/share/java/apksigner.jar verify --print-certs "${apk_path}" | grep -oP 'Signer #1 certificate DN: \K.*'
           if [ $? -eq 0 ]; then
             rm -f "$SimplUsr/Spotube-playstore-all-arch.apk" && rm -f "${apk_path}.idsig"
+            mv "$SimplUsr/Spotube-playstore-all-arch-signed.apk" "$SimplUsr/Spotube-playstore-all-arch.apk"
           fi
         fi
-        mv "$SimplUsr/Spotube-playstore-all-arch-signed.apk" "$SimplUsr/Spotube-playstore-all-arch.apk" && apk_path="$SimplUsr/Spotube-playstore-all-arch.apk"
+        apk_path="$SimplUsr/Spotube-playstore-all-arch.apk"
         assets=$(basename "$apk_path")
       fi
       if [ -f "$apk_path" ]; then
