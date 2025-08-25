@@ -136,11 +136,11 @@ dlApp() {
   local repo=$3
   local regex="$4"
   local file_pattern="$5"
-  local tag="$5"
-  local assets="$6"
+  local tag="$6"
+  local assets="$7"
   local url="https://github.com/$owner/$repo/releases/download/$tag/$assets"
-  local pkgApp="$7"
-  local activityApp="$8"
+  local pkgApp="$8"
+  local activityApp="$9"
   
 
   version=$(jq --arg appName "$appName" -r '.[] | select(.assets == $appName) | .version' $dataJson)
