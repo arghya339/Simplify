@@ -101,82 +101,17 @@ data() {
   fi
 }
 
-# --- dlPatchesApp function: download & install patched apps ---
-dlPatchesApp() {
-  local appName="${1}"
-  local owner="$2"
-  local repo="$3"
-  local assets="$4"
-  local apk_path="$SimplUsr/$assets"
-  if [ "$repo" == "VancedMicroG" ]; then
-    if [ $Android -eq 5 ]; then
-      tag="v0.2.22.212658-212658001"
-    elif [ "$Android" -ge "6" ]; then
-      tag=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases/latest" | jq -r '.tag_name')
-    fi
-    local url="https://github.com/$owner/$repo/releases/download/$tag/microg.apk"
-  elif [ "$repo" == "Nobook" ] || [ "$repo" == "YTPro" ] || [ "$repo" == "FreeTubeAndroid" ] || [ "$repo" == "Tubular" ] || [ "$repo" == "InnerTune" ] || [ "$repo" == "Seal" ] || [ "$repo" == "ytdlnis" ]; then
-    tag=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases/latest" | jq -r '.tag_name')
-    if [ "$repo" == "Nobook" ]; then
-      assets="Nobook_$tag.apk"
-    elif [ "$repo" == "YTPro" ]; then
-      assets="YTPRO.apk"
-    elif [ "$repo" == "FreeTubeAndroid" ]; then
-      assets="freetube-$tag-Android.apk"
-    elif [ "$repo" == "Tubular" ]; then
-      assets="tubular_$tag.apk"
-    elif [ "$repo" == "InnerTune" ]; then
-      assets="InnerTune_${tag}_full_$cpuAbi.apk"
-    elif [ "$repo" == "Seal" ] || [ "$repo" == "ytdlnis" ]; then
-      if [ "$release" == "latest" ]; then
-        tag=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases/latest" | jq -r '.tag_name | sub("^v"; "")' 2>/dev/null)  # 1.13.1
-        if [ "$repo" == "Seal" ]; then
-          assets="Seal-$tag-$cpuAbi-release.apk"
-        else
-          assets="YTDLnis-$tag-$cpuAbi-release.apk"
-        fi
-      else
-        if [ "$repo" == "Seal" ]; then
-          tag=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases" | jq -r '.[].tag_name | sub("^v"; "") | select(contains("alpha"))' | head -n 1 2>/dev/null)  # 2.0.0-alpha.5
-          assets="Seal-$tag-githubPreview-$cpuAbi-release.apk"
-        else
-          tag=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases" | jq -r '.[].tag_name | sub("^v"; "") | select(contains("beta"))' | head -n 1 2>/dev/null)  # 2.0.0-alpha.5
-          assets="YTDLnis-$tag-$cpuAbi-release.apk"
-        fi
-      fi
-    fi
-    local url="https://github.com/$owner/$repo/releases/download/$tag/$assets"
-  elif [ "$repo" == "spotube" ]; then
-    local url="https://github.com/KRTirtho/spotube/releases/download/nightly/Spotube-android-all-arch.apk"
-  else
-    local url="https://github.com/$owner/$repo/releases/download/all/$assets"
-  fi
-  local pkgPatches="$5"
-  local activityPatches="$6"
-  
-  
-  # read the updated_at value for the specified asset
-  if [ "$repo" == "ReVancedApp-Actions" ] || [ "$repo" == "Revanced-And-Revanced-Extended-Non-Root" ]; then
-    app_updated_at=$(jq --arg assets "$assets" -r '.[] | select(.assets == $assets) | .updated_at' $dataJson)
-    updated_at=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases/latest" | jq -r --arg assets "$assets" '.assets[] | select(.name == $assets) | .updated_at')
-    if [ "$app_updated_at" == "$updated_at" ]; then
-      echo -e "$notice ${Yellow}$appName Already up to date!${Reset}"
-      dlIs="0"
-    elif [ "$app_updated_at" != "$updated_at" ] || [ ! -f "$dataJson" ]; then
-      dlIs="1"
-      echo -e "$running Downloading $appName from GitHub.."
-      bash $Simplify/dlGitHub.sh "$owner" "$repo" "latest" ".apk" "$SimplUsr" "$assets"
-      echo -e "$info ${Green}Downloaded $appName APK found:${Reset} $apk_path"
-    fi
-  fi
-  if [ $dlIs -eq 1 ] || [ "$repo" == "VancedMicroG" ] || [ "$repo" == "Nobook" ] || [ "$repo" == "YTPro" ] || [ "$repo" == "FreeTubeAndroid" ] || [ "$repo" == "Tubular" ] || [ "$repo" == "InnerTune" ] || [ "$repo" == "Seal" ] || [ "$repo" == "ytdlnis" ] || [ "$repo" == "spotube" ]; then
-    version=$($HOME/aapt2 dump badging $apk_path 2>/dev/null | sed -n "s/.*versionName='\([^']*\)'.*/\1/p")
+appInstall() {
     echo -e "[?] ${Yellow}Do you want to install ${appName} $version app? [Y/n] ${Reset}\c" && read opt
     case $opt in
       y*|Y*|"")
         echo -e "$running Please Wait !! Installing Patched ${appName} apk.."
         bash $Simplify/apkInstall.sh "$apk_path" "$pkgPatches" "$activityPatches"
-        data "$assets" "$updated_at" "$version"
+        if [ "$repo" == "ReVancedApp-Actions" ] || [ "$repo" == "Revanced-And-Revanced-Extended-Non-Root" ]; then
+          data "$assets" "$updated_at" "$version"
+        else
+          data "$appName" "$updated_at" "$version"
+        fi
         ;;
       n*|N*) echo -e "$notice ${appName} Installaion skipped!" ;;
       *) echo -e "$info Invalid choice! ${appName} Installaion skipped." ;;
@@ -192,6 +127,126 @@ dlPatchesApp() {
         ;;
       *) echo -e "$info Invalid choice! ${appName} Sharing skipped." ;;
     esac
+}
+
+dlApp() {
+  local appName="${1}"
+  local owner=$2
+  local repo=$3
+  local regex="$4"
+  local file_pattern="$5"
+  local tag="$5"
+  local assets="$6"
+  local url="https://github.com/$owner/$repo/releases/download/$tag/$assets"
+  local pkgApp="$7"
+  local activityApp="$8"
+  
+
+  version=$(jq --arg assets "$appName" -r '.[] | select(.assets == $appName) | .version' $dataJson)
+  if [ "$tag" == "$version" ]; then
+    echo -e "$notice ${Yellow}$appName Already up to date!${Reset}"
+  else
+    echo -e "$running Downloading $appName from GitHub.."
+    bash $Simplify/dlGitHub.sh "$owner" "$repo" "latest" ".apk" "$SimplUsr" "$regex"
+    apk_path=$(find "$SimplUsr" -type f -name "$assets" -print -quit)
+    if [ -f "$apk_path" ]; then
+      echo -e "$info ${Green}Downloaded $appName APK found:${Reset} $apk_path"
+      updated_at=""
+      appInstall
+    fi
+  fi
+}
+
+# --- dlPatchesApp function: download & install patched apps ---
+dlPatchesApp() {
+  local appName="${1}"
+  local owner="$2"
+  local repo="$3"
+  local assets="$4"
+  if [ "$repo" == "spotube" ]; then
+    local url="https://github.com/KRTirtho/spotube/releases/download/nightly/Spotube-android-all-arch.apk"
+    updated_at=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases/nightly" | jq -r --arg assets "$assets" '.assets[] | select(.name == $assets) | .updated_at')
+  else
+    local url="https://github.com/$owner/$repo/releases/download/all/$assets"
+    updated_at=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases/latest" | jq -r --arg assets "$assets" '.assets[] | select(.name == $assets) | .updated_at')
+  fi
+  local pkgPatches="$5"
+  local activityPatches="$6"
+  
+  
+  # read the updated_at value for the specified asset
+    app_updated_at=$(jq --arg assets "$assets" -r '.[] | select(.assets == $assets) | .updated_at' $dataJson)
+    if [ "$app_updated_at" == "$updated_at" ]; then
+      echo -e "$notice ${Yellow}$appName Already up to date!${Reset}"
+    elif [ "$app_updated_at" != "$updated_at" ] || [ ! -f "$dataJson" ]; then
+      if [ "$repo" == "ReVancedApp-Actions" ] || [ "$repo" == "Revanced-And-Revanced-Extended-Non-Root" ]; then
+        echo -e "$running Downloading $appName from GitHub.."
+        bash $Simplify/dlGitHub.sh "$owner" "$repo" "latest" ".apk" "$SimplUsr" "$assets"
+        apk_path="$SimplUsr/$assets"
+      else
+        # Download .aab file
+        dlUrl="https://github.com/KRTirtho/spotube/releases/download/nightly/Spotube-playstore-all-arch.aab"
+        assets_name="Spotube-playstore-all-arch.aab"
+        aab_path="$SimplUsr/$assets_name"
+        echo -e "$running Downloading $appName.."
+        while true; do
+          aria2c -x 16 -s 16 --console-log-level=error --summary-interval=0 --download-result=hide -c -o "$assets_name" -d "$SimplUsr" "$dlUrl"
+          if [ $? -eq 0 ]; then
+            echo  # White Space
+            break
+          fi
+          echo -e "${bad} ${Red}Download failed! retrying in 5 seconds..${Reset}"
+          sleep 5  # Wait 5 seconds
+        done
+        
+        # Download bundletool
+        bundletoolJar=$(find "$Simplify" -type f -name "bundletool-all-*.jar" -print -quit 2>/dev/null)
+        if [ ! -f "$bundletoolJar" ]; then
+          bash $Simplify/dlGitHub.sh "google" "bundletool" "latest" ".jar" "$Simplify"
+          bundletoolJar=$(find "$Simplify" -type f -name "bundletool-all-*.jar" -print -quit)
+        fi
+        # Build apks from aab using bundletool
+        apks_path="$SimplUsr/Spotube-playstore-all-arch.apks"
+        echo -e "$running Build apks from aab.."
+        $PREFIX/lib/jvm/java-21-openjdk/bin/java -jar $bundletoolJar build-apks --bundle=$aab_path --output=$apks_path --aapt2=~/aapt2
+        rm -f "$aab_path"
+        
+        # Extract apks file
+        if jq -e '.DeviceArch != null' "$simplifyJson" >/dev/null 2>&1; then
+          cpuAbi=$(jq -r '.DeviceArch' "$simplifyJson" 2>/dev/null)  # Get Device Architecture from json
+        else
+          cpuAbi=$(getprop ro.product.cpu.abi)  # Get Android arch
+        fi
+        if [ "$cpuAbi" == "arm64-v8a" ]; then
+          cpuAbi="arm64_v8a"
+        elif [ "$cpuAbi" == "armeabi-v7a" ]; then
+          cpuAbi="armeabi_v7a"
+        fi
+        mkdir -p "$SimplUsr/Spotube-playstore-all-arch"
+        echo -e "$running Extracting apks.."
+        pv "$apks_path" | bsdtar -xf - -C "$SimplUsr/Spotube-playstore-all-arch" --include "splits/base-master.apk" --include "splits/base-$cpuAbi.apk" --include "splits/base-${lcd_dpi}.apk" --include "splits/base-$locale.apk"
+        cpuAbi=$(getprop ro.product.cpu.abi)  # Get Android arch
+        rm -f "$apks_path"
+        # Merge splits apks to standalone apk using APKEditor
+        bash $Simplify/dlGitHub.sh "REAndroid" "APKEditor" "latest" ".jar" "$Simplify"
+        APKEditor=$(find "$Simplify" -type f -name "APKEditor-*.jar" -print -quit)
+        echo -e "$running Merge splits apks to standalone apk.."
+        $PREFIX/lib/jvm/java-21-openjdk/bin/java -jar $APKEditor m -i "$SimplUsr/Spotube-playstore-all-arch/splits" -o "$SimplUsr/Spotube-playstore-all-arch.apk"
+        rm -rf "$SimplUsr/Spotube-playstore-all-arch"
+        # Sign apk
+        apk_path="$SimplUsr/Spotube-playstore-all-arch-signed.apk"
+        echo -e "$running Sign apk.."
+        $PREFIX/lib/jvm/java-21-openjdk/bin/java -jar $PREFIX/share/java/apksigner.jar sign --ks $Simplify/ks.keystore --ks-pass pass:123456 --ks-key-alias ReVancedKey --key-pass pass:123456 --out "$apk_path" "$SimplUsr/Spotube-playstore-all-arch.apk"
+        rm -f "$SimplUsr/Spotube-playstore-all-arch.apk" && rm -f "${apk_path}.idsig"
+        mv "$SimplUsr/Spotube-playstore-all-arch-signed.apk" "$SimplUsr/Spotube-playstore-all-arch.apk" && apk_path="$SimplUsr/Spotube-playstore-all-arch.apk"
+        assets=$(basename "$apk_path")
+      fi
+      if [ -f "$apk_path" ]; then
+        echo -e "$info ${Green}Downloaded $appName APK found:${Reset} $apk_path"
+        version=$($HOME/aapt2 dump badging $apk_path 2>/dev/null | sed -n "s/.*versionName='\([^']*\)'.*/\1/p")
+        appInstall
+      fi
+    fi
   fi
 }
 
@@ -407,20 +462,16 @@ while true; do
       repo="VancedMicroG"
       if [ $Android -eq 5 ]; then
         owner="TeamVanced"
-        apk_path="$SimplUsr/microg-0.2.22.212658.apk"
-        if [ ! -f "$apk_path" ]; then
-          curl -sL "https://github.com/$owner/$repo/releases/download/v0.2.22.212658-212658001/microg.apk" --progress-bar -C - -o "$apk_path"
-        fi
+        tag="v0.2.22.212658-212658001"
       elif [ "$Android" -ge "6" ]; then
         owner="inotia00"
-        bash $Simplify/dlGitHub.sh "$owner" "$repo" "latest" ".apk" "$SimplUsr"
-        apk_path=$(find "$SimplUsr" -type f -name "microg-*.apk" -print -quit)
+        tag=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases/latest" | jq -r '.tag_name')
       fi
-      echo -e "$info ${Blue}VancedMicroG:${Reset} $apk_path"
-      assets=$(basename "$apk_path")
-      pkgPatches="com.mgoogle.android.gms"
-      activityPatches="org.microg.gms.ui.SettingsActivity"
-      dlPatchesApp "${appName}" "$owner" "$repo" "$assets" "$pkgPatches" "$activityPatches"
+      file_pattern="microg-*.apk"
+      assets="microg.apk"
+      pkgApp="com.mgoogle.android.gms"
+      activityApp="com.mgoogle.android.gms/org.microg.gms.ui.SettingsActivity"
+      dlApp "${appName}" "$owner" "$repo" "" "$file_pattern" "$tag" "$assets" "$pkgApp" "$activityApp"
       ;;
     YouTube\ RV)
       appName="YouTube RV"
@@ -464,34 +515,34 @@ while true; do
       appName="YTPro"
       owner="prateek-chaubey"
       repo="YTPro"
-      bash $Simplify/dlGitHub.sh "$owner" "$repo" "latest" ".apk" "$SimplUsr"
-      apk_path=$(find "$SimplUsr" -type f -name "YTPRO-*.apk" -print -quit)
-      assets=$(basename "$apk_path")
-      pkgPatches="com.google.android.youtube.pro"
-      activityPatches="com.google.android.youtube.pro/.MainActivity"
-      dlPatchesApp "${appName}" "$owner" "$repo" "$assets" "$pkgPatches" "$activityPatches"
+      file_pattern="YTPRO-*.apk"
+      tag=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases/latest" | jq -r '.tag_name')
+      assets="YTPRO.apk"
+      pkgApp="com.google.android.youtube.pro"
+      activityApp="com.google.android.youtube.pro/.MainActivity"
+      dlApp "${appName}" "$owner" "$repo" "" "$file_pattern" "$tag" "$assets" "$pkgApp" "$activityApp"
       ;;
     FreeTubeAndroid)
       appName="FreeTubeAndroid"
       owner="MarmadileManteater"
       repo="FreeTubeAndroid"
-      bash $Simplify/dlGitHub.sh "$owner" "$repo" "latest" ".apk" "$SimplUsr"
-      apk_path=$(find "$SimplUsr" -type f -name "freetube-*-Android.apk" -print -quit)
-      assets=$(basename "$apk_path")
-      pkgPatches="io.freetubeapp.freetube"
-      activityPatches="io.freetubeapp.freetube/.MainActivity"
-      dlPatchesApp "${appName}" "$owner" "$repo" "$assets" "$pkgPatches" "$activityPatches"
+      file_pattern="freetube-*-Android.apk"
+      tag=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases/latest" | jq -r '.tag_name')
+      assets="freetube-$tag-Android.apk"
+      pkgApp="io.freetubeapp.freetube"
+      activityApp="io.freetubeapp.freetube/.MainActivity"
+      dlApp "${appName}" "$owner" "$repo" "" "$file_pattern" "$tag" "$assets" "$pkgApp" "$activityApp"
       ;;
     Tubular)
       appName="Tubular"
       owner="polymorphicshade"
       repo="Tubular"
-      bash $Simplify/dlGitHub.sh "$owner" "$repo" "latest" ".apk" "$SimplUsr"
-      apk_path=$(find "$SimplUsr" -type f -name "tubular_v*.apk" -print -quit)
-      assets=$(basename "$apk_path")
-      pkgPatches="org.polymorphicshade.tubular"
-      activityPatches="org.polymorphicshade.tubular/org.schabi.newpipe.MainActivity"
-      dlPatchesApp "${appName}" "$owner" "$repo" "$assets" "$pkgPatches" "$activityPatches"
+      file_pattern="tubular_v*.apk"
+      tag=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases/latest" | jq -r '.tag_name')
+      assets="tubular_$tag.apk"
+      pkgApp="org.polymorphicshade.tubular"
+      activityApp="org.polymorphicshade.tubular/org.schabi.newpipe.MainActivity"
+      dlApp "${appName}" "$owner" "$repo" "" "$file_pattern" "$tag" "$assets" "$pkgApp" "$activityApp"
       ;;
     YouTube\ Music)
       appName="YouTube Music"
@@ -533,12 +584,12 @@ while true; do
       owner="z-huang"
       repo="InnerTune"
       regex="InnerTune_v.*_full_$cpuAbi.apk"
-      bash $Simplify/dlGitHub.sh "$owner" "$repo" "latest" ".apk" "$SimplUsr" "$regex"
-      apk_path=$(find "$SimplUsr" -type f -name "InnerTune_v*_full_$cpuAbi.apk" -print -quit)
-      assets=$(basename "$apk_path")
-      pkgPatches="com.zionhuang.music"
-      activityPatches="com.zionhuang.music/.MainActivity"
-      dlPatchesApp "${appName}" "$owner" "$repo" "$assets" "$pkgPatches" "$activityPatches"
+      file_pattern="InnerTune_v*_full_$cpuAbi.apk"
+      tag=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases/latest" | jq -r '.tag_name')
+      assets="InnerTune_${tag}_full_$cpuAbi.apk"
+      pkgApp="com.zionhuang.music"
+      activityApp="com.zionhuang.music/.MainActivity"
+      dlApp "${appName}" "$owner" "$repo" "$regex" "$file_pattern" "$tag" "$assets" "$pkgApp" "$activityApp"
       ;;
     Seal)
       appName="Seal"
@@ -546,17 +597,18 @@ while true; do
       repo="Seal"
       if [ "$release" == "latest" ]; then
         regex="Seal-.*-$cpuAbi-release.apk"
-        bash $Simplify/dlGitHub.sh "$owner" "$repo" "$release" ".apk" "$SimplUsr" "$regex"
-        apk_path=$(find "$SimplUsr" -type f -name "Seal-*-$cpuAbi-release.apk" -print -quit)
+        file_pattern="Seal-*-$cpuAbi-release.apk"
+        tag=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases/latest" | jq -r '.tag_name | sub("^v"; "")' 2>/dev/null)  # 1.13.1
+        assets="Seal-$tag-$cpuAbi-release.apk"
       else
         regex="Seal-.*-githubPreview-$cpuAbi-release.apk"
-        bash $Simplify/dlGitHub.sh "$owner" "$repo" "$release" ".apk" "$SimplUsr" "$regex"
-        apk_path=$(find "$SimplUsr" -type f -name "Seal-*-githubPreview-$cpuAbi-release.apk" -print -quit)
+        file_pattern="Seal-*-githubPreview-$cpuAbi-release.apk"
+        tag=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases" | jq -r '.[].tag_name | sub("^v"; "") | select(contains("alpha"))' | head -n 1 2>/dev/null)  # 2.0.0-alpha.5
+        assets="Seal-$tag-githubPreview-$cpuAbi-release.apk"
       fi
-      assets=$(basename "$apk_path")
-      pkgPatches="com.junkfood.seal"
-      activityPatches="com.junkfood.seal/.MainActivity"
-      dlPatchesApp "${appName}" "$owner" "$repo" "$assets" "$pkgPatches" "$activityPatches"
+      pkgApp="com.junkfood.seal"
+      activityApp="com.junkfood.seal/.MainActivity"
+      dlApp "${appName}" "$owner" "$repo" "$regex" "$file_pattern" "$tag" "$assets" "$pkgApp" "$activityApp"
       ;;
     ytdlnis)
       appName="ytdlnis"
@@ -564,17 +616,17 @@ while true; do
       repo="ytdlnis"
       if [ "$release" == "latest" ]; then
         regex="YTDLnis-.*-$cpuAbi-release.apk"
-        bash $Simplify/dlGitHub.sh "$owner" "$repo" "$release" ".apk" "$SimplUsr" "$regex"
-        apk_path=$(find "$SimplUsr" -type f -name "YTDLnis-*-$cpuAbi-release.apk" -print -quit)
+        file_pattern="YTDLnis-*-$cpuAbi-release.apk"
+        tag=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases/latest" | jq -r '.tag_name | sub("^v"; "")' 2>/dev/null)  # 1.13.1
       else
         regex="YTDLnis-.*-beta-$cpuAbi-release.apk"
-        bash $Simplify/dlGitHub.sh "$owner" "$repo" "$release" ".apk" "$SimplUsr" "$regex"
-        apk_path=$(find "$SimplUsr" -type f -name "YTDLnis-*-beta-$cpuAbi-release.apk" -print -quit)
+        file_pattern="YTDLnis-*-beta-$cpuAbi-release.apk"
+        tag=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases" | jq -r '.[].tag_name | sub("^v"; "") | select(contains("beta"))' | head -n 1 2>/dev/null)  # 2.0.0-beta
       fi
-      assets=$(basename "$apk_path")
-      pkgPatches="com.deniscerri.ytdl"
-      activityPatches="com.deniscerri.ytdl/.Default"
-      dlPatchesApp "${appName}" "$owner" "$repo" "$assets" "$pkgPatches" "$activityPatches"
+      assets="YTDLnis-$tag-$cpuAbi-release.apk"
+      pkgApp="com.deniscerri.ytdl"
+      activityApp="com.deniscerri.ytdl/.Default"
+      dlApp "${appName}" "$owner" "$repo" "$regex" "$file_pattern" "$tag" "$assets" "$pkgApp" "$activityApp"
       ;;
     Spotify)
       appName="Spotify"
@@ -593,36 +645,7 @@ while true; do
       appName="spotube"
       owner="KRTirtho"
       repo="spotube"
-      url="https://github.com/KRTirtho/spotube/releases/download/nightly/Spotube-playstore-all-arch.aab"
-      assets_name="Spotube-playstore-all-arch.aab"
-      aab_path="$SimplUsr/$assets_name"
-      aria2c -x 16 -s 16 --console-log-level=error --summary-interval=0 --download-result=hide -c -o "$assets_name" -d "$SimplUsr" "$url"
-      echo  # White Space
-      bundletoolJar=$(find "$Simplify" -type f -name "bundletool-all-*.jar" -print -quit 2>/dev/null)
-      if [ ! -f "$bundletoolJar" ]; then
-        bash $Simplify/dlGitHub.sh "google" "bundletool" "latest" ".jar" "$Simplify"
-        bundletoolJar=$(find "$Simplify" -type f -name "bundletool-all-*.jar" -print -quit)
-      fi
-      apks_path="$SimplUsr/Spotube-playstore-all-arch.apks"
-      $PREFIX/lib/jvm/java-21-openjdk/bin/java -jar $bundletoolJar build-apks --bundle=$aab_path --output=$apks_path --aapt2=~/aapt2
-      rm "$aab_path"
-      if [ "$cpuAbi" == "arm64-v8a" ]; then
-        cpuAbi="arm64_v8a"
-      elif [ "$cpuAbi" == "armeabi-v7a" ]; then
-        cpuAbi="armeabi_v7a"
-      fi
-      mkdir -p "$SimplUsr/Spotube-playstore-all-arch"
-      pv "$apks_path" | bsdtar -xf - -C "$SimplUsr/Spotube-playstore-all-arch" --include "splits/base-master.apk" --include "splits/base-$cpuAbi.apk" --include "splits/base-${lcd_dpi}.apk" --include "splits/base-$locale.apk"
-      cpuAbi=$(getprop ro.product.cpu.abi)
-      rm "$apks_path"
-      bash $Simplify/dlGitHub.sh "REAndroid" "APKEditor" "latest" ".jar" "$Simplify"
-      APKEditor=$(find "$Simplify" -type f -name "APKEditor-*.jar" -print -quit)
-      $PREFIX/lib/jvm/java-21-openjdk/bin/java -jar $APKEditor m -i "$SimplUsr/Spotube-playstore-all-arch/splits" -o "$SimplUsr/Spotube-playstore-all-arch.apk"
-      rm -rf "$SimplUsr/Spotube-playstore-all-arch"
-      apk_path="$SimplUsr/Spotube-playstore-all-arch-signed.apk"
-      $PREFIX/lib/jvm/java-21-openjdk/bin/java -jar $PREFIX/share/java/apksigner.jar sign --ks $Simplify/ks.keystore --ks-pass pass:123456 --ks-key-alias ReVancedKey --key-pass pass:123456 --out "$apk_path" "$SimplUsr/Spotube-playstore-all-arch.apk"
-      rm "$SimplUsr/Spotube-playstore-all-arch.apk" && rm "${apk_path}.idsig"
-      assets=$(basename "$apk_path")
+      assets="Spotube-playstore-all-arch.aab"
       pkgPatches="oss.krtirtho.spotube.nightly"
       activityPatches="oss.krtirtho.spotube.nightly/com.ryanheise.audioservice.AudioServiceActivity"
       dlPatchesApp "${appName}" "$owner" "$repo" "$assets" "$pkgPatches" "$activityPatches"
@@ -683,12 +706,12 @@ while true; do
       appName="Nobook"
       owner="ycngmn"
       repo="Nobook"
-      bash $Simplify/dlGitHub.sh "$owner" "$repo" "latest" ".apk" "$SimplUsr"
-      apk_path=$(find "$SimplUsr" -type f -name "Nobook_v*.apk" -print -quit)
-      assets=$(basename "$apk_path")
-      pkgPatches="com.ycngmn.nobook"
-      activityPatches="com.ycngmn.nobook/.MainActivity"
-      dlPatchesApp "${appName}" "$owner" "$repo" "$assets" "$pkgPatches" "$activityPatches"
+      file_pattern="Nobook_v*.apk"
+      tag=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases/latest" | jq -r '.tag_name')
+      assets="Nobook_$tag.apk"
+      pkgApp="com.ycngmn.nobook"
+      activityApp="com.ycngmn.nobook/.MainActivity"
+      dlApp "${appName}" "$owner" "$repo" "" "$file_pattern" "$tag" "$assets" "$pkgApp" "$activityApp"
       ;;
     FacebookMessenger)
       appName="Facebook Messenger"

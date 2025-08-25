@@ -445,7 +445,7 @@ build_app() {
         case $opt in
           y*|Y*|"")
             echo -e "$running Please Wait !! Installing VancedMicroG apk.."
-            bash $Simplify/apkInstall.sh "$VancedMicroG" "com.mgoogle.android.gms" "org.microg.gms.ui.SettingsActivity"
+            bash $Simplify/apkInstall.sh "$VancedMicroG" "com.mgoogle.android.gms" "com.mgoogle.android.gms/org.microg.gms.ui.SettingsActivity"
             ;;
           n*|N*) echo -e "$notice VancedMicroG Installaion skipped!" ;;
           *) echo -e "$info Invalid choice! VancedMicroG Installaion skipped." ;;
