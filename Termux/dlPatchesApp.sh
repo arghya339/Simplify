@@ -110,7 +110,7 @@ appInstall() {
         if [ "$repo" == "ReVancedApp-Actions" ] || [ "$repo" == "Revanced-And-Revanced-Extended-Non-Root" ]; then
           data "$assets" "$updated_at" "$version"
         else
-          data "$appName" "$updated_at" "$version"
+          data "$appName" "" "$tag"
         fi
         ;;
       n*|N*) echo -e "$notice ${appName} Installaion skipped!" ;;
@@ -151,7 +151,7 @@ dlApp() {
     apk_path=$(find "$SimplUsr" -type f -name "$file_pattern" -print -quit)
     if [ -f "$apk_path" ]; then
       echo -e "$info ${Green}Downloaded $appName APK found:${Reset} $apk_path"
-      updated_at=""
+      version=$($HOME/aapt2 dump badging $apk_path 2>/dev/null | sed -n "s/.*versionName='\([^']*\)'.*/\1/p")
       appInstall
     fi
   fi
