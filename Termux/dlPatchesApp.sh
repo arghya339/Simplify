@@ -137,13 +137,14 @@ dlApp() {
   local appName="${1}"
   local owner=$2
   local repo=$3
-  local regex="$4"
-  local file_pattern="$5"
-  local tag="$6"
-  local assets="$7"
+  local release=$4
+  local regex="$5"
+  local file_pattern="$6"
+  local tag="$7"
+  local assets="$8"
   local url="https://github.com/$owner/$repo/releases/download/$tag/$assets"
-  local pkgApp="$8"
-  local activityApp="$9"
+  local pkgApp="$9"
+  local activityApp="$10"
   
 
   version=$(jq --arg appName "$appName" -r '.[] | select(.assets == $appName) | .version' $dataJson)
@@ -151,7 +152,7 @@ dlApp() {
     echo -e "$notice ${Yellow}$appName Already up to date!${Reset}"
   else
     echo -e "$running Downloading $appName from GitHub.."
-    bash $Simplify/dlGitHub.sh "$owner" "$repo" "latest" ".apk" "$SimplUsr" "$regex"
+    bash $Simplify/dlGitHub.sh "$owner" "$repo" "$release" ".apk" "$SimplUsr" "$regex"
     apk_path=$(find "$SimplUsr" -type f -name "$file_pattern" -print -quit)
     if [ -f "$apk_path" ]; then
       echo -e "$info ${Green}Downloaded $appName APK found:${Reset} $apk_path"
@@ -483,6 +484,7 @@ while true; do
     echo -e "$info \"$idx\" is not a valid index! Please select index [0-${max}]." >&2
   fi
   
+  release=latest
   case ${apps[$idx]} in
     Vanced\ MicroG)
       appName="Vanced MicroG"
@@ -498,7 +500,7 @@ while true; do
       assets="microg.apk"
       pkgApp="com.mgoogle.android.gms"
       activityApp="com.mgoogle.android.gms/org.microg.gms.ui.SettingsActivity"
-      dlApp "${appName}" "$owner" "$repo" "" "$file_pattern" "$tag" "$assets" "$pkgApp" "$activityApp"
+      dlApp "${appName}" "$owner" "$repo" "$release" "" "$file_pattern" "$tag" "$assets" "$pkgApp" "$activityApp"
       ;;
     YouTube\ RV)
       appName="YouTube RV"
@@ -547,7 +549,7 @@ while true; do
       assets="YTPRO.apk"
       pkgApp="com.google.android.youtube.pro"
       activityApp="com.google.android.youtube.pro/.MainActivity"
-      dlApp "${appName}" "$owner" "$repo" "" "$file_pattern" "$tag" "$assets" "$pkgApp" "$activityApp"
+      dlApp "${appName}" "$owner" "$repo" "$release" "" "$file_pattern" "$tag" "$assets" "$pkgApp" "$activityApp"
       ;;
     FreeTubeAndroid)
       appName="FreeTubeAndroid"
@@ -558,7 +560,7 @@ while true; do
       assets="freetube-$tag-Android.apk"
       pkgApp="io.freetubeapp.freetube"
       activityApp="io.freetubeapp.freetube/.MainActivity"
-      dlApp "${appName}" "$owner" "$repo" "" "$file_pattern" "$tag" "$assets" "$pkgApp" "$activityApp"
+      dlApp "${appName}" "$owner" "$repo" "$release" "" "$file_pattern" "$tag" "$assets" "$pkgApp" "$activityApp"
       ;;
     Tubular)
       appName="Tubular"
@@ -569,7 +571,7 @@ while true; do
       assets="tubular_$tag.apk"
       pkgApp="org.polymorphicshade.tubular"
       activityApp="org.polymorphicshade.tubular/org.schabi.newpipe.MainActivity"
-      dlApp "${appName}" "$owner" "$repo" "" "$file_pattern" "$tag" "$assets" "$pkgApp" "$activityApp"
+      dlApp "${appName}" "$owner" "$repo" "$release" "" "$file_pattern" "$tag" "$assets" "$pkgApp" "$activityApp"
       ;;
     YouTube\ Music)
       appName="YouTube Music"
@@ -616,7 +618,7 @@ while true; do
       assets="InnerTune_${tag}_full_$cpuAbi.apk"
       pkgApp="com.zionhuang.music"
       activityApp="com.zionhuang.music/.MainActivity"
-      dlApp "${appName}" "$owner" "$repo" "$regex" "$file_pattern" "$tag" "$assets" "$pkgApp" "$activityApp"
+      dlApp "${appName}" "$owner" "$repo" "$release" "$regex" "$file_pattern" "$tag" "$assets" "$pkgApp" "$activityApp"
       ;;
     Seal)
       appName="Seal"
@@ -628,6 +630,7 @@ while true; do
         tag=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases/latest" | jq -r '.tag_name | sub("^v"; "")' 2>/dev/null)  # 1.13.1
         assets="Seal-$tag-$cpuAbi-release.apk"
       else
+        release=alpha
         regex="Seal-.*-githubPreview-$cpuAbi-release.apk"
         file_pattern="Seal-*-githubPreview-$cpuAbi-release.apk"
         tag=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases" | jq -r '.[].tag_name | sub("^v"; "") | select(contains("alpha"))' | head -n 1 2>/dev/null)  # 2.0.0-alpha.5
@@ -635,7 +638,7 @@ while true; do
       fi
       pkgApp="com.junkfood.seal"
       activityApp="com.junkfood.seal/.MainActivity"
-      dlApp "${appName}" "$owner" "$repo" "$regex" "$file_pattern" "$tag" "$assets" "$pkgApp" "$activityApp"
+      dlApp "${appName}" "$owner" "$repo" "$release" "$regex" "$file_pattern" "$tag" "$assets" "$pkgApp" "$activityApp"
       ;;
     ytdlnis)
       appName="ytdlnis"
@@ -646,6 +649,7 @@ while true; do
         file_pattern="YTDLnis-*-$cpuAbi-release.apk"
         tag=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases/latest" | jq -r '.tag_name | sub("^v"; "")' 2>/dev/null)  # 1.13.1
       else
+        release=beta
         regex="YTDLnis-.*-beta-$cpuAbi-release.apk"
         file_pattern="YTDLnis-*-beta-$cpuAbi-release.apk"
         tag=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases" | jq -r '.[].tag_name | sub("^v"; "") | select(contains("beta"))' | head -n 1 2>/dev/null)  # 2.0.0-beta
@@ -653,7 +657,7 @@ while true; do
       assets="YTDLnis-$tag-$cpuAbi-release.apk"
       pkgApp="com.deniscerri.ytdl"
       activityApp="com.deniscerri.ytdl/.Default"
-      dlApp "${appName}" "$owner" "$repo" "$regex" "$file_pattern" "$tag" "$assets" "$pkgApp" "$activityApp"
+      dlApp "${appName}" "$owner" "$repo" "$release" "$regex" "$file_pattern" "$tag" "$assets" "$pkgApp" "$activityApp"
       ;;
     Spotify)
       appName="Spotify"
@@ -738,7 +742,7 @@ while true; do
       assets="Nobook_$tag.apk"
       pkgApp="com.ycngmn.nobook"
       activityApp="com.ycngmn.nobook/.MainActivity"
-      dlApp "${appName}" "$owner" "$repo" "" "$file_pattern" "$tag" "$assets" "$pkgApp" "$activityApp"
+      dlApp "${appName}" "$owner" "$repo" "$release" "" "$file_pattern" "$tag" "$assets" "$pkgApp" "$activityApp"
       ;;
     FacebookMessenger)
       appName="Facebook Messenger"
@@ -776,7 +780,7 @@ while true; do
       assets="twitter-piko-material-you-v$tag.apk"
       pkgApp="com.twitter.android"
       activityApp="com.twitter.android/.StartActivity"
-      dlApp "${appName}" "$owner" "$repo" "" "$file_pattern" "$tag" "$assets" "$pkgApp" "$activityApp"
+      dlApp "${appName}" "$owner" "$repo" "$release" "" "$file_pattern" "$tag" "$assets" "$pkgApp" "$activityApp"
       ;;
     Reddit)
       appName="Reddit"
@@ -913,13 +917,14 @@ while true; do
         tag=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases/latest" | jq -r '.tag_name')
         assets="Lawnchair-$tag.apk"
       else
+        release=nightly
         file_pattern="Lawnchair.Debug.*-dev.Nightly-CI_*.apk"
         tag="nightly"
         assets=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases" | jq -r --arg tag "$tag" '.[] | select(.tag_name == $tag) | .assets[] | .name')
       fi
       pkgApp="ch.deletescape.lawnchair"
       activityApp="ch.deletescape.lawnchair/.Launcher"
-      dlApp "${appName}" "$owner" "$repo" "" "$file_pattern" "$tag" "$assets" "$pkgApp" "$activityApp"
+      dlApp "${appName}" "$owner" "$repo" "$release" "" "$file_pattern" "$tag" "$assets" "$pkgApp" "$activityApp"
       
       appName="Lawnicons"
       repo="lawnicons"
@@ -928,13 +933,14 @@ while true; do
         tag=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases/latest" | jq -r '.tag_name')
         assets=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases/latest" | jq -r '.assets[] | .name')
       else
+        release=nightly
         file_pattern="Lawnicons.Nightly.*.apk"
         tag="nightly"
         assets=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases" | jq -r --arg tag "$tag" '.[] | select(.tag_name == $tag) | .assets[] | .name')
       fi
       pkgApp="app.lawnchair.lawnicons"
       activityApp="app.lawnchair.lawnicons/.MainActivity"
-      dlApp "${appName}" "$owner" "$repo" "" "$file_pattern" "$tag" "$assets" "$pkgApp" "$activityApp"
+      dlApp "${appName}" "$owner" "$repo" "$release" "" "$file_pattern" "$tag" "$assets" "$pkgApp" "$activityApp"
       
       appName="Lawnfeed"
       repo="lawnfeed"
@@ -943,7 +949,7 @@ while true; do
       assets=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases/latest" | jq -r '.assets[] | .name')
       pkgApp="app.lawnchair.lawnfeed"
       activityApp=
-      dlApp "${appName}" "$owner" "$repo" "" "$file_pattern" "$tag" "$assets" "$pkgApp" "$activityApp"
+      dlApp "${appName}" "$owner" "$repo" "$release" "" "$file_pattern" "$tag" "$assets" "$pkgApp" "$activityApp"
       ;;
     Tasker)
       appName="Tasker"
