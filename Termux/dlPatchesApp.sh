@@ -323,6 +323,8 @@ if [ $Android -ge 10 ]; then
     $Facebook
     Nobook
     ${fbMessenger}
+    Nagram
+    Nekogram
     Twitter
     piko\ Twitter
     Reddit
@@ -359,6 +361,8 @@ elif [ $Android -eq 9 ]; then
     $Facebook
     Nobook
     ${fbMessenger}
+    Nagram
+    Nekogram
     Twitter
     piko\ Twitter
     Reddit
@@ -394,6 +398,8 @@ elif [ $Android -eq 8 ]; then
     $Facebook
     Nobook
     ${fbMessenger}
+    Nagram
+    Nekogram
     Twitter
     piko\ Twitter
     Adobe\ Lightroom
@@ -426,6 +432,8 @@ elif [ $Android -eq 7 ]; then
     $Instagram
     Nobook
     ${fbMessenger}
+    Nagram
+    Nekogram
     Photomath
     RAR
     Twitch
@@ -444,6 +452,8 @@ elif [ $Android -eq 6 ]; then
     Google\ Photos
     Nobook
     ${fbMessenger}
+    Nagram
+    Nekogram
     Photomath
     RAR
     Twitch
@@ -460,6 +470,8 @@ elif [ $Android -eq 5 ]; then
     Google\ Photos
     Nobook
     ${fbMessenger}
+    Nagram
+    Nekogram
     Photomath
     RAR
     Twitch
@@ -772,6 +784,31 @@ while true; do
       pkgPatches="com.facebook.orca"
       activityPatches="com.facebook.orca/.auth.StartScreenActivity"
       dlPatchesApp "${appName}" "$owner" "$repo" "$assets" "$pkgPatches" "$activityPatches"
+      ;;
+    Nagram)
+      appName="Nagram"
+      owner="NextAlone"
+      repo="Nagram"
+      name=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases/latest" | jq -r '.name')
+      regex="Nagram-v$name-$cpuAbi.apk"
+      file_pattern="Nagram-v$name-$cpuAbi.apk"
+      tag=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases/latest" | jq -r '.tag_name')
+      assets="$regex"
+      pkgApp="xyz.nextalone.nagram"
+      activityApp="xyz.nextalone.nagram/org.telegram.messenger.DefaultIcon"
+      dlApp "${appName}" "$owner" "$repo" "$release" "$regex" "$file_pattern" "$tag" "$assets" "$pkgApp" "$activityApp"
+      ;;
+    Nekogram)
+      appName="Nekogram"
+      owner="Nekogram"
+      repo="Nekogram"
+      regex="Nekogram-.*-.*-$cpuAbi.apk"
+      file_pattern="Nekogram-*-*-$cpuAbi.apk"
+      tag=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases/latest" | jq -r '.tag_name')
+      assets=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases/latest" | jq -r --arg regex "$regex" '.assets[] | select(.name | test($regex)) | .name')
+      pkgApp="tw.nekomimi.nekogram"
+      activityApp="tw.nekomimi.nekogram/org.telegram.messenger.DefaultIcon"
+      dlApp "${appName}" "$owner" "$repo" "$release" "$regex" "$file_pattern" "$tag" "$assets" "$pkgApp" "$activityApp"
       ;;
     Twitter)
       appName="Twitter"
