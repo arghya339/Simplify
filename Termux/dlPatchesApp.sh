@@ -918,14 +918,16 @@ while true; do
         file_pattern="Lawnchair-*.apk"
         tag=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases/latest" | jq -r '.tag_name')
         assets="Lawnchair-$tag.apk"
+        pkgApp="ch.deletescape.lawnchair"
+        activityApp="ch.deletescape.lawnchair/.Launcher"
       else
         release=nightly
         file_pattern="Lawnchair.Debug.*-dev.Nightly-CI_*.apk"
         tag="nightly"
         assets=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases" | jq -r --arg tag "$tag" '.[] | select(.tag_name == $tag) | .assets[] | .name')
+        pkgApp="app.lawnchair.nightly"
+        activityApp="app.lawnchair.nightly/app.lawnchair.LawnchairLauncher"
       fi
-      pkgApp="ch.deletescape.lawnchair"
-      activityApp="ch.deletescape.lawnchair/.Launcher"
       dlApp "${appName}" "$owner" "$repo" "$release" "" "$file_pattern" "$tag" "$assets" "$pkgApp" "$activityApp"
       
       appName="Lawnicons"
