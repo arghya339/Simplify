@@ -145,37 +145,29 @@ dlGitHub() {
       fi
     fi
     echo -e "$info findFile: ${Cyan}$findFile${Reset}"
-  elif [ "$releases" == "nightly" ]; then
-    nightlyAssetsName=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases/tags/nightly" | jq -r --arg ext "$ext" '.assets[] | select(.name | endswith($ext)) | .name' 2>/dev/null)
-    echo -e "$info nightlyAssetsName: $nightlyAssetsName"
-    if [ "$repo" == "lawnchair" ]; then
-      nightlyAssetsNamePattern="Lawnchair.Debug.*-dev.Nightly-CI_*.apk"
-    elif [ "$repo" == "lawnicons" ]; then
-      nightlyAssetsNamePattern="Lawnicons.Nightly.*.apk"
-    fi
-    findFile=$(find "$dir" -type f -name "$nightlyAssetsNamePattern" -print -quit)
-    nightlyFileBaseName=$(basename $findFile)
-    if [ "$nightlyAssetsName" != "$nightlyFileBaseName" ]; then
-      echo -e "$notice diffs: $nightlyAssetsName ~ $nightlyFileBaseName"
-      [ -f "$findFile" ] && rm "$findFile"
-      dlUrl="https://github.com/$owner/$repo/releases/download/nightly/$nightlyAssetsName"
-      findFile="$dir/$nightlyAssetsName"
-      if [ "$repo" == "lawnchair" ] || [ "$repo" == "lawnicons" ]; then
-        dl "curl" "$dlUrl" "$findFile"
-      else
-        dl "aria2" "$dlUrl" "$findFile"
-      fi
-    fi
-    echo -e "$info findFile: ${Cyan}$findFile${Reset}"
   else
-    lastPreReleases=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases" | jq -r '.[].tag_name | sub("^v"; "") | select(contains("dev"))' | head -n 1 2>/dev/null)
-    echo -e "$info lastPreReleases: $lastPreReleases"
+    if [ "$repo" != "lawnchair" ] || [ "$repo" != "lawnicons" ] || [ "$repo" != "spotube" ]; then
+      lastPreReleases=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases" | jq -r '.[].tag_name | sub("^v"; "") | select(contains("dev"))' | head -n 1 2>/dev/null)
+      echo -e "$info lastPreReleases: $lastPreReleases"
+    fi
     
     # fetch assets from specific release tag
-    preAssetsName=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases/tags/v$lastPreReleases" | jq -r --arg ext "$ext" '.assets[] | select(.name | endswith($ext)) | .name' 2>/dev/null)
+    if [ "$repo" == "lawnchair" ] || [ "$repo" == "lawnicons" ] || [ "$repo" == "spotube" ]; then
+      preAssetsName=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases/tags/nightly" | jq -r --arg ext "$ext" '.assets[] | select(.name | endswith($ext)) | .name' 2>/dev/null)
+    else
+      preAssetsName=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases/tags/v$lastPreReleases" | jq -r --arg ext "$ext" '.assets[] | select(.name | endswith($ext)) | .name' 2>/dev/null)
+    fi
     echo -e "$info preAssetsName: $preAssetsName"
     
-    preAssetsNamePattern=$(echo "$preAssetsName" | sed "s/$lastPreReleases/*/g")
+    if [ "$repo" == "lawnchair" ]; then
+      preAssetsNamePattern="Lawnchair.Debug.*-dev.Nightly-CI_*.apk"
+    elif [ "$repo" == "lawnicons" ]; then
+      preAssetsNamePattern="Lawnicons.Nightly.*.apk"
+    elif [ "$repo" == "spotube" ]; then
+      preAssetsNamePattern="$preAssetsName"
+    else
+      preAssetsNamePattern=$(echo "$preAssetsName" | sed "s/$lastPreReleases/*/g")
+    fi
     findFile=$(find "$dir" -type f -name "$preAssetsNamePattern" -print -quit)
     preFileBaseName=$(basename $findFile)
     
@@ -183,9 +175,13 @@ dlGitHub() {
       echo -e "$notice diffs: $preAssetsName ~ $preFileBaseName"
       [ -f "$findFile" ] && rm "$findFile"
       # downloading assets
-      dlUrl="https://github.com/$owner/$repo/releases/download/v${lastPreReleases}/$preAssetsName"
+      if [ "$repo" == "lawnchair" ] || [ "$repo" == "lawnicons" ] || [ "$repo" == "spotube" ]; then
+        dlUrl="https://github.com/$owner/$repo/releases/download/nightly/$preAssetsName"
+      else
+        dlUrl="https://github.com/$owner/$repo/releases/download/v${lastPreReleases}/$preAssetsName"
+      fi
       findFile="$dir/$preAssetsName"
-      if [ "$repo" == "revanced-cli" ] || { [ "$repo" == "revanced-patches" ] && { [ "$owner" == "inotia00" ] || [ "$owner" == "anddea" ]; }; }; then
+      if [ "$repo" == "revanced-cli" ] || { [ "$repo" == "revanced-patches" ] && { [ "$owner" == "inotia00" ] || [ "$owner" == "anddea" ]; }; } || [ "$repo" == "spotube" ]; then
         dl "aria2" "$dlUrl" "$findFile"
       else
         dl "curl" "$dlUrl" "$findFile"
