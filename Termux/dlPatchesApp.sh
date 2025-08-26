@@ -182,13 +182,10 @@ dlPatchesApp() {
   local owner="$2"
   local repo="$3"
   local assets="$4"
-  if [ "$tag" == "nightly" ]; then
-    local url="https://github.com/KRTirtho/spotube/releases/download/nightly/$assets"
+  if [ "$repo" == "spotube" ]; then
+    local url="https://github.com/KRTirtho/spotube/releases/download/nightly/Spotube-android-all-arch.apk"
     updated_at=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases/tags/nightly" | jq -r --arg assets "$assets" '.assets[] | select(.name == $assets) | .updated_at')
-    if [ "$repo" == "spotube" ]; then
-      local url="https://github.com/KRTirtho/spotube/releases/download/nightly/Spotube-android-all-arch.apk"
-      assets="Spotube-playstore-all-arch.apk"
-    fi
+    assets="Spotube-playstore-all-arch.apk"
   else
     local url="https://github.com/$owner/$repo/releases/download/all/$assets"
     updated_at=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases/latest" | jq -r --arg assets "$assets" '.assets[] | select(.name == $assets) | .updated_at')
