@@ -790,7 +790,7 @@ while true; do
       assets="twitter-piko-material-you-v$tag.apk"
       pkgApp="com.twitter.android"
       activityApp="com.twitter.android/.StartActivity"
-      dlApp "${appName}" "$owner" "$repo" "$release" "" "$file_pattern" "$tag" "$assets" "$pkgApp" "$activityApp"
+      dlApp "${appName}" "$owner" "$repo" "$release" "$regex" "$file_pattern" "$tag" "$assets" "$pkgApp" "$activityApp"
       ;;
     Reddit)
       appName="Reddit"
