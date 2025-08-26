@@ -97,7 +97,12 @@ dlGitHub() {
     else
       assetsName=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases/latest" | jq -r --arg regex "$regex" '.assets[] | select(.name | test($regex)) | .name' 2>/dev/null)
       echo -e "$info assetsName: $assetsName"
-      assetsNamePattern=$(echo "$assetsName" | sed "s/$latestReleases/*/g")
+      if [ "$repo" == "Nagram" ]; then
+        name=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases/latest" | jq -r '.name')
+        assetsNamePattern=$(echo "$assetsName" | sed "s/$name/*/g")
+      else
+        assetsNamePattern=$(echo "$assetsName" | sed "s/$latestReleases/*/g")
+      fi
     fi
     
     if [ "$repo" == "ReVancedApp-Actions" ] || [ "$repo" == "Revanced-And-Revanced-Extended-Non-Root" ]; then
