@@ -790,8 +790,8 @@ while true; do
       owner="NextAlone"
       repo="Nagram"
       name=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases/latest" | jq -r '.name')
-      regex="Nagram-v$name-$cpuAbi.apk"
-      file_pattern="Nagram-v$name-$cpuAbi.apk"
+      regex="Nagram-v${name}-${cpuAbi}.apk"
+      file_pattern="Nagram-v${name}-${cpuAbi}.apk"
       tag=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases/latest" | jq -r '.tag_name')
       assets="$regex"
       pkgApp="xyz.nextalone.nagram"
