@@ -624,7 +624,7 @@ while true; do
       appName="Seal"
       owner="JunkFood02"
       repo="Seal"
-      if [ "$release" == "latest" ]; then
+      if [ "$FetchPreRelease" -eq 0 ]; then
         regex="Seal-.*-$cpuAbi-release.apk"
         file_pattern="Seal-*-$cpuAbi-release.apk"
         tag=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases/latest" | jq -r '.tag_name | sub("^v"; "")' 2>/dev/null)  # 1.13.1
@@ -644,7 +644,7 @@ while true; do
       appName="ytdlnis"
       owner="deniscerri"
       repo="ytdlnis"
-      if [ "$release" == "latest" ]; then
+      if [ "$FetchPreRelease" -eq 0 ]; then
         regex="YTDLnis-.*-$cpuAbi-release.apk"
         file_pattern="YTDLnis-*-$cpuAbi-release.apk"
         tag=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases/latest" | jq -r '.tag_name | sub("^v"; "")' 2>/dev/null)  # 1.13.1
@@ -912,7 +912,7 @@ while true; do
       owner="LawnchairLauncher"
       appName="Lawnchair"
       repo="lawnchair"
-      if [ "$release" == "latest" ]; then
+      if [ "$FetchPreRelease" -eq 0 ]; then
         file_pattern="Lawnchair-*.apk"
         tag=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases/latest" | jq -r '.tag_name')
         assets="Lawnchair-$tag.apk"
@@ -928,7 +928,7 @@ while true; do
       
       appName="Lawnicons"
       repo="lawnicons"
-      if [ "$release" == "latest" ]; then
+      if [ "$FetchPreRelease" -eq 0 ]; then
         file_pattern="Lawnicons.*.apk"
         tag=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases/latest" | jq -r '.tag_name')
         assets=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases/latest" | jq -r '.assets[] | .name')
