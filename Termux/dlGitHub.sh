@@ -149,13 +149,24 @@ dlGitHub() {
     if [ "$repo" != "lawnchair" ] || [ "$repo" != "lawnicons" ] || [ "$repo" != "spotube" ]; then
       lastPreReleases=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases" | jq -r '.[].tag_name | sub("^v"; "") | select(contains("dev"))' | head -n 1 2>/dev/null)
       echo -e "$info lastPreReleases: $lastPreReleases"
+    elif [ "$repo" == "Seal" ]; then
+      lastPreReleases=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases" | jq -r '.[].tag_name | sub("^v"; "") | select(contains("alpha"))' | head -n 1 2>/dev/null)
+    elif [ "$repo" == "ytdlnis" ]; then
+      lastPreReleases=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases" | jq -r '.[].tag_name | sub("^v"; "") | select(contains("beta"))' | head -n 1 2>/dev/null)
     fi
     
     # fetch assets from specific release tag
     if [ "$repo" == "lawnchair" ] || [ "$repo" == "lawnicons" ] || [ "$repo" == "spotube" ]; then
-      preAssetsName=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases/tags/nightly" | jq -r --arg ext "$ext" '.assets[] | select(.name | endswith($ext)) | .name' 2>/dev/null)
+      preAssetsName=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases/tags/nightly" | jq -r --arg regex "$regex" '.assets[] | select(.name | test($regex)) | .name' 2>/dev/null)
     else
-      preAssetsName=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases/tags/v$lastPreReleases" | jq -r --arg ext "$ext" '.assets[] | select(.name | endswith($ext)) | .name' 2>/dev/null)
+      preAssetsName=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases/tags/v$lastPreReleases" | jq -r --arg regex "$regex" '.assets[] | select(.name | test($regex)) | .name' 2>/dev/null)
+    fi
+    if [ -z "$preAssetsName" ]; then
+      if [ "$repo" == "lawnchair" ] || [ "$repo" == "lawnicons" ] || [ "$repo" == "spotube" ]; then
+        preAssetsName=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases/tags/nightly" | jq -r --arg ext "$ext" '.assets[] | select(.name | endswith($ext)) | .name' 2>/dev/null)
+      else
+        preAssetsName=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases/tags/v$lastPreReleases" | jq -r --arg ext "$ext" '.assets[] | select(.name | endswith($ext)) | .name' 2>/dev/null)
+      fi
     fi
     echo -e "$info preAssetsName: $preAssetsName"
     
