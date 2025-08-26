@@ -115,7 +115,7 @@ appInstall() {
           data "$assets" "$updated_at" "$version"
         else
           bash $Simplify/apkInstall.sh "$apk_path" "$pkgApp" "$activityApp"
-          data "$appName" "" "$tag"
+          data "$appName" "$updated_at" "$tag"
         fi
         if su -c "id" >/dev/null 2>&1 || "$HOME/rish" -c "id" >/dev/null 2>&1; then
           rm -f "$apk_path"
@@ -155,8 +155,14 @@ dlApp() {
   local activityApp="$10"
   
 
+  if [ "$tag" == "nightly" ]; then
+    updated_at=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases/tags/nightly" | jq -r --arg assets "$assets" '.assets[] | select(.name == $assets) | .updated_at')
+  else
+    updated_at=
+  fi
+  app_updated_at=$(jq --arg appName "$appName" -r '.[] | select(.assets == $appName) | .updated_at' $dataJson)
   version=$(jq --arg appName "$appName" -r '.[] | select(.assets == $appName) | .version' $dataJson)
-  if [ "$tag" == "$version" ]; then
+  if [ "$tag" == "$version" ] && [ "$app_updated_at" == "$updated_at" ]; then
     echo -e "$notice ${Yellow}$appName Already up to date!${Reset}"
   else
     echo -e "$running Downloading $appName from GitHub.."
@@ -176,10 +182,13 @@ dlPatchesApp() {
   local owner="$2"
   local repo="$3"
   local assets="$4"
-  if [ "$repo" == "spotube" ]; then
-    local url="https://github.com/KRTirtho/spotube/releases/download/nightly/Spotube-android-all-arch.apk"
+  if [ "$tag" == "nightly" ]; then
+    local url="https://github.com/KRTirtho/spotube/releases/download/nightly/$assets"
     updated_at=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases/tags/nightly" | jq -r --arg assets "$assets" '.assets[] | select(.name == $assets) | .updated_at')
-    assets="Spotube-playstore-all-arch.apk"
+    if [ "$repo" == "spotube" ]; then
+      local url="https://github.com/KRTirtho/spotube/releases/download/nightly/Spotube-android-all-arch.apk"
+      assets="Spotube-playstore-all-arch.apk"
+    fi
   else
     local url="https://github.com/$owner/$repo/releases/download/all/$assets"
     updated_at=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases/latest" | jq -r --arg assets "$assets" '.assets[] | select(.name == $assets) | .updated_at')
@@ -188,7 +197,7 @@ dlPatchesApp() {
   local activityPatches="$6"
   
   
-  # read the updated_at value for the specified asset
+    # read the updated_at value for the specified asset
     app_updated_at=$(jq --arg assets "$assets" -r '.[] | select(.assets == $assets) | .updated_at' $dataJson)
     if [ "$app_updated_at" == "$updated_at" ]; then
       echo -e "$notice ${Yellow}$appName Already up to date!${Reset}"
