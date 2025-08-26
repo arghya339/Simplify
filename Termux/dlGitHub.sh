@@ -96,10 +96,7 @@ dlGitHub() {
       assetsName="$assets"
       echo -e "$info assetsName: $assetsName"
     else
-      echo -e "$notice DEBUG - regex: $regex"
       assetsName=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases/latest" | jq -r --arg regex "$regex" '.assets[] | select(.name | test($regex)) | .name' 2>/dev/null)
-      echo -e "$notice DEBUG - gh api response:"
-      curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases/latest" | jq .
       echo -e "$info assetsName: $assetsName"
       if [ "$repo" == "Nagram" ]; then
         name=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases/latest" | jq -r '.name')

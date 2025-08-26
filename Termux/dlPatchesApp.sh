@@ -791,7 +791,6 @@ while true; do
       repo="Nagram"
       name=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases/latest" | jq -r '.name')
       regex="Nagram-v${name}-${cpuAbi}.apk"
-      echo -e "$notice DEBUG - regex: $regex"
       file_pattern="Nagram-v${name}-${cpuAbi}.apk"
       tag=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases/latest" | jq -r '.tag_name')
       assets="$regex"
