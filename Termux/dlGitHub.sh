@@ -75,7 +75,7 @@ dlGitHub() {
     if [ "$repo" == "APKEditor" ]; then
       latestReleases=$(curl -s ${auth} https://api.github.com/repos/$owner/$repo/releases/latest | jq -r '.tag_name | sub("^V"; "")')  # 1.4.3
       echo -e "$info latestReleases: V$latestReleases"
-    elif [ "$repo" == "FreeTubeAndroid" ] || [ "$repo" == "bundletool" ]; then
+    elif [ "$repo" == "FreeTubeAndroid" ] || [ "$repo" == "bundletool" ] || [ "$repo" == "twitter-apk" ]; then
       latestReleases=$(curl -s ${auth} https://api.github.com/repos/$owner/$repo/releases/latest | jq -r '.tag_name')  # 0.23.5.17
     else
       latestReleases=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases/latest" | jq -r '.tag_name | sub("^v"; "")' 2>/dev/null)
@@ -116,11 +116,11 @@ dlGitHub() {
         findFile="$dir/$fileName"
         dl "curl" "$dlUrl" "$findFile"
       fi
-    elif [ "$repo" == "ReVancedApp-Actions" ] || [ "$repo" == "Revanced-And-Revanced-Extended-Non-Root" ] || [ "$repo" == "FreeTubeAndroid" ] || [ "$repo" == "bundletool" ]; then
+    elif [ "$repo" == "ReVancedApp-Actions" ] || [ "$repo" == "Revanced-And-Revanced-Extended-Non-Root" ] || [ "$repo" == "FreeTubeAndroid" ] || [ "$repo" == "bundletool" ] || [ "$repo" == "twitter-apk" ]; then
       [ -f "$findFile" ] && rm "$findFile"
       dlUrl="https://github.com/$owner/$repo/releases/download/${latestReleases}/$assetsName"
       findFile="$dir/$assetsName"
-      if [ "$repo" == "ReVancedApp-Actions" ] || [ "$repo" == "Revanced-And-Revanced-Extended-Non-Root" ] || [ "$repo" == "bundletool" ]; then
+      if [ "$repo" == "ReVancedApp-Actions" ] || [ "$repo" == "Revanced-And-Revanced-Extended-Non-Root" ] || [ "$repo" == "bundletool" ] || [ "$repo" == "twitter-apk" ]; then
         dl "aria2" "$dlUrl" "$findFile"
       else
         dl "curl" "$dlUrl" "$findFile"
