@@ -629,15 +629,17 @@ while true; do
         file_pattern="Seal-*-$cpuAbi-release.apk"
         tag=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases/latest" | jq -r '.tag_name | sub("^v"; "")' 2>/dev/null)  # 1.13.1
         assets="Seal-$tag-$cpuAbi-release.apk"
+        pkgApp="com.junkfood.seal"
+        activityApp="com.junkfood.seal/.MainActivity"
       else
         release=alpha
         regex="Seal-.*-githubPreview-$cpuAbi-release.apk"
         file_pattern="Seal-*-githubPreview-$cpuAbi-release.apk"
         tag=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases" | jq -r '.[].tag_name | sub("^v"; "") | select(contains("alpha"))' | head -n 1 2>/dev/null)  # 2.0.0-alpha.5
         assets="Seal-$tag-githubPreview-$cpuAbi-release.apk"
+        pkgApp="com.junkfood.seal.preview"
+        activityApp="com.junkfood.seal.preview/.MainActivity"
       fi
-      pkgApp="com.junkfood.seal"
-      activityApp="com.junkfood.seal/.MainActivity"
       dlApp "${appName}" "$owner" "$repo" "$release" "$regex" "$file_pattern" "$tag" "$assets" "$pkgApp" "$activityApp"
       ;;
     ytdlnis)
