@@ -105,7 +105,11 @@ appInstall() {
     echo -e "[?] ${Yellow}Do you want to install ${appName} $version app? [Y/n] ${Reset}\c" && read opt
     case $opt in
       y*|Y*|"")
-        echo -e "$running Please Wait !! Installing Patched ${appName} apk.."
+        if [ "$repo" == "ReVancedApp-Actions" ] || [ "$repo" == "Revanced-And-Revanced-Extended-Non-Root" ]; then
+          echo -e "$running Please Wait !! Installing Patched ${appName} apk.."
+        else
+          echo -e "$running Please Wait !! Installing ${appName} apk.."
+        fi
         if [ "$repo" == "ReVancedApp-Actions" ] || [ "$repo" == "Revanced-And-Revanced-Extended-Non-Root" ] || [ "$repo" == "spotube" ]; then
           bash $Simplify/apkInstall.sh "$apk_path" "$pkgPatches" "$activityPatches"
           data "$assets" "$updated_at" "$version"
@@ -124,7 +128,11 @@ appInstall() {
     echo -e "[?] ${Yellow}Do you want to Share ${appName} app? [Y/n] ${Reset}\c" && read opt
     case $opt in
       y*|Y*|"")
-        echo -e "$running Please Wait !! Sharing Patched ${appName} apk Link.."
+        if [ "$repo" == "ReVancedApp-Actions" ] || [ "$repo" == "Revanced-And-Revanced-Extended-Non-Root" ]; then
+          echo -e "$running Please Wait !! Sharing Patched ${appName} apk Link.."
+        else
+          echo -e "$running Please Wait !! Sharing ${appName} apk Link.."
+        fi
         am start -a android.intent.action.SEND -t text/plain --es android.intent.extra.TEXT "$url" > /dev/null
         ;;
       n*|N*) echo -e "$notice ${appName} Sharing skipped!"
