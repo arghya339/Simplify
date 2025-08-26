@@ -320,6 +320,7 @@ if [ $Android -ge 10 ]; then
     Strava
     SoundCloud
     ${novaLauncher}
+    Lawnchair
     Tasker
   )
 elif [ $Android -eq 9 ]; then
@@ -354,6 +355,7 @@ elif [ $Android -eq 9 ]; then
     Strava
     SoundCloud
     ${novaLauncher}
+    Lawnchair
     Tasker
   )
 elif [ $Android -eq 8 ]; then
@@ -387,6 +389,7 @@ elif [ $Android -eq 8 ]; then
     Strava
     SoundCloud
     ${novaLauncher}
+    Lawnchair
     Tasker
   )
 elif [ $Android -eq 7 ]; then
@@ -763,17 +766,17 @@ while true; do
       activityPatches="com.twitter.android/.StartActivity"
       dlPatchesApp "${appName}" "$owner" "$repo" "$assets" "$pkgPatches" "$activityPatches"
       ;;
-      piko\ Twitter)
+    piko\ Twitter)
       appName="piko Twitter"
       owner="crimera"
       repo="twitter-apk"
       regex="twitter-piko-material-you-v.*.apk"
       file_pattern="twitter-piko-material-you-v*.apk"
       tag=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases/latest" | jq -r '.tag_name')
-      asset="twitter-piko-material-you-v$tag.apk"
+      assets="twitter-piko-material-you-v$tag.apk"
       pkgApp="com.twitter.android"
       activityApp="com.twitter.android/.StartActivity"
-      dlApp "${appName}" "$owner" "$repo" "$asset" "$file_pattern" "$tag" "$assets" "$pkgApp" "$activityApp"
+      dlApp "${appName}" "$owner" "$repo" "" "$file_pattern" "$tag" "$assets" "$pkgApp" "$activityApp"
       ;;
     Reddit)
       appName="Reddit"
@@ -900,6 +903,47 @@ while true; do
       pkgPatches="com.teslacoilsw.launcher"
       activityPatches="com.teslacoilsw.launcher/.NovaShortcutHandler"
       dlPatchesApp "${appName}" "$owner" "$repo" "$assets" "$pkgPatches" "$activityPatches"
+      ;;
+    Lawnchair)
+      owner="LawnchairLauncher"
+      appName="Lawnchair"
+      repo="lawnchair"
+      if [ "$release" == "latest" ]; then
+        file_pattern="Lawnchair-*.apk"
+        tag=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases/latest" | jq -r '.tag_name')
+        assets="Lawnchair-$tag.apk"
+      else
+        file_pattern="Lawnchair.Debug.*-dev.Nightly-CI_*.apk"
+        tag="nightly"
+        assets=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases" | jq -r --arg tag "$tag" '.[] | select(.tag_name == $tag) | .assets[] | .name')
+      fi
+      pkgApp="ch.deletescape.lawnchair"
+      activityApp="ch.deletescape.lawnchair/.Launcher"
+      dlApp "${appName}" "$owner" "$repo" "" "$file_pattern" "$tag" "$assets" "$pkgApp" "$activityApp"
+      
+      appName="Lawnicons"
+      repo="lawnicons"
+      if [ "$release" == "latest" ]; then
+        file_pattern="Lawnicons.*.apk"
+        tag=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases/latest" | jq -r '.tag_name')
+        assets=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases/latest" | jq -r '.assets[] | .name')
+      else
+        file_pattern="Lawnicons.Nightly.*.apk"
+        tag="nightly"
+        assets=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases" | jq -r --arg tag "$tag" '.[] | select(.tag_name == $tag) | .assets[] | .name')
+      fi
+      pkgApp="app.lawnchair.lawnicons"
+      activityApp="app.lawnchair.lawnicons/.MainActivity"
+      dlApp "${appName}" "$owner" "$repo" "" "$file_pattern" "$tag" "$assets" "$pkgApp" "$activityApp"
+      
+      appName="Lawnfeed"
+      repo="lawnfeed"
+      file_pattern="Lawnfeed.*.apk"
+      tag=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases/latest" | jq -r '.tag_name')
+      assets=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases/latest" | jq -r '.assets[] | .name')
+      pkgApp="app.lawnchair.lawnfeed"
+      activityApp=
+      dlApp "${appName}" "$owner" "$repo" "" "$file_pattern" "$tag" "$assets" "$pkgApp" "$activityApp"
       ;;
     Tasker)
       appName="Tasker"
