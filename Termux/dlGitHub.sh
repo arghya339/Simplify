@@ -146,13 +146,15 @@ dlGitHub() {
     fi
     echo -e "$info findFile: ${Cyan}$findFile${Reset}"
   else
-    if [ "$repo" != "lawnchair" ] || [ "$repo" != "lawnicons" ] || [ "$repo" != "spotube" ]; then
-      lastPreReleases=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases" | jq -r '.[].tag_name | sub("^v"; "") | select(contains("dev"))' | head -n 1 2>/dev/null)
-      echo -e "$info lastPreReleases: $lastPreReleases"
-    elif [ "$repo" == "Seal" ]; then
+    if [ "$repo" == "Seal" ]; then
       lastPreReleases=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases" | jq -r '.[].tag_name | sub("^v"; "") | select(contains("alpha"))' | head -n 1 2>/dev/null)
     elif [ "$repo" == "ytdlnis" ]; then
       lastPreReleases=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases" | jq -r '.[].tag_name | sub("^v"; "") | select(contains("beta"))' | head -n 1 2>/dev/null)
+    elif [ "$repo" != "lawnchair" ] || [ "$repo" != "lawnicons" ] || [ "$repo" != "spotube" ]; then
+      lastPreReleases=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases" | jq -r '.[].tag_name | sub("^v"; "") | select(contains("dev"))' | head -n 1 2>/dev/null)
+    fi
+    if [ -n "$lastPreReleases" ]; then
+      echo -e "$info lastPreReleases: $lastPreReleases"
     fi
     
     # fetch assets from specific release tag
