@@ -309,6 +309,7 @@ if [ $Android -ge 10 ]; then
     Nobook
     ${fbMessenger}
     Twitter
+    piko\ Twitter
     Reddit
     Adobe\ Lightroom
     Photomath
@@ -343,6 +344,7 @@ elif [ $Android -eq 9 ]; then
     Nobook
     ${fbMessenger}
     Twitter
+    piko\ Twitter
     Reddit
     Adobe\ Lightroom
     Photomath
@@ -376,6 +378,7 @@ elif [ $Android -eq 8 ]; then
     Nobook
     ${fbMessenger}
     Twitter
+    piko\ Twitter
     Adobe\ Lightroom
     Photomath
     RAR
@@ -759,6 +762,18 @@ while true; do
       pkgPatches="com.twitter.android"
       activityPatches="com.twitter.android/.StartActivity"
       dlPatchesApp "${appName}" "$owner" "$repo" "$assets" "$pkgPatches" "$activityPatches"
+      ;;
+      piko\ Twitter)
+      appName="piko Twitter"
+      owner="crimera"
+      repo="twitter-apk"
+      regex="twitter-piko-material-you-v.*.apk"
+      file_pattern="twitter-piko-material-you-v*.apk"
+      tag=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases/latest" | jq -r '.tag_name')
+      asset="twitter-piko-material-you-v$tag.apk"
+      pkgApp="com.twitter.android"
+      activityApp="com.twitter.android/.StartActivity"
+      dlApp "${appName}" "$owner" "$repo" "$asset" "$file_pattern" "$tag" "$assets" "$pkgApp" "$activityApp"
       ;;
     Reddit)
       appName="Reddit"
