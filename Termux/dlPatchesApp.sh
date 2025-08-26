@@ -306,6 +306,7 @@ if [ $Android -ge 10 ]; then
   apps=(
     Quit
     Vanced\ MicroG
+    ReVanced\ GmsCore
     YouTube\ RV
     YouTube
     YTPro
@@ -344,6 +345,7 @@ elif [ $Android -eq 9 ]; then
   apps=(
     Quit
     Vanced\ MicroG
+    ReVanced\ GmsCore
     YouTube\ RV
     YouTube
     YTPro
@@ -381,6 +383,7 @@ elif [ $Android -eq 8 ]; then
   apps=(
     Quit
     Vanced\ MicroG
+    ReVanced\ GmsCore
     YouTube\ RV
     YouTube
     YTPro
@@ -417,6 +420,7 @@ elif [ $Android -eq 7 ]; then
   apps=(
     Quit
     Vanced\ MicroG
+    ReVanced\ GmsCore
     YouTube
     YTPro
     FreeTubeAndroid
@@ -444,6 +448,7 @@ elif [ $Android -eq 6 ]; then
   apps=(
     Quit
     Vanced\ MicroG
+    ReVanced\ GmsCore
     YouTube
     YTPro
     Tubular
@@ -465,6 +470,7 @@ elif [ $Android -eq 5 ]; then
     YTPro
     Tubular
     Vanced\ MicroG
+    ReVanced\ GmsCore
     YouTube\ Music
     TikTok
     Google\ Photos
@@ -480,6 +486,7 @@ elif [ $Android -eq 5 ]; then
 elif [ $Android -eq 4 ]; then
   apps=(
     Quit
+    ReVanced\ GmsCore
     RAR
   )
 fi
@@ -526,6 +533,18 @@ while true; do
       assets="microg.apk"
       pkgApp="com.mgoogle.android.gms"
       activityApp="com.mgoogle.android.gms/org.microg.gms.ui.SettingsActivity"
+      dlApp "${appName}" "$owner" "$repo" "$release" "" "$file_pattern" "$tag" "$assets" "$pkgApp" "$activityApp"
+      ;;
+    ReVanced\ GmsCore)
+      appName="ReVanced GmsCore"
+      owner="YT-Advanced"
+      repo="GmsCore"
+      tag=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases/latest" | jq -r '.tag_name')
+      file_pattern="app.revanced.android.gms-*.apk"
+      regex="app.revanced.android.gms-.*.apk"
+      assets=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases/latest" | jq -r --arg regex "$regex" '.assets[] | select(.name | test($regex)) | .name')
+      pkgApp="app.revanced.android.gms"
+      activityApp="app.revanced.android.gms/org.microg.gms.ui.SettingsActivity"
       dlApp "${appName}" "$owner" "$repo" "$release" "" "$file_pattern" "$tag" "$assets" "$pkgApp" "$activityApp"
       ;;
     YouTube\ RV)
