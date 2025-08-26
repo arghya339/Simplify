@@ -948,6 +948,7 @@ while true; do
       
       appName="Lawnfeed"
       repo="lawnfeed"
+      release=latest
       file_pattern="Lawnfeed.*.apk"
       tag=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases/latest" | jq -r '.tag_name')
       assets=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases/latest" | jq -r '.assets[] | .name')
