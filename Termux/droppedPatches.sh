@@ -123,8 +123,8 @@ build_app() {
   local outputAPK=$6
   local fileName=$(basename $outputAPK)
   local log=$7
-  local pkgPatches=$8
-  local activityPatches=$9
+  local pkgPatched=$8
+  local activityPatched=$9
   
 
   bash $Simplify/APKMdl.sh "$pkgName" "$pkgVersion" "$Type" "${archRef[0]}"  # Download stock apk from APKMirror
@@ -156,7 +156,7 @@ build_app() {
       y*|Y*|"")
         echo -e "$notice ${Yellow}Warning! Disable auto updates for the patched app to avoid unexpected issues.${Reset}"
         echo -e "$running Please Wait !! Installing Patched ${appNameRef[0]} Dropped apk.."
-        bash $Simplify/apkInstall.sh "$outputAPK" "$pkgPatches" "$activityPatches"
+        bash $Simplify/apkInstall.sh "$outputAPK" "$pkgPatched" "$activityPatched"
         ;;
       n*|N*) echo -e "$notice ${appNameRef[0]} Dropped Installaion skipped!" ;;
       *) echo -e "$info Invalid choice! ${appNameRef[0]} Dropped Installaion skipped." ;;
@@ -218,8 +218,7 @@ while true; do
   if [ "$idx" == 0 ]; then
     break  # break the while loop
   elif [ "$idx" == "" ] || [ -z "$idx" ]; then
-    tag=$(curl -sL ${auth} "https://api.github.com/repos/indrastorms/Dropped-Patches/releases/latest" | jq -r '.tag_name')
-    curl -sL ${auth} "https://api.github.com/repos/indrastorms/Dropped-Patches/releases/tags/$tag" | jq -r .body | glow  # Display the release notes
+    curl -sL ${auth} "https://api.github.com/repos/indrastorms/Dropped-Patches/releases/latest" | jq -r .body | glow  # Display the release notes
   elif [[ $idx =~ ^[0-9]+$ ]] && (( idx >= 0 && idx <= max )); then
     echo -e "$notice You chose: ${apps[$idx]}"
   else
@@ -239,8 +238,8 @@ while true; do
       Arch=("arm64-v8a + armeabi-v7a")
       outputAPK="$SimplUsr/nova-launcher-dropped_v${pkgVersion}-${Arch[0]}.apk"
       log="$SimplUsr/nova-launcher-dropped_patch-log.txt"
-      activityPatches="com.teslacoilsw.launcher/.NovaShortcutHandler"
-      build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "$outputAPK" "$log" "$pkgName" "$activityPatches"
+      activityPatched="com.teslacoilsw.launcher/.NovaShortcutHandler"
+      build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "$outputAPK" "$log" "$pkgName" "$activityPatched"
       ;;
     Tasker)
       pkgName="net.dinglisch.android.taskerm"
@@ -255,8 +254,8 @@ while true; do
       Arch=("universal")
       outputAPK="$SimplUsr/tasker-dropped_v${pkgVersion}-${Arch[0]}.apk"
       log="$SimplUsr/tasker-dropped_patch-log.txt"
-      activityPatches="net.dinglisch.android.taskerm/.Tasker"
-      build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "$outputAPK" "$log" "$pkgName" "$activityPatches"
+      activityPatched="net.dinglisch.android.taskerm/.Tasker"
+      build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "$outputAPK" "$log" "$pkgName" "$activityPatched"
       ;;
   esac  
 done
