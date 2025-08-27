@@ -339,6 +339,7 @@ if [ $Android -ge 10 ]; then
     Duolingo
     RAR
     CloudStream
+    WeatherMaster
     Twitch
     Tumblr
     Strava
@@ -378,6 +379,7 @@ elif [ $Android -eq 9 ]; then
     Photomath
     RAR
     CloudStream
+    WeatherMaster
     Twitch
     Tumblr
     Strava
@@ -416,6 +418,7 @@ elif [ $Android -eq 8 ]; then
     Photomath
     RAR
     CloudStream
+    WeatherMaster
     Twitch
     Tumblr
     Strava
@@ -449,6 +452,7 @@ elif [ $Android -eq 7 ]; then
     Photomath
     RAR
     CloudStream
+    WeatherMaster
     Twitch
     Tumblr
     Tasker
@@ -471,6 +475,7 @@ elif [ $Android -eq 6 ]; then
     Photomath
     RAR
     CloudStream
+    WeatherMaster
     Twitch
     Tasker
   )
@@ -491,6 +496,7 @@ elif [ $Android -eq 5 ]; then
     Photomath
     RAR
     CloudStream
+    WeatherMaster
     Twitch
     Tasker
   )
@@ -951,6 +957,18 @@ while true; do
         activityApp="com.lagradost.cloudstream3.prerelease/com.lagradost.cloudstream3.ui.account.AccountSelectActivity"
       fi
       dlApp "${appName}" "$owner" "$repo" "$release" "" "$file_pattern" "$tag" "$assets" "$pkgApp" "$activityApp"
+      ;;
+    WeatherMaster)
+      appName="WeatherMaster"
+      owner="PranshulGG"
+      repo="WeatherMaster"
+      tag=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases/latest" | jq -r '.tag_name')
+      regex="WeatherMaster.$tag.$cpuAbi.apk"
+      file_pattern="$regex"
+      assets="$regex"
+      pkgApp="com.pranshulgg.weather_master_app"
+      activityApp="com.pranshulgg.weather_master_app/.MainActivity"
+      dlApp "${appName}" "$owner" "$repo" "$release" "$regex" "$file_pattern" "$tag" "$assets" "$pkgApp" "$activityApp"
       ;;
     Twitch)
       appName="Twitch"
