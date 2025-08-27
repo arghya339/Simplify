@@ -567,7 +567,7 @@ while true; do
   if [ "$idx" == 0 ]; then
     break  # break the while loop
   elif [[ "$idx" =~ ^[0-9]+$ ]] && (( idx >= 0 && idx <= max )); then
-    echo -e "$notice You chose: ${apps[$idx]}"
+    echo -e "$notice Selected: ${apps[$idx]}"
   elif [[ "$idx" =~ ^[0-9]+\?$ ]]; then
     listOfPatches  # Call the listOfPatches function
     continue

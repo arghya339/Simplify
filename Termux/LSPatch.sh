@@ -424,7 +424,7 @@ while true; do
   if [ "$idx" == 0 ]; then
     break  # break the while loop
   elif [[ "$idx" =~ ^[0-9]+$ ]] && (( idx >= 0 && idx <= max )); then
-    echo -e "$notice You chose: ${apps[$idx]}"
+    echo -e "$notice Selected: ${apps[$idx]}"
   else
     echo -e "$info \"$idx\" is not a valid index! Please select index [0-${max}]." >&2
   fi
