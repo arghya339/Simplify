@@ -89,7 +89,7 @@ dlGitHub() {
     if [ "$repo" == "VancedMicroG" ] || [ "$repo" == "LSPatch" ] || [ "$repo" == "YTPro" ] || [ "$repo" == "cloudstream" ]; then
       assetsName=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases/latest" | jq -r --arg regex "$regex" '.assets[] | select(.name | test($regex)) | .name' 2>/dev/null)
       if [ "$repo" == "cloudstream" ]; then
-        fileName="$repo-${latestReleases}$regex"
+        fileName="$repo-${latestReleases}$ext"
       else
         assetsNameWithoutExt="${assetsName%.*}"
         fileName="$assetsNameWithoutExt-${latestReleases}$ext"
