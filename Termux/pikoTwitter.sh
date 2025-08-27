@@ -178,7 +178,7 @@ Type="BUNDLE"
 Arch=("universal")
 outputAPK="$SimplUsr/piko-twitter_v${pkgVersion}-$cpuAbi.apk"
 fileName=$(basename $outputAPK)
-activityPatches="com.twitter.android/.StartActivity"
+activityPatched="com.twitter.android/.StartActivity"
 
 bash $Simplify/APKMdl.sh "$pkgName" "$pkgVersion" "$Type" "${Arch[0]}"  # Download stock apk from APKMirror
 xFileName=$(basename "$(find "$Download" -type f -name "${appName[0]}_v*-$cpuAbi.apk" -print -quit)")
@@ -207,7 +207,7 @@ if [ -f "$outputAPK" ]; then
   case $opt in
     y*|Y*|"")
       echo -e "$running Please Wait !! Installing Patched Piko Twitter apk.."
-      bash $Simplify/apkInstall.sh "$outputAPK" "$pkgName" "$activityPatches"
+      bash $Simplify/apkInstall.sh "$outputAPK" "$pkgName" "$activityPatched"
       ;;
     n*|N*) echo -e "$notice Piko Twitter Installaion skipped!" ;;
     *) echo -e "$info Invalid choice! Piko Twitter Installaion skipped." ;;
