@@ -405,7 +405,7 @@ commonPrompt() {
           echo -e "$notice ${Yellow}Warning! Disable auto updates for the patched app to avoid unexpected issues.${Reset}"
         fi
         echo -e "$running Please Wait !! Installing Patched ${appNameRef[0]} RV apk.."
-        bash $Simplify/apkInstall.sh "$outputAPK" "$pkgPatches" "$activityPatches"
+        bash $Simplify/apkInstall.sh "$outputAPK" "$pkgPatched" "$activityPatched"
         ;;
       n*|N*) echo -e "$notice ${appNameRef[0]} RV Installaion skipped!" ;;
       *) echo -e "$info Invalid choice! ${appNameRef[0]} RV Installaion skipped." ;;
@@ -436,8 +436,8 @@ build_app() {
   local arch="${archRef[0]}"
   local web=$6
   local appPatchesArgs=$7
-  local pkgPatches=$8
-  local activityPatches=$9
+  local pkgPatched=$8
+  local activityPatched=$9
   local os_val=${10}
   local dpi_val=${11}
   local or_val=${12}
@@ -1005,9 +1005,9 @@ while true; do
         Type="BUNDLE"
       fi
       Arch=("universal")
-      pkgPatches="app.revanced.android.youtube"
-      activityPatches="com.google.android.youtube/.app.honeycomb.Shell\$HomeActivity"
-      build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "APKMirror" "yt_patches_args" "$pkgPatches" "$activityPatches" "" "" ""
+      pkgPatched="app.revanced.android.youtube"
+      activityPatched="com.google.android.youtube/.app.honeycomb.Shell\$HomeActivity"
+      build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "APKMirror" "yt_patches_args" "$pkgPatched" "$activityPatched" "" "" ""
       ;;
     Spotify)
       pkgName="com.spotify.music"
@@ -1020,8 +1020,8 @@ while true; do
       fi
       Type="apk"
       Arch=("armeabi-v7a, x86, arm64-v8a, x86_64")
-      activityPatches="com.spotify.music/.MainActivity"
-      build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "Uptodown" "spotify_patches_args" "$pkgName" "$activityPatches" "" "" ""
+      activityPatched="com.spotify.music/.MainActivity"
+      build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "Uptodown" "spotify_patches_args" "$pkgName" "$activityPatched" "" "" ""
       ;;
     TikTok)
       pkgName="com.zhiliaoapp.musically"
@@ -1034,8 +1034,8 @@ while true; do
       fi
       Type="APK"
       Arch=("arm64-v8a + armeabi-v7a")
-      activityPatches="com.zhiliaoapp.musically/com.ss.android.ugc.aweme.splash.SplashActivity"
-      build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "APKMirror" "tiktok_patches_args" "$pkgName" "$activityPatches" "" "" ""
+      activityPatched="com.zhiliaoapp.musically/com.ss.android.ugc.aweme.splash.SplashActivity"
+      build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "APKMirror" "tiktok_patches_args" "$pkgName" "$activityPatched" "" "" ""
       ;;
     Google\ Photos)
       pkgName="com.google.android.apps.photos"
@@ -1052,9 +1052,9 @@ while true; do
       fi
       Type="APK"
       Arch=("$cpuAbi")
-      pkgPatches="app.revanced.android.apps.photos"
-      activityPatches="com.google.android.apps.photos/.home.HomeActivity"
-      build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "APKMirror" "photos_patches_args" "$pkgPatches" "$activityPatches" "" "" ""
+      pkgPatched="app.revanced.android.apps.photos"
+      activityPatched="com.google.android.apps.photos/.home.HomeActivity"
+      build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "APKMirror" "photos_patches_args" "$pkgPatched" "$activityPatched" "" "" ""
       ;;
     GoogleRecorder)
       pkgName="com.google.android.apps.recorder"
@@ -1080,8 +1080,8 @@ while true; do
       fi
       Type="BUNDLE"
       Arch=("$cpuAbi")
-      activityPatches="com.instagram.android/.activity.MainTabActivity"
-      build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "APKMirror" "instagram_patches_args" "$pkgName" "$activityPatches" "" "" ""
+      activityPatched="com.instagram.android/.activity.MainTabActivity"
+      build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "APKMirror" "instagram_patches_args" "$pkgName" "$activityPatched" "" "" ""
       ;;
     Facebook)
       pkgName="com.facebook.katana"
@@ -1101,8 +1101,8 @@ while true; do
       Os=("Android 11+")
       Dpi="nodpi"
       Or=("Download APK")
-      activityPatches="com.facebook.katana/.LoginActivity"
-      build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "APKMirror" "facebook_patches_args" "$pkgName" "$activityPatches" "${Os[0]}" "$Dpi" "${Or[0]}"
+      activityPatched="com.facebook.katana/.LoginActivity"
+      build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "APKMirror" "facebook_patches_args" "$pkgName" "$activityPatched" "${Os[0]}" "$Dpi" "${Or[0]}"
       ;;
     FacebookMessenger)
       pkgName="com.facebook.orca"
@@ -1115,8 +1115,8 @@ while true; do
       fi
       Type="APK"
       Arch=("$cpuAbi")
-      activityPatches="com.facebook.orca/.auth.StartScreenActivity"
-      build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "APKMirror" "fb_messenger_patches_args" "$pkgName" "$activityPatches" "" "" ""
+      activityPatched="com.facebook.orca/.auth.StartScreenActivity"
+      build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "APKMirror" "fb_messenger_patches_args" "$pkgName" "$activityPatched" "" "" ""
       ;;
     Lightroom)
       pkgName="com.adobe.lrmobile"
@@ -1129,8 +1129,8 @@ while true; do
       fi
       Type="apk"
       Arch=("arm64-v8a, x86_64")
-      activityPatches="com.adobe.lrmobile/.StorageCheckActivity"
-      build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "Uptodown" "lightroom_patches_args" "$pkgName" "$activityPatches" "" "" ""  # F*** Cloudflare DDoS Protection on APKMirror Lightroom Page
+      activityPatched="com.adobe.lrmobile/.StorageCheckActivity"
+      build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "Uptodown" "lightroom_patches_args" "$pkgName" "$activityPatched" "" "" ""  # F*** Cloudflare DDoS Protection on APKMirror Lightroom Page
       ;;
     Photomath)
       pkgName="com.microblink.photomath"
@@ -1143,8 +1143,8 @@ while true; do
       fi
       Type="BUNDLE"
       Arch=("universal")
-      activityPatches="com.microblink.photomath/.main.activity.LauncherActivity"
-      build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "APKMirror" "photomath_patches_args" "$pkgName" "$activityPatches" "" "" ""
+      activityPatched="com.microblink.photomath/.main.activity.LauncherActivity"
+      build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "APKMirror" "photomath_patches_args" "$pkgName" "$activityPatched" "" "" ""
       ;;
     Duolingo)
       pkgName="com.duolingo"
@@ -1157,8 +1157,8 @@ while true; do
       fi
       Type="BUNDLE"
       Arch=("universal")
-      activityPatches="com.duolingo/.app.LoginActivity"
-      build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "APKMirror" "duolingo_patches_args" "$pkgName" "$activityPatches" "" "" ""
+      activityPatched="com.duolingo/.app.LoginActivity"
+      build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "APKMirror" "duolingo_patches_args" "$pkgName" "$activityPatched" "" "" ""
       ;;
     RAR)
       pkgName="com.rarlab.rar"
@@ -1171,8 +1171,8 @@ while true; do
       fi
       Type="APK"
       Arch=("$cpuAbi")
-      activityPatches="com.rarlab.rar/.MainActivity"
-      build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "APKMirror" "rar_patches_args" "$pkgName" "$activityPatches" "" "" ""
+      activityPatched="com.rarlab.rar/.MainActivity"
+      build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "APKMirror" "rar_patches_args" "$pkgName" "$activityPatched" "" "" ""
       ;;
     AmazonPrimeVideo)
       pkgName="com.amazon.avod.thirdpartyclient"
@@ -1186,8 +1186,8 @@ while true; do
       Type="APK"
       Arch=("$cpuAbi")
       primeVideoFileName=$(basename "$(find "$Download" -type f -name "${appName[0]}_v*-$cpuAbi.apk" -print -quit)")
-      activityPatches="com.amazon.avod.thirdpartyclient/.LauncherActivity"
-      build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "APKMirror" "prime_video_patches_args" "$pkgName" "$activityPatches" "" "" ""
+      activityPatched="com.amazon.avod.thirdpartyclient/.LauncherActivity"
+      build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "APKMirror" "prime_video_patches_args" "$pkgName" "$activityPatched" "" "" ""
       ;;
     Twitch)
       pkgName="tv.twitch.android.app"
@@ -1200,8 +1200,8 @@ while true; do
       fi
       Type="BUNDLE"
       Arch=("universal")
-      activityPatches="tv.twitch.android.app/.core.LandingActivity"
-      build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "APKMirror" "twitch_patches_args" "$pkgName" "$activityPatches" "" "" ""
+      activityPatched="tv.twitch.android.app/.core.LandingActivity"
+      build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "APKMirror" "twitch_patches_args" "$pkgName" "$activityPatched" "" "" ""
       ;;
     Tumblr)
       pkgName="com.tumblr"
@@ -1214,8 +1214,8 @@ while true; do
       fi
       Type="BUNDLE"
       Arch=("universal")
-      activityPatches="com.tumblr/.ui.activity.JumpoffActivity"
-      build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "APKMirror" "tumblr_patches_args" "$pkgName" "$activityPatches" "" "" ""
+      activityPatched="com.tumblr/.ui.activity.JumpoffActivity"
+      build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "APKMirror" "tumblr_patches_args" "$pkgName" "$activityPatched" "" "" ""
       ;;
     Threads)
       pkgName="com.instagram.barcelona"
@@ -1228,8 +1228,8 @@ while true; do
       fi
       Type="BUNDLE"
       Arch=("$cpuAbi")
-      activityPatches="com.instagram.barcelona/.mainactivity.BarcelonaActivity"
-      build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "APKMirror" "threads_patches_args" "$pkgName" "$activityPatches" "" "" ""
+      activityPatched="com.instagram.barcelona/.mainactivity.BarcelonaActivity"
+      build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "APKMirror" "threads_patches_args" "$pkgName" "$activityPatched" "" "" ""
       ;;
     Strava)
       pkgName="com.strava"
@@ -1242,8 +1242,8 @@ while true; do
       fi
       Type="xapk"
       Arch=("arm64-v8a, armeabi-v7a, x86, x86_64")
-      activityPatches="com.strava/.SplashActivity"
-      build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "Uptodown" "strava_patches_args" "$pkgName" "$activityPatches" "" "" ""
+      activityPatched="com.strava/.SplashActivity"
+      build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "Uptodown" "strava_patches_args" "$pkgName" "$activityPatched" "" "" ""
       ;;
     SoundCloud)
       pkgName="com.soundcloud.android"
@@ -1256,8 +1256,8 @@ while true; do
       fi
       Type="BUNDLE"
       Arch=("universal")
-      activityPatches="com.soundcloud.android/.launcher.LauncherActivity"
-      build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "APKMirror" "soundcloud_patches_args" "$pkgName" "$activityPatches" "" "" ""
+      activityPatched="com.soundcloud.android/.launcher.LauncherActivity"
+      build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "APKMirror" "soundcloud_patches_args" "$pkgName" "$activityPatched" "" "" ""
       ;;
     Proton\ Mail)
       pkgName="ch.protonmail.android"
@@ -1269,8 +1269,8 @@ while true; do
       fi
       Type="APK"
       Arch=("universal")
-      activityPatches="ch.protonmail.android/.MainActivity"
-      build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "APKMirror" "protonmail_patches_args" "$pkgName" "$activityPatches" "" "" ""
+      activityPatched="ch.protonmail.android/.MainActivity"
+      build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "APKMirror" "protonmail_patches_args" "$pkgName" "$activityPatched" "" "" ""
       ;;
     MyFitnessPal)
       pkgName="com.myfitnesspal.android"
@@ -1283,8 +1283,8 @@ while true; do
       fi
       Type="apk"
       Arch=("armeabi-v7a, x86, arm64-v8a, x86_64")
-      activityPatches="com.myfitnesspal.android/.splash.SplashActivity"
-      build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "Uptodown" "myfitnesspal_patches_args" "$pkgName" "$activityPatches" "" "" ""
+      activityPatched="com.myfitnesspal.android/.splash.SplashActivity"
+      build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "Uptodown" "myfitnesspal_patches_args" "$pkgName" "$activityPatched" "" "" ""
       ;;
     Crunchyroll)
       pkgName="com.crunchyroll.crunchyroid"
@@ -1297,8 +1297,8 @@ while true; do
       fi
       Type="xapk"
       Arch=("arm64-v8a, armeabi-v7a, x86, x86_64")
-      activityPatches="com.crunchyroll.crunchyroid/com.ellation.crunchyroll.presentation.startup.StartupActivity"
-      build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "Uptodown" "crunchyroll_patches_args" "$pkgName" "$activityPatches" "" "" ""
+      activityPatched="com.crunchyroll.crunchyroid/com.ellation.crunchyroll.presentation.startup.StartupActivity"
+      build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "Uptodown" "crunchyroll_patches_args" "$pkgName" "$activityPatched" "" "" ""
       ;;
     Cricbuzz)
       pkgName="com.cricbuzz.android"
@@ -1311,8 +1311,8 @@ while true; do
       fi
       Type="xapk"
       Arch=("arm64-v8a, armeabi-v7a, x86_64")
-      activityPatches="com.cricbuzz.android/.lithium.app.view.activity.NyitoActivity"
-      build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "Uptodown" "cricbuzz_patches_args" "$pkgName" "$activityPatches" "" "" ""
+      activityPatched="com.cricbuzz.android/.lithium.app.view.activity.NyitoActivity"
+      build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "Uptodown" "cricbuzz_patches_args" "$pkgName" "$activityPatched" "" "" ""
       ;;
   esac  
 done
