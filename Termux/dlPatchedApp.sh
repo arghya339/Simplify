@@ -339,6 +339,7 @@ if [ $Android -ge 10 ]; then
     Duolingo
     RAR
     CloudStream
+    Breezy\ Weather
     WeatherMaster
     Twitch
     Tumblr
@@ -379,6 +380,7 @@ elif [ $Android -eq 9 ]; then
     Photomath
     RAR
     CloudStream
+    Breezy\ Weather
     WeatherMaster
     Twitch
     Tumblr
@@ -418,6 +420,7 @@ elif [ $Android -eq 8 ]; then
     Photomath
     RAR
     CloudStream
+    Breezy\ Weather
     WeatherMaster
     Twitch
     Tumblr
@@ -968,6 +971,26 @@ while true; do
       assets="$regex"
       pkgApp="com.pranshulgg.weather_master_app"
       activityApp="com.pranshulgg.weather_master_app/.MainActivity"
+      dlApp "${appName}" "$owner" "$repo" "$release" "$regex" "$file_pattern" "$tag" "$assets" "$pkgApp" "$activityApp"
+      ;;
+    Breezy\ Weather)
+      appNmae="Breezy Weather"
+      owner="breezy-weather"
+      repo="$owner"
+      if [ "$FetchPreRelease" -eq 0 ]; then
+        tag=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases/latest" | jq -r '.tag_name')
+        regex="breezy-weather-$cpuAbi-${tag}_standard.apk"
+        file_pattern="$regex"
+        assets="$regex"
+      else
+        release=alpha
+        tag=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases" | jq -r --arg release "$release" '.[].tag_name | select(contains($release))' | head -n 1)
+        regex="breezy-weather-$cpuAbi-${tag}_standard.apk"
+        file_pattern="$regex"
+        assets="$regex"
+      fi
+      pkgApp="org.breezyweather"
+      activityApp="org.breezyweather/.ui.main.MainActivity"
       dlApp "${appName}" "$owner" "$repo" "$release" "$regex" "$file_pattern" "$tag" "$assets" "$pkgApp" "$activityApp"
       ;;
     Twitch)

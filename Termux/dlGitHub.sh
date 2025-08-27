@@ -160,10 +160,8 @@ dlGitHub() {
     fi
     echo -e "$info findFile: ${Cyan}$findFile${Reset}"
   else
-    if [ "$repo" == "Seal" ]; then
-      lastPreReleases=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases" | jq -r '.[].tag_name | sub("^v"; "") | select(contains("alpha"))' | head -n 1 2>/dev/null)
-    elif [ "$repo" == "ytdlnis" ]; then
-      lastPreReleases=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases" | jq -r '.[].tag_name | sub("^v"; "") | select(contains("beta"))' | head -n 1 2>/dev/null)
+    if [ "$releases" == "alpha" ] || [ "$releases" == "beta" ]; then
+      lastPreReleases=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases" | jq -r --arg releases "$releases" '.[].tag_name | sub("^v"; "") | select(contains($releases))' | head -n 1 2>/dev/null)
     elif [ "$repo" != "lawnchair" ] || [ "$repo" != "lawnicons" ] || [ "$repo" != "spotube" ]; then
       lastPreReleases=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases" | jq -r '.[].tag_name | sub("^v"; "") | select(contains("dev"))' | head -n 1 2>/dev/null)
     fi
