@@ -183,12 +183,13 @@ build_app() {
     elif [ $RipLib -eq 0 ]; then
       pv "$stock_apks_path" | bsdtar -xf - -C "$Download/${appNameRef}_v${pkgVersion}-${cpuAbi}/" --include "base.apk" "split_config.arm64_v8a.apk" "split_config.armeabi_v7a.apk" "split_config.x86_64.apk" "split_config.x86.apk" "split_config.${locale}.apk" "split_config.${lcd_dpi}.apk"
     fi
+    rm -f "$stock_apks_path"
     stock_apk_path=("$Download/${appNameRef}_v${pkgVersion}-${cpuAbi}.apk")
     bash $Simplify/dlGitHub.sh "REAndroid" "APKEditor" "latest" ".jar" "$Simplify"
     APKEditor=$(find "$Simplify" -type f -name "APKEditor-*.jar" -print -quit)
     echo -e "$running Merge splits apks to standalone lite apk.."
     $PREFIX/lib/jvm/java-21-openjdk/bin/java -jar $APKEditor m -i "$$Download/${appNameRef}_v${pkgVersion}-${cpuAbi}" -o "$stock_apk_path"
-    rm -f "$stock_apks_path"
+    rm -rf "$$Download/${appNameRef}_v${pkgVersion}-${cpuAbi}"
     echo  # Space
   else
     if [ "$web" == "APKMirror" ]; then
