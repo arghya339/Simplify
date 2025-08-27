@@ -31,6 +31,38 @@ if jq -e '.DeviceArch != null' "$simplifyJson" >/dev/null 2>&1; then
 else
   cpuAbi=$(getprop ro.product.cpu.abi)  # Get Android arch
 fi
+RipLocale="$(jq -r '.RipLocale' "$simplifyJson" 2>/dev/null)"
+RipDpi="$(jq -r '.RipDpi' "$simplifyJson" 2>/dev/null)"
+RipLib="$(jq -r '.RipLib' "$simplifyJson" 2>/dev/null)"
+if [ $RipLocale -eq 1 ]; then
+  locale=$(getprop persist.sys.locale | cut -d'-' -f1)  # Get System Languages
+  if [ -z $locale ]; then
+    locale=$(getprop ro.product.locale | cut -d'-' -f1)  # Get Languages
+  fi
+elif [ $RipLocale -eq 0 ]; then
+  locale="[a-z][a-z]"
+fi
+if [ $RipDpi -eq 1 ]; then
+  density=$(getprop ro.sf.lcd_density)  # Get the device screen density
+  # Check and categorize the density
+  if [ "$density" -le 120 ]; then
+    lcd_dpi="ldpi"  # Low Density
+  elif [ "$density" -le 160 ]; then
+    lcd_dpi="mdpi"  # Medium Density
+  elif [ "$density" -le 240 ]; then
+    lcd_dpi="hdpi"  # High Density
+  elif [ "$density" -le 320 ]; then
+    lcd_dpi="xhdpi"  # Extra High Density
+  elif [ "$density" -le 480 ]; then
+    lcd_dpi="xxhdpi"  # Extra Extra High Density
+  elif [ "$density" -gt 480 ] || [ "$density" -ge 640 ]; then
+    lcd_dpi="xxxhdpi"  # Extra Extra Extra High Density
+  else
+    lcd_dpi="*dpi"
+  fi
+elif [ $RipDpi -eq 0 ]; then
+  lcd_dpi="*dpi"
+fi
 Model=$(getprop ro.product.model)  # Get Device Model
 LSPatch="$Simplify/LSPatch"
 SimplUsr="/sdcard/Simplify"  # /storage/emulated/0/Simplify dir
@@ -133,8 +165,9 @@ build_app() {
   if [ "${appNameRef[0]}" == "Discord" ]; then
     assetsName="com.discord_289.20-Stable-289020_4arch_7dpi_25lang.apks"
     dlUrl="https://github.com/arghya339/Simplify/releases/download/all/$assetsName"
+    echo -e "$running Downloading ${appNameRef[0]}.."
     while true; do
-      aria2c -x 16 -s 16 --console-log-level=error --summary-interval=0 --download-result=hide -c -o "$assetsName" -d "$Download" "$dlUrl"
+      aria2c -x 16 -s 16 --console-log-level=error --summary-interval=0 --download-result=hide -c -o "${appNameRef}_v${pkgVersion}-${archRef[0]}.${Type}" -d "$Download" "$dlUrl"
       if [ $? -eq 0 ]; then
         echo  # White Space
         break
@@ -142,11 +175,18 @@ build_app() {
       echo -e "${bad} ${Red}Download failed! retrying in 5 seconds..${Reset}"
       sleep 5
     done
-    stock_apks_path=("$Download/$assetsName")
-    apks_without_ext="${assetsName%.*}"
-    stock_apk_path=("$Download/$apks_without_ext.apk")
+    stock_apks_path=("${appNameRef}_v${pkgVersion}-${archRef[0]}.${Type}")
+    mkdir -p "$Download/${appNameRef}_v${pkgVersion}-${cpuAbi}"
+    echo -e "$running Extracting APKM content.."
+    if [ $RipLib -eq 1 ]; then
+      pv "$stock_apks_path" | bsdtar -xf - -C "$Download/${appNameRef}_v${pkgVersion}-${cpuAbi}/" --include "base.apk" "split_config.${cpuAbi//-/_}.apk" "split_config.${locale}.apk" "split_config.${lcd_dpi}.apk"
+    elif [ $RipLib -eq 0 ]; then
+      pv "$stock_apks_path" | bsdtar -xf - -C "$Download/${appNameRef}_v${pkgVersion}-${cpuAbi}/" --include "base.apk" "split_config.arm64_v8a.apk" "split_config.armeabi_v7a.apk" "split_config.x86_64.apk" "split_config.x86.apk" "split_config.${locale}.apk" "split_config.${lcd_dpi}.apk"
+    fi
+    stock_apk_path=("$Download/${appNameRef}_v${pkgVersion}-${cpuAbi}.apk")
     bash $Simplify/dlGitHub.sh "REAndroid" "APKEditor" "latest" ".jar" "$Simplify"
     APKEditor=$(find "$Simplify" -type f -name "APKEditor-*.jar" -print -quit)
+    echo -e "$running Merge splits apks to standalone lite apk.."
     $PREFIX/lib/jvm/java-21-openjdk/bin/java -jar $APKEditor m -i $stock_apks_path -o "$stock_apk_path"
     rm -f "$stock_apks_path"
     echo  # Space
@@ -464,6 +504,8 @@ while true; do
       appName=("Discord")
       pkgName="com.discord"
       pkgVersion="289.20-Stable"
+      Type="apks"
+      Arch=("universal")
       releasesTagName=$(curl -s ${auth} "https://api.github.com/repos/revenge-mod/revenge-xposed/releases/latest" | jq -r '.tag_name')  # 1202
       releasesName=$(curl -s ${auth} "https://api.github.com/repos/revenge-mod/revenge-xposed/releases/latest" | jq -r '.name')  # 1.2.2
       dlLink="https://github.com/revenge-mod/revenge-xposed/releases/download/$releasesTagName/app-release.apk"
@@ -472,7 +514,7 @@ while true; do
       echo -e "$info module_apk_path: $module_apk_path"
       activityPatched="com.discord/.main.MainDefault"
       BugReport="https://github.com/revenge-mod/revenge-xposed/issues/new"
-      build_app "$pkgName" "appName" "$pkgVersion" "" "" "" "$module_apk_path" "$BugReport" "$pkgName" "$activityPatched"
+      build_app "$pkgName" "appName" "$pkgVersion" "$Type" "$Arch" "" "$module_apk_path" "$BugReport" "$pkgName" "$activityPatched"
       ;;
     LINE)
       appName=("LINE")
