@@ -175,7 +175,7 @@ build_app() {
       echo -e "${bad} ${Red}Download failed! retrying in 5 seconds..${Reset}"
       sleep 5
     done
-    stock_apks_path=($Download/"${appNameRef}_v${pkgVersion}-${archRef[0]}.${Type}")
+    stock_apks_path=("$Download/${appNameRef}_v${pkgVersion}-${archRef[0]}.${Type}")
     mkdir -p "$Download/${appNameRef}_v${pkgVersion}-${cpuAbi}"
     echo -e "$running Extracting APKM content.."
     if [ $RipLib -eq 1 ]; then
