@@ -155,8 +155,8 @@ dlApp() {
   local activityApp="$10"
   
 
-  if [ "$tag" == "nightly" ]; then
-    updated_at=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases/tags/nightly" | jq -r --arg assets "$assets" '.assets[] | select(.name == $assets) | .updated_at')
+  if [ "$tag" == "nightly" ] || [ "$tag" == "pre-release" ]; then
+    updated_at=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases/tags/$tag" | jq -r --arg assets "$assets" '.assets[] | select(.name == $assets) | .updated_at')
   else
     updated_at=
   fi
@@ -333,6 +333,7 @@ if [ $Android -ge 10 ]; then
     Photomath
     Duolingo
     RAR
+    CloudStream
     Twitch
     Tumblr
     Strava
@@ -371,6 +372,7 @@ elif [ $Android -eq 9 ]; then
     Adobe\ Lightroom
     Photomath
     RAR
+    CloudStream
     Twitch
     Tumblr
     Strava
@@ -408,6 +410,7 @@ elif [ $Android -eq 8 ]; then
     Adobe\ Lightroom
     Photomath
     RAR
+    CloudStream
     Twitch
     Tumblr
     Strava
@@ -440,6 +443,7 @@ elif [ $Android -eq 7 ]; then
     Nekogram
     Photomath
     RAR
+    CloudStream
     Twitch
     Tumblr
     Tasker
@@ -461,6 +465,7 @@ elif [ $Android -eq 6 ]; then
     Nekogram
     Photomath
     RAR
+    CloudStream
     Twitch
     Tasker
   )
@@ -480,6 +485,7 @@ elif [ $Android -eq 5 ]; then
     Nekogram
     Photomath
     RAR
+    CloudStream
     Twitch
     Tasker
   )
@@ -920,6 +926,26 @@ while true; do
       pkgPatched="com.rarlab.rar"
       activityPatched="com.rarlab.rar/.MainActivity"
       dlPatchedApp "${appName}" "$owner" "$repo" "$assets" "$pkgPatched" "$activityPatched"
+      ;;
+    CloudStream)
+      appName="CloudStream"
+      owner="recloudstream"
+      repo="cloudstream"
+      if [ "$FetchPreRelease" -eq 0 ]; then
+        file_pattern="cloudstream-*.apk"
+        tag=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases/latest" | jq -r '.tag_name')
+        assets=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases/latest" | jq -r '.assets[] | .name')
+        pkgApp="com.lagradost.cloudstream3"
+        activityApp="com.lagradost.cloudstream3/.ui.account.AccountSelectActivity"
+      else
+        release="pre-release"
+        file_pattern="app-prerelease-release.apk"
+        tag="$release"
+        assets="$file_pattern"
+        pkgApp="com.lagradost.cloudstream3.prerelease"
+        activityApp="com.lagradost.cloudstream3.prerelease/com.lagradost.cloudstream3.ui.account.AccountSelectActivity"
+      fi
+      dlApp "${appName}" "$owner" "$repo" "$release" "" "$file_pattern" "$tag" "$assets" "$pkgApp" "$activityApp"
       ;;
     Twitch)
       appName="Twitch"

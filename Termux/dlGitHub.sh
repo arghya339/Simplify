@@ -86,10 +86,14 @@ dlGitHub() {
         echo -e "$info latestReleases: v$latestReleases"
       fi
     fi
-    if [ "$repo" == "VancedMicroG" ] || [ "$repo" == "LSPatch" ] || [ "$repo" == "YTPro" ]; then
+    if [ "$repo" == "VancedMicroG" ] || [ "$repo" == "LSPatch" ] || [ "$repo" == "YTPro" ] || [ "$repo" == "cloudstream" ]; then
       assetsName=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases/latest" | jq -r --arg regex "$regex" '.assets[] | select(.name | test($regex)) | .name' 2>/dev/null)
-      assetsNameWithoutExt="${assetsName%.*}"
-      fileName="$assetsNameWithoutExt-${latestReleases}$ext"
+      if [ "$repo" == "cloudstream" ]; then
+        fileName="$repo-${latestReleases}$regex"
+      else
+        assetsNameWithoutExt="${assetsName%.*}"
+        fileName="$assetsNameWithoutExt-${latestReleases}$ext"
+      fi
       echo -e "$info assetsName: $fileName"
       assetsNamePattern=$(echo "$fileName" | sed "s/$latestReleases/*/g")
     elif [ "$repo" == "ReVancedApp-Actions" ] || [ "$repo" == "Revanced-And-Revanced-Extended-Non-Root" ]; then
@@ -114,13 +118,17 @@ dlGitHub() {
       fileBaseName=$(basename $findFile)
     fi
     
-    if [ "$repo" == "VancedMicroG" ] || [ "$repo" == "LSPatch" ] || [ "$repo" == "YTPro" ]; then
+    if [ "$repo" == "VancedMicroG" ] || [ "$repo" == "LSPatch" ] || [ "$repo" == "YTPro" ] || [ "$repo" == "cloudstream" ]; then
       if [ "$fileName" != "$fileBaseName" ]; then
         echo -e "$notice diffs: $fileName ~ $fileBaseName"
         [ -f "$findFile" ] && rm "$findFile"
         dlUrl="https://github.com/$owner/$repo/releases/download/v${latestReleases}/$assetsName"
         findFile="$dir/$fileName"
-        dl "curl" "$dlUrl" "$findFile"
+        if [ "$repo" == "cloudstream" ]; then
+          dl "aria2" "$dlUrl" "$findFile"
+        else
+          dl "curl" "$dlUrl" "$findFile"
+        fi
       fi
     elif [ "$repo" == "ReVancedApp-Actions" ] || [ "$repo" == "Revanced-And-Revanced-Extended-Non-Root" ] || [ "$repo" == "FreeTubeAndroid" ] || [ "$repo" == "bundletool" ] || [ "$repo" == "twitter-apk" ] || [ "$repo" == "lawnchair" ] || [ "$repo" == "Nagram" ]; then
       [ -f "$findFile" ] && rm "$findFile"
@@ -164,14 +172,14 @@ dlGitHub() {
     fi
     
     # fetch assets from specific release tag
-    if [ "$repo" == "lawnchair" ] || [ "$repo" == "lawnicons" ] || [ "$repo" == "spotube" ]; then
-      preAssetsName=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases/tags/nightly" | jq -r --arg regex "$regex" '.assets[] | select(.name | test($regex)) | .name' 2>/dev/null)
+    if [ "$releases" == "nightly" ] || [ "$releases" == "pre-release" ]; then
+      preAssetsName=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases/tags/$releases" | jq -r --arg regex "$regex" '.assets[] | select(.name | test($regex)) | .name' 2>/dev/null)
     else
       preAssetsName=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases/tags/v$lastPreReleases" | jq -r --arg regex "$regex" '.assets[] | select(.name | test($regex)) | .name' 2>/dev/null)
     fi
     if [ -z "$preAssetsName" ]; then
-      if [ "$repo" == "lawnchair" ] || [ "$repo" == "lawnicons" ] || [ "$repo" == "spotube" ]; then
-        preAssetsName=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases/tags/nightly" | jq -r --arg ext "$ext" '.assets[] | select(.name | endswith($ext)) | .name' 2>/dev/null)
+      if [ "$releases" == "nightly" ] || [ "$releases" == "pre-release" ]; then
+        preAssetsName=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases/tags/$releases" | jq -r --arg ext "$ext" '.assets[] | select(.name | endswith($ext)) | .name' 2>/dev/null)
       else
         preAssetsName=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases/tags/v$lastPreReleases" | jq -r --arg ext "$ext" '.assets[] | select(.name | endswith($ext)) | .name' 2>/dev/null)
       fi
@@ -182,7 +190,7 @@ dlGitHub() {
       preAssetsNamePattern="Lawnchair.Debug.*-dev.Nightly-CI_*.apk"
     elif [ "$repo" == "lawnicons" ]; then
       preAssetsNamePattern="Lawnicons.Nightly.*.apk"
-    elif [ "$repo" == "spotube" ]; then
+    elif [ "$repo" == "spotube" ] || [ "$releases" == "pre-release" ]; then
       preAssetsNamePattern="$preAssetsName"
     else
       preAssetsNamePattern=$(echo "$preAssetsName" | sed "s/$lastPreReleases/*/g")
@@ -194,13 +202,13 @@ dlGitHub() {
       echo -e "$notice diffs: $preAssetsName ~ $preFileBaseName"
       [ -f "$findFile" ] && rm "$findFile"
       # downloading assets
-      if [ "$repo" == "lawnchair" ] || [ "$repo" == "lawnicons" ] || [ "$repo" == "spotube" ]; then
-        dlUrl="https://github.com/$owner/$repo/releases/download/nightly/$preAssetsName"
+      if [ "$releases" == "nightly" ] || [ "$releases" == "pre-release" ]; then
+        dlUrl="https://github.com/$owner/$repo/releases/download/$releases/$preAssetsName"
       else
         dlUrl="https://github.com/$owner/$repo/releases/download/v${lastPreReleases}/$preAssetsName"
       fi
       findFile="$dir/$preAssetsName"
-      if [ "$repo" == "revanced-cli" ] || { [ "$repo" == "revanced-patches" ] && { [ "$owner" == "inotia00" ] || [ "$owner" == "anddea" ]; }; } || [ "$repo" == "spotube" ]; then
+      if [ "$repo" == "revanced-cli" ] || { [ "$repo" == "revanced-patches" ] && { [ "$owner" == "inotia00" ] || [ "$owner" == "anddea" ]; }; } || [ "$repo" == "spotube" ] || [ "$repo" == "cloudstream" ]; then
         dl "aria2" "$dlUrl" "$findFile"
       else
         dl "curl" "$dlUrl" "$findFile"
