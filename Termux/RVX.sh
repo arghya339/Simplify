@@ -613,8 +613,8 @@ while true; do
         pkgVersion="17.34.36"
         BugReportUrl="https://github.com/kitadai31/revanced-patches-android6-7/issues/new?template=bug_report.yml"
       fi
-      outputAPK="$SimplUsr/youtube-rvx_v${pkgVersion}-$cpuAbi.apk"
-      log="$SimplUsr/yt-rvx-patch_log.txt"
+      outputAPK="$SimplUsr/YouTube-RVX_v${pkgVersion}-$cpuAbi.apk"
+      log="$SimplUsr/YouTube-RVX_patch-log.txt"
       appName=("YouTube")
       pkgPatched="app.rvx.android.youtube"
       activityPatched="com.google.android.youtube/.app.honeycomb.Shell\$HomeActivity"
@@ -640,8 +640,8 @@ while true; do
       fi
       Type="APK"
       stock_apk_path=("${Download}/YouTube Music_v${pkgVersion}-${cpuAbi}.apk")
-      outputAPK="$SimplUsr/yt-music-rvx_v${pkgVersion}-$cpuAbi.apk"
-      log="$SimplUsr/yt-music-rvx-patch_log.txt"
+      outputAPK="$SimplUsr/YT-Music-RVX_v${pkgVersion}-$cpuAbi.apk"
+      log="$SimplUsr/YT-Music-RVX_patch-log.txt"
       appName=("YouTube Music")
       pkgPatched="app.rvx.android.apps.youtube.music"
       activityPatched="com.google.android.apps.youtube.music/.activities.MusicActivity"
@@ -658,8 +658,8 @@ while true; do
       Type="BUNDLE"
       Arch="universal"
       stock_apk_path=("$Download/Reddit_v${pkgVersion}-$cpuAbi.apk")
-      outputAPK="$SimplUsr/reddit-rvx_v${pkgVersion}-$cpuAbi.apk"
-      log="$SimplUsr/reddit-rvx-patch_log.txt"
+      outputAPK="$SimplUsr/Reddit-RVX_v${pkgVersion}-$cpuAbi.apk"
+      log="$SimplUsr/Reddit-RVX_patch-log.txt"
       appName=("Reddit")
       activityPatched="com.reddit.frontpage/launcher.default"
       build_app "$pkgName" "$pkgVersion" "$Type" "$Arch" "stock_apk_path" "reddit_patches_args" "$outputAPK" "$log" "appName" "$BugReportUrl" "$pkgName" "$activityPatched"
