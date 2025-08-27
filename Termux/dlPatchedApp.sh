@@ -46,7 +46,7 @@ density=$(getprop ro.sf.lcd_density)  # Get the device screen density
 Simplify="$HOME/Simplify"  # /data/data/com.termux/files/home/Simplify dir
 SimplUsr="/sdcard/Simplify"  # /storage/emulated/0/Simplify dir
 mkdir -p "$Simplify" "$SimplUsr"  # Create $Simplify and $SimplUsr dir if it does't exist
-dataJson="$Simplify/data.json"  # Data file to store simplify dlPatchesApp data
+dataJson="$Simplify/data.json"  # Data file to store simplify dlPatchedApp data
   # Create empty json file if it doesn't exist
   if [ ! -f "$dataJson" ]; then
     jq -n '[]' > "$dataJson"
@@ -73,7 +73,7 @@ fi
 
 # --- Checking Android Version ---
 if [ $Android -le 3 ]; then
-  echo -e "${bad} ${Red}Android $Android is not supported by dlPatchesApp.${Reset}"
+  echo -e "${bad} ${Red}Android $Android is not supported by dlPatchedApp.${Reset}"
   return 1
 fi
 
@@ -111,7 +111,7 @@ appInstall() {
           echo -e "$running Please Wait !! Installing ${appName} apk.."
         fi
         if [ "$repo" == "ReVancedApp-Actions" ] || [ "$repo" == "Revanced-And-Revanced-Extended-Non-Root" ] || [ "$repo" == "spotube" ]; then
-          bash $Simplify/apkInstall.sh "$apk_path" "$pkgPatches" "$activityPatches"
+          bash $Simplify/apkInstall.sh "$apk_path" "$pkgPatched" "$activityPatched"
           data "$assets" "$updated_at" "$version"
         else
           bash $Simplify/apkInstall.sh "$apk_path" "$pkgApp" "$activityApp"
@@ -176,8 +176,8 @@ dlApp() {
   fi
 }
 
-# --- dlPatchesApp function: download & install patched apps ---
-dlPatchesApp() {
+# --- dlPatchedApp function: download & install patched apps ---
+dlPatchedApp() {
   local appName="${1}"
   local owner="$2"
   local repo="$3"
@@ -190,8 +190,8 @@ dlPatchesApp() {
     local url="https://github.com/$owner/$repo/releases/download/all/$assets"
     updated_at=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases/latest" | jq -r --arg assets "$assets" '.assets[] | select(.name == $assets) | .updated_at')
   fi
-  local pkgPatches="$5"
-  local activityPatches="$6"
+  local pkgPatched="$5"
+  local activityPatched="$6"
   
   
     # read the updated_at value for the specified asset
@@ -556,9 +556,9 @@ while true; do
       else
         assets="youtube-beta-$cpuAbi-revanced.apk"  # Use Beta release
       fi
-      pkgPatches="app.revanced.android.youtube"
-      activityPatches="com.google.android.youtube/.app.honeycomb.Shell\$HomeActivity"
-      dlPatchesApp "${appName}" "$owner" "$repo" "$assets" "$pkgPatches" "$activityPatches"
+      pkgPatched="app.revanced.android.youtube"
+      activityPatched="com.google.android.youtube/.app.honeycomb.Shell\$HomeActivity"
+      dlPatchedApp "${appName}" "$owner" "$repo" "$assets" "$pkgPatched" "$activityPatched"
       ;;
     YouTube)
       appName="YouTube"
@@ -581,9 +581,9 @@ while true; do
       elif [ $Android -eq 7 ] || [ $Android -eq 6 ]; then
         assets="youtube-$cpuAbi-revanced-extended-android-6-7.apk" # Use YT Android 6-7 by kitadai31
       fi
-      pkgPatches="app.rvx.android.youtube"
-      activityPatches="com.google.android.youtube/.app.honeycomb.Shell\$HomeActivity"
-      dlPatchesApp "${appName}" "$owner" "$repo" "$assets" "$pkgPatches" "$activityPatches"
+      pkgPatched="app.rvx.android.youtube"
+      activityPatched="com.google.android.youtube/.app.honeycomb.Shell\$HomeActivity"
+      dlPatchedApp "${appName}" "$owner" "$repo" "$assets" "$pkgPatched" "$activityPatched"
       ;;
     YTPro)
       appName="YTPro"
@@ -649,9 +649,9 @@ while true; do
           assets="youtube-music-beta-android-5-6-$cpuAbi-revanced-extended.apk"  # Use Beta release
         fi
       fi
-      pkgPatches="app.rvx.android.apps.youtube.music"
-      activityPatches="com.google.android.apps.youtube.music/.activities.MusicActivity"
-      dlPatchesApp "${appName}" "$owner" "$repo" "$assets" "$pkgPatches" "$activityPatches"
+      pkgPatched="app.rvx.android.apps.youtube.music"
+      activityPatched="com.google.android.apps.youtube.music/.activities.MusicActivity"
+      dlPatchedApp "${appName}" "$owner" "$repo" "$assets" "$pkgPatched" "$activityPatched"
       ;;
     InnerTune)
       appName="InnerTune"
@@ -715,18 +715,18 @@ while true; do
       else
         assets="spotjfy-beta-$cpuAbi-revanced.apk"  # Use Beta release
       fi
-      pkgPatches="com.spotify.music"
-      activityPatches="com.spotify.music/.MainActivity"
-      dlPatchesApp "${appName}" "$owner" "$repo" "$assets" "$pkgPatches" "$activityPatches"
+      pkgPatched="com.spotify.music"
+      activityPatched="com.spotify.music/.MainActivity"
+      dlPatchedApp "${appName}" "$owner" "$repo" "$assets" "$pkgPatched" "$activityPatched"
       ;;
     spotube)
       appName="spotube"
       owner="KRTirtho"
       repo="spotube"
       assets="Spotube-playstore-all-arch.aab"
-      pkgPatches="oss.krtirtho.spotube.nightly"
-      activityPatches="oss.krtirtho.spotube.nightly/com.ryanheise.audioservice.AudioServiceActivity"
-      dlPatchesApp "${appName}" "$owner" "$repo" "$assets" "$pkgPatches" "$activityPatches"
+      pkgPatched="oss.krtirtho.spotube.nightly"
+      activityPatched="oss.krtirtho.spotube.nightly/com.ryanheise.audioservice.AudioServiceActivity"
+      dlPatchedApp "${appName}" "$owner" "$repo" "$assets" "$pkgPatched" "$activityPatched"
       ;;
     TikTok)
       appName="TikTok"
@@ -737,9 +737,9 @@ while true; do
       else
         assets="tiktok-beta-revanced.apk"  # Use Beta release
       fi
-      pkgPatches="com.zhiliaoapp.musically"
-      activityPatches="com.zhiliaoapp.musically/com.ss.android.ugc.aweme.splash.SplashActivity"
-      dlPatchesApp "${appName}" "$owner" "$repo" "$assets" "$pkgPatches" "$activityPatches"
+      pkgPatched="com.zhiliaoapp.musically"
+      activityPatched="com.zhiliaoapp.musically/com.ss.android.ugc.aweme.splash.SplashActivity"
+      dlPatchedApp "${appName}" "$owner" "$repo" "$assets" "$pkgPatched" "$activityPatched"
       ;;
     Google\ Photos)
       appName="Google Photos"
@@ -750,9 +750,9 @@ while true; do
       else
         assets="gg-photos-$cpuAbi-beta-revanced.apk"  # Use Beta release
       fi
-      pkgPatches="com.google.android.apps.photos"
-      activityPatches="com.google.android.apps.photos/.home.HomeActivity"
-      dlPatchesApp "${appName}" "$owner" "$repo" "$assets" "$pkgPatches" "$activityPatches"
+      pkgPatched="com.google.android.apps.photos"
+      activityPatched="com.google.android.apps.photos/.home.HomeActivity"
+      dlPatchedApp "${appName}" "$owner" "$repo" "$assets" "$pkgPatched" "$activityPatched"
       ;;
     Instagram)
       appName="Instagram"
@@ -763,9 +763,9 @@ while true; do
       else
         assets="instagram-$cpuAbi-beta-revanced.apk"  # Use Beta release
       fi
-      pkgPatches="com.instagram.android"
-      activityPatches="com.instagram.android/.activity.MainTabActivity"
-      dlPatchesApp "${appName}" "$owner" "$repo" "$assets" "$pkgPatches" "$activityPatches"
+      pkgPatched="com.instagram.android"
+      activityPatched="com.instagram.android/.activity.MainTabActivity"
+      dlPatchedApp "${appName}" "$owner" "$repo" "$assets" "$pkgPatched" "$activityPatched"
       ;;
     Facebook)
       appName="Facebook"
@@ -776,9 +776,9 @@ while true; do
       else
         assets="facebook-$cpuAbi-beta-revanced.apk"  # Use Beta release
       fi
-      pkgPatches="com.facebook.katana"
-      activityPatches="com.facebook.katana/.LoginActivity"
-      dlPatchesApp "${appName}" "$owner" "$repo" "$assets" "$pkgPatches" "$activityPatches"
+      pkgPatched="com.facebook.katana"
+      activityPatched="com.facebook.katana/.LoginActivity"
+      dlPatchedApp "${appName}" "$owner" "$repo" "$assets" "$pkgPatched" "$activityPatched"
       ;;
     Nobook)
       appName="Nobook"
@@ -800,9 +800,9 @@ while true; do
       else
         assets="messenger-$cpuAbi-beta-revanced.apk"  # Use Beta release
       fi
-      pkgPatches="com.facebook.orca"
-      activityPatches="com.facebook.orca/.auth.StartScreenActivity"
-      dlPatchesApp "${appName}" "$owner" "$repo" "$assets" "$pkgPatches" "$activityPatches"
+      pkgPatched="com.facebook.orca"
+      activityPatched="com.facebook.orca/.auth.StartScreenActivity"
+      dlPatchedApp "${appName}" "$owner" "$repo" "$assets" "$pkgPatched" "$activityPatched"
       ;;
     Nagram)
       appName="Nagram"
@@ -840,9 +840,9 @@ while true; do
       else
         assets="twitter-$cpuAbi-beta-piko.apk"  # Use Beta release
       fi
-      pkgPatches="com.twitter.android"
-      activityPatches="com.twitter.android/.StartActivity"
-      dlPatchesApp "${appName}" "$owner" "$repo" "$assets" "$pkgPatches" "$activityPatches"
+      pkgPatched="com.twitter.android"
+      activityPatched="com.twitter.android/.StartActivity"
+      dlPatchedApp "${appName}" "$owner" "$repo" "$assets" "$pkgPatched" "$activityPatched"
       ;;
     piko\ Twitter)
       appName="piko Twitter"
@@ -865,9 +865,9 @@ while true; do
       else
         assets="reddit-$cpuAbi-beta-revanced-extended.apk"  # Use Beta release
       fi
-      pkgPatches="com.reddit.frontpage"
-      activityPatches="com.reddit.frontpage/launcher.default"
-      dlPatchesApp "${appName}" "$owner" "$repo" "$assets" "$pkgPatches" "$activityPatches"
+      pkgPatched="com.reddit.frontpage"
+      activityPatched="com.reddit.frontpage/launcher.default"
+      dlPatchedApp "${appName}" "$owner" "$repo" "$assets" "$pkgPatched" "$activityPatched"
       ;;
     Adobe\ Lightroom)
       appName="Adobe Lightroom"
@@ -878,9 +878,9 @@ while true; do
       else
         assets="lightroom-beta-revanced.apk"  # Use Beta release
       fi
-      pkgPatches="com.adobe.lrmobile"
-      activityPatches="com.adobe.lrmobile/.StorageCheckActivity"
-      dlPatchesApp "${appName}" "$owner" "$repo" "$assets" "$pkgPatches" "$activityPatches"
+      pkgPatched="com.adobe.lrmobile"
+      activityPatched="com.adobe.lrmobile/.StorageCheckActivity"
+      dlPatchedApp "${appName}" "$owner" "$repo" "$assets" "$pkgPatched" "$activityPatched"
       ;;
     Photomath)
       appName="Photomath"
@@ -891,9 +891,9 @@ while true; do
       else
         assets="photomath-beta-revanced.apk"  # Use Beta release
       fi
-      pkgPatches="com.microblink.photomath"
-      activityPatches="com.microblink.photomath/.main.activity.LauncherActivity"
-      dlPatchesApp "${appName}" "$owner" "$repo" "$assets" "$pkgPatches" "$activityPatches"
+      pkgPatched="com.microblink.photomath"
+      activityPatched="com.microblink.photomath/.main.activity.LauncherActivity"
+      dlPatchedApp "${appName}" "$owner" "$repo" "$assets" "$pkgPatched" "$activityPatched"
       ;;
     Duolingo)
       appName="Duolingo"
@@ -904,9 +904,9 @@ while true; do
       else
         assets="duolingo-beta-revanced.apk"  # Use Beta release
       fi
-      pkgPatches="com.duolingo"
-      activityPatches="com.duolingo/.app.LoginActivity"
-      dlPatchesApp "${appName}" "$owner" "$repo" "$assets" "$pkgPatches" "$activityPatches"
+      pkgPatched="com.duolingo"
+      activityPatched="com.duolingo/.app.LoginActivity"
+      dlPatchedApp "${appName}" "$owner" "$repo" "$assets" "$pkgPatched" "$activityPatched"
       ;;
     RAR)
       appName="RAR"
@@ -917,9 +917,9 @@ while true; do
       else
         assets="rar-beta-revanced.apk"  # Use Beta release
       fi
-      pkgPatches="com.rarlab.rar"
-      activityPatches="com.rarlab.rar/.MainActivity"
-      dlPatchesApp "${appName}" "$owner" "$repo" "$assets" "$pkgPatches" "$activityPatches"
+      pkgPatched="com.rarlab.rar"
+      activityPatched="com.rarlab.rar/.MainActivity"
+      dlPatchedApp "${appName}" "$owner" "$repo" "$assets" "$pkgPatched" "$activityPatched"
       ;;
     Twitch)
       appName="Twitch"
@@ -930,9 +930,9 @@ while true; do
       else
         assets="twitch-beta-revanced.apk"  # Use Beta release
       fi
-      pkgPatches="tv.twitch.android.app"
-      activityPatches="tv.twitch.android.app/.core.LandingActivity"
-      dlPatchesApp "${appName}" "$owner" "$repo" "$assets" "$pkgPatches" "$activityPatches"
+      pkgPatched="tv.twitch.android.app"
+      activityPatched="tv.twitch.android.app/.core.LandingActivity"
+      dlPatchedApp "${appName}" "$owner" "$repo" "$assets" "$pkgPatched" "$activityPatched"
       ;;
     Tumblr)
       appName="Tumblr"
@@ -943,9 +943,9 @@ while true; do
       else
         assets="tumblr-$cpuAbi-beta-revanced.apk"  # Use Beta release
       fi
-      pkgPatches="com.tumblr"
-      activityPatches="com.tumblr/.ui.activity.JumpoffActivity"
-      dlPatchesApp "${appName}" "$owner" "$repo" "$assets" "$pkgPatches" "$activityPatches"
+      pkgPatched="com.tumblr"
+      activityPatched="com.tumblr/.ui.activity.JumpoffActivity"
+      dlPatchedApp "${appName}" "$owner" "$repo" "$assets" "$pkgPatched" "$activityPatched"
       ;;
     Strava)
       appName="Strava"
@@ -956,9 +956,9 @@ while true; do
       else
         assets="strava-beta-$cpuAbi-revanced.apk"  # Use Beta release
       fi
-      pkgPatches="com.strava"
-      activityPatches="com.strava/.SplashActivity"
-      dlPatchesApp "${appName}" "$owner" "$repo" "$assets" "$pkgPatches" "$activityPatches"
+      pkgPatched="com.strava"
+      activityPatched="com.strava/.SplashActivity"
+      dlPatchedApp "${appName}" "$owner" "$repo" "$assets" "$pkgPatched" "$activityPatched"
       ;;
     SoundCloud)
       appName="SoundCloud"
@@ -969,18 +969,18 @@ while true; do
       else
         assets="soundcloud-$cpuAbi-beta-revanced.apk"  # Use Beta release
       fi
-      pkgPatches="com.soundcloud.android"
-      activityPatches="com.soundcloud.android/.launcher.LauncherActivity"
-      dlPatchesApp "${appName}" "$owner" "$repo" "$assets" "$pkgPatches" "$activityPatches"
+      pkgPatched="com.soundcloud.android"
+      activityPatched="com.soundcloud.android/.launcher.LauncherActivity"
+      dlPatchedApp "${appName}" "$owner" "$repo" "$assets" "$pkgPatched" "$activityPatched"
       ;;
     NovaLauncher)
       appName="Nova Launcher"
       owner="FiorenMas"
       repo="Revanced-And-Revanced-Extended-Non-Root"
       assets="nova-launcher-indrastorms.apk"
-      pkgPatches="com.teslacoilsw.launcher"
-      activityPatches="com.teslacoilsw.launcher/.NovaShortcutHandler"
-      dlPatchesApp "${appName}" "$owner" "$repo" "$assets" "$pkgPatches" "$activityPatches"
+      pkgPatched="com.teslacoilsw.launcher"
+      activityPatched="com.teslacoilsw.launcher/.NovaShortcutHandler"
+      dlPatchedApp "${appName}" "$owner" "$repo" "$assets" "$pkgPatched" "$activityPatched"
       ;;
     Lawnchair)
       owner="LawnchairLauncher"
@@ -1033,9 +1033,9 @@ while true; do
       owner="FiorenMas"
       repo="Revanced-And-Revanced-Extended-Non-Root"
       assets="tasker-indrastorms.apk"
-      pkgPatches="net.dinglisch.android.taskerm"
-      activityPatches="net.dinglisch.android.taskerm/.Tasker"
-      dlPatchesApp "${appName}" "$owner" "$repo" "$assets" "$pkgPatches" "$activityPatches"
+      pkgPatched="net.dinglisch.android.taskerm"
+      activityPatched="net.dinglisch.android.taskerm/.Tasker"
+      dlPatchedApp "${appName}" "$owner" "$repo" "$assets" "$pkgPatched" "$activityPatched"
       ;;
   esac
 done

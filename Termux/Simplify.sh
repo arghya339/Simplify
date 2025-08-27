@@ -129,9 +129,9 @@ mkdir -p "$Simplify" "$RV" "$RVX" "$pikoTwitter" "$Dropped" "$LSPatch" "$SimplUs
 Download="/sdcard/Download"
 simplifyJson="$Simplify/simplify.json"  # Configuration file to store simplify settings
 isPreRelease=0  # Default value (false/off/0) for isPreRelease, it's enabled latest release for Patches source
-isRipLocale=1  # Default value (true/on/1) for RipLocale, it's delete locale from patches apk file except device specific locale by default
-isRipDpi=1  # Default value (true/on/1) for RipDpi, it's delete dpi from patches apk file except device specific dpi by default
-isRipLib=1  # Default value (true/on/1) for RipLib, it's delete lib dir from patches apk file except device specific arch lib by default
+isRipLocale=1  # Default value (true/on/1) for RipLocale, it's delete locale from patched apk file except device specific locale by default
+isRipDpi=1  # Default value (true/on/1) for RipDpi, it's delete dpi from patched apk file except device specific dpi by default
+isRipLib=1  # Default value (true/on/1) for RipLib, it's delete lib dir from patched apk file except device specific arch lib by default
 isChangeRVXSource=0  # Default value (false/off/0) for ChangeRVXSource, means patches source remain unchange ie. official source (inotia00) for RVX Patches
 isReadPatchesFile=0  # Default value (false/off/0) for ReadPatchesFile, means recommended PatchesOptions loading from script.
 branding="google_family"
@@ -345,13 +345,13 @@ ripLocale() {
       [Ee]*)
         isRipLocale=1  # Enable RipLocale
         config "RipLocale" "$isRipLocale"
-        echo -e "$good ${Green}RipLocale is Enabled! Device specific locale will be kept in patches apk file.${Reset}"
+        echo -e "$good ${Green}RipLocale is Enabled! Device specific locale will be kept in patched apk file.${Reset}"
         break
         ;;
       [Dd]*)
         isRipLocale=0  # Disable RipLocale
         config "RipLocale" "$isRipLocale"
-        echo -e "$good ${Green}RipLocale is Disabled! All locale will be kept in patches apk file.${Reset}"
+        echo -e "$good ${Green}RipLocale is Disabled! All locale will be kept in patched apk file.${Reset}"
         break
         ;;
       *) echo -e "${info} Invalid input! Please enter E or D." ;;
@@ -366,13 +366,13 @@ ripDpi() {
       [Ee]*)
         isRipDpi=1  # Enable RipDpi
         config "RipDpi" "$isRipDpi"
-        echo -e "$good ${Green}RipDpi is Enabled! Device specific dpi will be kept in patches apk file.${Reset}"
+        echo -e "$good ${Green}RipDpi is Enabled! Device specific dpi will be kept in patched apk file.${Reset}"
         break
         ;;
       [Dd]*)
         isRipDpi=0  # Disable RipDpi
         config "RipDpi" "$isRipDpi"
-        echo -e "$good ${Green}RipDpi is Disabled! All dpi will be kept in patches apk file.${Reset}"
+        echo -e "$good ${Green}RipDpi is Disabled! All dpi will be kept in patched apk file.${Reset}"
         break
         ;;
       *) echo -e "${info} Invalid input! Please enter E or D." ;;
@@ -387,13 +387,13 @@ ripLib() {
       [Ee]*)
         isRipLib=1  # Enable RipLib
         config "RipLib" "$isRipLib"
-        echo -e "$good ${Green}RipLib is Enabled! Device specific arch lib will be kept in patches apk file.${Reset}"
+        echo -e "$good ${Green}RipLib is Enabled! Device specific arch lib will be kept in patched apk file.${Reset}"
         break
         ;;
       [Dd]*)
         isRipLib=0  # Disable RipLib
         config "RipLib" "$isRipLib"
-        echo -e "$good ${Green}RipLib is Disabled! All lib dir will be kept in patches apk file.${Reset}"
+        echo -e "$good ${Green}RipLib is Disabled! All lib dir will be kept in patched apk file.${Reset}"
         break
         ;;
       *) echo -e "${info} Invalid input! Please enter E or D." ;;
@@ -619,7 +619,7 @@ overwriteArch() {
   done
 }
 
-DeletePatchesApk() {
+DeletePatchedApk() {
   local nameArr=("YouTube" "YT Music" "Spotify" "TikTok" "Google Photos" "Instagram" "Facebook" "Facebook Messenger" "Reddit" "X" "Adobe Lightroom Mobile" "Photomath" "Duolingo" "RAR" "Amazon Prime Video" "Twitch" "Tumblr" "Threads" "Strava" "SoundCloud" "Proton Mail" "Calorie Counter MyFitnessPal" "NovaLauncher" "Tasker" "Crunchyroll" "Cricbuzz Cricket Scores and News")
   for app in "${nameArr[@]}"; do
     find "$SimplUsr" -type f -name "${app}-RV_v[0-9.]*-${cpuAbi}.apk" \
@@ -639,7 +639,7 @@ DeletePatchLog() {
   echo "Cleanup complete!"
 }
 
-UninstallPatchesApp() {
+UninstallPatchedApp() {
   local pkgArr=(
     "com.google.android.youtube"
     "com.google.android.apps.youtube.music"
@@ -767,12 +767,12 @@ while true; do
   clear  # Clear
   # Apply the eye color to the simplify shape and print it
   echo -e "${BoldGreen}$print_simplify${Reset}" && echo ""  # Space
-  echo -e "Dl: Download Patches App\nR : ReVanced\nX : ReVanced Extended\nP : Piko Twitter\nD : Dropped Patches\nL : LSPatch\nC : Configuration\nM : Miscellaneous\nF : Feature request\nB : Bug report\nS : Support\nA : About\nQ : Quit\n"
+  echo -e "P. Download Patched App\nR. ReVanced\nX. ReVanced Extended\nT. Piko Twitter\nD. Dropped Patches\nL. LSPatch\nC. Configuration\nM. Miscellaneous\nF. Feature request\nB. Bug report\nS. Support\nA. About\nQ. Quit\n"
   echo -n "Select Patches source: " && read source
   case $source in
-    DL|dl)
-      curl -sL -o "$Simplify/dlPatchesApp.sh" "https://raw.githubusercontent.com/arghya339/Simplify/refs/heads/main/Termux/dlPatchesApp.sh"
-      bash "$Simplify/dlPatchesApp.sh"
+    [Pp])
+      curl -sL -o "$Simplify/dlPatchedApp.sh" "https://raw.githubusercontent.com/arghya339/Simplify/refs/heads/main/Termux/dlPatchedApp.sh"
+      bash "$Simplify/dlPatchedApp.sh"
       sleep 3
       ;;
     [Rr])
@@ -785,7 +785,7 @@ while true; do
       bash "$RVX/RVX.sh"
       sleep 3
       ;;
-    [Pp])
+    [Tt])
       curl -sL -o "$pikoTwitter/pikoTwitter.sh" "https://raw.githubusercontent.com/arghya339/Simplify/refs/heads/main/Termux/pikoTwitter.sh"
       bash "$pikoTwitter/pikoTwitter.sh"
       sleep 3
@@ -842,14 +842,14 @@ while true; do
       ;;
     [Mm]*)
       while true; do
-        echo -e "\nV. Spoof Android Version\nA. Spoof Device Architecture\nD. Delete patches apk file\nL. Delete Patch Log\nU. Uninstall Patches Apps\nM. Unmount Apps\nS. Uninstall Simplify\nQ. Quit\n"
+        echo -e "\nV. Spoof Android Version\nA. Spoof Device Architecture\nD. Delete patched apk file\nL. Delete Patch Log\nU. Uninstall Patched Apps\nM. Unmount Patched Apps\nS. Uninstall Simplify\nQ. Quit\n"
         read -r -p "Select: " misc
         case "$misc" in
           [Vv]*) overwriteVersion ;;
           [Aa]*) overwriteArch ;;
-          [Dd]*) DeletePatchesApk ;;
+          [Dd]*) DeletePatchedApk ;;
           [Ll]*) DeletePatchLog ;;
-          [Uu]*) UninstallPatchesApp ;;
+          [Uu]*) UninstallPatchedApp ;;
           [Mm]*) Unmount && sleep 3 ;;
           [Ss]*)
             echo -ne "${Yellow}Are you sure you want to uninstall Simplify? [Y/n]${Reset}: " && read -r userInput
@@ -899,7 +899,7 @@ while true; do
     [Ss]*) support && sleep 3 ;;
     [Aa]*) about && sleep 3 ;;
     [Qq]*) clear && break ;;
-    *) echo -e "$info Invalid input! Please enter: Dl / R / X / P / D / L / C / M / F / B / S / A / Q" && sleep 3 ;;
+    *) echo -e "$info Invalid input! Please enter: P / R / X / T / D / L / C / M / F / B / S / A / Q" && sleep 3 ;;
   esac
 done
 ####################################################################################################################
