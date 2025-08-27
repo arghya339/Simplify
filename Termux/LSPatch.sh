@@ -187,7 +187,7 @@ build_app() {
     bash $Simplify/dlGitHub.sh "REAndroid" "APKEditor" "latest" ".jar" "$Simplify"
     APKEditor=$(find "$Simplify" -type f -name "APKEditor-*.jar" -print -quit)
     echo -e "$running Merge splits apks to standalone lite apk.."
-    $PREFIX/lib/jvm/java-21-openjdk/bin/java -jar $APKEditor m -i $stock_apks_path -o "$stock_apk_path"
+    $PREFIX/lib/jvm/java-21-openjdk/bin/java -jar $APKEditor m -i "$$Download/${appNameRef}_v${pkgVersion}-${cpuAbi}" -o "$stock_apk_path"
     rm -f "$stock_apks_path"
     echo  # Space
   else
