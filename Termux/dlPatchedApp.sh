@@ -974,7 +974,7 @@ while true; do
       dlApp "${appName}" "$owner" "$repo" "$release" "$regex" "$file_pattern" "$tag" "$assets" "$pkgApp" "$activityApp"
       ;;
     Breezy\ Weather)
-      appNmae="Breezy Weather"
+      appName="Breezy Weather"
       owner="breezy-weather"
       repo="$owner"
       if [ "$FetchPreRelease" -eq 0 ]; then
