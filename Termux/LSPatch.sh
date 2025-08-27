@@ -177,7 +177,7 @@ build_app() {
     done
     stock_apks_path=("$Download/${appNameRef}_v${pkgVersion}-${archRef[0]}.${Type}")
     mkdir -p "$Download/${appNameRef}_v${pkgVersion}-${cpuAbi}"
-    echo -e "$running Extracting APKM content.."
+    echo -e "$running Extracting APKS content.."
     if [ $RipLib -eq 1 ]; then
       pv "$stock_apks_path" | bsdtar -xf - -C "$Download/${appNameRef}_v${pkgVersion}-${cpuAbi}/" --include "base.apk" "split_config.${cpuAbi//-/_}.apk" "split_config.${locale}.apk" "split_config.${lcd_dpi}.apk"
     elif [ $RipLib -eq 0 ]; then
