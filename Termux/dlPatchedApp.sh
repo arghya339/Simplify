@@ -316,7 +316,7 @@ if [ $Android -ge 10 ]; then
     InnerTune
     Seal
     ytdlnis
-    Spotify
+    #Spotify
     spotube
     TikTok
     Google\ Photos
@@ -355,7 +355,7 @@ elif [ $Android -eq 9 ]; then
     InnerTune
     Seal
     ytdlnis
-    Spotify
+    #Spotify
     spotube
     TikTok
     Google\ Photos
@@ -393,7 +393,7 @@ elif [ $Android -eq 8 ]; then
     InnerTune
     Seal
     ytdlnis
-    Spotify
+    #Spotify
     spotube
     TikTok
     Google\ Photos
@@ -429,7 +429,7 @@ elif [ $Android -eq 7 ]; then
     InnerTune
     Seal
     ytdlnis
-    Spotify
+    #Spotify
     spotube
     TikTok
     Google\ Photos
