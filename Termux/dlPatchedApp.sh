@@ -115,6 +115,11 @@ appInstall() {
           data "$assets" "$updated_at" "$version"
         else
           bash $Simplify/apkInstall.sh "$apk_path" "$pkgApp" "$activityApp"
+          if [ "$appName" == "CloudStream" ]; then
+            if jq --arg appName "$appName" 'any(.[]; .assets == $appName)' "$dataJson" | grep -q false; then
+              termux-open-url "https://rentry.co/cs3-repos"
+            fi
+          fi
           data "$appName" "$updated_at" "$tag"
         fi
         if su -c "id" >/dev/null 2>&1 || "$HOME/rish" -c "id" >/dev/null 2>&1; then
