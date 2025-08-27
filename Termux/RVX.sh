@@ -561,7 +561,7 @@ while true; do
 
   # Ask for an index, showing the valid range
   max=$(( ${#apps[@]} - 1 ))  # highest legal index
-  read -rp "Enter the index [0-${max}] of apps you want to patch or '0' to Quit: " idx
+  read -rp "Enter the index [0-${max}] of apps you want to patch: " idx
 
   # Validate and respond
   if [ "$idx" == 0 ]; then
