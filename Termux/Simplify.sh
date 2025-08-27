@@ -620,9 +620,9 @@ overwriteArch() {
 }
 
 DeletePatchedApk() {
-  local nameArr=("YouTube" "YT Music" "Spotify" "TikTok" "Google Photos" "Instagram" "Facebook" "Facebook Messenger" "Reddit" "X" "Adobe Lightroom Mobile" "Photomath" "Duolingo" "RAR" "Amazon Prime Video" "Twitch" "Tumblr" "Threads" "Strava" "SoundCloud" "Proton Mail" "Calorie Counter MyFitnessPal" "NovaLauncher" "Tasker" "Crunchyroll" "Cricbuzz Cricket Scores and News")
+  local nameArr=("YouTube" "YT-Music" "Spotify" "TikTok" "Google Photos" "Instagram" "Facebook" "Facebook Messenger" "Reddit" "X" "Adobe Lightroom Mobile" "Photomath" "Duolingo" "RAR" "Amazon Prime Video" "Twitch" "Tumblr" "Threads" "Strava" "SoundCloud" "Proton Mail" "Calorie Counter MyFitnessPal" "NovaLauncher" "Tasker" "Crunchyroll" "Cricbuzz Cricket Scores and News")
   for app in "${nameArr[@]}"; do
-    find "$SimplUsr" -type f -name "${app}-RV_v[0-9.]*-${cpuAbi}.apk" \
+    find "$SimplUsr" -type f -name "${app}-RV*_v[0-9.]*-${cpuAbi}.apk" \
       -exec echo "Deleting: {}" \; \
       -exec rm -f {} \; 2>/dev/null
   done
@@ -630,9 +630,9 @@ DeletePatchedApk() {
 }
 
 DeletePatchLog() {
-  local nameArr=("YouTube" "YT Music" "Spotify" "TikTok" "Google Photos" "Instagram" "Facebook" "Facebook Messenger" "Reddit" "X" "Adobe Lightroom Mobile" "Photomath" "Duolingo" "RAR" "Amazon Prime Video" "Twitch" "Tumblr" "Threads" "Strava" "SoundCloud" "Proton Mail" "Calorie Counter MyFitnessPal" "NovaLauncher" "Tasker" "Crunchyroll" "Cricbuzz Cricket Scores and News")
+  local nameArr=("YouTube" "YT-Music" "Spotify" "TikTok" "Google Photos" "Instagram" "Facebook" "Facebook Messenger" "Reddit" "X" "Adobe Lightroom Mobile" "Photomath" "Duolingo" "RAR" "Amazon Prime Video" "Twitch" "Tumblr" "Threads" "Strava" "SoundCloud" "Proton Mail" "Calorie Counter MyFitnessPal" "NovaLauncher" "Tasker" "Crunchyroll" "Cricbuzz Cricket Scores and News")
   for app in "${nameArr[@]}"; do
-    find "$SimplUsr" -type f -name "${app}-RV_patch-log.txt" \
+    find "$SimplUsr" -type f -name "${app}-RV*_patch-log.txt" \
       -exec echo "Deleting: {}" \; \
       -exec rm -f {} \; 2>/dev/null
   done
@@ -641,11 +641,12 @@ DeletePatchLog() {
 
 UninstallPatchedApp() {
   local pkgArr=(
-    "com.google.android.youtube"
-    "com.google.android.apps.youtube.music"
+    "app.revanced.android.youtube"
+    "app.rvx.android.youtube"
+    "app.rvx.android.apps.youtube.music"
     "com.spotify.music"
     "com.zhiliaoapp.musically"
-    "com.google.android.apps.photos"
+    "app.revanced.android.photos"
     "com.instagram.android"
     "com.facebook.katana"
     "com.facebook.orca"
@@ -669,7 +670,7 @@ UninstallPatchedApp() {
     "com.cricbuzz.android"
   )
   local nameArr=(
-    "YouTube" "YT Music" "Spotify" "TikTok" "Google Photos" "Instagram" "Facebook" "Facebook Messenger" "Reddit" "X" "Adobe Lightroom Mobile" "Photomath" "Duolingo" "RAR" "Amazon Prime Video" 
+    "YouTube RV" "YouTube" "YT Music" "Spotify" "TikTok" "Google Photos" "Instagram" "Facebook" "Facebook Messenger" "Reddit" "X" "Adobe Lightroom Mobile" "Photomath" "Duolingo" "RAR" "Amazon Prime Video" 
     "Twitch" "Tumblr" "Threads" "Strava" "SoundCloud" "Proton Mail" "Calorie Counter MyFitnessPal" "NovaLauncher" "Tasker" "Crunchyroll" "Cricbuzz Cricket Scores and News"
   )
   
