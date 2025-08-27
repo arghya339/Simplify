@@ -127,8 +127,8 @@ build_app() {
   local web=$6
   local module_apk_path=$7
   local BugReportUrl=$8
-  local pkgPatches=$9
-  local activityPatches=$10
+  local pkgPatched=$9
+  local activityPatched=$10
 
   if [ "${appNameRef[0]}" == "Discord" ]; then
     assetsName="com.discord_289.20-Stable-289020_4arch_7dpi_25lang.apks"
@@ -228,7 +228,7 @@ build_app() {
       case $opt in
         y*|Y*|"")
           echo -e "$running Please Wait !! Installing Patched ${appNameRef[0]} LSPatch apk.."
-          bash $Simplify/apkInstall.sh "${output_apk_path}" "$pkgName" "$activityPatches"
+          bash $Simplify/apkInstall.sh "${output_apk_path}" "$pkgName" "$activityPatched"
           ;;
         n*|N*) echo -e "$notice ${appNameRef[0]} LSPatch Installaion skipped!" ;;
         *) echo -e "$info Invalid choice! ${appNameRef[0]} LSPatch Installaion skipped." ;;
@@ -258,8 +258,8 @@ sign_app() {
   local Type=$4
   local -n ArchRef=$5
   local web=$6
-  local pkgPatches=$7
-  local activityPatches=$8
+  local pkgPatched=$7
+  local activityPatched=$8
   
   if [ "$web" == "APKMirror" ]; then
     bash $Simplify/APKMdl.sh "$pkgName" "$pkgVersion" "$Type" "${ArchRef[0]}"  # Download stock apk from APKMirror
@@ -324,7 +324,7 @@ sign_app() {
     case $opt in
       y*|Y*|"")
         echo -e "$running Please Wait !! Installing Signed ${appNameRef[0]} apk.."
-        bash $Simplify/apkInstall.sh "${output_apk_path}" "$pkgName" "$activityPatches"
+        bash $Simplify/apkInstall.sh "${output_apk_path}" "$pkgName" "$activityPatched"
         ;;
       n*|N*) echo -e "$notice ${appNameRef[0]} Signed Installaion skipped!" ;;
       *) echo -e "$info Invalid choice! ${appNameRef[0]} Signed Installaion skipped." ;;
@@ -456,9 +456,9 @@ while true; do
         module_apk_path=$(find "$LSPatch" -type f -name "snapenhance_*-${arch}-release-signed.apk")
       fi
       echo -e "$info module_apk_path: $module_apk_path"
-      activityPatches="com.snapchat.android/.LandingPageActivity"
+      activityPatched="com.snapchat.android/.LandingPageActivity"
       BugReport="https://github.com/rhunk/SnapEnhance/issues/new?template=bug_report.yml"
-      build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "APKMirror" "$module_apk_path" "$BugReport" "$pkgName" "$activityPatches"
+      build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "APKMirror" "$module_apk_path" "$BugReport" "$pkgName" "$activityPatched"
       ;;
     Discord)
       appName=("Discord")
@@ -470,9 +470,9 @@ while true; do
       module_apk_path="$LSPatch/revenge-xposed-${releasesName}.apk"
       curl -L --progress-bar -C - -o "$module_apk_path" "$dlLink"
       echo -e "$info module_apk_path: $module_apk_path"
-      activityPatches="com.discord/.main.MainDefault"
+      activityPatched="com.discord/.main.MainDefault"
       BugReport="https://github.com/revenge-mod/revenge-xposed/issues/new"
-      build_app "$pkgName" "appName" "$pkgVersion" "" "" "" "$module_apk_path" "$BugReport" "$pkgName" "$activityPatches"
+      build_app "$pkgName" "appName" "$pkgVersion" "" "" "" "$module_apk_path" "$BugReport" "$pkgName" "$activityPatched"
       ;;
     LINE)
       appName=("LINE")
@@ -485,9 +485,9 @@ while true; do
       bash $Simplify/dlGitHub.sh "yagiyuu" "LineXtra" "latest" ".apk" "$LSPatch" "$regex"
       module_apk_path=$(find "$LSPatch" -type f -name "LineXtra-*-all-release.apk")
       echo -e "$info module_apk_path: $module_apk_path"
-      activityPatches="jp.naver.line.android/.activity.SplashActivity"
+      activityPatched="jp.naver.line.android/.activity.SplashActivity"
       BugReport="https://github.com/yagiyuu/LineXtra/issues"
-      build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "APKMirror" "$module_apk_path" "$BugReport" "$pkgName" "$activityPatches"
+      build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "APKMirror" "$module_apk_path" "$BugReport" "$pkgName" "$activityPatched"
       ;;
     PhoneByGoogle)
       appName=("Phone by Google")
@@ -508,9 +508,9 @@ while true; do
       curl -L --progress-bar -C - -o "$LSPatch/callrecording-${releasesName}.apk" "$dlUrl"
       module_apk_path=$(find "$LSPatch" -type f -name "callrecording-*.apk")
       echo -e "$info module_apk_path: $module_apk_path"
-      activityPatches="com.google.android.dialer/.extensions.GoogleDialtactsActivity"
+      activityPatched="com.google.android.dialer/.extensions.GoogleDialtactsActivity"
       BugReport="https://github.com/vvb2060/CallRecording/issues/new"
-      build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "APKMirror" "$module_apk_path" "$BugReport" "$pkgName" "$activityPatches"
+      build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "APKMirror" "$module_apk_path" "$BugReport" "$pkgName" "$activityPatched"
       ;;
     1.1.1.1\ +\ WARP)
       appName=("1.1.1.1 + WARP")
@@ -519,9 +519,9 @@ while true; do
       pkgVersion=""
       Type="BUNDLE"
       Arch=("universal")
-      activityPatches=""
-      sign_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "APKMirror" "$pkgName" "$activityPatches"
+      activityPatched=""
+      sign_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "APKMirror" "$pkgName" "$activityPatched"
       ;;
   esac
 done
-#########################################################################################################################################################################################
+#################################################################################################################################################################################################
