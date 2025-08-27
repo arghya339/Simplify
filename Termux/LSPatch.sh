@@ -188,8 +188,8 @@ build_app() {
     bash $Simplify/dlGitHub.sh "REAndroid" "APKEditor" "latest" ".jar" "$Simplify"
     APKEditor=$(find "$Simplify" -type f -name "APKEditor-*.jar" -print -quit)
     echo -e "$running Merge splits apks to standalone lite apk.."
-    $PREFIX/lib/jvm/java-21-openjdk/bin/java -jar $APKEditor m -i "$$Download/${appNameRef}_v${pkgVersion}-${cpuAbi}" -o "$stock_apk_path"
-    rm -rf "$$Download/${appNameRef}_v${pkgVersion}-${cpuAbi}"
+    $PREFIX/lib/jvm/java-21-openjdk/bin/java -jar $APKEditor m -i "$Download/${appNameRef}_v${pkgVersion}-${cpuAbi}" -o "$stock_apk_path"
+    rm -rf "$Download/${appNameRef}_v${pkgVersion}-${cpuAbi}"
     echo  # Space
   else
     if [ "$web" == "APKMirror" ]; then
