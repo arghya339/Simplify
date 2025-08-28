@@ -238,9 +238,9 @@ if ! su -c "id" >/dev/null 2>&1 && { [ ! -f "$HOME/rish" ] || [ ! -f "$HOME/rish
   am start -n "$activityClass" > /dev/null 2>&1
   termux-open-url "$url"
 fi
-if ! "$HOME/rish" -c "id" >/dev/null 2>&1 && [ -f "$HOME/rish" ]; then
+if ! "$HOME/rish" -c "id" >/dev/null 2>&1 && [ -f "$HOME/rish_shizuku.dex" ]; then
   if ~/rish -c "id" 2>&1 | grep -q 'java.lang.UnsatisfiedLinkError'; then
-    rm -f "$HOME/rish" && curl -sL -o "$HOME/rish" "https://raw.githubusercontent.com/arghya339/crdl/refs/heads/main/Termux/Shizuku/Play/rish" && chmod +x "$HOME/rish"
+    rm -f "$HOME/rish_shizuku.dex" && curl -sL -o "$HOME/rish_shizuku.dex" "https://raw.githubusercontent.com/arghya339/crdl/refs/heads/main/Termux/Shizuku/Play/rish_shizuku.dex"
   fi
 fi
 
