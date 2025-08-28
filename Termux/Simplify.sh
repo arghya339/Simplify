@@ -165,12 +165,6 @@ isChangeRVXSource=0  # Default value (false/off/0) for ChangeRVXSource, means pa
 isReadPatchesFile=0  # Default value (false/off/0) for ReadPatchesFile, means recommended PatchesOptions loading from script.
 branding="google_family"
 
-# --- Checking Android Version ---
-if [ $Android -le 4 ]; then
-  echo -e "${bad} ${Red}Android $Android is not supported by RV Patches.${Reset}"
-  return 1
-fi
-
 # --- pkg uninstall function ---
 pkgUninstall() {
   local pkg=$1

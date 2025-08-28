@@ -80,12 +80,6 @@ else
   auth=""
 fi
 
-# --- Checking Android Version ---
-if [ $Android -le 4 ]; then
-  echo -e "${bad} ${Red}Android $Android is not supported by LSPatch Module.${Reset}"
-  return 1
-fi
-
 echo -e "$info ${Blue}Target device:${Reset} $Model"
 
 # --- Check if CorePatch Installed ---

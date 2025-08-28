@@ -54,12 +54,6 @@ else
   auth=""
 fi
 
-# --- Checking Android Version ---
-if [ $Android -le 3 ]; then
-  echo -e "${bad} ${Red}Android $Android is not supported by ReVanced Patches.${Reset}"
-  return 1
-fi
-
 if su -c "id" >/dev/null 2>&1; then
   echo -e "$info ${Blue}Target device:${Reset} $Model ($Serial)"
 else

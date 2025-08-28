@@ -49,12 +49,6 @@ else
   auth=""
 fi
 
-# --- Checking Android Version ---
-if [ $Android -le 4 ]; then
-  echo -e "${bad} ${Red}Android $Android is not supported by Dropped Patches.${Reset}"
-  return 1
-fi
-
 echo -e "$info ${Blue}Target device:${Reset} $Model"
 
 bash $Simplify/dlGitHub.sh "inotia00" "revanced-cli" "latest" ".jar" "$RVX"
