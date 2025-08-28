@@ -119,6 +119,8 @@ appInstall() {
             if jq --arg appName "$appName" 'any(.[]; .assets == $appName)' "$dataJson" | grep -q false; then
               termux-open-url "https://rentry.co/cs3-repos"
             fi
+          elif [ "$appName" == "YTPro" ] || [ "$appName" == "Nobook" ]; then
+            termux-open-url "https://play.google.com/store/apps/details?id=com.google.android.webview"
           fi
           data "$appName" "$updated_at" "$tag"
         fi
