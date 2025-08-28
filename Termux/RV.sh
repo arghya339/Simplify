@@ -33,6 +33,7 @@ else
 fi
 Serial=$(su -c 'getprop ro.serialno')  # Get Serial Number required root
 Model=$(getprop ro.product.model)  # Get Device Model
+jdkVersion="21"
 RV="$Simplify/RV"
 RVX="$Simplify/RVX"
 SimplUsr="/sdcard/Simplify"  # /storage/emulated/0/Simplify dir
@@ -136,12 +137,12 @@ fi
 getVersion() {
   local pkgName="$1"
   
-  preVersion=$($PREFIX/lib/jvm/java-21-openjdk/bin/java -jar $ReVancedCLIJar list-versions $PatchesRvp -f=$pkgName | sed 's/^[[:space:]]*//; s/ (.*//;' | grep -E '^[0-9]|^Any$' | sort -rV | head -n 2 | tail -n 1)
+  preVersion=$($PREFIX/lib/jvm/java-$jdkVersion-openjdk/bin/java -jar $ReVancedCLIJar list-versions $PatchesRvp -f=$pkgName | sed 's/^[[:space:]]*//; s/ (.*//;' | grep -E '^[0-9]|^Any$' | sort -rV | head -n 2 | tail -n 1)
   pre_stock_apk_path=$(find "$Download" -type f -name "${appName[0]}_v${preVersion}-*.apk" -print -quit)
   [[ -f "$pre_stock_apk_path" ]] && rm "$pre_stock_apk_path"  # Remove previous stock apk if exists
   
   # Get all versions for the package and sort them, then take the highest version
-  pkgVersion=$($PREFIX/lib/jvm/java-21-openjdk/bin/java -jar $ReVancedCLIJar list-versions $PatchesRvp -f=$pkgName | sed 's/^[[:space:]]*//; s/ (.*//;' | grep -E '^[0-9]|^Any$' | sort -rV | head -n 2 | head -n 1)
+  pkgVersion=$($PREFIX/lib/jvm/java-$jdkVersion-openjdk/bin/java -jar $ReVancedCLIJar list-versions $PatchesRvp -f=$pkgName | sed 's/^[[:space:]]*//; s/ (.*//;' | grep -E '^[0-9]|^Any$' | sort -rV | head -n 2 | head -n 1)
 }
 
 #  --- Patch Apps ---
@@ -177,14 +178,14 @@ patch_app() {
   fi
   echo -e "$running Patching ${appName} RV.."
   if [ "$appName" == "Instagram" ] || [ "$appName" == "Facebook" ] || [ "$appName" == "Facebook Messenger" ] || [ "$appName" == "Threads" ]; then
-    $PREFIX/lib/jvm/java-21-openjdk/bin/java -jar $ReVancedCLIJar patch -p $PatchesRvp \
+    $PREFIX/lib/jvm/java-$jdkVersion-openjdk/bin/java -jar $ReVancedCLIJar patch -p $PatchesRvp \
     -o "$outputAPK" "${stock_apk_ref[0]}" \
     "${patches[@]}" \
     "${universalPatches[@]}" \
     --custom-aapt2-binary="$HOME/aapt2" \
     --purge -f | tee "$log"
   else
-    $PREFIX/lib/jvm/java-21-openjdk/bin/java -jar $ReVancedCLIJar patch -p $PatchesRvp \
+    $PREFIX/lib/jvm/java-$jdkVersion-openjdk/bin/java -jar $ReVancedCLIJar patch -p $PatchesRvp \
       -o "$outputAPK" "${stock_apk_ref[0]}" \
       "${patches[@]}" \
       "${universalPatches[@]}" \
@@ -604,19 +605,19 @@ getListOfPatches() {
   local pkgName="$1"
   curl -sL 'https://api.revanced.app/v4/patches/list' | jq --arg pkgName "$pkgName" '.[] | select(.compatiblePackages."'"$pkgName"'" != null)'
   if [ "$ReadPatchesFile" -eq 1 ]; then
-    $PREFIX/lib/jvm/java-21-openjdk/bin/java -jar $ReVancedCLIJar list-patches -d=true -f=$pkgName -i=true -o=true -p=false -u -v=false $PatchesRvp > "$SimplUsr/${pkgName}_list-patches.txt"
+    $PREFIX/lib/jvm/java-$jdkVersion-openjdk/bin/java -jar $ReVancedCLIJar list-patches -d=true -f=$pkgName -i=true -o=true -p=false -u -v=false $PatchesRvp > "$SimplUsr/${pkgName}_list-patches.txt"
   fi
   Patches=$(curl -sL 'https://api.revanced.app/v4/patches/list' | jq --arg pkgName "$pkgName" '.[] | select(.compatiblePackages."'"$pkgName"'" != null)')
   if [ "$pkgName" == "app.revanced" ]; then
     if [ "$ReadPatchesFile" -eq 1 ]; then
-      $PREFIX/lib/jvm/java-21-openjdk/bin/java -jar $ReVancedCLIJar list-patches -d=true -f=$pkgName -i=true -o=true -p=false -u=true -v=false $PatchesRvp | tee "$SimplUsr/${pkgName}_list-patches.txt"
+      $PREFIX/lib/jvm/java-$jdkVersion-openjdk/bin/java -jar $ReVancedCLIJar list-patches -d=true -f=$pkgName -i=true -o=true -p=false -u=true -v=false $PatchesRvp | tee "$SimplUsr/${pkgName}_list-patches.txt"
     else
-      $PREFIX/lib/jvm/java-21-openjdk/bin/java -jar $ReVancedCLIJar list-patches -d=true -f=$pkgName -i=true -o=true -p=false -u=true -v=false $PatchesRvp  # get only universal-patches list
+      $PREFIX/lib/jvm/java-$jdkVersion-openjdk/bin/java -jar $ReVancedCLIJar list-patches -d=true -f=$pkgName -i=true -o=true -p=false -u=true -v=false $PatchesRvp  # get only universal-patches list
     fi
   elif [ -z "$Patches" ]; then
     # java -jar revanced-cli-*-all.jar list-patches patches-*.rvp -h
     # -d=--with-descriptions, -f=--filter-package-name, -i=--index, -o=--with-options, -p=--with-packages, -u=--with-universal-patches, -v, --with-versions
-    $PREFIX/lib/jvm/java-21-openjdk/bin/java -jar $ReVancedCLIJar list-patches -d=true -f=$pkgName -i=true -o=true -p=false -u -v=false $PatchesRvp
+    $PREFIX/lib/jvm/java-$jdkVersion-openjdk/bin/java -jar $ReVancedCLIJar list-patches -d=true -f=$pkgName -i=true -o=true -p=false -u -v=false $PatchesRvp
   fi
 }
 

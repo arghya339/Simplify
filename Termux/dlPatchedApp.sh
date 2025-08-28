@@ -22,6 +22,7 @@ Reset="\033[0m"
 Android=$(getprop ro.build.version.release)  # Get Android version
 cpuAbi=$(getprop ro.product.cpu.abi)  # Get Android arch
 Model=$(getprop ro.product.model)  # Get Device Model
+jdkVersion="21"
 locale=$(getprop persist.sys.locale | cut -d'-' -f1)  # Get System Languages
 if [ -z $locale ]; then
   locale=$(getprop ro.product.locale | cut -d'-' -f1)  # Get Languages
@@ -235,7 +236,7 @@ dlPatchedApp() {
         # Build apks from aab using bundletool
         apks_path="$SimplUsr/Spotube-playstore-all-arch.apks"
         echo -e "$running Build apks from aab.."
-        $PREFIX/lib/jvm/java-21-openjdk/bin/java -jar $bundletoolJar build-apks --bundle=$aab_path --output=$apks_path --aapt2=~/aapt2 2>&1 | grep -v "WARNING: The APKs won't be signed"
+        $PREFIX/lib/jvm/java-$jdkVersion-openjdk/bin/java -jar $bundletoolJar build-apks --bundle=$aab_path --output=$apks_path --aapt2=~/aapt2 2>&1 | grep -v "WARNING: The APKs won't be signed"
         if [ $? -eq 0 ] || [ -f "$apks_path" ]; then
           echo "Success"
         fi
@@ -261,18 +262,18 @@ dlPatchedApp() {
         bash $Simplify/dlGitHub.sh "REAndroid" "APKEditor" "latest" ".jar" "$Simplify"
         APKEditor=$(find "$Simplify" -type f -name "APKEditor-*.jar" -print -quit)
         echo -e "$running Merge splits apks to standalone apk.."
-        $PREFIX/lib/jvm/java-21-openjdk/bin/java -jar $APKEditor m -i "$SimplUsr/Spotube-playstore-all-arch/splits" -o "$SimplUsr/Spotube-playstore-all-arch.apk"
+        $PREFIX/lib/jvm/java-$jdkVersion-openjdk/bin/java -jar $APKEditor m -i "$SimplUsr/Spotube-playstore-all-arch/splits" -o "$SimplUsr/Spotube-playstore-all-arch.apk"
         rm -rf "$SimplUsr/Spotube-playstore-all-arch"
         # Sign apk
         apk_path="$SimplUsr/Spotube-playstore-all-arch-signed.apk"
         echo -e "$running Sign apk.."
-        $PREFIX/lib/jvm/java-21-openjdk/bin/java -jar $PREFIX/share/java/apksigner.jar sign --ks $Simplify/ks.keystore --ks-pass pass:123456 --ks-key-alias ReVancedKey --key-pass pass:123456 --out "$apk_path" "$SimplUsr/Spotube-playstore-all-arch.apk"
-        $PREFIX/lib/jvm/java-21-openjdk/bin/keytool -printcert -jarfile "${apk_path}" | grep -oP 'Owner: \K.*' 2>/dev/null
+        $PREFIX/lib/jvm/java-$jdkVersion-openjdk/bin/java -jar $PREFIX/share/java/apksigner.jar sign --ks $Simplify/ks.keystore --ks-pass pass:123456 --ks-key-alias ReVancedKey --key-pass pass:123456 --out "$apk_path" "$SimplUsr/Spotube-playstore-all-arch.apk"
+        $PREFIX/lib/jvm/java-$jdkVersion-openjdk/bin/keytool -printcert -jarfile "${apk_path}" | grep -oP 'Owner: \K.*' 2>/dev/null
         if [ $? -eq 0 ]; then
           rm -f "$SimplUsr/Spotube-playstore-all-arch.apk" && rm -f "${apk_path}.idsig"
           mv "$SimplUsr/Spotube-playstore-all-arch-signed.apk" "$SimplUsr/Spotube-playstore-all-arch.apk"
         elif [ $? -ne 0 ]; then
-          $PREFIX/lib/jvm/java-21-openjdk/bin/java -jar $PREFIX/share/java/apksigner.jar verify --print-certs "${apk_path}" | grep -oP 'Signer #1 certificate DN: \K.*'
+          $PREFIX/lib/jvm/java-$jdkVersion-openjdk/bin/java -jar $PREFIX/share/java/apksigner.jar verify --print-certs "${apk_path}" | grep -oP 'Signer #1 certificate DN: \K.*'
           if [ $? -eq 0 ]; then
             rm -f "$SimplUsr/Spotube-playstore-all-arch.apk" && rm -f "${apk_path}.idsig"
             mv "$SimplUsr/Spotube-playstore-all-arch-signed.apk" "$SimplUsr/Spotube-playstore-all-arch.apk"

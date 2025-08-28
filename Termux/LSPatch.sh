@@ -64,6 +64,7 @@ elif [ $RipDpi -eq 0 ]; then
   lcd_dpi="*dpi"
 fi
 Model=$(getprop ro.product.model)  # Get Device Model
+jdkVersion="21"
 LSPatch="$Simplify/LSPatch"
 SimplUsr="/sdcard/Simplify"  # /storage/emulated/0/Simplify dir
 mkdir -p "$Simplify" "$LSPatch" "$SimplUsr"  # Create $Simplify, $LSPatch and $SimplUsr dir if it does't exist
@@ -133,7 +134,7 @@ patch_app() {
   local log="$SimplUsr/$appName-LSPatch_patch-log.txt"
   local BugReportUrl=$4
 
-  $PREFIX/lib/jvm/java-21-openjdk/bin/java -jar $LSPatchJar "$stock_apk_path" -m "$module_apk_path" -o "$SimplUsr/" | tee "$log"
+  $PREFIX/lib/jvm/java-$jdkVersion-openjdk/bin/java -jar $LSPatchJar "$stock_apk_path" -m "$module_apk_path" -o "$SimplUsr/" | tee "$log"
 
   if [ $? != 0 ]; then
     echo -e "$bad Oops, $appName Patching failed !! Logs saved to "$log". Share the Patchlog to developer."
@@ -182,7 +183,7 @@ build_app() {
     bash $Simplify/dlGitHub.sh "REAndroid" "APKEditor" "latest" ".jar" "$Simplify"
     APKEditor=$(find "$Simplify" -type f -name "APKEditor-*.jar" -print -quit)
     echo -e "$running Merge splits apks to standalone lite apk.."
-    $PREFIX/lib/jvm/java-21-openjdk/bin/java -jar $APKEditor m -i "$Download/${appNameRef}_v${pkgVersion}-${cpuAbi}" -o "$stock_apk_path"
+    $PREFIX/lib/jvm/java-$jdkVersion-openjdk/bin/java -jar $APKEditor m -i "$Download/${appNameRef}_v${pkgVersion}-${cpuAbi}" -o "$stock_apk_path"
     rm -rf "$Download/${appNameRef}_v${pkgVersion}-${cpuAbi}"
     echo  # Space
   else
@@ -339,16 +340,16 @@ sign_app() {
   if [ -f "${stock_apk_path[0]}" ]; then
     echo -e "$good ${Green}Downloaded ${appNameRef[0]} APK found:${Reset} ${stock_apk_path[0]}"
     echo -e "$running Checking ${appNameRef[0]} Certificate.."
-    checkOwner=$($PREFIX/lib/jvm/java-21-openjdk/bin/keytool -printcert -jarfile "${stock_apk_path[0]}" | grep -oP 'Owner: \K.*')
+    checkOwner=$($PREFIX/lib/jvm/java-$jdkVersion-openjdk/bin/keytool -printcert -jarfile "${stock_apk_path[0]}" | grep -oP 'Owner: \K.*')
     if [ -z "$checkOwner" ]; then
       echo -e "$notice keytool error: SHA-256 digest error!"
       local output_apk_path="$SimplUsr/$stockFileNameWOExt-signed.apk"
       local fileName=$(basename "${output_apk_path}")
-      $PREFIX/lib/jvm/java-21-openjdk/bin/java -jar $PREFIX/share/java/apksigner.jar sign --ks $Simplify/ks.keystore --ks-pass pass:123456 --ks-key-alias ReVancedKey --key-pass pass:123456 --out "${output_apk_path}" "${stock_apk_path[0]}"
+      $PREFIX/lib/jvm/java-$jdkVersion-openjdk/bin/java -jar $PREFIX/share/java/apksigner.jar sign --ks $Simplify/ks.keystore --ks-pass pass:123456 --ks-key-alias ReVancedKey --key-pass pass:123456 --out "${output_apk_path}" "${stock_apk_path[0]}"
       rm "$output_apk_path.idsig"
-      $PREFIX/lib/jvm/java-21-openjdk/bin/keytool -printcert -jarfile "${output_apk_path}" | grep -oP 'Owner: \K.*' 2>/dev/null
+      $PREFIX/lib/jvm/java-$jdkVersion-openjdk/bin/keytool -printcert -jarfile "${output_apk_path}" | grep -oP 'Owner: \K.*' 2>/dev/null
       if [ $? -ne 0 ]; then
-        $PREFIX/lib/jvm/java-21-openjdk/bin/java -jar $PREFIX/share/java/apksigner.jar verify --print-certs "${output_apk_path}" | grep -oP 'Signer #1 certificate DN: \K.*'
+        $PREFIX/lib/jvm/java-$jdkVersion-openjdk/bin/java -jar $PREFIX/share/java/apksigner.jar verify --print-certs "${output_apk_path}" | grep -oP 'Signer #1 certificate DN: \K.*'
       fi
     fi
   fi

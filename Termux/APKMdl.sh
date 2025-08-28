@@ -25,6 +25,7 @@ AUTH_TOKEN="YXBpLXRvb2xib3gtZm9yLWdvb2dsZS1wbGF5OkNiVVcgQVVMZyBNRVJXIHU4M3IgS0s0
 cloudflareDOH="https://cloudflare-dns.com/dns-query"
 cloudflareIP="1.1.1.1,1.0.0.1"
 Download="/sdcard/Download"  # Download dir
+jdkVersion="21"
 Simplify="$HOME/Simplify"
 simplifyJson="$Simplify/simplify.json"  # Configuration file to store simplify settings
 if jq -e '.DeviceArch != null' "$simplifyJson" >/dev/null 2>&1; then
@@ -339,7 +340,7 @@ APKMdl() {
       fi
       rm "$outputPath"
       echo -e "$running Merge splits apkm to standalone lite apk.."
-      $PREFIX/lib/jvm/java-21-openjdk/bin/java -jar $APKEditor m -i "$Download/${appName}_v${VERSION}-${cpuAbi}" -o "$Download/${appName}_v${VERSION}-${cpuAbi}.apk"
+      $PREFIX/lib/jvm/java-$jdkVersion-openjdk/bin/java -jar $APKEditor m -i "$Download/${appName}_v${VERSION}-${cpuAbi}" -o "$Download/${appName}_v${VERSION}-${cpuAbi}.apk"
       rm -rf "$Download/${appName}_v${VERSION}-${cpuAbi}"
       echo
     fi

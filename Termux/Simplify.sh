@@ -147,6 +147,7 @@ serial=$(su -c 'getprop ro.serialno')  # Get Serial Number required root
 model=$(getprop ro.product.model)  # Get Device Model
 outdatedPKG=$(apt list --upgradable 2>/dev/null)  # list of outdated pkg
 installedPKG=$(pkg list-installed 2>/dev/null)  # list of installed pkg
+jdkVersion="21"
 SimplUsr="/sdcard/Simplify"
 Simplify="$HOME/Simplify"
 RV="$Simplify/RV"
@@ -201,7 +202,7 @@ pkgInstall "curl"  # curl update
 pkgInstall "aria2"  # aria2 install/update
 pkgInstall "jq"  # jq install/update
 pkgInstall "pup"  # pup install/update
-pkgInstall "openjdk-21"  # java install/update
+pkgInstall "openjdk-$jdkVersion"  # java install/update
 pkgInstall "apksigner"  # apksigner install/update
 pkgInstall "bsdtar"  # bsdtar install/update
 pkgInstall "pv"  # pv install/update
@@ -277,8 +278,8 @@ fi
 # --- Create a ks.keystore for Signing apk ---
 if [ ! -f "$Simplify/ks.keystore" ]; then
   echo -e "$running Create a 'ks.keystore' for Signing apk.."
-  $PREFIX/lib/jvm/java-21-openjdk/bin/keytool -genkey -v -storetype pkcs12 -keystore $Simplify/ks.keystore -alias ReVancedKey -keyalg RSA -keysize 2048 -validity 36050 -dname "CN=arghya339, OU=Android Development Team, O=ReVanced, L=Kolkata, S=West Bengal, C=In" -storepass 123456 -keypass 123456
-  $PREFIX/lib/jvm/java-21-openjdk/bin/keytool -list -v -keystore $Simplify/ks.keystore -storepass 123456 | grep -oP '(?<=Owner:).*' | xargs
+  $PREFIX/lib/jvm/java-$jdkVersion-openjdk/bin/keytool -genkey -v -storetype pkcs12 -keystore $Simplify/ks.keystore -alias ReVancedKey -keyalg RSA -keysize 2048 -validity 36050 -dname "CN=arghya339, OU=Android Development Team, O=ReVanced, L=Kolkata, S=West Bengal, C=In" -storepass 123456 -keypass 123456
+  $PREFIX/lib/jvm/java-$jdkVersion-openjdk/bin/keytool -list -v -keystore $Simplify/ks.keystore -storepass 123456 | grep -oP '(?<=Owner:).*' | xargs
 fi
 
 Unmount() {
@@ -897,7 +898,7 @@ while true; do
                     pkgUninstall "aria2"  # aria2 uninstall
                     pkgUninstall "jq"  # jq uninstall
                     pkgUninstall "pup"  # pup uninstall
-                    pkgUninstall "openjdk-21"  # java uninstall
+                    pkgUninstall "openjdk-$jdkVersion"  # java uninstall
                     pkgUninstall "apksigner"  # apksigner uninstall
                     pkgUninstall "bsdtar"  # bsdtar uninstall
                     pkgUninstall "pv"  # pv uninstall

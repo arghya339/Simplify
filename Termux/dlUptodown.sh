@@ -21,6 +21,7 @@ Reset="\033[0m"
 
 # --- Global Variables ---
 Download="/sdcard/Download"  # Download dir
+jdkVersion="21"
 Simplify="$HOME/Simplify"
 simplifyJson="$Simplify/simplify.json"  # Configuration file to store simplify settings
 if jq -e '.DeviceArch != null' "$simplifyJson" >/dev/null 2>&1; then
@@ -260,7 +261,7 @@ dlUptodown() {
       fi
       rm "$outputPath"
       echo -e "$running Merge splits apks to standalone lite apk.."
-      $PREFIX/lib/jvm/java-21-openjdk/bin/java -jar $APKEditor m -i "$Download/${appName}_v${appVersion}-${cpuAbi}" -o "$Download/${appName}_v${appVersion}-${cpuAbi}.apk"
+      $PREFIX/lib/jvm/java-$jdkVersion-openjdk/bin/java -jar $APKEditor m -i "$Download/${appName}_v${appVersion}-${cpuAbi}" -o "$Download/${appName}_v${appVersion}-${cpuAbi}.apk"
       rm -rf "$Download/${appName}_v${appVersion}-${cpuAbi}"
     fi
     echo  # White Space

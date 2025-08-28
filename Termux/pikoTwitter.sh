@@ -32,6 +32,7 @@ else
   cpuAbi=$(getprop ro.product.cpu.abi)  # Get Android arch
 fi
 Model=$(getprop ro.product.model)  # Get Device Model
+jdkVersion="21"
 pikoTwitter="$Simplify/pikoTwitter"
 SimplUsr="/sdcard/Simplify"  # /storage/emulated/0/Simplify dir
 mkdir -p "$Simplify" "$pikoTwitter" "$SimplUsr"  # Create $Simplify, $RV, $RVX and $SimplUsr dir if it does't exist
@@ -126,8 +127,8 @@ getVersion() {
   local pkgName="$1"
   
   # Get all versions for the package and sort them, then take the highest version
-  pkgVersion=$($PREFIX/lib/jvm/java-21-openjdk/bin/java -jar $ReVancedCLIJar list-versions $PatchesJar -f=$pkgName | sed 's/^[[:space:]]*//; s/ (.*//;' | grep -E '^[0-9]|^Any$' | sort -rV | head -n 2 | head -n 1)
-  preVersion=$($PREFIX/lib/jvm/java-21-openjdk/bin/java -jar $ReVancedCLIJar list-versions $PatchesJar -f=$pkgName | sed 's/^[[:space:]]*//; s/ (.*//;' | grep -E '^[0-9]|^Any$' | sort -rV | head -n 2 | tail -n 1)
+  pkgVersion=$($PREFIX/lib/jvm/java-$jdkVersion-openjdk/bin/java -jar $ReVancedCLIJar list-versions $PatchesJar -f=$pkgName | sed 's/^[[:space:]]*//; s/ (.*//;' | grep -E '^[0-9]|^Any$' | sort -rV | head -n 2 | head -n 1)
+  preVersion=$($PREFIX/lib/jvm/java-$jdkVersion-openjdk/bin/java -jar $ReVancedCLIJar list-versions $PatchesJar -f=$pkgName | sed 's/^[[:space:]]*//; s/ (.*//;' | grep -E '^[0-9]|^Any$' | sort -rV | head -n 2 | tail -n 1)
   if [ -z "$pkgVersion" ] || [ "$pkgVersion" == "Any" ] || [ "$pkgVersion" == "null" ]; then
     if [ "$isPreReleases" == "true" ]; then
       pkgVersion=$(curl -sL ${auth} "https://api.github.com/repos/crimera/twitter-apk/releases" | jq -r '.[].tag_name' | head -1)  # Last Releases
@@ -136,8 +137,8 @@ getVersion() {
     fi
     preVersion=$(curl -sL ${auth} "https://api.github.com/repos/crimera/twitter-apk/releases" | jq -r '.[].tag_name' | head -n 2 | tail -n 1)  # Previous Releases
     if [ -z "$pkgVersion" ]; then
-      pkgVersion=$($PREFIX/lib/jvm/java-21-openjdk/bin/java -jar $ReVancedCLIJar list-patches -d=true -f=$pkgName -i=false -o=false -p=false -u -v=true $PatchesJar | grep -oP 'Requires X \K[\d.]+-release\.\d+' | sort -rV | head -n 1)
-      preVersion=$($PREFIX/lib/jvm/java-21-openjdk/bin/java -jar $ReVancedCLIJar list-patches -d=true -f=$pkgName -i=false -o=false -p=false -u -v=true $PatchesJar | grep -oP 'Requires X \K[\d.]+-release\.\d+' | sort -rV | head -n 2 | tail -n 1)
+      pkgVersion=$($PREFIX/lib/jvm/java-$jdkVersion-openjdk/bin/java -jar $ReVancedCLIJar list-patches -d=true -f=$pkgName -i=false -o=false -p=false -u -v=true $PatchesJar | grep -oP 'Requires X \K[\d.]+-release\.\d+' | sort -rV | head -n 1)
+      preVersion=$($PREFIX/lib/jvm/java-$jdkVersion-openjdk/bin/java -jar $ReVancedCLIJar list-patches -d=true -f=$pkgName -i=false -o=false -p=false -u -v=true $PatchesJar | grep -oP 'Requires X \K[\d.]+-release\.\d+' | sort -rV | head -n 2 | tail -n 1)
     fi
   fi
 
@@ -152,7 +153,7 @@ patch_twitter() {
   without_ext="${outputAPK%.*}"  # remove file extension (.apk)
   local log="$SimplUsr/piko-twitter_patch-log.txt"
   
-  $PREFIX/lib/jvm/java-21-openjdk/bin/java -jar $ReVancedCLIJar patch -b $PatchesJar -m $IntegrationsApk \
+  $PREFIX/lib/jvm/java-$jdkVersion-openjdk/bin/java -jar $ReVancedCLIJar patch -b $PatchesJar -m $IntegrationsApk \
     -o "$outputAPK" "${stock_apk_ref[0]}" \
     -i "Bring back twitter" -i "Enable app downgrading" -e "Export all activities" \
     --custom-aapt2-binary="$HOME/aapt2" --purge $ripLib -f | tee "$log"

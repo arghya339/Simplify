@@ -32,6 +32,7 @@ else
   cpuAbi=$(getprop ro.product.cpu.abi)  # Get Android arch
 fi
 Model=$(getprop ro.product.model)  # Get Device Model
+jdkVersion="21"
 RVX="$Simplify/RVX"
 Dropped="$Simplify/Dropped"
 SimplUsr="/sdcard/Simplify"  # /storage/emulated/0/Simplify dir
@@ -81,7 +82,7 @@ getVersion() {
   local pkgName="$1"
   
   # Get all versions for the package and sort them, then take the highest version
-  pkgVersion=$($PREFIX/lib/jvm/java-21-openjdk/bin/java -jar $ReVancedCLIJar list-versions $PatchesRvp -f=$pkgName | sed 's/^[[:space:]]*//; s/ (.*//;' | grep -E '^[0-9]|^Any$' | sort -rV | head -n 2 | head -n 1)
+  pkgVersion=$($PREFIX/lib/jvm/java-$jdkVersion-openjdk/bin/java -jar $ReVancedCLIJar list-versions $PatchesRvp -f=$pkgName | sed 's/^[[:space:]]*//; s/ (.*//;' | grep -E '^[0-9]|^Any$' | sort -rV | head -n 2 | head -n 1)
 }
 
 #  --- Patch Apps ---
@@ -92,7 +93,7 @@ patch_app() {
   local log=$3
   local appName=$4
   
-  $PREFIX/lib/jvm/java-21-openjdk/bin/java -jar $ReVancedCLIJar patch -p $PatchesRvp \
+  $PREFIX/lib/jvm/java-$jdkVersion-openjdk/bin/java -jar $ReVancedCLIJar patch -p $PatchesRvp \
     -o "$outputAPK" "${stock_apk_ref[0]}" \
     --custom-aapt2-binary="$HOME/aapt2" --purge $ripLib -f | tee "$log"
   
