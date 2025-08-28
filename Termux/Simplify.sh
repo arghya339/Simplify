@@ -97,6 +97,7 @@ if [ ! -d "$HOME/storage/shared" ] || ! ls /sdcard/ 2>/dev/null | grep -q "^Andr
   if [ "$Android" -gt 5 ]; then  # for Android 5 storage permissions grant during app installation time, so Termux API termux-setup-storage command not required
     while true; do
       termux-setup-storage  # ask Termux Storage permissions
+      sleep 3  # wait 3 seconds
       if ls /sdcard/ 2>/dev/null | grep -q "^Android"; then
         break
       fi
