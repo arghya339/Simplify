@@ -217,22 +217,30 @@ if su -c "id" >/dev/null 2>&1; then
 fi
 
 # --- Shizuku Setup first time ---
-if [ ! -f "$HOME/rish" ] || [ ! -f "$HOME/rish_shizuku.dex" ]; then
-  echo -e "$info Please manually install Shizuku from Google Play Store." && sleep 1
+if ! su -c "id" >/dev/null 2>&1 && [ ! -f "$HOME/rish" ] || [ ! -f "$HOME/rish_shizuku.dex" ]; then
+  #echo -e "$info Please manually install Shizuku from Google Play Store." && sleep 1
   #termux-open-url "https://play.google.com/store/apps/details?id=moe.shizuku.privileged.api"
+  echo -e "$info Please manually install Shizuku from GitHub." && sleep 1
   termux-open-url "https://github.com/RikkaApps/Shizuku/releases/latest"
   am start -n com.android.settings/.Settings\$MyDeviceInfoActivity > /dev/null 2>&1  # Open Device Info
 
-  curl -o "$HOME/rish" "https://raw.githubusercontent.com/arghya339/crdl/refs/heads/main/Termux/Shizuku/rish" &> /dev/null && chmod +x "$HOME/rish"
-  sleep 0.5 && curl -o "$HOME/rish_shizuku.dex" "https://raw.githubusercontent.com/arghya339/crdl/refs/heads/main/Termux/Shizuku/rish_shizuku.dex" > /dev/null 2>&1
+  curl -sL -o "$HOME/rish" "https://raw.githubusercontent.com/arghya339/crdl/refs/heads/main/Termux/Shizuku/rish" && chmod +x "$HOME/rish"
+  sleep 0.5 && curl -sL -o "$HOME/rish_shizuku.dex" "https://raw.githubusercontent.com/arghya339/crdl/refs/heads/main/Termux/Shizuku/rish_shizuku.dex"
   
-  echo -e "$info Please start Shizuku by following guide." && sleep 1
-  if [ $Android -le 10 ]; then
-    am start -n com.android.settings/.Settings\$DevelopmentSettingsDashboardActivity > /dev/null 2>&1  # Open Developer options
-    termux-open-url "https://youtu.be/ZxjelegpTLA"  # YouTube/@MrPalash360: Start Shizuku using Computer
+  if [ "$Android" -lt 11 ]; then
+    url="https://youtu.be/ZxjelegpTLA"  # YouTube/@MrPalash360: Start Shizuku using Computer
+    activityClass="com.android.settings/.Settings\$DevelopmentSettingsDashboardActivity"  # Open Developer options
   else
-    am start -n com.android.settings/.Settings\$WirelessDebuggingActivity > /dev/null 2>&1  # Open Wireless Debugging Settings
-    termux-open-url "https://youtu.be/YRd0FBfdntQ"  # YouTube/@MrPalash360: Start Shizuku Android 11+
+    activityClass="com.android.settings/.Settings\$WirelessDebuggingActivity"  # Open Wireless Debugging Settings
+    url="https://youtu.be/YRd0FBfdntQ"  # YouTube/@MrPalash360: Start Shizuku Android 11+
+  fi
+  echo -e "$info Please start Shizuku by following guide: $url" && sleep 1
+  am start -n "$activityClass" > /dev/null 2>&1
+  termux-open-url "$url"
+fi
+if ! "$HOME/rish" -c "id" >/dev/null 2>&1 && [ -f "$HOME/rish" ]; then
+  if ~/rish -c "id" 2>&1 | grep -q 'java.lang.UnsatisfiedLinkError'; then
+    rm -f "$HOME/rish" && curl -sL -o "$HOME/rish" "https://raw.githubusercontent.com/arghya339/crdl/refs/heads/main/Termux/Shizuku/Play/rish" && chmod +x "$HOME/rish"
   fi
 fi
 
