@@ -101,6 +101,12 @@ if [ ! -d "$HOME/storage/shared" ] || [ ! -d "/sdcard/Android" ]; then
     fi
   fi
 fi
+if [ ! -d "/sdcard/Android" ] || [ ! -d "/sdcard/Download" ]; then
+  termux-setup-storage
+  if [ "$Android" -lt 8 ]; then
+    exit 0
+  fi
+fi
 
 # --- enabled allow-external-apps ---
 if [ "$Android" -eq 6 ] && [ ! -f "$HOME/.termux/termux.properties" ]; then
