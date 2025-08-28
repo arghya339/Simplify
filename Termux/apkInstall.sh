@@ -68,32 +68,14 @@ apkInstall() {
     if [ $? -ne 0 ] || [ $? -eq 2 ]; then
       am start -n "com.android.documentsui/com.android.documentsui.files.FilesActivity" > /dev/null 2>&1  # Open Android Files
     fi
-  elif [ "$Android" -le "7" ]; then
+  elif [ "$Android" -le "6" ]; then
     am start -a android.intent.action.VIEW -t application/vnd.android.package-archive -d "file://$outputAPK" > /dev/null 2>&1  # Activity Manager
-    INSTALL_STATUS=$?
-    if [ "$INSTALL_STATUS" != "0" ]; then
-      termux-open "$outputAPK"
-      FALLBACK_INSTALL_STATUS=$?
-    fi
-    if [ "$INSTALL_STATUS" -eq "0" ] || [ "$FALLBACK_INSTALL_STATUS" -eq "0" ]; then
-      am start -n "$activityClass" &> /dev/null  # launch app after update
-    else
-      echo -e $notice "${Yellow}There was a problem open the app package using Termux API! Please manually install app from${Reset} Files: $Model > ${Blue}Simplify${Reset} > $outputFileName"
-    fi
+    am start -n "$activityClass" &> /dev/null  # launch app after update
   else
     termux-open --view "$outputAPK"  # install apk using Session installer
-    INSTALL_STATUS=$?
-    if [ "$INSTALL_STATUS" != "0" ]; then
-      am start -a android.intent.action.VIEW -t application/vnd.android.package-archive -d "file://$outputAPK" > /dev/null 2>&1  # Activity Manager
-      FALLBACK_INSTALL_STATUS=$?
-    fi
-    if [ "$INSTALL_STATUS" == "0" ] || [ "$FALLBACK_INSTALL_STATUS" == "0" ]; then
-      am start -n "$activityClass" &> /dev/null  # launch app after update
-    else
-      echo -e $notice "${Yellow}There was a problem open the app package using Termux API! Please manually install app from${Reset} Files: $Model > ${Blue}Simplify${Reset} > $outputFileName"
-    fi
+    am start -n "$activityClass" &> /dev/null  # launch app after update
   fi
 }
 
 apkInstall "$@"
-##############################################################################################################################################################################################
+########################################################################################################################################################

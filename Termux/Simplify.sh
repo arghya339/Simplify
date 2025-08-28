@@ -89,19 +89,35 @@ EOF
 )
 comment
 
-# --- Storage Permission Check Logic ---
-if [ ! -d "$HOME/storage/shared" ]; then
-  # Attempt to list /storage/emulated/0 to trigger the error
-  error=$(ls /storage/emulated/0 2>&1)
-  expected_error="ls: cannot open directory '/storage/emulated/0': Permission denied"
+Android=$(getprop ro.build.version.release)  # Get Android version
 
-  if echo "$error" | grep -qF "$expected_error" || ! echo "$error" | grep -q "^Android"; then
-    echo -e "${notice} Storage permission not granted. Running ${Green}termux-setup-storage${Reset}.."
-    termux-setup-storage
-    exit 1  # Exit the script after handling the error
-  else
-    echo -e "${bad} Unknown error: ${Red}$error${Reset}"
-    exit 1  # Exit on any other error
+# --- Storage Permission Check Logic ---
+if [ ! -d "$HOME/storage/shared" ] || [ ! -d "/sdcard/Android" ]; then
+  echo -e "${notice} ${Yellow}Storage permission not granted!${Reset}\n$running ${Green}termux-setup-storage${Reset}.."
+  if [ "$Android" -gt 5 ]; then  # for Android 5 storage permissions grant during app installation time, so Termux API termux-setup-storage command not required
+    termux-setup-storage  # ask Termux Storage permissions
+    if [ "$Android" -lt 8 ]; then
+      exit 0  # Exit the script
+    fi
+  fi
+fi
+
+# --- enabled allow-external-apps ---
+if [ "$Android" -eq 6 ] && [ ! -f "$HOME/.termux/termux.properties" ]; then
+  mkdir -p "$HOME/.termux" && echo "allow-external-apps = true" > "$HOME/.termux/termux.properties"
+  echo -e "$notice 'termux.properties' file has been created successfully & 'allow-external-apps = true' line has been add (enabled) in Termux \$HOME/.termux/termux.properties."
+  termux-reload-settings
+fi
+if [ "$Android" -ge 6 ]; then
+  if grep -q "^# allow-external-apps" "$HOME/.termux/termux.properties"; then
+    # other Android applications can send commands into Termux.
+    # termux-open utility can send an Android Intent from Termux to Android system to open apk package file in pm.
+    # other Android applications also can be Access Termux app data (files).
+    sed -i '/allow-external-apps/s/# //' "$HOME/.termux/termux.properties"  # uncomment 'allow-external-apps = true' line
+    echo -e "$notice 'allow-external-apps = true' line has been uncommented (enabled) in Termux \$HOME/.termux/termux.properties."
+    if [ "$Android" -eq 6 ]; then
+      termux-reload-settings  # reload (restart) Termux settings required for Android 6 after enabled allow-external-apps
+    fi
   fi
 fi
 
@@ -112,7 +128,6 @@ if ! ping -c 1 -W 2 8.8.8.8 >/dev/null 2>&1 ; then
 fi
 
 # --- Global Variables ---
-Android=$(getprop ro.build.version.release)  # Get Android version
 cpuAbi=$(getprop ro.product.cpu.abi)  # Get Android arch
 serial=$(su -c 'getprop ro.serialno')  # Get Serial Number required root
 model=$(getprop ro.product.model)  # Get Device Model
