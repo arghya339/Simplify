@@ -217,7 +217,7 @@ if su -c "id" >/dev/null 2>&1; then
 fi
 
 # --- Shizuku Setup first time ---
-if ! su -c "id" >/dev/null 2>&1 && [ ! -f "$HOME/rish" ] || [ ! -f "$HOME/rish_shizuku.dex" ]; then
+if ! su -c "id" >/dev/null 2>&1 && { [ ! -f "$HOME/rish" ] || [ ! -f "$HOME/rish_shizuku.dex" ] }; then
   #echo -e "$info Please manually install Shizuku from Google Play Store." && sleep 1
   #termux-open-url "https://play.google.com/store/apps/details?id=moe.shizuku.privileged.api"
   echo -e "$info Please manually install Shizuku from GitHub." && sleep 1
