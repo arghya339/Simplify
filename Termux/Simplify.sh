@@ -95,12 +95,20 @@ Android=$(getprop ro.build.version.release)  # Get Android version
 if [ ! -d "$HOME/storage/shared" ] || ! ls /sdcard/ 2>/dev/null | grep -q "^Android"; then
   echo -e "${notice} ${Yellow}Storage permission not granted!${Reset}\n$running ${Green}termux-setup-storage${Reset}.."
   if [ "$Android" -gt 5 ]; then  # for Android 5 storage permissions grant during app installation time, so Termux API termux-setup-storage command not required
+    count=1
     while true; do
+      if [ "$count" -ge 2 ]; then
+        echo -e "$bad Failed to get storage permissions after $count attempts!"
+        echo -e "$notice Please grant permissions manually in Termux App info > Permissions > Files > File permission → Allow."
+        am start -a android.settings.APPLICATION_DETAILS_SETTINGS -d package:com.termux &> /dev/null
+        exit 0
+      fi
       termux-setup-storage  # ask Termux Storage permissions
       sleep 3  # wait 3 seconds
       if ls /sdcard/ 2>/dev/null | grep -q "^Android"; then
         break
       fi
+      ((count++))
     done
     if [ "$Android" -lt 8 ]; then
       exit 0  # Exit the script
