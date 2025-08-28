@@ -107,12 +107,12 @@ if ! ls /sdcard/ 2>/dev/null | grep -E -q "^(Android|Download)"; then
       sleep 3  # wait 3 seconds
       if ls /sdcard/ 2>/dev/null | grep -q "^Android" || ls "$HOME/storage/shared/" 2>/dev/null | grep -q "^Android"; then
         break
+        if [ "$Android" -lt 8 ]; then
+          exit 0  # Exit the script
+        fi
       fi
       ((count++))
     done
-    if [ "$Android" -lt 8 ]; then
-      exit 0  # Exit the script
-    fi
   fi
 fi
 
