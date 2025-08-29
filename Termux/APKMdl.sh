@@ -43,6 +43,7 @@ if [ $RipLocale -eq 1 ]; then
   fi
 elif [ $RipLocale -eq 0 ]; then
   locale="[a-z][a-z]"
+  echo -e "$notice RipLocale Disabled!"
 fi
 if [ $RipDpi -eq 1 ]; then
   density=$(getprop ro.sf.lcd_density)  # Get the device screen density
@@ -64,6 +65,7 @@ if [ $RipDpi -eq 1 ]; then
   fi
 elif [ $RipDpi -eq 0 ]; then
   lcd_dpi="*dpi"
+  echo -e "$notice RipDpi Disabled!"
 fi
 
 APKMdl() {
