@@ -226,7 +226,7 @@ dlUptodown() {
     file_ext="apk"
   fi
   
-  findFile=$(find "$Download" -type f -name "${appName}_v*-$cpuAbi.apk" --print --quit)
+  findFile=$(find "$Download" -type f -name "${appName}_v*-$cpuAbi.apk" -print -quit)
   findFile=("$findFile")  # convert into arrays
   if [ -f "${findFile[0]}" ]; then
     fileBaseName=$(basename "${findFile[0]}")

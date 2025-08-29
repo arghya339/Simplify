@@ -140,7 +140,7 @@ fi
 
 # --- Checking Internet Connection ---
 if ! ping -c 1 -W 2 8.8.8.8 >/dev/null 2>&1 ; then
-  echo -e "${bad} ${Red} Oops! No Internet Connection available.\nConnect to the Internet and try again later."
+  echo -e "${bad} ${Red}Oops! No Internet Connection available.\nConnect to the Internet and try again later."
   exit 1
 fi
 
