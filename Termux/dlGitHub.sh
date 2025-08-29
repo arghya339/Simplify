@@ -112,15 +112,15 @@ dlGitHub() {
     
     if [ "$repo" == "ReVancedApp-Actions" ] || [ "$repo" == "Revanced-And-Revanced-Extended-Non-Root" ]; then
       findFile="$dir/$assetsName"
-      fileBaseName=$(basename $findFile)
+      fileBaseName=$(basename $findFile 2>/dev/null)
     else
       findFile=$(find "$dir" -type f -name "$assetsNamePattern" -print -quit)
-      fileBaseName=$(basename $findFile)
+      fileBaseName=$(basename $findFile 2>/dev/null)
     fi
     
     if [ "$repo" == "VancedMicroG" ] || [ "$repo" == "LSPatch" ] || [ "$repo" == "YTPro" ] || [ "$repo" == "cloudstream" ]; then
       if [ "$fileName" != "$fileBaseName" ]; then
-        echo -e "$notice diffs: $fileName ~ $fileBaseName"
+        [ -n "$fileBaseName" ] && echo -e "$notice diffs: $fileName ~ $fileBaseName"
         [ -f "$findFile" ] && rm "$findFile"
         dlUrl="https://github.com/$owner/$repo/releases/download/v${latestReleases}/$assetsName"
         findFile="$dir/$fileName"
@@ -141,7 +141,7 @@ dlGitHub() {
       fi
     else 
       if [ "$assetsName" != "$fileBaseName" ]; then
-        echo -e "$notice diffs: $assetsName ~ $fileBaseName"
+        [ -n "$fileBaseName" ] && echo -e "$notice diffs: $assetsName ~ $fileBaseName"
         [ -f "$findFile" ] && rm "$findFile"
         # downloading assets
         findFile="$dir/$assetsName"
@@ -194,10 +194,10 @@ dlGitHub() {
       preAssetsNamePattern=$(echo "$preAssetsName" | sed "s/$lastPreReleases/*/g")
     fi
     findFile=$(find "$dir" -type f -name "$preAssetsNamePattern" -print -quit)
-    preFileBaseName=$(basename $findFile)
+    preFileBaseName=$(basename $findFile 2>/dev/null)
     
     if [ "$preAssetsName" != "$preFileBaseName" ]; then
-      echo -e "$notice diffs: $preAssetsName ~ $preFileBaseName"
+      [ -n "$preFileBaseName" ] && echo -e "$notice diffs: $preAssetsName ~ $preFileBaseName"
       [ -f "$findFile" ] && rm "$findFile"
       # downloading assets
       if [ "$releases" == "nightly" ] || [ "$releases" == "pre-release" ]; then
