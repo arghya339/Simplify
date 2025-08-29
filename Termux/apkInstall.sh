@@ -16,6 +16,8 @@ White="\033[37m"
 Yellow="\033[93m"
 Reset="\033[0m"
 
+Android=$(getprop ro.build.version.release | cut -d. -f1)
+
 # Install final apk
 apkInstall() {
   local outputAPK=$1
@@ -35,9 +37,6 @@ apkInstall() {
   else
     local activityClass="$activity"
   fi
-  local OEM=$(getprop ro.product.manufacturer)
-  local Model=$(getprop ro.product.model)
-  local Android=$(getprop ro.build.version.release | cut -d. -f1)
   
   if su -c "id" >/dev/null 2>&1; then
     su -c "cp '$outputAPK' '/data/local/tmp/$outputFileName'"
@@ -62,18 +61,12 @@ apkInstall() {
       ~/rish -c "monkey -p $pkgName -c android.intent.category.LAUNCHER 1" > /dev/null 2>&1
     fi
     $HOME/rish -c "rm -f '/data/local/tmp/$outputFileName'"  # Cleanup tmp APK
-  elif [ "$OEM" == "Xiaomi" ] || [ "$OEM" == "Poco" ]; then
-    echo -e $notice "${Yellow}MIUI Optimization detected! Please manually install app from${Reset} Files: $Model > ${Blue}Simplify${Reset} > $outputAPK"
-    am start -n "com.google.android.documentsui/com.android.documentsui.files.FilesActivity" > /dev/null 2>&1  # Open Android Files by Google
-    if [ $? -ne 0 ] || [ $? -eq 2 ]; then
-      am start -n "com.android.documentsui/com.android.documentsui.files.FilesActivity" > /dev/null 2>&1  # Open Android Files
-    fi
   elif [ "$Android" -le "6" ]; then
     am start -a android.intent.action.VIEW -t application/vnd.android.package-archive -d "file://$outputAPK" > /dev/null 2>&1  # Activity Manager
-    am start -n "$activityClass" &> /dev/null  # launch app after update
+    sleep 15 && am start -n "$activityClass" &> /dev/null  # launch app after update
   else
     termux-open --view "$outputAPK"  # install apk using Session installer
-    am start -n "$activityClass" &> /dev/null  # launch app after update
+    sleep 15 && am start -n "$activityClass" &> /dev/null  # launch app after update
   fi
 }
 

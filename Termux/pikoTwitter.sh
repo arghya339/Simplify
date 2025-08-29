@@ -221,7 +221,11 @@ if [ -f "$outputAPK" ]; then
       termux-open --send "$outputAPK"
       ;;
     n*|N*) echo -e "$notice Piko Twitter Sharing skipped!"
-      echo -e "$info Locate '$fileName' in '/sdcard/Simplify/' dir, Share it with your Friends and Family ;)"
+      echo -e "$info Locate '$fileName' in '/sdcard/Simplify/' dir, Share it with your Friends and Family ;)" && sleep 3
+      am start -n "com.google.android.documentsui/com.android.documentsui.files.FilesActivity" > /dev/null 2>&1  # Open Android Files by Google
+      if [ $? -ne 0 ] || [ $? -eq 2 ]; then
+        am start -n "com.android.documentsui/com.android.documentsui.files.FilesActivity" > /dev/null 2>&1  # Open Android Files
+      fi
       ;;
     *) echo -e "$info Invalid choice! Piko Twitter Sharing skipped." ;;
   esac

@@ -277,7 +277,11 @@ build_app() {
           termux-open --send "${output_apk_path}"
           ;;
         n*|N*) echo -e "$notice ${appNameRef[0]} LSPatch Sharing skipped!"
-          echo -e "$info Locate '$fileName' in '/sdcard/Simplify/' dir, Share it with your Friends and Family ;)"
+          echo -e "$info Locate '$fileName' in '/sdcard/Simplify/' dir, Share it with your Friends and Family ;)" && sleep 3
+          am start -n "com.google.android.documentsui/com.android.documentsui.files.FilesActivity" > /dev/null 2>&1  # Open Android Files by Google
+          if [ $? -ne 0 ] || [ $? -eq 2 ]; then
+            am start -n "com.android.documentsui/com.android.documentsui.files.FilesActivity" > /dev/null 2>&1  # Open Android Files
+          fi
           ;;
         *) echo -e "$info Invalid choice! ${appNameRef[0]} LSPatch Sharing skipped." ;;
       esac
@@ -373,7 +377,11 @@ sign_app() {
         termux-open --send "${output_apk_path}"
         ;;
       n*|N*) echo -e "$notice ${appNameRef[0]} Signed Sharing skipped!"
-        echo -e "$info Locate '$fileName' in '/sdcard/Simplify/' dir, Share it with your Friends and Family ;)"
+        echo -e "$info Locate '$fileName' in '/sdcard/Simplify/' dir, Share it with your Friends and Family ;)" && sleep 3
+        am start -n "com.google.android.documentsui/com.android.documentsui.files.FilesActivity" > /dev/null 2>&1  # Open Android Files by Google
+        if [ $? -ne 0 ] || [ $? -eq 2 ]; then
+          am start -n "com.android.documentsui/com.android.documentsui.files.FilesActivity" > /dev/null 2>&1  # Open Android Files
+        fi
         ;;
       *) echo -e "$info Invalid choice! ${appNameRef[0]} Signed Sharing skipped." ;;
     esac
