@@ -226,6 +226,13 @@ dlUptodown() {
     file_ext="apk"
   fi
   
+  findFile=$(find "$Download" -type f -name "${appName}_v*-$cpuAbi.apk" --print --quit)
+  if [ -f "$findFile" ]; then
+    fileBaseName=$(basename "$findFile")
+    if [ "$fileBaseName" != "${appName}_v${appVersion}-$cpuAbi.apk" ]; then
+      rm -f "$findFile"  # remove previous version apk
+    fi
+  fi
   if [ ! -f "$Download/${appName}_v${appVersion}-$cpuAbi.apk" ] || [ ! -f "$Download/${appName}_v${appVersion}-$Arch.apks" ]; then
     echo -e "$running Downloading $actualAppName.."
     aria2c -x 16 -s 16 --console-log-level=error --summary-interval=0 --download-result=hide -c -o "${appName}_v${appVersion}-$Arch.$file_ext" -d "$Download" "$dlUrl"
