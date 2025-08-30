@@ -1258,16 +1258,23 @@ while true; do
     SoundCloud)
       pkgName="com.soundcloud.android"
       appName=("SoundCloud")
-      pkgVersion="2025.05.27-release"
-      #pkgVersion=""
+      #pkgVersion="2025.05.27-release"
+      pkgVersion=""
       if [ -z "$pkgVersion" ]; then
         getVersion "$pkgName"
         pkgVersion="$pkgVersion"
       fi
-      Type="BUNDLE"
-      Arch=("universal")
+      #web="APKMirror"
+      web="Uptodown"
+      if [ "$web" == "APKMirror" ]; then
+        Type="BUNDLE"
+        Arch=("universal")
+      else
+        Type="xapk"
+        Arch=("arm64-v8a, armeabi-v7a, x86_64")
+      fi
       activityPatched="com.soundcloud.android/.launcher.LauncherActivity"
-      build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "APKMirror" "soundcloud_patches_args" "$pkgName" "$activityPatched" "" "" ""
+      build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "$web" "soundcloud_patches_args" "$pkgName" "$activityPatched" "" "" ""
       ;;
     Proton\ Mail)
       pkgName="ch.protonmail.android"
