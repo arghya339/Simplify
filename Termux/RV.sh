@@ -506,6 +506,22 @@ build_app() {
     if [ "$pkgName" == "com.google.android.youtube" ] || [ "$pkgName" == "com.google.android.apps.photos" ] || [ "$pkgName" == "com.google.android.apps.recorder" ]; then
       if su -c "id" >/dev/null 2>&1; then
         
+        if [ "$Type" == "APK" ] || [ "$Type" == "apk" ]; then
+          if [ "$pkgVersion" == "Any" ] || [ -z "$pkgVersion" ]; then
+            fileNamePattern=("${appNameRef[0]}_v*-${archRef[0]}.apk")
+            stock_apk_path=$(find "$Download" -type f -name "${fileNamePattern[0]}" -print -quit)
+          elif [ -n "$pkgVersion" ] && [ "$pkgVersion" != "Any" ]; then
+            stock_apk_path="$Download/${appNameRef[0]}_v${pkgVersion}-${archRef[0]}.apk"
+          fi
+        else
+          if [ "$pkgVersion" == "Any" ] || [ -z "$pkgVersion" ]; then
+            fileNamePattern=("${appNameRef[0]}_v*-$cpuAbi.apk")
+            stock_apk_path=$(find "$Download" -type f -name "${fileNamePattern[0]}" -print -quit)
+          elif [ -n "$pkgVersion" ] && [ "$pkgVersion" != "Any" ]; then
+            stock_apk_path="$Download/${appNameRef[0]}_v${pkgVersion}-$cpuAbi.apk"
+          fi
+        fi
+
         if [ "$pkgName" == "com.google.android.youtube" ]; then
           echo -e "[?] ${Yellow}Please select installation type - 'M' for Mount or 'I' for SU-Install or 'N' for Installation cancel. [M/i/N]: ${Reset}\c" && read opt
           case $opt in
@@ -518,8 +534,8 @@ build_app() {
               ;;
             M*|m*)
               echo -e "$running Please Wait !! Mounting Patched ${appNameRef[0]} RV apk.."
-              su -mm -c "/system/bin/sh $Simplify/apkMount.sh \"${stock_apk_path[0]}\" $outputAPK \"${appNameRef[0]}\" $pkgName $pkgVersion" &> /dev/null
-              su -mm -c "/system/bin/sh $Simplify/apkMount.sh \"${stock_apk_path[0]}\" $outputAPK \"${appNameRef[0]}\" $pkgName $pkgVersion" | tee "$SimplUsr/${appNameRef[0]}-RV_mount-log.txt"
+              su -mm -c "/system/bin/sh $Simplify/apkMount.sh \"${stock_apk_path}\" \"$outputAPK\" \"${appName}\" \"$pkgName\" \"$pkgVersion\"" &> /dev/null
+              su -mm -c "/system/bin/sh $Simplify/apkMount.sh \"${stock_apk_path}\" \"$outputAPK\" \"${appName}\" \"$pkgName\" \"$pkgVersion\"" | tee "$SimplUsr/${appNameRef[0]}-RV_mount-log.txt"
               rm $outputAPK
               ;;
             N*|n*) echo -e "$notice ${appNameRef[0]} RV Installaion skipped!" ;;
@@ -530,8 +546,8 @@ build_app() {
           case $opt in
             y*|Y*|"")
               echo -e "$running Please Wait !! Mounting Patched ${appNameRef[0]} RV apk.."
-              su -mm -c "/system/bin/sh $Simplify/apkMount.sh \"${stock_apk_path[0]}\" $outputAPK \"${appNameRef[0]}\" $pkgName $pkgVersion" &> /dev/null
-              su -mm -c "/system/bin/sh $Simplify/apkMount.sh \"${stock_apk_path[0]}\" $outputAPK \"${appNameRef[0]}\" $pkgName $pkgVersion" | tee "$SimplUsr/${appNameRef[0]}-RV_mount-log.txt"
+              su -mm -c "/system/bin/sh $Simplify/apkMount.sh \"${stock_apk_path}\" \"$outputAPK\" \"${appName}\" \"$pkgName\" \"$pkgVersion\"" &> /dev/null
+              su -mm -c "/system/bin/sh $Simplify/apkMount.sh \"${stock_apk_path}\" \"$outputAPK\" \"${appName}\" \"$pkgName\" \"$pkgVersion\"" | tee "$SimplUsr/${appNameRef[0]}-RV_mount-log.txt"
               rm $outputAPK
               ;;
             n*|N*) echo -e "$notice ${appNameRef[0]} RV Installaion skipped!" ;;
