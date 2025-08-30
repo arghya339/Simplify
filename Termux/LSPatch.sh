@@ -196,38 +196,33 @@ build_app() {
   else
     if [ "$web" == "APKMirror" ]; then
       bash $Simplify/APKMdl.sh "$pkgName" "$pkgVersion" "$Type" "${archRef[0]}"  # Download stock apk from APKMirror
-      if [ "$Type" == "BUNDLE" ]; then
-        if [ -n "$pkgVersion" ] && [ "$pkgVersion" != "null" ]; then
-          local stock_apk_path=("$Download/${appNameRef[0]}_v${pkgVersion}-$cpuAbi.apk")
-        elif [ -z "$pkgVersion" ] || [ "$pkgVersion" == "null" ]; then
-          local stock_apk=$(find "$Download" -type f -name "${appNameRef[0]}_v*-$cpuAbi.apk" -print -quit)
-          local stock_apk_path=("$stock_apk")  # -quit= find stops after first match
-        fi
-      elif [ "$Type" == "APK" ]; then
-        if [ -n "$pkgVersion" ] && [ "$pkgVersion" != "null" ]; then
-          local stock_apk_path=("$Download/${appNameRef[0]}_v${pkgVersion}-${archRef[0]}.apk")
-        elif [ -z "$pkgVersion" ] || [ "$pkgVersion" == "null" ]; then
-          local stock_apk=$(find "$Download" -type f -name "${appNameRef[0]}_v*-${archRef[0]}.apk" -print -quit)
-          local stock_apk_path=("$stock_apk")
-        fi
-      fi
     else
       bash $Simplify/dlUptodown.sh "${appNameRef[0]}" "$pkgVersion" "$Type" "${archRef[0]}"  # Download stock apk from Uptodown
-      if [ "$Type" == "xapk" ]; then
-        local stock_apk_path=("$Download/${appNameRef[0]}_v${pkgVersion}-$cpuAbi.apk")
-      elif [ "$Type" == "apk" ]; then
-        local stock_apk_path=("$Download/${appNameRef[0]}_v${pkgVersion}-${archRef[0]}.apk")
-      fi
     fi
   fi
   sleep 0.5  # Wait 500 milliseconds
+  if [ "$Type" == "APK" ] || [ "$Type" == "apk" ]; then
+    if [ "$pkgVersion" == "Any" ] || [ -z "$pkgVersion" ]; then
+      fileNamePattern=("${appNameRef[0]}_v*-${archRef[0]}.apk")
+      stock_apk_path=$(find "$Download" -type f -name "${fileNamePattern[0]}" -print -quit)
+    elif [ -n "$pkgVersion" ] && [ "$pkgVersion" != "Any" ]; then
+      stock_apk_path="$Download/${appNameRef[0]}_v${pkgVersion}-${archRef[0]}.apk"
+    fi
+  else
+    if [ "$pkgVersion" == "Any" ] || [ -z "$pkgVersion" ]; then
+      fileNamePattern=("${appNameRef[0]}_v*-$cpuAbi.apk")
+      stock_apk_path=$(find "$Download" -type f -name "${fileNamePattern[0]}" -print -quit)
+    elif [ -n "$pkgVersion" ] && [ "$pkgVersion" != "Any" ]; then
+      stock_apk_path="$Download/${appNameRef[0]}_v${pkgVersion}-$cpuAbi.apk"
+    fi
+  fi
   
-  local stockFileName=$(basename "${stock_apk_path[0]}")
+  local stockFileName=$(basename "${stock_apk_path}")
   local stockFileNameWOExt="${stockFileName%.*}"
-  if [ -f "${stock_apk_path[0]}" ]; then
-    echo -e "$good ${Green}Downloaded ${appNameRef[0]} APK found:${Reset} ${stock_apk_path[0]}"
+  if [ -f "${stock_apk_path}" ]; then
+    echo -e "$good ${Green}Downloaded ${appNameRef[0]} APK found:${Reset} ${stock_apk_path}"
     echo -e "$running Patching ${appNameRef[0]} LSPatch.."
-    patch_app "${stock_apk_path[0]}" "$module_apk_path" "${appNameRef[0]}" "$BugReportUrl"
+    patch_app "${stock_apk_path}" "$module_apk_path" "${appNameRef[0]}" "$BugReportUrl"
   fi
   
   local output_apk_path=$(find "$SimplUsr" -type f -name "${stockFileNameWOExt}-*-lspatched.apk")
@@ -246,9 +241,9 @@ build_app() {
           ;;
         M*|m*)
           echo -e "$running Please Wait !! Mounting Patched ${appNameRef[0]} LSPatch apk.."
-          su -mm -c "/system/bin/sh $Simplify/apkMount.sh \"${stock_apk_path[0]}\" "${output_apk_path}" \"${appNameRef[0]}\" $pkgName $pkgVersion" &> /dev/null
-          su -mm -c "/system/bin/sh $Simplify/apkMount.sh \"${stock_apk_path[0]}\" "${output_apk_path}" \"${appNameRef[0]}\" $pkgName $pkgVersion" | tee "$SimplUsr/${appNameRef[0]}-LSPatch_mount-log.txt"
-          rm "${output_apk_path}"
+          su -mm -c "/system/bin/sh $Simplify/apkMount.sh \"${stock_apk_path}\" \"${output_apk_path}\" \"${appName}\" \"$pkgName\" \"$pkgVersion\"" &> /dev/null
+          su -mm -c "/system/bin/sh $Simplify/apkMount.sh \"${stock_apk_path}\" \"${output_apk_path}\" \"${appName}\" \"$pkgName\" \"$pkgVersion\"" | tee "$SimplUsr/${appNameRef[0]}-LSPatch_mount-log.txt"
+          rm -f "${output_apk_path}"
           ;;
         N*|n*) echo -e "$notice ${appNameRef[0]} LSPatch Installaion skipped!" ;;
         *) echo -e "$info Invalid choice! ${appNameRef[0]} LSPatch Installaion skipped." ;;
