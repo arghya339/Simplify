@@ -229,9 +229,11 @@ dlUptodown() {
   if [ "$Type" == "XAPK" ]; then
     fileNamePattern="${appName}_v*-$cpuAbi.apk"
     apkName=("${appName}_v${appVersion}-$cpuAbi.apk")
+    apk_path=("$Download/${appName}_v${appVersion}-$cpuAbi.apk")
   else
     fileNamePattern="${appName}_v*-${Arch}.apk"
     apkName=("${appName}_v${appVersion}-${Arch}.apk")
+    apk_path=("$Download/${appName}_v${appVersion}-${Arch}.apk")
   fi
   findFile=$(find "$Download" -type f -name "${fileNamePattern}" -print -quit)
   findFile=("$findFile")  # convert into arrays
@@ -244,8 +246,7 @@ dlUptodown() {
     fi
   fi
   
-  apk_path=("$Download/${appName}_v${appVersion}-$cpuAbi.apk")
-  apks_path=("$Download/${appName}_v${appVersion}-${Arch}.apks")
+  apks_path=("$Download/${appName}_v${appVersion}-${Arch}.$file_ext")
   if [ ! -f "${apk_path[0]}" ] || [ ! -f "${apks_path[0]}" ]; then
     echo -e "$running Downloading $actualAppName.."
     aria2c -x 16 -s 16 --console-log-level=error --summary-interval=0 --download-result=hide -c -o "${appName}_v${appVersion}-$Arch.$file_ext" -d "$Download" "$dlUrl"
