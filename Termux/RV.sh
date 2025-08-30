@@ -1183,9 +1183,9 @@ while true; do
         Type="APK"
       else
         appName=("Amazon Video")
-        if [ "$cpuAbi" == "arm64_v8a" ]; then
+        if [ "$cpuAbi" == "arm64-v8a" ]; then
           pkgVersion="3.0.412.2947"
-        elif [ "$cpuAbi" == "armeabi_v7a" ]; then
+        elif [ "$cpuAbi" == "armeabi-v7a" ]; then
           pkgVersion="3.0.412.2945"
         fi
         Type="apk"
