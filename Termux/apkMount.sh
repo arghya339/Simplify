@@ -20,10 +20,10 @@ Reset="\033[0m"
 # --- Attaching patched apk file to system using su ---
 apkMount() {
   # local variables
-  local stock=$1
+  local stock=${1}
   local stockFileName=$(basename "$stock")
-  local patched=$2
-  local appName=$3
+  local patched=${2}
+  local appName=${3}
   local pkgName=$4
   local versionName=$5
   local model=$(getprop ro.product.model)
