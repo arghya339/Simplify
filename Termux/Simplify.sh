@@ -349,107 +349,28 @@ for i in "${!all_key[@]}"; do
   fi
 done
 
-fetchPreRelease() {
+tfConfig() {
+  local key=$1
+  local value=$2
+  local m1=${3}
+  local m2=${4}
+
   while true; do
-    read -r -p "FetchPreRelease [T/f]: " opt
-    case "$opt" in
+    read -r -p "$key [T/f]: " opt
+      case "$opt" in
       [Tt]*)
-        isPreRelease=1  # FetchPreRelease  == true
-        config "FetchPreRelease" "$isPreRelease"
-        echo -e "$good ${Green}FetchPreRelease is True! Last Pre Release Patches will be fetched.${Reset}"
+        value=1  # value  == true
+        config "$key" "$value"
+        echo -e "$good ${Green}$key is True! $m1.${Reset}"
         break
         ;;
       [Ff]*)
-        isPreRelease=0  # FetchPreRelease  == false
-        config "FetchPreRelease" "$isPreRelease"
-        echo -e "$good ${Green}FetchPreRelease is False! Latest Release Patches will be fetched.${Reset}"
+        value=0  # value  == false
+        config "$key" "$value"
+        echo -e "$good ${Green}$key is False! $m2.${Reset}"
         break
         ;;
       *) echo -e "${info} Invalid input! Please enter T or F." ;;
-    esac
-  done
-}
-
-ripLocale() {
-  while true; do
-    read -r -p "RipLocale [E/d]: " opt
-    case "$opt" in
-      [Ee]*)
-        isRipLocale=1  # Enable RipLocale
-        config "RipLocale" "$isRipLocale"
-        echo -e "$good ${Green}RipLocale is Enabled! Device specific locale will be kept in patched apk file.${Reset}"
-        break
-        ;;
-      [Dd]*)
-        isRipLocale=0  # Disable RipLocale
-        config "RipLocale" "$isRipLocale"
-        echo -e "$good ${Green}RipLocale is Disabled! All locale will be kept in patched apk file.${Reset}"
-        break
-        ;;
-      *) echo -e "${info} Invalid input! Please enter E or D." ;;
-    esac
-  done
-}
-
-ripDpi() {
-  while true; do
-    read -r -p "RipDpi [E/d]: " opt
-    case "$opt" in
-      [Ee]*)
-        isRipDpi=1  # Enable RipDpi
-        config "RipDpi" "$isRipDpi"
-        echo -e "$good ${Green}RipDpi is Enabled! Device specific dpi will be kept in patched apk file.${Reset}"
-        break
-        ;;
-      [Dd]*)
-        isRipDpi=0  # Disable RipDpi
-        config "RipDpi" "$isRipDpi"
-        echo -e "$good ${Green}RipDpi is Disabled! All dpi will be kept in patched apk file.${Reset}"
-        break
-        ;;
-      *) echo -e "${info} Invalid input! Please enter E or D." ;;
-    esac
-  done
-}
-
-ripLib() {
-  while true; do
-    read -r -p "RipLib [E/d]: " opt
-    case "$opt" in
-      [Ee]*)
-        isRipLib=1  # Enable RipLib
-        config "RipLib" "$isRipLib"
-        echo -e "$good ${Green}RipLib is Enabled! Device specific arch lib will be kept in patched apk file.${Reset}"
-        break
-        ;;
-      [Dd]*)
-        isRipLib=0  # Disable RipLib
-        config "RipLib" "$isRipLib"
-        echo -e "$good ${Green}RipLib is Disabled! All lib dir will be kept in patched apk file.${Reset}"
-        break
-        ;;
-      *) echo -e "${info} Invalid input! Please enter E or D." ;;
-    esac
-  done
-}
-
-changeRVXSource() {
-  while true; do
-    read -r -p "ChangeRVXSource [Y/n]: " opt
-    case "$opt" in
-      [Yy]*)
-        isChangeRVXSource=1  # ChangeRVXSource: anddea
-        config "ChangeRVXSource" "$isChangeRVXSource"
-        echo -e "$good ${Green}ChangeRVXSource == Yes! RVX Patches source will be changed to anddea.${Reset}"
-        break
-        ;;
-      [Nn]*)
-        isChangeRVXSource=0  # ChangeRVXSource: inotia00
-        config "ChangeRVXSource" "$isChangeRVXSource"
-        echo -e "$good ${Green}ChangeRVXSource == No! RVX Patches source will remain official (inotia00).${Reset}"
-        break
-        ;;
-      *) echo -e "${info} Invalid input! Please enter Y or N." ;;
     esac
   done
 }
@@ -518,27 +439,6 @@ pat() {
         *) echo -e "${info} Invalid input! Please enter Yes or No." ;;
       esac
     fi
-  done
-}
-
-read_patches_file() {
-  while true; do
-    read -r -p "ReadPatchesFile [E/d]: " opt
-    case "$opt" in
-      [Ee]*)
-        isReadPatchesFile=1  # Enable ReadPatchesFile
-        config "ReadPatchesFile" "$isReadPatchesFile"
-        echo -e "$good ${Green}ReadPatchesFile is Enabled! Custom PatchesOptions Loading from File.${Reset}"
-        break
-        ;;
-      [Dd]*)
-        isReadPatchesFile=0  # Disable ReadPatchesFile
-        config "ReadPatchesFile" "$isReadPatchesFile"
-        echo -e "$good ${Green}ReadPatchesFile is Disabled! Recommended PatchesOptions Loading from Script.${Reset}"
-        break
-        ;;
-      *) echo -e "${info} Invalid input! Please enter E or D." ;;
-    esac
   done
 }
 
@@ -859,11 +759,36 @@ while true; do
         echo -e "P. FetchPreRelease\nL. RipLocale\nD. RipDpi\nR. RipLib\nS. Change RVX Source\nT. Add gh PAT (increases gh api rate limit)\nO. Import Custom PatchesOptions from file\nB. Change YouTube & YT Music AppIcon & Header\nQ. Quit\n"
         read -r -p "Select: " opt
         case "$opt" in
-          [Pp]*) if [ "$FetchPreRelease" == 0 ]; then echo "FetchPreRelease == false"; else echo "FetchPreRelease == true"; fi && fetchPreRelease ;;
-          [Ll]*) if [ "$RipLocale" == 1 ]; then echo "RipLocale == Enabled"; else echo "RipLocale == Disabled"; fi && ripLocale ;;
-          [Dd]*) if [ "$RipDpi" == 1 ]; then echo "RipDpi == Enabled"; else echo "RipDpi == Disabled"; fi && ripDpi ;;
-          [Rr]*) if [ "$RipLib" == 1 ]; then echo "RipLib == Enabled"; else echo "RipLib == Disabled"; fi && ripLib ;;
-          [Ss]*) if [ "$ChangeRVXSource" == 0 ]; then echo "ChangeRVXSource == No"; else echo "ChangeRVXSource == Yes"; fi && changeRVXSource ;;
+          [Pp]*) if [ "$FetchPreRelease" == 0 ]; then echo "FetchPreRelease == false"; else echo "FetchPreRelease == true"; fi
+            key="FetchPreRelease" && value="$isPreRelease"
+            m1="Last Pre Release Patches will be fetched"
+            m2="Latest Release Patches will be fetched"
+            tfConfig "$key" "$value" "$m1" "$m2"
+            ;;
+          [Ll]*) if [ "$RipLocale" == 1 ]; then echo "RipLocale == true"; else echo "RipLocale == false"; fi
+            key="RipLocale" && value="$isRipLocale"
+            m1="Device specific locale will be kept in patched apk file"
+            m2="All locale will be kept in patched apk file"
+            tfConfig "$key" "$value" "$m1" "$m2"
+            ;;
+          [Dd]*) if [ "$RipDpi" == 1 ]; then echo "RipDpi == true"; else echo "RipDpi == false"; fi
+            key="RipDpi" && value="$isRipDpi"
+            m1="Device specific dpi will be kept in patched apk file"
+            m2="All dpi will be kept in patched apk file"
+            tfConfig "$key" "$value" "$m1" "$m2"
+            ;;
+          [Rr]*) if [ "$RipLib" == 1 ]; then echo "RipLib == true"; else echo "RipLib == false"; fi
+            key="RipLib" && value="$isRipLib"
+            m1="Device specific arch lib will be kept in patched apk file"
+            m2="All lib dir will be kept in patched apk file"
+            tfConfig "$key" "$value" "$m1" "$m2"
+            ;;
+          [Ss]*) if [ "$ChangeRVXSource" == 0 ]; then echo "ChangeRVXSource == false"; else echo "ChangeRVXSource == true"; fi
+            key="ChangeRVXSource" && value="$isChangeRVXSource"
+            m1="RVX Patches source will be changed to forked (@anddea)"
+            m2="RVX Patches source will remain official (@inotia00)"
+            tfConfig "$key" "$value" "$m1" "$m2"
+            ;;
           [Tt]*) 
             if { [ -f "$simplifyJson" ] && jq -e '.PAT' "$simplifyJson" >/dev/null 2>&1; } || { gh auth status > /dev/null 2>&1 && [ -f "$HOME/.config/gh/hosts.yml" ]; }; then
               if jq -e '.PAT' "$simplifyJson" >/dev/null 2>&1; then
@@ -876,7 +801,12 @@ while true; do
             fi
             pat  # Call the pat function to create & add GitHub token
             ;;
-          [Oo]*) if [ "$ReadPatchesFile" == 1 ]; then echo "ReadPatchesFile == Enabled"; else echo "ReadPatchesFile == Disabled"; fi && read_patches_file ;;
+          [Oo]*) if [ "$ReadPatchesFile" == 0 ]; then echo "ReadPatchesFile == false"; else echo "ReadPatchesFile == true"; fi
+            key="ReadPatchesFile" && value="$isReadPatchesFile"
+            m1="Custom PatchesOptions Loading from File"
+            m2="Recommended PatchesOptions Loading from Script"
+            tfConfig "$key" "$value" "$m1" "$m2"
+            ;;
           [Bb]*) echo "changeYouTubeYTMusicAppIconHeader == $Branding" && change_yt_ytm_app_icon_header ;;
           [Qq]*) break ;;
           *) echo -e "$info Invalid input! Please enter P / L / D / R / S / T / O / B / Q." ;;
