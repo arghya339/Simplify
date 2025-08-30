@@ -1215,7 +1215,7 @@ while true; do
       ;;
     Tumblr)
       pkgName="com.tumblr"
-      appName=("Tumblr")
+      appName=("Tumblr - Social Fandom Art")
       pkgVersion="33.8.0.110"
       #pkgVersion=""
       if [ -z "$pkgVersion" ]; then
