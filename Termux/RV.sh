@@ -1175,18 +1175,29 @@ while true; do
       ;;
     AmazonPrimeVideo)
       pkgName="com.amazon.avod.thirdpartyclient"
-      appName=("Amazon Prime Video")
-      pkgVersion="3.0.412"
+      #web="APKMirror"
+      web="Uptodown"
+      if [ "$web" == "APKMirror" ]; then
+        appName=("Amazon Prime Video")
+        pkgVersion="3.0.412"
+        Type="APK"
+      else
+        appName=("Amazon Video")
+        if [ "$cpuAbi" == "arm64_v8a" ]; then
+          pkgVersion="3.0.412.2947"
+        elif [ "$cpuAbi" == "armeabi_v7a" ]; then
+          pkgVersion="3.0.412.2945"
+        fi
+        Type="apk"
+      fi
       #pkgVersion=""
       if [ -z "$pkgVersion" ]; then
         getVersion "$pkgName"
         pkgVersion="$pkgVersion"
       fi
-      Type="APK"
       Arch=("$cpuAbi")
-      primeVideoFileName=$(basename "$(find "$Download" -type f -name "${appName[0]}_v*-$cpuAbi.apk" -print -quit)")
       activityPatched="com.amazon.avod.thirdpartyclient/.LauncherActivity"
-      build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "APKMirror" "prime_video_patches_args" "$pkgName" "$activityPatched" "" "" ""
+      build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "$web" "prime_video_patches_args" "$pkgName" "$activityPatched" "" "" ""
       ;;
     Twitch)
       pkgName="tv.twitch.android.app"
