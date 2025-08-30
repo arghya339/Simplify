@@ -477,7 +477,7 @@ build_app() {
   fi
   
   local outputAPK="$SimplUsr/${appNameRef[0]}-RV_v${pkgVersion}-$cpuAbi.apk"
-  local fileName=$(basename $outputAPK)
+  local fileName=$(basename $outputAPK 2>/dev/null)
   sleep 0.5  # Wait 500 milliseconds
   second=1
   while true; do
