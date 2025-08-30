@@ -457,6 +457,12 @@ build_app() {
     elif [ "$Type" == "APK" ] || [ "${orRef[0]}" == "Download APK" ]; then
       if [ -n "$pkgVersion" ] && [ "$pkgVersion" != "null" ]; then
         local stock_apk_path=("$Download/${appNameRef[0]}_v${pkgVersion}-${archRef[0]}.apk")
+        sleep 0.5  # Wait 500 milliseconds
+        if [ ! -f "${stock_apk_path[0]}" ]; then
+          fileNamePattern="${appNameRef[0]}_v${pkgVersion}*-${archRef[0]}.apk"  # for primeVideo, primeVideo version in APKMirror version page: 3.0.412 but primeVideo version in Variant list & dlPage: 3.0.412.2947. after primeVide downloaded complete it's match: 3.0.412* 
+          local stock_apk_path=$(find "$Download" -type f -name "${fileNamePattern}" -print -quit)
+          local stock_apk_path=("$stock_apk_path")  # convert into arrays
+        fi
       elif [ -z "$pkgVersion" ] || [ "$pkgVersion" == "null" ]; then
         fileNamePattern="${appNameRef[0]}_v*-${archRef[0]}.apk"
         local stock_apk_path=$(find "$Download" -type f -name "${fileNamePattern}" -print -quit)
