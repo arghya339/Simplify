@@ -571,6 +571,76 @@ DeletePatchLog() {
   echo "Cleanup complete!"
 }
 
+DeleteListPatches() {
+  local pkgArr=(
+    "app.revanced.android.youtube"
+    "app.rvx.android.youtube"
+    "app.rvx.android.apps.youtube.music"
+    "com.spotify.music"
+    "com.zhiliaoapp.musically"
+    "app.revanced.android.photos"
+    "com.instagram.android"
+    "com.facebook.katana"
+    "com.facebook.orca"
+    "com.reddit.frontpage"
+    "com.twitter.android"
+    "com.adobe.lrmobile"
+    "com.microblink.photomath"
+    "com.duolingo"
+    "com.rarlab.rar"
+    "com.amazon.avod.thirdpartyclient"
+    "tv.twitch.android.app"
+    "com.tumblr"
+    "com.instagram.barcelona"
+    "com.strava"
+    "com.soundcloud.android"
+    "ch.protonmail.android"
+    "com.myfitnesspal.android"
+    "com.crunchyroll.crunchyroid"
+    "com.cricbuzz.android"
+  )
+  for pkg in "${pkgArr[@]}"; do
+    find "$SimplUsr" -type f -name "${pkg}_list-patches.txt" \
+      -exec echo "Deleting: {}" \; \
+      -exec rm -f {} \; 2>/dev/null
+  done
+  echo "Cleanup complete!"
+}
+
+DeletePatchesOption() {
+  local patchesArr=(
+    yt_patches_args
+    yt_music_patches_args
+    spotify_patches_args
+    tiktok_patches_args
+    photos_patches_args
+    instagram_patches_args
+    facebook_patches_args
+    fb_messenger_patches_args
+    reddit_patches_args
+    lightroom_patches_args
+    photomath_patches_args
+    duolingo_patches_args
+    rar_patches_args
+    prime_video_patches_args
+    twitch_patches_args
+    tumblr_patches_args
+    threads_patches_args
+    strava_patches_args
+    soundcloud_patches_args
+    protonmail_patches_args
+    myfitnesspal_patches_args
+    crunchyroll_patches_args
+    cricbuzz_patches_args
+  )
+  for patches in "${patchesArr[@]}"; do
+    find "$SimplUsr" -type f -name "${patches}.txt" \
+      -exec echo "Deleting: {}" \; \
+      -exec rm -f {} \; 2>/dev/null
+  done
+  echo "Cleanup complete!"
+}
+
 UninstallPatchedApp() {
   local pkgArr=(
     "app.revanced.android.youtube"
@@ -816,13 +886,15 @@ while true; do
       ;;
     [Mm]*)
       while true; do
-        echo -e "\nV. Spoof Android Version\nA. Spoof Device Architecture\nD. Delete patched apk file\nL. Delete Patch Log\nU. Uninstall Patched Apps\nM. Unmount Patched Apps\nS. Uninstall Simplify\nQ. Quit\n"
+        echo -e "\nV. Spoof Android Version\nA. Spoof Device Architecture\nD. Delete patched apk file\nL. Delete Patch Log\nP. Delete list-patches file\nO. Delete PatchesOption file\nU. Uninstall Patched Apps\nM. Unmount Patched Apps\nS. Uninstall Simplify\nQ. Quit\n"
         read -r -p "Select: " misc
         case "$misc" in
           [Vv]*) overwriteVersion ;;
           [Aa]*) overwriteArch ;;
           [Dd]*) DeletePatchedApk ;;
           [Ll]*) DeletePatchLog ;;
+          [Pp]*) DeleteListPatches ;;
+          [Oo]*) DeletePatchesOption ;;
           [Uu]*) UninstallPatchedApp ;;
           [Mm]*) Unmount && sleep 3 ;;
           [Ss]*)
@@ -863,7 +935,7 @@ while true; do
             esac
             ;;
           [Qq]*) break ;;
-          *) echo -e "$info Invalid input! Please enter V or A or D or L or U or M or S." ;;
+          *) echo -e "$info Invalid input! Please enter V or A or D or L or P or O or U or M or S." ;;
         esac
       done
       sleep 3
