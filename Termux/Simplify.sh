@@ -573,6 +573,7 @@ DeletePatchLog() {
 
 DeleteListPatches() {
   local pkgArr=(
+    "app.revanced"
     "com.google.android.youtube"
     "com.google.android.apps.youtube.music"
     "com.spotify.music"
