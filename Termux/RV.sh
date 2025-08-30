@@ -450,26 +450,27 @@ build_app() {
       if [ -n "$pkgVersion" ] && [ "$pkgVersion" != "null" ]; then
         local stock_apk_path=("$Download/${appNameRef[0]}_v${pkgVersion}-$cpuAbi.apk")
         if [ ! -f "${stock_apk_path[0]}" ]; then
-          local stock_apk=$(find "$Download" -type f -name "${appNameRef[0]}_v${pkgVersion}*-$cpuAbi.apk" -print -quit)
-          local stock_apk_path=("$stock_apk")
+          local stock_apk_path=$(find "$Download" -type f -name "${appNameRef[0]}_v${pkgVersion}*-$cpuAbi.apk" -print -quit)
+          local stock_apk_path=("$stock_apk_path")  # convert into arrays
         fi
       elif [ -z "$pkgVersion" ] || [ "$pkgVersion" == "null" ]; then
-        local stock_apk=$(find "$Download" -type f -name "${appNameRef[0]}_v*-$cpuAbi.apk" -print -quit)
-        local stock_apk_path=("$stock_apk")  # -quit= find stops after first match
+        local stock_apk_path=$(find "$Download" -type f -name "${appNameRef[0]}_v*-$cpuAbi.apk" -print -quit)  # -quit= find stops after first match
+        local stock_apk_path=("$stock_apk_path")  # convert into arrays
       fi
     elif [ "$Type" == "APK" ] || [ "${orRef[0]}" == "Download APK" ]; then
       if [ -n "$pkgVersion" ] && [ "$pkgVersion" != "null" ]; then
         local stock_apk_path=("$Download/${appNameRef[0]}_v${pkgVersion}-${archRef[0]}.apk")
         if [ ! -f "${stock_apk_path[0]}" ]; then
-          local stock_apk=$(find "$Download" -type f -name "${appNameRef[0]}_v${pkgVersion}*-${cpuAbi}.apk" -print -quit)
-          local stock_apk_path=("$stock_apk")
+          local stock_apk_path=$(find "$Download" -type f -name "${appNameRef[0]}_v${pkgVersion}*-${cpuAbi}.apk" -print -quit)
+          local stock_apk_path=("$stock_apk_path")  # convert into arrays
         fi
       elif [ -z "$pkgVersion" ] || [ "$pkgVersion" == "null" ]; then
-        local stock_apk=$(find "$Download" -type f -name "${appNameRef[0]}_v*-${archRef[0]}.apk" -print -quit)
+        local stock_apk_path=$(find "$Download" -type f -name "${appNameRef[0]}_v*-${archRef[0]}.apk" -print -quit)
+        local stock_apk_path=("$stock_apk_path")  # convert into arrays
         if [ ! -f "${stock_apk_path[0]}" ]; then
-          local stock_apk=$(find "$Download" -type f -name "${appNameRef[0]}_v*-${cpuAbi}.apk" -print -quit)
+          local stock_apk_path=$(find "$Download" -type f -name "${appNameRef[0]}_v*-${cpuAbi}.apk" -print -quit)
+          local stock_apk_path=("$stock_apk_path")  # convert into arrays
         fi
-        local stock_apk_path=("$stock_apk")
       fi
     fi
     
