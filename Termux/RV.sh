@@ -1279,7 +1279,8 @@ while true; do
     Proton\ Mail)
       pkgName="ch.protonmail.android"
       appName=("ProtonMail")
-      pkgVersion=""
+      pkgVersion="4.15.0"
+      #pkgVersion=""
       if [ -z "$pkgVersion" ]; then
         getVersion "$pkgName"
         pkgVersion="$pkgVersion"
