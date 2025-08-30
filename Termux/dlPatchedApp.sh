@@ -72,15 +72,9 @@ else
   release="latest"
 fi
 
-# --- Checking Android Version ---
-if [ $Android -le 3 ]; then
-  echo -e "${bad} ${Red}Android $Android is not supported by dlPatchedApp.${Reset}"
-  return 1
-fi
-
 echo -e "$info ${Blue}Target device:${Reset} $Model"
 
-# --- data function: store app data to data.json file ---
+# --- function to store app metadata to data.json file ---
 data() {
   local assets="$1"
   local updated_at="$2"
@@ -102,6 +96,7 @@ data() {
   fi
 }
 
+# --- function to install app ---
 appInstall() {
     echo -e "[?] ${Yellow}Do you want to install ${appName} $version app? [Y/n] ${Reset}\c" && read opt
     case $opt in
@@ -149,6 +144,7 @@ appInstall() {
     esac
 }
 
+# --- function to download app ---
 dlApp() {
   local appName="${1}"
   local owner=$2
@@ -184,7 +180,7 @@ dlApp() {
   fi
 }
 
-# --- dlPatchedApp function: download & install patched apps ---
+# --- function to download & install patched apps ---
 dlPatchedApp() {
   local appName="${1}"
   local owner="$2"
@@ -290,6 +286,7 @@ dlPatchedApp() {
     fi
 }
 
+# --- Decisions block for app that required specific arch & android version ---
 if  [[ $Android -ge 9  &&  ( "$cpuAbi" == "arm64-v8a" || "$cpuAbi" == "x86_64" ) ]]; then
   Instagram="Instagram"
   #Facebook="Facebook"
@@ -310,6 +307,7 @@ if  [[ $Android -ge 11  &&  ( "$cpuAbi" == "arm64-v8a" || "$cpuAbi" == "armeabi-
   Facebook="Facebook"
 fi
 
+# --- Arrays of apps list that required specific android version ---
 if [ $Android -ge 10 ]; then
   apps=(
     Quit
@@ -515,7 +513,7 @@ elif [ $Android -eq 4 ]; then
 fi
 
 while true; do
-  # Display the list
+  # Display the apps list
   echo -e "$info Available apps:"
   for i in "${!apps[@]}"; do
     if [ -n "${apps[$i]}" ] && [ "${apps[$i]}" != "null" ]; then
@@ -541,6 +539,7 @@ while true; do
   fi
   
   release=latest
+  # main conditional control flow
   case ${apps[$idx]} in
     Vanced\ MicroG)
       appName="Vanced MicroG"
@@ -602,7 +601,11 @@ while true; do
           fi
         fi
       elif [ $Android -eq 7 ] || [ $Android -eq 6 ]; then
-        assets="youtube-$cpuAbi-revanced-extended-android-6-7.apk" # Use YT Android 6-7 by kitadai31
+        if [ "$ChangeRVXSource" -eq 0 ]; then
+          assets="youtube-$cpuAbi-revanced-extended-android-6-7.apk" # Use YT Android 6-7 by kitadai31
+        else
+          assets="youtube-$cpuAbi-revanced-extended-android-6-7-arghya339.apk" # Use YT Android 6-7 forked by arghya339
+        fi
       fi
       pkgPatched="app.rvx.android.youtube"
       activityPatched="com.google.android.youtube/.app.honeycomb.Shell\$HomeActivity"

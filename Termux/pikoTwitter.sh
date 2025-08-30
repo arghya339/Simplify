@@ -59,6 +59,7 @@ fi
 
 echo -e "$info ${Blue}Target device:${Reset} $Model"
 
+# --- Download ReVanced CLI v3 ---
 ReVancedCLIJar="$pikoTwitter/revanced-cli-4.6.2-all.jar"
 if [ ! -f "$ReVancedCLIJar" ]; then
   echo -e "$running Downloading revanced-cli-4.6.2-all.jar.."
@@ -84,26 +85,24 @@ else
   tag=$(curl -sL ${auth} "https://api.github.com/repos/crimera/piko/releases" | jq -r '.[].tag_name | select(contains("dev"))' | head -n 1)
 fi
 
+# --- Download piko Patches ---
 bash $Simplify/dlGitHub.sh "crimera" "piko" "$release" ".jar" "$pikoTwitter"
 PatchesJar=$(find "$pikoTwitter" -type f -name "piko-twitter-patches-*.jar" -print -quit)
 echo -e "$info ${Blue}PatchesJar:${Reset} $PatchesJar"
-  curl -sL ${auth} "https://api.github.com/repos/crimera/piko/releases/tags/$tag" | jq -r .body | glow  # Display the release notes
-patchesJarFile=$(basename "$PatchesJar")
-if echo "$patchesJarFile" | grep -q "dev" 2>/dev/null; then
-  isPreReleases="true"
-else
-  isPreReleases=false
-fi
+#echo -e "${Cyan}~~~~~~~~~~~~~~~~~~~~~release notes~~~~~~~~~~~~~~~~~~~~~~${Reset}"
+echo -e "${Cyan}~~~~~~~~~~~~~~~~~~~~~~~changelog~~~~~~~~~~~~~~~~~~~~~~~~${Reset}"
+curl -sL ${auth} "https://api.github.com/repos/crimera/piko/releases/tags/$tag" | jq -r .body | glow  # Display the release notes
+echo -e "${Cyan}~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~${Reset}"
 
-#bash $Simplify/dlGitHub.sh "crimera" "revanced-integrations" "latest" ".apk" "$pikoTwitter"
+# --- Download ReVanced Integrations ---
 bash $Simplify/dlGitHub.sh "crimera" "revanced-integrations" "$release" ".apk" "$pikoTwitter"
 IntegrationsApk=$(find "$pikoTwitter" -type f -name "revanced-integrations-*.apk" -print -quit)
 echo -e "$info ${Blue}IntegrationsApk:${Reset} $IntegrationsApk"
 
+# --- Generate ripLib arg ---
 if [ "$RipLib" -eq 1 ]; then
-  # --- Architecture Detection ---
-  all_arch="arm64-v8a armeabi-v7a x86_64 x86"  # Space-separated list instead of array
-  # Generate ripLib arguments for all ABIs EXCEPT the detected one
+  all_arch="arm64-v8a armeabi-v7a x86_64 x86"  # all ABIs
+  # Generate ripLib arguments for all ABIs EXCEPT the device ABI
   ripLib=""
   for current_arch in $all_arch; do
     if [ "$current_arch" != "$cpuAbi" ]; then
@@ -122,7 +121,7 @@ else
   echo -e "$notice RipLib Disabled!"
 fi
 
-# Get compatiblePackages version from json
+# --- Get compatible Packages version ---
 getVersion() {
   local pkgName="$1"
   
@@ -130,7 +129,7 @@ getVersion() {
   pkgVersion=$($PREFIX/lib/jvm/java-$jdkVersion-openjdk/bin/java -jar $ReVancedCLIJar list-versions $PatchesJar -f=$pkgName | sed 's/^[[:space:]]*//; s/ (.*//;' | grep -E '^[0-9]|^Any$' | sort -rV | head -n 2 | head -n 1)
   preVersion=$($PREFIX/lib/jvm/java-$jdkVersion-openjdk/bin/java -jar $ReVancedCLIJar list-versions $PatchesJar -f=$pkgName | sed 's/^[[:space:]]*//; s/ (.*//;' | grep -E '^[0-9]|^Any$' | sort -rV | head -n 2 | tail -n 1)
   if [ -z "$pkgVersion" ] || [ "$pkgVersion" == "Any" ] || [ "$pkgVersion" == "null" ]; then
-    if [ "$isPreReleases" == "true" ]; then
+    if [ "$release" == "pre" ]; then
       pkgVersion=$(curl -sL ${auth} "https://api.github.com/repos/crimera/twitter-apk/releases" | jq -r '.[].tag_name' | head -1)  # Last Releases
     else
       pkgVersion=$(curl -sL ${auth} "https://api.github.com/repos/crimera/twitter-apk/releases/latest" | jq -r '.tag_name')  # Latest Releases
@@ -146,7 +145,7 @@ getVersion() {
   [[ -f "$pre_stock_apk_path" ]] && rm "$pre_stock_apk_path"  # Remove previous stock apk if exists
 }
 
-#  --- Patch Apps ---
+#  --- Patching Twitter apk ---
 patch_twitter() {
   local -n stock_apk_ref=$1
   local outputAPK=$2
@@ -168,6 +167,7 @@ patch_twitter() {
   fi
 }
 
+# --- Twitter app Info ---
 appName=("X")
 pkgName="com.twitter.android"
 #pkgVersion="11.4.0-release.0"
@@ -181,28 +181,19 @@ outputAPK="$SimplUsr/piko-twitter_v${pkgVersion}-$cpuAbi.apk"
 fileName=$(basename $outputAPK)
 activityPatched="com.twitter.android/.StartActivity"
 
-bash $Simplify/APKMdl.sh "$pkgName" "$pkgVersion" "$Type" "${Arch[0]}"  # Download stock apk from APKMirror
+# --- Download Twitter apk ---
+bash $Simplify/APKMdl.sh "$pkgName" "$pkgVersion" "$Type" "${Arch[0]}"  # Download stock Twitter apk from APKMirror
 xFileName=$(basename "$(find "$Download" -type f -name "${appName[0]}_v*-$cpuAbi.apk" -print -quit)")
 stock_apk_path=("$Download/$xFileName")
+
 sleep 0.5  # Wait 500 milliseconds
-second=1
-while true; do
-  if [ -f "${stock_apk_path[0]}" ]; then
-    break
-  fi
-  if [ $second -ge 30 ]; then
-    echo -e "$notice Oops, ${appName[0]} APK not found in $Download dir after waiting 30 seconds!"
-    break
-  fi
-  second=$((second + 1))
-  sleep 1  # Wait 1 seconds
-done
 if [ -f "${stock_apk_path[0]}" ]; then
   echo -e "$good ${Green}Downloaded ${appName[0]} APK found:${Reset} ${stock_apk_path[0]}"
   echo -e "$running Patching Piko Twitter.."
   patch_twitter "stock_apk_path" "$outputAPK"
 fi
 
+# --- app installation prompt ---
 if [ -f "$outputAPK" ]; then
   echo -e "[?] ${Yellow}Do you want to install Piko Twitter app? [Y/n] ${Reset}\c" && read opt
   case $opt in

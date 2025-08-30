@@ -64,10 +64,12 @@ else
   echo -e "$info ${Blue}Target device:${Reset} $Model"
 fi
 
+# --- Download ReVanced CLI ---
 bash $Simplify/dlGitHub.sh "inotia00" "revanced-cli" "latest" ".jar" "$RVX"
 ReVancedCLIJar=$(find "$RVX" -type f -name "revanced-cli-*-all.jar" -print -quit)
 echo -e "$info ${Blue}ReVancedCLIJar:${Reset} $ReVancedCLIJar"
 
+# --- Download ReVanced Patches ---
 if [ "$FetchPreRelease" -eq 0 ]; then
   release="latest"  # Use latest release
 else
@@ -82,6 +84,7 @@ bash $Simplify/dlGitHub.sh "$owner" "revanced-patches" "$release" ".rvp" "$RVX"
 PatchesRvp=$(find "$RVX" -type f -name "patches-*.rvp" -print -quit)
 echo -e "$info ${Blue}PatchesRvp:${Reset} $PatchesRvp"
 
+# --- Download Vanced MicroG ---
 if ! su -c "id" >/dev/null 2>&1; then
   if [ $Android -eq 5 ]; then
     VancedMicroG="$SimplUsr/microg-0.2.22.212658.apk"
@@ -119,10 +122,10 @@ checkCoreLSPosed() {
   fi
 }
 
+# --- Generate ripLib arg ---
 if [ "$RipLib" -eq 1 ]; then
-  # --- Architecture Detection ---
-  all_arch="arm64-v8a armeabi-v7a x86_64 x86"  # Space-separated list instead of array
-  # Generate ripLib arguments for all ABIs EXCEPT the detected one
+  all_arch="arm64-v8a armeabi-v7a x86_64 x86"  # all ABIs
+  # Generate ripLib arguments for all ABIs EXCEPT the device ABI
   ripLib=""
   for current_arch in $all_arch; do
     if [ "$current_arch" != "$cpuAbi" ]; then
@@ -141,7 +144,7 @@ else
   echo -e "$notice RipLib Disabled!"
 fi
 
-# Get compatiblePackages version from json
+# Get compatiblePackages version from patches
 getVersion() {
   local pkgName="$1"
   
@@ -158,11 +161,10 @@ getVersion() {
 if [ ! -f "$RVX/rvx-options.json" ]; then
   echo -e "$running Downloading revanced-extended-options.json from GitHub.."
   curl -sL "https://github.com/arghya339/Simplify/releases/download/all/rvx-options.json" --progress-bar -o "$RVX/rvx-options.json"
-  # Supported app icon: google_family, pink, revancify_blue, vanced_light
 fi
 comment
 
-#  --- Patch Apps ---
+#  --- Patching Apps Method ---
 patch_app() {
   local stock_apk_path=$1
   local -n patches=$2  # nameref (-n) accept an array name as parameter
@@ -336,6 +338,7 @@ if [ "$ReadPatchesFile" -eq 1 ]; then
   
 fi
 
+# --- function for common app installation prompt ---
 commonPrompt() {
     echo -e "[?] ${Yellow}Do you want to install ${appNameRef[0]} RVX app? [Y/n] ${Reset}\c" && read opt
     case $opt in
@@ -364,7 +367,7 @@ commonPrompt() {
     esac
 }
 
-# --- Build App ---
+# --- function to Build App ---
 build_app() {
   # local variables
   local pkgName=$1
@@ -383,19 +386,7 @@ build_app() {
   
   
   bash $Simplify/APKMdl.sh "$pkgName" "$pkgVersion" "$Type" "$Arch"  # Download stock apk from APKMirror
-  sleep 0.5  # Wait 500 milliseconds
-  second=1
-  while true; do
-    if [ -f "${stock_apk_path[0]}" ]; then
-      break
-    fi
-    if [ $second -ge 30 ]; then
-      echo -e "$notice Oops, ${appNameRef[0]} APK not found in $Download dir after waiting 30 seconds!"
-      break
-    fi
-    second=$((second + 1))
-    sleep 1  # Wait 1 seconds
-  done
+  
   if [ -f "${stock_apk_ref[0]}" ]; then
     echo -e "$good ${Green}Downloaded ${appNameRef[0]} APK found:${Reset} ${stock_apk_ref[0]}"
     echo -e "$running Patching ${appNameRef[0]} RVX.."
@@ -457,6 +448,7 @@ build_app() {
   fi
 }
 
+# --- function to overwriting cpuAbi value ---
 overwriteArch() {
   if jq -e '.DeviceArch != null' "$simplifyJson" >/dev/null 2>&1; then
     cpuAbi=$(jq -r '.DeviceArch' "$simplifyJson" 2>/dev/null)  # Get Device Architecture from json
@@ -494,6 +486,7 @@ overwriteArch() {
         ;;
       *) echo -e "$info Invalid input! Please enter 0, 8, 7, 4, 6." ;;
     esac
+  # update cpuAbi value
   if jq -e '.DeviceArch != null' "$simplifyJson" >/dev/null 2>&1; then
     cpuAbi=$(jq -r '.DeviceArch' "$simplifyJson" 2>/dev/null)  # Get Device Architecture from json
   else
@@ -501,6 +494,7 @@ overwriteArch() {
   fi
 }
 
+# --- Function to retrieve the list of patches for a specific filtered app
 getListOfPatches() {
   local pkgName=$1
   $PREFIX/lib/jvm/java-$jdkVersion-openjdk/bin/java -jar $ReVancedCLIJar list-patches -d=true -f=$pkgName -i=true -o=true -p=false -u -v=false $PatchesRvp
@@ -509,6 +503,7 @@ getListOfPatches() {
   fi
 }
 
+# conditional flow to get list of patches
 listOfPatches() {
   local clean_idx=${idx%\?}
   case "${apps[$clean_idx]}" in
@@ -527,7 +522,7 @@ listOfPatches() {
   esac
 }
 
-# Define the array
+# --- Arrays of apps list that required specific android version ---
 if [ $Android -ge 9 ]; then
   apps=(
     Quit
@@ -549,7 +544,7 @@ elif [ $Android -eq 5 ]; then
 fi
 
 while true; do
-  # Display the list
+  # Display the apps list
   echo -e "$info Available apps:"
   echo -e "↵   . CHANGELOG"
   echo -e "Arch. Spoof Device Arch"
@@ -583,6 +578,7 @@ while true; do
     echo -e "$info \"$idx\" is not a valid index! Please select index [0-${max}]." >&2
   fi
 
+  # main conditional control flow
   case "${apps[$idx]}" in
     YouTube)
       pkgName="com.google.android.youtube"

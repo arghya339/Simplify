@@ -63,6 +63,7 @@ if [ $RipDpi -eq 1 ]; then
 elif [ $RipDpi -eq 0 ]; then
   lcd_dpi="*dpi"
 fi
+Serial=$(su -c 'getprop ro.serialno')  # Get Serial Number required root
 Model=$(getprop ro.product.model)  # Get Device Model
 jdkVersion="21"
 LSPatch="$Simplify/LSPatch"
@@ -81,7 +82,11 @@ else
   auth=""
 fi
 
-echo -e "$info ${Blue}Target device:${Reset} $Model"
+if su -c "id" >/dev/null 2>&1; then
+  echo -e "$info ${Blue}Target device:${Reset} $Model ($Serial)"
+else
+  echo -e "$info ${Blue}Target device:${Reset} $Model"
+fi
 
 # --- Check if CorePatch Installed ---
 checkCoreLSPosed() {
@@ -107,10 +112,12 @@ checkCoreLSPosed() {
   fi
 }
 
+# --- Download LSPatch ---
 bash $Simplify/dlGitHub.sh "JingMatrix" "LSPatch" "latest" ".jar" "$LSPatch"
 LSPatchJar=$(find "$LSPatch" -type f -name "lspatch-*.jar" -print -quit)
 echo -e "$info ${Blue}LSPatchJar:${Reset} $LSPatchJar"
 
+# --- function to download artifacts from github actions (req. gh pat) ---
 dlArtifacts() {
   local owner=$1
   local repo=$2
@@ -126,7 +133,7 @@ dlArtifacts() {
   fi
 }
 
-#  --- Patch Apps ---
+#  --- Patchcing Apps Method ---
 patch_app() {
   local stock_apk_path=$1
   local module_apk_path=$2
@@ -143,7 +150,7 @@ patch_app() {
   fi
 }
 
-# --- Build App ---
+# --- function to Build App ---
 build_app() {
   # local variables
   local pkgName=$1
@@ -214,18 +221,7 @@ build_app() {
     fi
   fi
   sleep 0.5  # Wait 500 milliseconds
-  second=1
-  while true; do
-    if [ -f "${stock_apk_path[0]}" ]; then
-      break
-    fi
-    if [ $second -ge 30 ]; then
-      echo -e "$notice Oops, ${appNameRef[0]} APK not found in $Download dir after waiting 30 seconds!"
-      break
-    fi
-    second=$((second + 1))
-    sleep 1  # Wait 1 seconds
-  done
+  
   local stockFileName=$(basename "${stock_apk_path[0]}")
   local stockFileNameWOExt="${stockFileName%.*}"
   if [ -f "${stock_apk_path[0]}" ]; then
@@ -291,6 +287,7 @@ build_app() {
   fi
 }
 
+# --- function to signing an apk file ---
 sign_app() {
   local pkgName=$1
   local -n appNameRef=$2
@@ -327,18 +324,7 @@ sign_app() {
     fi
   fi
   sleep 0.5  # Wait 500 milliseconds
-  second=1
-  while true; do
-    if [ -f "${stock_apk_path[0]}" ]; then
-      break
-    fi
-    if [ $second -ge 30 ]; then
-      echo -e "$notice Oops, ${appNameRef[0]} APK not found in $Download dir after waiting 30 seconds!"
-      break
-    fi
-    second=$((second + 1))
-    sleep 1  # Wait 1 seconds
-  done
+  
   local stockFileName=$(basename "${stock_apk_path[0]}")
   local stockFileNameWOExt="${stockFileName%.*}"
   if [ -f "${stock_apk_path[0]}" ]; then
@@ -398,6 +384,7 @@ sign_app() {
   1.1.1.1 + WARP Android 5.0+
 comment
 
+# --- Decisions block for app that required specific arch && root ---
 if [ "$cpuAbi" == "arm64-v8a" ] || [ "$cpuAbi" == "armeabi-v7a" ]; then
   Snapchat="Snapchat"
   LINE="LINE"
@@ -406,6 +393,7 @@ if [ "$cpuAbi" == "arm64-v8a" ] || [ "$cpuAbi" == "armeabi-v7a" ]; then
   fi
 fi
 
+# --- Arrays of apps list that required specific android version ---
 if [ $Android -ge 10 ]; then
   apps=(
     Quit
@@ -452,7 +440,7 @@ elif [ $Android -eq 5 ]; then
 fi
 
 while true; do
-  # Display the list
+  # Display the apps list
   echo -e "$info Available apps:"
   for i in "${!apps[@]}"; do
     if [ -n "${apps[$i]}" ] && [ "${apps[$i]}" != "null" ]; then
@@ -473,6 +461,7 @@ while true; do
     echo -e "$info \"$idx\" is not a valid index! Please select index [0-${max}]." >&2
   fi
   
+  # main conditional control flow
   case "${apps[$idx]}" in
     Snapchat)
       appName=("Snapchat")

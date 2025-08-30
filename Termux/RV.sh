@@ -61,10 +61,12 @@ else
   echo -e "$info ${Blue}Target device:${Reset} $Model"
 fi
 
+# --- Download ReVanced CLI ---
 bash $Simplify/dlGitHub.sh "inotia00" "revanced-cli" "latest" ".jar" "$RVX"
 ReVancedCLIJar=$(find "$RVX" -type f -name "revanced-cli-*-all.jar" -print -quit)
 echo -e "$info ${Blue}ReVancedCLIJar:${Reset} $ReVancedCLIJar"
 
+# --- Download ReVanced Patches ---
 if [ "$FetchPreRelease" -eq 0 ]; then
   release="latest"  # Use latest release
 else
@@ -74,6 +76,7 @@ bash $Simplify/dlGitHub.sh "ReVanced" "revanced-patches" "$release" ".rvp" "$RV"
 PatchesRvp=$(find "$RV" -type f -name "patches-*.rvp" -print -quit)
 echo -e "$info ${Blue}PatchesRvp:${Reset} $PatchesRvp"
 
+# --- Download Vanced MicroG ---
 if ! su -c "id" >/dev/null 2>&1; then
   if [ "$Android" -ge "6" ]; then
     bash $Simplify/dlGitHub.sh "inotia00" "VancedMicroG" "latest" ".apk" "$SimplUsr"
@@ -111,10 +114,10 @@ checkCoreLSPosed() {
   fi
 }
 
+# --- Generate ripLib arg ---
 if [ "$RipLib" -eq 1 ]; then
-  # --- Architecture Detection ---
-  all_arch="arm64-v8a armeabi-v7a x86_64 x86"  # Space-separated list instead of array
-  # Generate ripLib arguments for all ABIs EXCEPT the detected one
+  all_arch="arm64-v8a armeabi-v7a x86_64 x86"  # all ABIs
+  # Generate ripLib arguments for all ABIs EXCEPT the device ABI
   ripLib=""
   for current_arch in $all_arch; do
     if [ "$current_arch" != "$cpuAbi" ]; then
@@ -133,7 +136,7 @@ else
   echo -e "$notice RipLib Disabled!"
 fi
 
-# Get compatiblePackages version from json
+# Get compatiblePackages version from patches
 getVersion() {
   local pkgName="$1"
   
@@ -145,7 +148,7 @@ getVersion() {
   pkgVersion=$($PREFIX/lib/jvm/java-$jdkVersion-openjdk/bin/java -jar $ReVancedCLIJar list-versions $PatchesRvp -f=$pkgName | sed 's/^[[:space:]]*//; s/ (.*//;' | grep -E '^[0-9]|^Any$' | sort -rV | head -n 2 | head -n 1)
 }
 
-#  --- Patch Apps ---
+#  --- Patching Apps Method ---
 patch_app() {
   local stock_apk_ref="${1}"
   local -n patches=$2  # nameref (-n) accept an array name as parameter
@@ -392,6 +395,7 @@ if [ "$ReadPatchesFile" -eq 1 ]; then
   
 fi
 
+# --- function for common app installation prompt ---
 commonPrompt() {
     echo -e "[?] ${Yellow}Do you want to install ${appNameRef[0]} RV app? [Y/n] ${Reset}\c" && read opt
     case $opt in
@@ -423,7 +427,7 @@ commonPrompt() {
     esac
 }
 
-# --- Build App ---
+# --- function to Build App ---
 build_app() {
   # local variables
   local pkgName=$1
@@ -535,6 +539,7 @@ build_app() {
   fi
 }
 
+# --- function to overwriting cpuAbi value ---
 overwriteArch() {
   if jq -e '.DeviceArch != null' "$simplifyJson" >/dev/null 2>&1; then
     cpuAbi=$(jq -r '.DeviceArch' "$simplifyJson" 2>/dev/null)  # Get Device Architecture from json
@@ -572,6 +577,7 @@ overwriteArch() {
         ;;
       *) echo -e "$info Invalid input! Please enter 0, 8, 7, 4, 6." ;;
     esac
+  # update cpuAbi value
   if jq -e '.DeviceArch != null' "$simplifyJson" >/dev/null 2>&1; then
     cpuAbi=$(jq -r '.DeviceArch' "$simplifyJson" 2>/dev/null)  # Get Device Architecture from json
   else
@@ -579,6 +585,7 @@ overwriteArch() {
   fi
 }
 
+# --- Function to retrieve the list of patches for a specific filtered app
 getListOfPatches() {
   local pkgName="$1"
   curl -sL 'https://api.revanced.app/v4/patches/list' | jq --arg pkgName "$pkgName" '.[] | select(.compatiblePackages."'"$pkgName"'" != null)'
@@ -599,6 +606,7 @@ getListOfPatches() {
   fi
 }
 
+# conditional flow to get list of patches
 listOfPatches() {
   local clean_idx=${idx%\?}
   case "${apps[$clean_idx]}" in
@@ -727,6 +735,7 @@ listOfPatches() {
   Cricbuzz 5.0+
 comment
 
+# --- Decisions block for app that required specific arch & android version ---
 if su -c "id" >/dev/null 2>&1 && [ "$cpuAbi" == "arm64-v8a" ]; then
   googleRecorder="GoogleRecorder"
 fi
@@ -753,7 +762,7 @@ if  [[ $Android -ge 11  &&  ( "$cpuAbi" == "arm64-v8a" || "$cpuAbi" == "armeabi-
   Facebook="Facebook"
 fi
 
-# Define the array
+# --- Arrays of apps list that required specific android version ---
 if [ $Android -ge 12 ]; then
   apps=(
     Quit
@@ -922,7 +931,7 @@ elif [ $Android -eq 4 ]; then
 fi
 
 while true; do
-  # Display the list
+  # Display the apps list
   echo -e "$info Available apps:"
   echo -e "↵   . CHANGELOG"
   echo -e "Arch. Spoof Device Arch"
@@ -963,6 +972,7 @@ while true; do
     echo -e "$info \"$idx\" is not a valid index! Please select index [0-${max}]." >&2
   fi
 
+  # main conditional control flow
   case ${apps[$idx]} in
     YouTube)
       pkgName="com.google.android.youtube"

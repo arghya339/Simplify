@@ -60,24 +60,29 @@ bash $Simplify/dlGitHub.sh "indrastorms" "Dropped-Patches" "latest" ".rvp" "$Dro
 PatchesRvp=$(find "$Dropped" -type f -name "patches-*.rvp" -print -quit)
 echo -e "$info ${Blue}PatchesRvp:${Reset} $PatchesRvp"
 
-# --- Architecture Detection ---
-all_arch="arm64-v8a armeabi-v7a x86_64 x86"  # Space-separated list instead of array
-# Generate ripLib arguments for all ABIs EXCEPT the detected one
-ripLib=""
-for current_arch in $all_arch; do
-  if [ "$current_arch" != "$cpuAbi" ]; then
-    if [ -z "$ripLib" ]; then
-      ripLib="--rip-lib=$current_arch"  # No leading space for first item
-    else
-      ripLib="$ripLib --rip-lib=$current_arch"  # Add space for subsequent items
+# --- Generate ripLib arg ---
+if [ "$RipLib" -eq 1 ]; then
+  all_arch="arm64-v8a armeabi-v7a x86_64 x86"  # all ABIs
+  # Generate ripLib arguments for all ABIs EXCEPT the device ABI
+  ripLib=""
+  for current_arch in $all_arch; do
+    if [ "$current_arch" != "$cpuAbi" ]; then
+      if [ -z "$ripLib" ]; then
+        ripLib="--rip-lib=$current_arch"  # No leading space for first item
+      else
+        ripLib="$ripLib --rip-lib=$current_arch"  # Add space for subsequent items
+      fi
     fi
-  fi
-done
-# Display the final ripLib arguments
-echo -e "$info ${Blue}cpuAbi:${Reset} $cpuAbi"
-echo -e "$info ${Blue}ripLib:${Reset} $ripLib"
+  done
+  # Display the final ripLib arguments
+  echo -e "$info ${Blue}cpuAbi:${Reset} $cpuAbi"
+  echo -e "$info ${Blue}ripLib:${Reset} $ripLib"
+else
+  ripLib=""  # If RipLib is not enabled, set ripLib to an empty string
+  echo -e "$notice RipLib Disabled!"
+fi
 
-# Get compatiblePackages version from json
+# Get compatiblePackages version from patches
 getVersion() {
   local pkgName="$1"
   
@@ -85,7 +90,7 @@ getVersion() {
   pkgVersion=$($PREFIX/lib/jvm/java-$jdkVersion-openjdk/bin/java -jar $ReVancedCLIJar list-versions $PatchesRvp -f=$pkgName | sed 's/^[[:space:]]*//; s/ (.*//;' | grep -E '^[0-9]|^Any$' | sort -rV | head -n 2 | head -n 1)
 }
 
-#  --- Patch Apps ---
+#  --- Patching Apps Method ---
 patch_app() {
   local -n stock_apk_ref=$1
   local outputAPK=$2
@@ -107,7 +112,7 @@ patch_app() {
   fi
 }
 
-# --- Build App ---
+# --- function to Build App ---
 build_app() {
   # local variables
   local pkgName=$1
@@ -125,19 +130,8 @@ build_app() {
   bash $Simplify/APKMdl.sh "$pkgName" "$pkgVersion" "$Type" "${archRef[0]}"  # Download stock apk from APKMirror
   stockFileName=$(basename "$(find "$Download" -type f -name "${appNameRef[0]}_v*-${archRef[0]}.apk" -print -quit)")
   local stock_apk_path=("$Download/$stockFileName")
+  
   sleep 0.5  # Wait 500 milliseconds
-  second=1
-  while true; do
-    if [ -f "${stock_apk_path[0]}" ]; then
-      break
-    fi
-    if [ $second -ge 30 ]; then
-      echo -e "$notice Oops, ${appNameRef[0]} APK not found in $Download dir after waiting 30 seconds!"
-      break
-    fi
-    second=$((second + 1))
-    sleep 1  # Wait 1 seconds
-  done
   if [ -f "${stock_apk_path[0]}" ]; then
     echo -e "$good ${Green}Downloaded ${appNameRef[0]} APK found:${Reset} ${stock_apk_path[0]}"
     echo -e "$running Patching ${appNameRef[0]} Dropped.."
@@ -182,10 +176,13 @@ build_app() {
   Tasker 5.0+
 comment
 
+
+# --- Decisions block for app that required specific arch ---
 if [ $cpuAbi == "arm64-v8a" ] || [ $cpuAbi == "armeabi-v7a" ]; then
   novaLauncher="NovaLauncher"
 fi
 
+# --- Arrays of apps list that required specific android version ---
 if [ $Android -ge 8 ]; then
   apps=(
     Quit
@@ -200,7 +197,7 @@ elif [ $Android -eq 7 ] || [ $Android -eq 6 ] || [ $Android -eq 5 ]; then
 fi
 
 while true; do
-  # Display the list
+  # Display the apps list
   echo -e "$info Available apps:"
   echo -e "↵. CHANGELOG"
   for i in "${!apps[@]}"; do
@@ -223,7 +220,8 @@ while true; do
   else
     echo -e "$info \"$idx\" is not a valid index! Please select index [0-${max}]." >&2
   fi
-
+  
+  # main conditional control flow
   case ${apps[$idx]} in
     NovaLauncher)
       pkgName="com.teslacoilsw.launcher"
@@ -258,4 +256,4 @@ while true; do
       ;;
   esac  
 done
-#####################################################################################################################################
+###################################################################################################################

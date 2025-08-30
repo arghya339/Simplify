@@ -212,13 +212,6 @@ pkgInstall "pv"  # pv install/update
 pkgInstall "grep"  # grep update
 pkgInstall "sed"  # sed update
 pkgInstall "glow"  # glow install/update
-if su -c "id" >/dev/null 2>&1; then
-  pkgInstall "openssl"  # openssl install/update
-  pkgInstall "python"  # python install/update
-  if ! pip list 2>/dev/null | grep -q "apksigcopier"; then
-    pip install apksigcopier > /dev/null 2>&1  # install apksigcopier using pip
-  fi
-fi
 
 # --- Shizuku Setup first time ---
 if ! su -c "id" >/dev/null 2>&1 && { [ ! -f "$HOME/rish" ] || [ ! -f "$HOME/rish_shizuku.dex" ]; }; then
@@ -816,11 +809,25 @@ while true; do
       sleep 3
       ;;
     [Rr])
+      if su -c "id" >/dev/null 2>&1; then
+        pkgInstall "openssl"  # openssl install/update
+        pkgInstall "python"  # python install/update
+        if ! pip list 2>/dev/null | grep -q "apksigcopier"; then
+          pip install apksigcopier > /dev/null 2>&1  # install apksigcopier using pip
+        fi
+      fi
       curl -sL -o "$RV/RV.sh" "https://raw.githubusercontent.com/arghya339/Simplify/refs/heads/main/Termux/RV.sh"
       bash "$RV/RV.sh"
       sleep 3
       ;;
     [Xx])
+      if su -c "id" >/dev/null 2>&1; then
+        pkgInstall "openssl"  # openssl install/update
+        pkgInstall "python"  # python install/update
+        if ! pip list 2>/dev/null | grep -q "apksigcopier"; then
+          pip install apksigcopier > /dev/null 2>&1  # install apksigcopier using pip
+        fi
+      fi
       curl -sL -o "$RVX/RVX.sh" "https://raw.githubusercontent.com/arghya339/Simplify/refs/heads/main/Termux/RVX.sh"
       bash "$RVX/RVX.sh"
       sleep 3
