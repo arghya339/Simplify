@@ -147,7 +147,7 @@ getVersion() {
 
 #  --- Patch Apps ---
 patch_app() {
-  local -n stock_apk_ref=$1
+  local stock_apk_ref="${1}"
   local -n patches=$2  # nameref (-n) accept an array name as parameter
   local outputAPK=$3
   without_ext="${outputAPK%.*}"  # remove file extension (.apk)
@@ -179,14 +179,14 @@ patch_app() {
   echo -e "$running Patching ${appName} RV.."
   if [ "$appName" == "Instagram" ] || [ "$appName" == "Facebook" ] || [ "$appName" == "Facebook Messenger" ] || [ "$appName" == "Threads" ]; then
     $PREFIX/lib/jvm/java-$jdkVersion-openjdk/bin/java -jar $ReVancedCLIJar patch -p $PatchesRvp \
-    -o "$outputAPK" "${stock_apk_ref[0]}" \
+    -o "$outputAPK" "${stock_apk_ref}" \
     "${patches[@]}" \
     "${universalPatches[@]}" \
     --custom-aapt2-binary="$HOME/aapt2" \
     --purge -f | tee "$log"
   else
     $PREFIX/lib/jvm/java-$jdkVersion-openjdk/bin/java -jar $ReVancedCLIJar patch -p $PatchesRvp \
-      -o "$outputAPK" "${stock_apk_ref[0]}" \
+      -o "$outputAPK" "${stock_apk_ref}" \
       "${patches[@]}" \
       "${universalPatches[@]}" \
       --custom-aapt2-binary="$HOME/aapt2" \
@@ -443,85 +443,43 @@ build_app() {
   
   
   if [ "$web" == "APKMirror" ]; then
-    
     bash $Simplify/APKMdl.sh "$pkgName" "$pkgVersion" "$Type" "${archRef[0]}" "$os_val" "$dpi_val" "$or_val"  # Download stock apk from APKMirror
-    sleep 0.5  # Wait 500 milliseconds
-    if [ "$Type" == "BUNDLE" ] || [ "${orRef[0]}" == "Download APK Bundle" ]; then
-      if [ -n "$pkgVersion" ] && [ "$pkgVersion" != "null" ]; then
-        local stock_apk_path=("$Download/${appNameRef[0]}_v${pkgVersion}-$cpuAbi.apk")
-      elif [ -z "$pkgVersion" ] || [ "$pkgVersion" == "null" ]; then
-        fileNamePattern="${appNameRef[0]}_v*-$cpuAbi.apk"
-        local stock_apk_path=$(find "$Download" -type f -name "${fileNamePattern}" -print -quit)  # -quit= find stops after first match
-        local stock_apk_path=("$stock_apk_path")  # convert into arrays
-      fi
-    elif [ "$Type" == "APK" ] || [ "${orRef[0]}" == "Download APK" ]; then
-      if [ -n "$pkgVersion" ] && [ "$pkgVersion" != "null" ]; then
-        local stock_apk_path=("$Download/${appNameRef[0]}_v${pkgVersion}-${archRef[0]}.apk")
-        sleep 0.5  # Wait 500 milliseconds
-        if [ ! -f "${stock_apk_path[0]}" ]; then
-          fileNamePattern=("${appNameRef[0]}_v${pkgVersion}*-${archRef[0]}.apk")  # for primeVideo, primeVideo version in APKMirror version page: 3.0.412 but primeVideo version in Variant list & dlPage: 3.0.412.2947. after primeVide downloaded complete it's match: 3.0.412* 
-          local stock_apk_path=$(find "$Download" -type f -name "${fileNamePattern[0]}" -print -quit)
-          local stock_apk_path=("$stock_apk_path")  # convert into arrays
-        fi
-      elif [ -z "$pkgVersion" ] || [ "$pkgVersion" == "null" ]; then
-        fileNamePattern="${appNameRef[0]}_v*-${archRef[0]}.apk"
-        local stock_apk_path=$(find "$Download" -type f -name "${fileNamePattern}" -print -quit)
-        local stock_apk_path=("$stock_apk_path")  # convert into arrays
-      fi
-    fi
-    
   elif [ "$web" == "Uptodown" ]; then
-    
     bash $Simplify/dlUptodown.sh "${appNameRef[0]}" "$pkgVersion" "$Type" "${archRef[0]}"  # Download stock apk from Uptodown
-    
-    if [ "$Type" == "xapk" ]; then
-      local stock_apk_path=("$Download/${appNameRef[0]}_v${pkgVersion}-$cpuAbi.apk")
-    elif [ "$Type" == "apk" ]; then
-      local stock_apk_path=("$Download/${appNameRef[0]}_v${pkgVersion}-${archRef[0]}.apk")
+  fi
+  sleep 0.5  # Wait 500 milliseconds
+  if [ "$Type" == "APK" ] || [ "${orRef[0]}" == "Download APK" ] || [ "$Type" == "apk" ]; then
+    if [ "$pkgVersion" == "Any" ] || [ -z "$pkgVersion" ]; then
+      fileNamePattern=("${appNameRef[0]}_v*-${archRef[0]}.apk")
+      stock_apk_path=$(find "$Download" -type f -name "${fileNamePattern[0]}" -print -quit)
+    elif [ -n "$pkgVersion" ] && [ "$pkgVersion" != "Any" ]; then
+      stock_apk_path="$Download/${appNameRef[0]}_v${pkgVersion}-${archRef[0]}.apk"
+      if [ ! -f "${stock_apk_path}" ]; then
+        fileNamePattern=("${appNameRef[0]}_v${pkgVersion}*-${archRef[0]}.apk")  # for primeVideo, primeVideo version in APKMirror version page: 3.0.412 but primeVideo version in Variant list & dlPage: 3.0.412.2947. after primeVide downloaded complete it's match: 3.0.412* 
+        stock_apk_path=$(find "$Download" -type f -name "${fileNamePattern[0]}" -print -quit)
+      fi
     fi
-    
+  else
+    if [ "$pkgVersion" == "Any" ] || [ -z "$pkgVersion" ]; then
+      fileNamePattern=("${appNameRef[0]}_v*-$cpuAbi.apk")
+      stock_apk_path=$(find "$Download" -type f -name "${fileNamePattern[0]}" -print -quit)
+    elif [ -n "$pkgVersion" ] && [ "$pkgVersion" != "Any" ]; then
+      stock_apk_path="$Download/${appNameRef[0]}_v${pkgVersion}-$cpuAbi.apk"
+    fi
   fi
   
   local outputAPK="$SimplUsr/${appNameRef[0]}-RV_v${pkgVersion}-$cpuAbi.apk"
   local fileName=$(basename $outputAPK 2>/dev/null)
-  sleep 0.5  # Wait 500 milliseconds
-  second=1
-  while true; do
-    if [ -f "${stock_apk_path[0]}" ]; then
-      break
-    fi
-    if [ $second -ge 30 ]; then
-      echo -e "$notice Oops, ${appNameRef[0]} APK not found in $Download dir after waiting 30 seconds!"
-      break
-    fi
-    second=$((second + 1))
-    sleep 1  # Wait 1 seconds
-  done
-  if [ -f "${stock_apk_path[0]}" ]; then
-    echo -e "$good ${Green}Downloaded ${appNameRef[0]} APK found:${Reset} ${stock_apk_path[0]}"
-    patch_app "stock_apk_path" "$appPatchesArgs" "$outputAPK" "${appNameRef[0]}"
+  
+  if [ -f "${stock_apk_path}" ]; then
+    echo -e "$good ${Green}Downloaded ${appName} APK found:${Reset} ${stock_apk_path}"
+    patch_app "$stock_apk_path" "$appPatchesArgs" "$outputAPK" "${appName}"
   fi
   
   if [ -f "$outputAPK" ]; then
     if [ "$pkgName" == "com.google.android.youtube" ] || [ "$pkgName" == "com.google.android.apps.photos" ] || [ "$pkgName" == "com.google.android.apps.recorder" ]; then
       if su -c "id" >/dev/null 2>&1; then
         
-        if [ "$Type" == "APK" ] || [ "$Type" == "apk" ]; then
-          if [ "$pkgVersion" == "Any" ] || [ -z "$pkgVersion" ]; then
-            fileNamePattern=("${appNameRef[0]}_v*-${archRef[0]}.apk")
-            stock_apk_path=$(find "$Download" -type f -name "${fileNamePattern[0]}" -print -quit)
-          elif [ -n "$pkgVersion" ] && [ "$pkgVersion" != "Any" ]; then
-            stock_apk_path="$Download/${appNameRef[0]}_v${pkgVersion}-${archRef[0]}.apk"
-          fi
-        else
-          if [ "$pkgVersion" == "Any" ] || [ -z "$pkgVersion" ]; then
-            fileNamePattern=("${appNameRef[0]}_v*-$cpuAbi.apk")
-            stock_apk_path=$(find "$Download" -type f -name "${fileNamePattern[0]}" -print -quit)
-          elif [ -n "$pkgVersion" ] && [ "$pkgVersion" != "Any" ]; then
-            stock_apk_path="$Download/${appNameRef[0]}_v${pkgVersion}-$cpuAbi.apk"
-          fi
-        fi
-
         if [ "$pkgName" == "com.google.android.youtube" ]; then
           echo -e "[?] ${Yellow}Please select installation type - 'M' for Mount or 'I' for SU-Install or 'N' for Installation cancel. [M/i/N]: ${Reset}\c" && read opt
           case $opt in
