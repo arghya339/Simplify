@@ -21,7 +21,7 @@ Reset="\033[0m"
 apkMount() {
   # local variables
   local stock=${1}
-  local stockFileName=$(basename "$stock")
+  local stockFileName="$(basename "$stock")"
   local patched=${2}
   local appName=${3}
   local pkgName=$4
