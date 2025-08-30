@@ -536,7 +536,7 @@ build_app() {
               echo -e "$running Please Wait !! Mounting Patched ${appNameRef[0]} RV apk.."
               su -mm -c "/system/bin/sh $Simplify/apkMount.sh \"${stock_apk_path}\" \"$outputAPK\" \"${appName}\" \"$pkgName\" \"$pkgVersion\"" &> /dev/null
               su -mm -c "/system/bin/sh $Simplify/apkMount.sh \"${stock_apk_path}\" \"$outputAPK\" \"${appName}\" \"$pkgName\" \"$pkgVersion\"" | tee "$SimplUsr/${appNameRef[0]}-RV_mount-log.txt"
-              rm $outputAPK
+              rm -f "$outputAPK"
               ;;
             N*|n*) echo -e "$notice ${appNameRef[0]} RV Installaion skipped!" ;;
             *) echo -e "$info Invalid choice! ${appNameRef[0]} RV Installaion skipped." ;;
@@ -548,7 +548,7 @@ build_app() {
               echo -e "$running Please Wait !! Mounting Patched ${appNameRef[0]} RV apk.."
               su -mm -c "/system/bin/sh $Simplify/apkMount.sh \"${stock_apk_path}\" \"$outputAPK\" \"${appName}\" \"$pkgName\" \"$pkgVersion\"" &> /dev/null
               su -mm -c "/system/bin/sh $Simplify/apkMount.sh \"${stock_apk_path}\" \"$outputAPK\" \"${appName}\" \"$pkgName\" \"$pkgVersion\"" | tee "$SimplUsr/${appNameRef[0]}-RV_mount-log.txt"
-              rm $outputAPK
+              rm -f "$outputAPK"
               ;;
             n*|N*) echo -e "$notice ${appNameRef[0]} RV Installaion skipped!" ;;
             *) echo -e "$info Invalid choice! ${appNameRef[0]} RV Installaion skipped." ;;
