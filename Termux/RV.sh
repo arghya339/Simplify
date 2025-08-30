@@ -445,15 +445,10 @@ build_app() {
   if [ "$web" == "APKMirror" ]; then
     
     bash $Simplify/APKMdl.sh "$pkgName" "$pkgVersion" "$Type" "${archRef[0]}" "$os_val" "$dpi_val" "$or_val"  # Download stock apk from APKMirror
-    
+    sleep 0.5  # Wait 500 milliseconds
     if [ "$Type" == "BUNDLE" ] || [ "${orRef[0]}" == "Download APK Bundle" ]; then
       if [ -n "$pkgVersion" ] && [ "$pkgVersion" != "null" ]; then
         local stock_apk_path=("$Download/${appNameRef[0]}_v${pkgVersion}-$cpuAbi.apk")
-        if [ ! -f "${stock_apk_path[0]}" ]; then
-          fileNamePattern="${appNameRef[0]}_v${pkgVersion}*-$cpuAbi.apk"
-          local stock_apk_path=$(find "$Download" -type f -name "${fileNamePattern}" -print -quit)
-          local stock_apk_path=("$stock_apk_path")  # convert into arrays
-        fi
       elif [ -z "$pkgVersion" ] || [ "$pkgVersion" == "null" ]; then
         fileNamePattern="${appNameRef[0]}_v*-$cpuAbi.apk"
         local stock_apk_path=$(find "$Download" -type f -name "${fileNamePattern}" -print -quit)  # -quit= find stops after first match
@@ -462,20 +457,10 @@ build_app() {
     elif [ "$Type" == "APK" ] || [ "${orRef[0]}" == "Download APK" ]; then
       if [ -n "$pkgVersion" ] && [ "$pkgVersion" != "null" ]; then
         local stock_apk_path=("$Download/${appNameRef[0]}_v${pkgVersion}-${archRef[0]}.apk")
-        if [ ! -f "${stock_apk_path[0]}" ]; then
-          fileNamePattern="${appNameRef[0]}_v${pkgVersion}*-${cpuAbi}.apk"
-          local stock_apk_path=$(find "$Download" -type f -name "${fileNamePattern}" -print -quit)
-          local stock_apk_path=("$stock_apk_path")  # convert into arrays
-        fi
       elif [ -z "$pkgVersion" ] || [ "$pkgVersion" == "null" ]; then
         fileNamePattern="${appNameRef[0]}_v*-${archRef[0]}.apk"
         local stock_apk_path=$(find "$Download" -type f -name "${fileNamePattern}" -print -quit)
         local stock_apk_path=("$stock_apk_path")  # convert into arrays
-        if [ ! -f "${stock_apk_path[0]}" ]; then
-          fileNamePattern="${appNameRef[0]}_v*-${cpuAbi}.apk"
-          local stock_apk_path=$(find "$Download" -type f -name "${fileNamePattern}" -print -quit)
-          local stock_apk_path=("$stock_apk_path")  # convert into arrays
-        fi
       fi
     fi
     
