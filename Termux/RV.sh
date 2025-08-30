@@ -1278,16 +1278,23 @@ while true; do
       ;;
     Proton\ Mail)
       pkgName="ch.protonmail.android"
-      appName=("Proton Mail")
+      appName=("ProtonMail")
       pkgVersion=""
       if [ -z "$pkgVersion" ]; then
         getVersion "$pkgName"
         pkgVersion="$pkgVersion"
       fi
-      Type="APK"
-      Arch=("universal")
+      #web="APKMirror"
+      web="Uptodown"
+      if [ "$web" == "APKMirror" ]; then
+        Type="APK"
+        Arch=("universal")
+      else
+        Type="apk"
+        Arch=("armeabi-v7a, x86, arm64-v8a, x86_64")
+      fi
       activityPatched="ch.protonmail.android/.MainActivity"
-      build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "APKMirror" "protonmail_patches_args" "$pkgName" "$activityPatched" "" "" ""
+      build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "$web" "protonmail_patches_args" "$pkgName" "$activityPatched" "" "" ""
       ;;
     MyFitnessPal)
       pkgName="com.myfitnesspal.android"
