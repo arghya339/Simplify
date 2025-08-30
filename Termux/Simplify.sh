@@ -573,12 +573,12 @@ DeletePatchLog() {
 
 DeleteListPatches() {
   local pkgArr=(
-    "app.revanced.android.youtube"
-    "app.rvx.android.youtube"
-    "app.rvx.android.apps.youtube.music"
+    "com.google.android.youtube"
+    "com.google.android.apps.youtube.music"
     "com.spotify.music"
     "com.zhiliaoapp.musically"
-    "app.revanced.android.photos"
+    "com.google.android.apps.photos"
+    "com.google.android.apps.recorder"
     "com.instagram.android"
     "com.facebook.katana"
     "com.facebook.orca"
