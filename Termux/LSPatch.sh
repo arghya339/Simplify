@@ -202,17 +202,17 @@ build_app() {
   fi
   sleep 0.5  # Wait 500 milliseconds
   if [ "$Type" == "APK" ] || [ "$Type" == "apk" ]; then
-    if [ "$pkgVersion" == "Any" ] || [ -z "$pkgVersion" ]; then
+    if [ -z "$pkgVersion" ]; then
       fileNamePattern=("${appNameRef[0]}_v*-${archRef[0]}.apk")
       stock_apk_path=$(find "$Download" -type f -name "${fileNamePattern[0]}" -print -quit)
-    elif [ -n "$pkgVersion" ] && [ "$pkgVersion" != "Any" ]; then
+    elif [ -n "$pkgVersion" ]; then
       stock_apk_path="$Download/${appNameRef[0]}_v${pkgVersion}-${archRef[0]}.apk"
     fi
   else
-    if [ "$pkgVersion" == "Any" ] || [ -z "$pkgVersion" ]; then
+    if [ -z "$pkgVersion" ]; then
       fileNamePattern=("${appNameRef[0]}_v*-$cpuAbi.apk")
       stock_apk_path=$(find "$Download" -type f -name "${fileNamePattern[0]}" -print -quit)
-    elif [ -n "$pkgVersion" ] && [ "$pkgVersion" != "Any" ]; then
+    elif [ -n "$pkgVersion" ]; then
       stock_apk_path="$Download/${appNameRef[0]}_v${pkgVersion}-$cpuAbi.apk"
     fi
   fi
