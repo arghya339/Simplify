@@ -300,13 +300,23 @@ APKMdl() {
   appName=$(echo "${appName%%[:—(]*}" | xargs)
   FileName="${appName}_v${VERSION}-${Arch}${file_ext}"
   outputPath="${Download}/${FileName}" 
-  findFile=$(find "$Download" -type f -name "${appName}_v*-${cpuAbi}.apk" -print -quit)
+  
+  if [ "$file_ext" == ".apkm" ]; then
+    fileNamePattern="${appName}_v*-${cpuAbi}.apk"
+    apkName="${appName}_v${VERSION}-${cpuAbi}.apk"
+  else
+    fileNamePattern="${appName}_v*-${Arch}.apk"
+    apkName="${appName}_v${VERSION}-${Arch}.apk"
+  fi
+  findFile=$(find "$Download" -type f -name "${fileNamePattern}" -print -quit)
+  
   if [ -f "$findFile" ]; then
-    fileBaseName=$(basename "$findFile")
-    if [ "$fileBaseName" != "${appName}_v${VERSION}-${cpuAbi}.apk" ]; then
+    fileBaseName=$(basename "$findFile" 2>/dev/null)
+    if [ "$fileBaseName" != "${apkName}" ]; then
       rm -f "$findFile"  # remove previous version apk
     fi
   fi
+  
   if [ ! -f "$Download/${appName}_v${VERSION}-${cpuAbi}.apk" ] && [ ! -f "$outputPath" ]; then
     echo -e "$running Attempting to download APK from: ${Blue}$final_app_url${Reset}"
     while true; do

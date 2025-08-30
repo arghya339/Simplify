@@ -214,7 +214,7 @@ dlUptodown() {
   SHA256="${sha256:-N/A}"
   
   if [ -z "$data_version" ]; then
-    Arch="${architecture:-N/A}"
+    Arch="${architecture}"
   else
     Arch="$arch"
   fi
@@ -226,16 +226,24 @@ dlUptodown() {
     file_ext="apk"
   fi
   
-  findFile=$(find "$Download" -type f -name "${appName}_v*-$cpuAbi.apk" -print -quit)
-  findFile=("$findFile")  # convert into arrays
-  if [ -f "${findFile[0]}" ]; then
-    fileBaseName=$(basename "${findFile[0]}")
-    fileBaseName=("$fileBaseName")  # convert into arrays
+  if [ "$Type" == "XAPK" ]; then
+    fileNamePattern="${appName}_v*-$cpuAbi.apk"
     apkName=("${appName}_v${appVersion}-$cpuAbi.apk")
+  else
+    fileNamePattern="${appName}_v*-${Arch}.apk"
+    apkName=("${appName}_v${appVersion}-${Arch}.apk")
+  fi
+  findFile=$(find "$Download" -type f -name "${fileNamePattern}" -print -quit)
+  findFile=("$findFile")  # convert into arrays
+  
+  if [ -f "${findFile[0]}" ]; then
+    fileBaseName=$(basename "${findFile[0]}" 2>/dev/null)
+    fileBaseName=("$fileBaseName")  # convert into arrays
     if [ "${fileBaseName[0]}" != "${apkName[0]}" ]; then
       rm -f "${findFile[0]}"  # remove previous version apk
     fi
   fi
+  
   apk_path=("$Download/${appName}_v${appVersion}-$cpuAbi.apk")
   apks_path=("$Download/${appName}_v${appVersion}-${Arch}.apks")
   if [ ! -f "${apk_path[0]}" ] || [ ! -f "${apks_path[0]}" ]; then
