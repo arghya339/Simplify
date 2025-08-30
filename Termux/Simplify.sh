@@ -262,6 +262,10 @@ curl -sL "https://raw.githubusercontent.com/arghya339/Simplify/refs/heads/main/T
 
 curl -sL "https://raw.githubusercontent.com/arghya339/Simplify/refs/heads/main/Termux/apkInstall.sh" --progress-bar -o $Simplify/apkInstall.sh
 
+if su -c "id" >/dev/null 2>&1; then
+  curl -sL -o "$Simplify/apkMount.sh" "https://raw.githubusercontent.com/arghya339/Simplify/refs/heads/main/Termux/apkMount.sh"
+fi
+
 # --- Download branding.zip ---
 if [ ! -d "$SimplUsr/.branding" ] && [ ! -f "$SimplUsr/branding.zip" ]; then
   echo -e "$running Downloading ${Red}branding.zip${Reset} from GitHub.."
@@ -833,9 +837,6 @@ while true; do
       ;;
     [Ll])
       curl -sL -o "$LSPatch/LSPatch.sh" "https://raw.githubusercontent.com/arghya339/Simplify/refs/heads/main/Termux/LSPatch.sh"
-      if su -c "id" >/dev/null 2>&1; then
-        curl -sL -o "$Simplify/apkMount.sh" "https://raw.githubusercontent.com/arghya339/Simplify/refs/heads/main/Termux/apkMount.sh"
-      fi
       bash "$LSPatch/LSPatch.sh"
       sleep 3
       ;;
