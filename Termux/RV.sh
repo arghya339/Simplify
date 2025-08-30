@@ -450,24 +450,24 @@ build_app() {
       if [ -n "$pkgVersion" ] && [ "$pkgVersion" != "null" ]; then
         local stock_apk_path=("$Download/${appNameRef[0]}_v${pkgVersion}-$cpuAbi.apk")
         if [ ! -f "${stock_apk_path[0]}" ]; then
-          local stock_apk=$(find "$Download" -type f -name "${appName}_v${pkgVersion}*-$cpuAbi.apk" -print -quit)
+          local stock_apk=$(find "$Download" -type f -name "${appNameRef[0]}_v${pkgVersion}*-$cpuAbi.apk" -print -quit)
           local stock_apk_path=("$stock_apk")
         fi
       elif [ -z "$pkgVersion" ] || [ "$pkgVersion" == "null" ]; then
-        local stock_apk=$(find "$Download" -type f -name "${appName}_v*-$cpuAbi.apk" -print -quit)
+        local stock_apk=$(find "$Download" -type f -name "${appNameRef[0]}_v*-$cpuAbi.apk" -print -quit)
         local stock_apk_path=("$stock_apk")  # -quit= find stops after first match
       fi
     elif [ "$Type" == "APK" ] || [ "${orRef[0]}" == "Download APK" ]; then
       if [ -n "$pkgVersion" ] && [ "$pkgVersion" != "null" ]; then
         local stock_apk_path=("$Download/${appNameRef[0]}_v${pkgVersion}-${archRef[0]}.apk")
         if [ ! -f "${stock_apk_path[0]}" ]; then
-          local stock_apk=$(find "$Download" -type f -name "${appName}_v${pkgVersion}*-${cpuAbi}.apk" -print -quit)
+          local stock_apk=$(find "$Download" -type f -name "${appNameRef[0]}_v${pkgVersion}*-${cpuAbi}.apk" -print -quit)
           local stock_apk_path=("$stock_apk")
         fi
       elif [ -z "$pkgVersion" ] || [ "$pkgVersion" == "null" ]; then
-        local stock_apk=$(find "$Download" -type f -name "$Download/${appNameRef[0]}_v*-${archRef[0]}.apk" -print -quit)
+        local stock_apk=$(find "$Download" -type f -name "${appNameRef[0]}_v*-${archRef[0]}.apk" -print -quit)
         if [ ! -f "${stock_apk_path[0]}" ]; then
-          local stock_apk=$(find "$Download" -type f -name "${appName}_v*-${cpuAbi}.apk" -print -quit)
+          local stock_apk=$(find "$Download" -type f -name "${appNameRef[0]}_v*-${cpuAbi}.apk" -print -quit)
         fi
         local stock_apk_path=("$stock_apk")
       fi
