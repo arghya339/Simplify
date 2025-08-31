@@ -280,7 +280,7 @@ dlPatchedApp() {
       else
         # Download spotube .aab file
         echo -e "$running Downloading $appName.."
-        bash $Simplify/dlGitHub.sh "$owner" "$repo" "nightly" ".apk" "$SimplUsr" "Spotube-playstore-all-arch.aab"
+        bash $Simplify/dlGitHub.sh "$owner" "$repo" "nightly" ".aab" "$SimplUsr" "Spotube-playstore-all-arch.aab"
         assets_name="Spotube-playstore-all-arch.aab"
         aab_path="$SimplUsr/$assets_name"
         filename_wo_ext="${$aab_path%.*}"
