@@ -171,7 +171,7 @@ branding="google_family"
 isCheckTermuxUpdate=1
 CheckTermuxUpdate=$(jq -r '.CheckTermuxUpdate' "$simplifyJson" 2>/dev/null)  # Get CheckTermuxUpdate value from json
 isJdkVersion=21
-jdkVersion=$(jq -r '.openjdk' "$simplifyJson" 2>/dev/null)  # Get CheckTermuxUpdate value from json
+jdkVersion=$(jq -r '.openjdk' "$simplifyJson" 2>/dev/null)
 
 # --- pkg uninstall function ---
 pkgUninstall() {
@@ -209,7 +209,11 @@ pkgInstall "curl"  # curl update
 pkgInstall "aria2"  # aria2 install/update
 pkgInstall "jq"  # jq install/update
 pkgInstall "pup"  # pup install/update
-pkgInstall "openjdk-$jdkVersion"  # java install/update
+if [ -f "$simplifyJson" ]; then
+  pkgInstall "openjdk-$jdkVersion"  # java install/update
+else
+  pkgInstall "openjdk-$isJdkVersion"  # java install/update
+fi
 pkgInstall "apksigner"  # apksigner install/update
 pkgInstall "bsdtar"  # bsdtar install/update
 pkgInstall "pv"  # pv install/update
@@ -592,17 +596,17 @@ change_jdk_version() {
   if [ ${#jdkVersion[@]} -ne 0 ]; then
     while true; do
       # Display available versions
-      echo "Available OpenJDK versions:"
+      echo -e "$info Available openjdk versions:"
       for i in "${!jdkVersion[@]}"; do
-        echo "$((i+1)). openjdk-${jdkVersion[$i]}"
+        echo "▶ openjdk-${jdkVersion[$i]}"
       done
 
       # Prompt for version selection
-      read -p "Enter JDK version number (e.g.17, 21): " version
+      read -p "Enter jdk version number [${jdkVersion[@]}]: " version
       
       # Check if input is empty
       if [ -z "$version" ]; then
-        echo "$notice Please enter a version number."
+        echo -e "$notice $version not a valid number! Please enter a version number."
         continue  # skips current iteration & continue next iteration
       fi
 
@@ -617,12 +621,14 @@ change_jdk_version() {
     
       # Display result
       if [ "$found" = true ]; then
-        echo "Selected: openjdk-$version"
+        echo -e "$info Selected: openjdk-$version"
         config "openjdk" "$version"
+        pkgInstall "openjdk-$version"  # java install/update
+        echo -e "$good ${Green}Java version change successfully!${Reset}"
         break
       else
-        echo "$notice openjdk-$version is not available!"
-        echo "$info Available versions: ${jdkVersion[*]}"
+        echo -e "$notice openjdk-$version is not available!"
+        echo -e "$info Available versions: ${jdkVersion[*]}"
       fi
     done
   fi
@@ -982,6 +988,7 @@ while true; do
         ChangeRVXSource="$(jq -r '.ChangeRVXSource' "$simplifyJson" 2>/dev/null)"
         ReadPatchesFile="$(jq -r '.ReadPatchesFile' "$simplifyJson" 2>/dev/null)"
         Branding=$(jq -r '.Branding' "$simplifyJson" 2>/dev/null)
+        jdkVersion=$(jq -r '.openjdk' "$simplifyJson" 2>/dev/null)
         echo -e "P. FetchPreRelease\nL. RipLocale\nD. RipDpi\nR. RipLib\nS. Change RVX Source\nT. Add gh PAT (increases gh api rate limit)\nO. Import Custom PatchesOptions from file\nB. Change YouTube & YT Music AppIcon & Header\nU. Check Termux update on startup\nJ. Change Java version\nQ. Quit\n"
         read -r -p "Select: " opt
         case "$opt" in
