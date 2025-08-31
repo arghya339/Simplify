@@ -411,7 +411,7 @@ changeVersionCode() {
   
   # Decoding
   echo -e "$running Decoding resources.."
-  $PREFIX/lib/jvm/java-$jdkVersion-openjdk/bin/java -jar $apktoolJar d "$input_apk_path" -o "${filename_wo_ext}_src"
+  $PREFIX/lib/jvm/java-$jdkVersion-openjdk/bin/java -jar $apktoolJar d -f "$input_apk_path" -o "${filename_wo_ext}_src"
   cat "${filename_wo_ext}_src/apktool.yml" | grep -E "versionCode"
   
   # Overwrite versionCode
