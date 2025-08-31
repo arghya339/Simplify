@@ -31,9 +31,13 @@ if jq -e '.DeviceArch != null' "$simplifyJson" >/dev/null 2>&1; then
 else
   cpuAbi=$(getprop ro.product.cpu.abi)  # Get Android arch
 fi
+if jq -e '.openjdk != null' "$simplifyJson" >/dev/null 2>&1; then
+  jdkVersion=$(jq -r '.openjdk' "$simplifyJson" 2>/dev/null)  # Get openjdk value (version) from json
+else
+  jdkVersion="21"
+fi
 Serial=$(su -c 'getprop ro.serialno')  # Get Serial Number required root
 Model=$(getprop ro.product.model)  # Get Device Model
-jdkVersion="21"
 RV="$Simplify/RV"
 RVX="$Simplify/RVX"
 SimplUsr="/sdcard/Simplify"  # /storage/emulated/0/Simplify dir

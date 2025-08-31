@@ -22,7 +22,6 @@ Reset="\033[0m"
 Android=$(getprop ro.build.version.release)  # Get Android version
 cpuAbi=$(getprop ro.product.cpu.abi)  # Get Android arch
 Model=$(getprop ro.product.model)  # Get Device Model
-jdkVersion="21"
 locale=$(getprop persist.sys.locale | cut -d'-' -f1)  # Get System Languages
 if [ -z $locale ]; then
   locale=$(getprop ro.product.locale | cut -d'-' -f1)  # Get Languages
@@ -53,6 +52,11 @@ dataJson="$Simplify/data.json"  # Data file to store simplify dlPatchedApp data
     jq -n '[]' > "$dataJson"
   fi
 simplifyJson="$Simplify/simplify.json"  # Configuration file to store simplify settings
+if jq -e '.openjdk != null' "$simplifyJson" >/dev/null 2>&1; then
+  jdkVersion=$(jq -r '.openjdk' "$simplifyJson" 2>/dev/null)  # Get openjdk value (verison) from json
+else
+  jdkVersion="21"
+fi
 ChangeRVXSource="$(jq -r '.ChangeRVXSource' "$simplifyJson" 2>/dev/null)"
 FetchPreRelease=$(jq -r '.FetchPreRelease' "$simplifyJson" 2>/dev/null)
 if [ -f "$HOME/.config/gh/hosts.yml" ] && gh auth status > /dev/null 2>&1; then

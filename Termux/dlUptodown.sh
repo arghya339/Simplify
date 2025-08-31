@@ -21,13 +21,17 @@ Reset="\033[0m"
 
 # --- Global Variables ---
 Download="/sdcard/Download"  # Download dir
-jdkVersion="21"
 Simplify="$HOME/Simplify"
 simplifyJson="$Simplify/simplify.json"  # Configuration file to store simplify settings
 if jq -e '.DeviceArch != null' "$simplifyJson" >/dev/null 2>&1; then
   cpuAbi=$(jq -r '.DeviceArch' "$simplifyJson" 2>/dev/null)  # Get Device Architecture from json
 else  
   cpuAbi=$(getprop ro.product.cpu.abi)  # Get Android architecture
+fi
+if jq -e '.openjdk != null' "$simplifyJson" >/dev/null 2>&1; then
+  jdkVersion=$(jq -r '.openjdk' "$simplifyJson" 2>/dev/null)  # Get openjdk value (verison) from json
+else
+  jdkVersion="21"
 fi
 RipLocale="$(jq -r '.RipLocale' "$simplifyJson" 2>/dev/null)"
 RipDpi="$(jq -r '.RipDpi' "$simplifyJson" 2>/dev/null)"

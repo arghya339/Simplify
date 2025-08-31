@@ -31,6 +31,11 @@ if jq -e '.DeviceArch != null' "$simplifyJson" >/dev/null 2>&1; then
 else
   cpuAbi=$(getprop ro.product.cpu.abi)  # Get Android arch
 fi
+if jq -e '.openjdk != null' "$simplifyJson" >/dev/null 2>&1; then
+  jdkVersion=$(jq -r '.openjdk' "$simplifyJson" 2>/dev/null)  # Get openjdk value (verison) from json
+else
+  jdkVersion="21"
+fi
 RipLocale="$(jq -r '.RipLocale' "$simplifyJson" 2>/dev/null)"
 RipDpi="$(jq -r '.RipDpi' "$simplifyJson" 2>/dev/null)"
 RipLib="$(jq -r '.RipLib' "$simplifyJson" 2>/dev/null)"
@@ -65,7 +70,6 @@ elif [ $RipDpi -eq 0 ]; then
 fi
 Serial=$(su -c 'getprop ro.serialno')  # Get Serial Number required root
 Model=$(getprop ro.product.model)  # Get Device Model
-jdkVersion="21"
 LSPatch="$Simplify/LSPatch"
 SimplUsr="/sdcard/Simplify"  # /storage/emulated/0/Simplify dir
 mkdir -p "$Simplify" "$LSPatch" "$SimplUsr"  # Create $Simplify, $LSPatch and $SimplUsr dir if it does't exist
