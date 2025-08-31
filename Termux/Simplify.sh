@@ -168,6 +168,8 @@ isRipLib=1  # Default value (true/on/1) for RipLib, it's delete lib dir from pat
 isChangeRVXSource=0  # Default value (false/off/0) for ChangeRVXSource, means patches source remain unchange ie. official source (inotia00) for RVX Patches
 isReadPatchesFile=0  # Default value (false/off/0) for ReadPatchesFile, means recommended PatchesOptions loading from script.
 branding="google_family"
+isCheckTermuxUpdate=1
+CheckTermuxUpdate=$(jq -r '.CheckTermuxUpdate' "$simplifyJson" 2>/dev/null)  # Get CheckTermuxUpdate value from json
 
 # --- pkg uninstall function ---
 pkgUninstall() {
@@ -340,8 +342,8 @@ config() {
   
   jq --arg key "$key" --arg value "$value" '.[$key] = $value' "$simplifyJson" > temp.json && mv temp.json "$simplifyJson"
 }
-all_key=("FetchPreRelease" "RipLocale" "RipDpi" "RipLib" "ChangeRVXSource" "ReadPatchesFile" "Branding")
-all_value=("$isPreRelease" "$isRipLocale" "$isRipDpi" "$isRipLib" "$isChangeRVXSource" "$isReadPatchesFile" "$branding")
+all_key=("FetchPreRelease" "RipLocale" "RipDpi" "RipLib" "ChangeRVXSource" "ReadPatchesFile" "Branding" "CheckTermuxUpdate")
+all_value=("$isPreRelease" "$isRipLocale" "$isRipDpi" "$isRipLib" "$isChangeRVXSource" "$isReadPatchesFile" "$branding" "$isCheckTermuxUpdate")
 # Loop through all keys and set values if they don't exist
 for i in "${!all_key[@]}"; do
   if ! jq -e --arg key "${all_key[i]}" 'has($key)' "$simplifyJson" >/dev/null; then
@@ -475,6 +477,99 @@ change_yt_ytm_app_icon_header() {
     esac
   done
 }
+
+if [ $CheckTermuxUpdate -eq 1 ]; then
+  if [ $Android -ge 8 ]; then
+    latestReleases=$(curl -s https://api.github.com/repos/termux/termux-app/releases/latest | jq -r '.tag_name | sub("^v"; "")')  # 0.118.0
+    if [ "$TERMUX_VERSION" != "$latestReleases" ]; then
+      echo -e "$bad Termux app is outdated!"
+      echo -e "$running Downloading Termux app update.."
+      while true; do
+        curl -L --progress-bar -C - -o "$SimplUsr/termux-app_v${latestReleases}+github-debug_$cpuAbi.apk" "https://github.com/termux/termux-app/releases/download/v$latestReleases/termux-app_v${latestReleases}+github-debug_$cpuAbi.apk"
+        if [ $? -eq 0 ]; then
+          break  # break the resuming download loop
+        fi
+        echo -e "$notice Retrying in 5 seconds.." && sleep 5  # wait 5 seconds
+      done
+      #bash $Simplify/dlGitHub.sh "termux" "termux-app" "latest" ".apk" "$SimplUsr" "termux-app_v.*+github-debug_$cpuAbi.apk"
+      echo -e "$notice Please rerun this script again after Termux app update!"
+      echo -e "$running Installing app update and restarting Termux app.." && sleep 3
+      if su -c "id" >/dev/null 2>&1; then
+        su -c "cp '$SimplUsr/termux-app_v${latestReleases}+github-debug_$cpuAbi.apk' '/data/local/tmp/termux-app_v${latestReleases}+github-debug_$cpuAbi.apk'"
+        # Temporary Disable SELinux Enforcing during installation if it not in Permissive
+        if [ "$(su -c 'getenforce 2>/dev/null')" = "Enforcing" ]; then
+          su -c "setenforce 0"  # set SELinux to Permissive mode to unblock unauthorized operations
+          touch "$Simplify/setenforce0"
+          su -c "pm install -i com.android.vending '/data/local/tmp/termux-app_v${latestReleases}+github-debug_$cpuAbi.apk'"
+        else
+          su -c "pm install -i com.android.vending '/data/local/tmp/termux-app_v${latestReleases}+github-debug_$cpuAbi.apk'"
+        fi
+      else
+        bash $Simplify/apkInstall.sh "$SimplUsr/termux-app_v${latestReleases}+github-debug_$cpuAbi.apk" "com.termux" "com.termux/.app.TermuxActivity"
+      fi
+    else
+      if [ -f "$SimplUsr/termux-app_v${latestReleases}+github-debug_$cpuAbi.apk" ]; then
+        if su -c "id" >/dev/null 2>&1; then
+          if [ "$(su -c 'getenforce 2>/dev/null')" = "Permissive" ] && [ -f "$Simplify/setenforce0" ]; then
+            su -c "setenforce 1"  # set SELinux to Enforcing mode to block unauthorized operations
+            rm -f "$Simplify/setenforce0"
+          fi
+          su -c "rm -f '/data/local/tmp/termux-app_v${latestReleases}+github-debug_$cpuAbi.apk'"
+        elif "$HOME/rish" -c "id" >/dev/null 2>&1; then
+          ~/rish -c "rm -f '/data/local/tmp/termux-app_v${latestReleases}+github-debug_$cpuAbi.apk'"
+        fi
+        rm -f "$SimplUsr/termux-app_v${latestReleases}+github-debug_$cpuAbi.apk"
+      fi
+    fi
+  else
+    if [ $Android -eq 7 ]; then
+      variant=7
+    else
+      variant=5
+    fi
+    lastReleases=$(curl -s https://api.github.com/repos/termux/termux-app/tags | jq -r '.[0].name | sub("^v"; "")')  # 0.119.0-beta.2
+    if [ "$TERMUX_VERSION" != "$lastReleases" ]; then
+      echo -e "$bad Termux app is outdated!"
+      echo -e "$running Downloading Termux app update.."
+      while true; do
+        su -c "$PREFIX/bin/curl -L --progress-bar -C - -o '/data/local/tmp/termux-app_v${lastReleases}+apt-android-$variant-github-debug_$cpuAbi.apk' 'https://github.com/termux/termux-app/releases/download/v$lastReleases/termux-app_v${lastReleases}+apt-android-$variant-github-debug_$cpuAbi.apk'"
+        if [ $? -eq 0 ]; then
+          break  # break the resuming download loop
+        fi
+        echo -e "$notice Retrying in 5 seconds.." && sleep 5  # wait 5 seconds
+      done
+      #bash $Simplify/dlGitHub.sh "termux" "termux-app" "pre" ".apk" "$SimplUsr" "termux-app_v.*+apt-android-$variant-github-debug_$cpuAbi.apk"
+      echo -e "$notice Please rerun this script again after Termux app update!"
+      echo -e "$running Installing app update and restarting Termux app.." && sleep 3
+      if su -c "id" >/dev/null 2>&1; then
+        su -c "cp '$SimplUsr/termux-app_v${lastReleases}+apt-android-$variant-github-debug_$cpuAbi.apk' '/data/local/tmp/termux-app_v${lastReleases}+apt-android-$variant-github-debug_$cpuAbi.apk'"
+        # Temporary Disable SELinux Enforcing during installation if it not in Permissive
+        if [ "$(su -c 'getenforce 2>/dev/null')" = "Enforcing" ]; then
+          su -c "setenforce 0"  # set SELinux to Permissive mode to unblock unauthorized operations
+          touch "$Simplify/setenforce0"
+          su -c "pm install -i com.android.vending '/data/local/tmp/termux-app_v${lastReleases}+apt-android-$variant-github-debug_$cpuAbi.apk'"
+        else
+          su -c "pm install -i com.android.vending '/data/local/tmp/termux-app_v${lastReleases}+apt-android-$variant-github-debug_$cpuAbi.apk'"
+        fi
+      else
+        bash $Simplify/apkInstall.sh "$SimplUsr/termux-app_v${latestReleases}+apt-android-$variant-github-debug_$cpuAbi.apk" "com.termux" "com.termux/.app.TermuxActivity"
+      fi
+    else
+      if [ -f "$SimplUsr/termux-app_v${lastReleases}+apt-android-$variant-github-debug_$cpuAbi.apk" ]; then
+        if su -c "id" >/dev/null 2>&1; then
+          if [ "$(su -c 'getenforce 2>/dev/null')" = "Permissive" ] && [ -f "$Simplify/setenforce0" ]; then
+            su -c "setenforce 1"  # set SELinux to Enforcing mode to block unauthorized operations
+            rm -f "$Simplify/setenforce0"
+          fi
+          su -c "rm -f '/data/local/tmp/termux-app_v${latestReleases}+apt-android-$variant-github-debug_$cpuAbi.apk'"
+        elif "$HOME/rish" -c "id" >/dev/null 2>&1; then
+          ~/rish -c "rm -f '/data/local/tmp/termux-app_v${latestReleases}+apt-android-$variant-github-debug_$cpuAbi.apk'"
+        fi
+        rm -f "$SimplUsr/termux-app_v${latestReleases}+apt-android-$variant-github-debug_$cpuAbi.apk"
+      fi
+    fi
+  fi
+fi
 
 overwriteVersion() {
   if jq -e '.AndroidVersion != null' "$simplifyJson" >/dev/null 2>&1; then
@@ -830,7 +925,7 @@ while true; do
         ChangeRVXSource="$(jq -r '.ChangeRVXSource' "$simplifyJson" 2>/dev/null)"
         ReadPatchesFile="$(jq -r '.ReadPatchesFile' "$simplifyJson" 2>/dev/null)"
         Branding=$(jq -r '.Branding' "$simplifyJson" 2>/dev/null)
-        echo -e "P. FetchPreRelease\nL. RipLocale\nD. RipDpi\nR. RipLib\nS. Change RVX Source\nT. Add gh PAT (increases gh api rate limit)\nO. Import Custom PatchesOptions from file\nB. Change YouTube & YT Music AppIcon & Header\nQ. Quit\n"
+        echo -e "P. FetchPreRelease\nL. RipLocale\nD. RipDpi\nR. RipLib\nS. Change RVX Source\nT. Add gh PAT (increases gh api rate limit)\nO. Import Custom PatchesOptions from file\nB. Change YouTube & YT Music AppIcon & Header\nU. Check Termux update on startup\nQ. Quit\n"
         read -r -p "Select: " opt
         case "$opt" in
           [Pp]*) if [ "$FetchPreRelease" == 0 ]; then echo "FetchPreRelease == false"; else echo "FetchPreRelease == true"; fi
@@ -882,8 +977,14 @@ while true; do
             tfConfig "$key" "$value" "$m1" "$m2"
             ;;
           [Bb]*) echo "changeYouTubeYTMusicAppIconHeader == $Branding" && change_yt_ytm_app_icon_header ;;
+          [Uu]*) if [ $CheckTermuxUpdate -eq 1 ]; then echo "CheckTermuxUpdate == true"; else echo "CheckTermuxUpdate == false"; fi
+            key="CheckTermuxUpdate" && value="$isCheckTermuxUpdate"
+            m1="Check for Termux app updates on startup"
+            m2="Never check for Termux app updates on startup"
+            tfConfig "$key" "$value" "$m1" "$m2"
+            ;;
           [Qq]*) break ;;
-          *) echo -e "$info Invalid input! Please enter P / L / D / R / S / T / O / B / Q." ;;
+          *) echo -e "$info Invalid input! Please enter P / L / D / R / S / T / O / B / U / Q." ;;
         esac
       done
       sleep 3
