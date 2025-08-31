@@ -455,7 +455,7 @@ commonPrompt() {
         if [ $pkgName == "com.instagram.android" ] || [ $pkgName == "com.facebook.katana" ] || [ $pkgName == "com.facebook.orca" ] || [ $pkgName == "com.instagram.barcelona" ] || [ $pkgName == "com.zhiliaoapp.musically" ]; then
           echo -e "[?] ${Yellow}Do you want to Change ${appNameRef[0]} RV app versionCode? [Y/n] ${Reset}\c" && read opt
           case $opt in
-            y*|Y*|"") changeVersionCode "$outputAPK" ;;  # Change app versionCode by calling changeVersionCode method
+            y*|Y*|"") changeVersionCode "$outputAPK" | tee "$SimplUsr/${appNameRef[0]}-RV_changeVersionCode-log.txt" ;;  # Change app versionCode by calling changeVersionCode method
             n*|N*) echo -e "$notice ${Yellow}Warning! Disable auto updates for the patched app to avoid unexpected issues.${Reset}" ;;
             *) echo -e "$info Invalid choice! Change ${appNameRef[0]} RV versionCode skipped." ;;
           esac
