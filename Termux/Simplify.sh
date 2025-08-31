@@ -573,7 +573,7 @@ if [ $CheckTermuxUpdate -eq 1 ]; then
   fi
 fi
 
-change_jdk_version=() {
+change_jdk_version() {
   # Get available JDK versions
   attempt=0
   while true; do
