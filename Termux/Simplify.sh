@@ -604,9 +604,14 @@ change_jdk_version() {
       # Prompt for version selection
       echo -e "Enter jdk version number [${jdkVersion[@]}]: \c" && read version
       
-      # Check if input is empty
+      # if press enter key (input is empty) chose default openjdk version
       if [ -z "$version" ]; then
-        echo -e "$notice $version not a valid number! Please enter a version number."
+        version="$isJdkVersion"
+      fi
+
+      # Check if input is a valid number
+      if [[ ! "$version" =~ ^[0-9]+$ ]]; then
+        echo -e "$notice $version not a valid number! Please enter a valid openjdk version number."
         continue  # skips current iteration & continue next iteration
       fi
 
