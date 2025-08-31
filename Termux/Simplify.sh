@@ -170,6 +170,8 @@ isReadPatchesFile=0  # Default value (false/off/0) for ReadPatchesFile, means re
 branding="google_family"
 isCheckTermuxUpdate=1
 CheckTermuxUpdate=$(jq -r '.CheckTermuxUpdate' "$simplifyJson" 2>/dev/null)  # Get CheckTermuxUpdate value from json
+isJdkVersion=21
+jdkVersion=$(jq -r '.openjdk' "$simplifyJson" 2>/dev/null)  # Get CheckTermuxUpdate value from json
 
 # --- pkg uninstall function ---
 pkgUninstall() {
@@ -342,8 +344,8 @@ config() {
   
   jq --arg key "$key" --arg value "$value" '.[$key] = $value' "$simplifyJson" > temp.json && mv temp.json "$simplifyJson"
 }
-all_key=("FetchPreRelease" "RipLocale" "RipDpi" "RipLib" "ChangeRVXSource" "ReadPatchesFile" "Branding" "CheckTermuxUpdate")
-all_value=("$isPreRelease" "$isRipLocale" "$isRipDpi" "$isRipLib" "$isChangeRVXSource" "$isReadPatchesFile" "$branding" "$isCheckTermuxUpdate")
+all_key=("FetchPreRelease" "RipLocale" "RipDpi" "RipLib" "ChangeRVXSource" "ReadPatchesFile" "Branding" "CheckTermuxUpdate" "openjdk")
+all_value=("$isPreRelease" "$isRipLocale" "$isRipDpi" "$isRipLib" "$isChangeRVXSource" "$isReadPatchesFile" "$branding" "$isCheckTermuxUpdate" "$isJdkVersion")
 # Loop through all keys and set values if they don't exist
 for i in "${!all_key[@]}"; do
   if ! jq -e --arg key "${all_key[i]}" 'has($key)' "$simplifyJson" >/dev/null; then
@@ -570,6 +572,61 @@ if [ $CheckTermuxUpdate -eq 1 ]; then
     fi
   fi
 fi
+
+change_jdk_version=() {
+  # Get available JDK versions
+  attempt=0
+  while true; do
+    jdkVersion=($(pkg search openjdk 2>&1 | grep -E "^openjdk-[0-9]+/" | awk -F'[-/ ]' '{print $2}'))
+    if [ $attempt -eq 7 ]; then
+      echo -e "$notice Not found any java version in search result, after 7 attempts."
+      break
+    fi
+    if [ ${#jdkVersion[@]} -ne 0 ]; then
+      break
+    fi  
+    ((attempt++))
+    sleep 0.5  # wait 500 milliseconds
+  done
+  
+  if [ ${#jdkVersion[@]} -ne 0 ]; then
+    while true; do
+      # Display available versions
+      echo "Available OpenJDK versions:"
+      for i in "${!jdkVersion[@]}"; do
+        echo "$((i+1)). openjdk-${jdkVersion[$i]}"
+      done
+
+      # Prompt for version selection
+      read -p "Enter JDK version number (e.g.17, 21): " version
+      
+      # Check if input is empty
+      if [ -z "$version" ]; then
+        echo "$notice Please enter a version number."
+        continue  # skips current iteration & continue next iteration
+      fi
+
+      # Check if entered version exists in the array
+      found=false
+      for available_version in "${jdkVersion[@]}"; do
+        if [ "$available_version" = "$version" ]; then
+          found=true
+          break
+        fi
+      done
+    
+      # Display result
+      if [ "$found" = true ]; then
+        echo "Selected: openjdk-$version"
+        config "openjdk" "$version"
+        break
+      else
+        echo "$notice openjdk-$version is not available!"
+        echo "$info Available versions: ${jdkVersion[*]}"
+      fi
+    done
+  fi
+}
 
 overwriteVersion() {
   if jq -e '.AndroidVersion != null' "$simplifyJson" >/dev/null 2>&1; then
@@ -925,7 +982,7 @@ while true; do
         ChangeRVXSource="$(jq -r '.ChangeRVXSource' "$simplifyJson" 2>/dev/null)"
         ReadPatchesFile="$(jq -r '.ReadPatchesFile' "$simplifyJson" 2>/dev/null)"
         Branding=$(jq -r '.Branding' "$simplifyJson" 2>/dev/null)
-        echo -e "P. FetchPreRelease\nL. RipLocale\nD. RipDpi\nR. RipLib\nS. Change RVX Source\nT. Add gh PAT (increases gh api rate limit)\nO. Import Custom PatchesOptions from file\nB. Change YouTube & YT Music AppIcon & Header\nU. Check Termux update on startup\nQ. Quit\n"
+        echo -e "P. FetchPreRelease\nL. RipLocale\nD. RipDpi\nR. RipLib\nS. Change RVX Source\nT. Add gh PAT (increases gh api rate limit)\nO. Import Custom PatchesOptions from file\nB. Change YouTube & YT Music AppIcon & Header\nU. Check Termux update on startup\nJ. Change Java version\nQ. Quit\n"
         read -r -p "Select: " opt
         case "$opt" in
           [Pp]*) if [ "$FetchPreRelease" == 0 ]; then echo "FetchPreRelease == false"; else echo "FetchPreRelease == true"; fi
@@ -983,8 +1040,9 @@ while true; do
             m2="Never check for Termux app updates on startup"
             tfConfig "$key" "$value" "$m1" "$m2"
             ;;
+          [Jj]*) echo "openjdkVersion == $jdkVersion" && change_jdk_version ;;
           [Qq]*) break ;;
-          *) echo -e "$info Invalid input! Please enter P / L / D / R / S / T / O / B / U / Q." ;;
+          *) echo -e "$info Invalid input! Please enter P / L / D / R / S / T / O / B / U / J / Q." ;;
         esac
       done
       sleep 3
