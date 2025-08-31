@@ -415,7 +415,7 @@ changeVersionCode() {
   cat "${filename_wo_ext}_src/apktool.yml" | grep -E "versionCode"
   
   # Overwrite versionCode
-  sed -i 's/versionCode: [0-9]*/versionCode: $versionCode/' "${filename_wo_ext}_src/apktool.yml"
+  sed -i '' "s/versionCode: [0-9]*/versionCode: $versionCode/" "${filename_wo_ext}_src/apktool.yml"
   if grep -q "$versionCode" "${filename_wo_ext}_src/apktool.yml"; then
     echo -e "$info \"Change version code\" succeeded"
     cat "${filename_wo_ext}_src/apktool.yml" | grep -E "versionCode"
@@ -423,7 +423,7 @@ changeVersionCode() {
   
   # Building
   echo -e "$running Building modified resources.."
-  $PREFIX/lib/jvm/java-$jdkVersion-openjdk/bin/java -jar $apktoolJar -b --use-aapt1 "${filename_wo_ext}_src" -o "${filename_wo_ext}_src.apk"
+  $PREFIX/lib/jvm/java-$jdkVersion-openjdk/bin/java -jar $apktoolJar b --use-aapt1 "${filename_wo_ext}_src" -o "${filename_wo_ext}_src.apk"
   
   # Purge tmp dir
   echo -e "$running Purging temporary resource files & directory.."
