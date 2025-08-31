@@ -72,14 +72,15 @@ dlGitHub() {
   }
 
   if [ "$releases" == "latest" ]; then
+    ghApiResponseJson=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases/latest")
     if [ "$repo" == "APKEditor" ]; then
-      latestReleases=$(curl -s ${auth} https://api.github.com/repos/$owner/$repo/releases/latest | jq -r '.tag_name | sub("^V"; "")')  # 1.4.3
+      latestReleases=$(jq -r '.tag_name | sub("^V"; "")' <<< "$ghApiResponseJson")  # 1.4.3
       echo -e "$info latestReleases: V$latestReleases"
     elif [ "$repo" == "FreeTubeAndroid" ] || [ "$repo" == "bundletool" ] || [ "$repo" == "twitter-apk" ] || [ "$repo" == "lawnchair" ] || [ "$repo" == "Nagram" ]; then
-      latestReleases=$(curl -s ${auth} https://api.github.com/repos/$owner/$repo/releases/latest | jq -r '.tag_name')  # 0.23.5.17
+      latestReleases=$(jq -r '.tag_name' <<< "$ghApiResponseJson")  # 0.23.5.17
       echo -e "$info latestReleases: $latestReleases"
     else
-      latestReleases=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases/latest" | jq -r '.tag_name | sub("^v"; "")' 2>/dev/null)
+      latestReleases=$(jq -r '.tag_name | sub("^v"; "")' <<< "$ghApiResponseJson")
       if [ "$repo" == "ReVancedApp-Actions" ] || [ "$repo" == "Revanced-And-Revanced-Extended-Non-Root" ]; then
         echo -e "$info latestReleases: $latestReleases"
       else
@@ -87,7 +88,7 @@ dlGitHub() {
       fi
     fi
     if [ "$repo" == "VancedMicroG" ] || [ "$repo" == "LSPatch" ] || [ "$repo" == "YTPro" ] || [ "$repo" == "cloudstream" ]; then
-      assetsName=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases/latest" | jq -r --arg regex "$regex" '.assets[] | select(.name | test($regex)) | .name' 2>/dev/null)
+      assetsName=$(jq -r --arg regex "$regex" '.assets[] | select(.name | test($regex)) | .name' <<< "$ghApiResponseJson")
       if [ "$repo" == "cloudstream" ]; then
         fileName="$repo-${latestReleases}$ext"
       else
@@ -100,10 +101,10 @@ dlGitHub() {
       assetsName="$assets"
       echo -e "$info assetsName: $assetsName"
     else
-      assetsName=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases/latest" | jq -r --arg regex "$regex" '.assets[] | select(.name | test($regex)) | .name' 2>/dev/null)
+      assetsName=$(jq -r --arg regex "$regex" '.assets[] | select(.name | test($regex)) | .name' <<< "$ghApiResponseJson")
       echo -e "$info assetsName: $assetsName"
       if [ "$repo" == "Nagram" ]; then
-        name=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases/latest" | jq -r '.name')
+        name=$(jq -r '.name' <<< "$ghApiResponseJson")
         assetsNamePattern=$(echo "$assetsName" | sed "s/$name/*/g")
       else
         assetsNamePattern=$(echo "$assetsName" | sed "s/$latestReleases/*/g")
