@@ -627,8 +627,7 @@ change_jdk_version() {
         echo -e "$good ${Green}Java version change successfully!${Reset}"
         break
       else
-        echo -e "$notice openjdk-$version is not available!"
-        echo -e "$info Available versions: ${jdkVersion[*]}"
+        echo -e "$notice openjdk-$version is not available! Available: ${jdkVersion[*]}"
       fi
     done
   fi
