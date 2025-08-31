@@ -186,7 +186,7 @@ dlApp() {
 
 build_apks() {
   aab_path=$1  # aab file path
-  filename_wo_ext="${$aab_path%.*}"  # remove .* from file | aab filename w/o extension (.aab)
+  filename_wo_ext="${aab_path%.*}"  # remove .* from file | aab filename w/o extension (.aab)
   apks_path="$filename_wo_ext.apks"
   apk_path="$filename_wo_ext.apk"
   singed_apk_path="$filename_wo_ext-signed.apk"
@@ -283,7 +283,7 @@ dlPatchedApp() {
         bash $Simplify/dlGitHub.sh "$owner" "$repo" "nightly" ".aab" "$SimplUsr" "Spotube-playstore-all-arch.aab"
         assets_name="Spotube-playstore-all-arch.aab"
         aab_path="$SimplUsr/$assets_name"
-        filename_wo_ext="${$aab_path%.*}"
+        filename_wo_ext="${aab_path%.*}"
         apk_path="$filename_wo_ext.apk"
         assets=$(basename "$apk_path")
         build_apks "$aab_path"  # build apk from aab by calling build_apks function
