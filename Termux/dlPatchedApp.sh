@@ -187,9 +187,9 @@ dlApp() {
 build_apks() {
   aab_path=$1  # aab file path
   filename_wo_ext="${$aab_path%.*}"  # remove .* from file | aab filename w/o extension (.aab)
-  apks_path="$basename_wo_ext.apks"
-  apk_path="$basename_wo_ext.apk"
-  singed_apk_path="$basename_wo_ext-signed.apk"
+  apks_path="$filename_wo_ext.apks"
+  apk_path="$filename_wo_ext.apk"
+  singed_apk_path="$filename_wo_ext-signed.apk"
   if jq -e '.DeviceArch != null' "$simplifyJson" >/dev/null 2>&1; then
     cpuAbi=$(jq -r '.DeviceArch' "$simplifyJson" 2>/dev/null)  # Get Device Architecture from json
   else
@@ -284,7 +284,7 @@ dlPatchedApp() {
         assets_name="Spotube-playstore-all-arch.aab"
         aab_path="$SimplUsr/$assets_name"
         filename_wo_ext="${$aab_path%.*}"
-        apk_path="$basename_wo_ext.apk"
+        apk_path="$filename_wo_ext.apk"
         assets=$(basename "$apk_path")
         build_apks "$aab_path"  # build apk from aab by calling build_apks function
       fi
