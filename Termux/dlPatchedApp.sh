@@ -184,6 +184,72 @@ dlApp() {
   fi
 }
 
+build_apks() {
+  aab_path=$1  # aab file path
+  filename_wo_ext="${$aab_path%.*}"  # remove .* from file | aab filename w/o extension (.aab)
+  apks_path="$basename_wo_ext.apks"
+  apk_path="$basename_wo_ext.apk"
+  singed_apk_path="$basename_wo_ext-signed.apk"
+  if jq -e '.DeviceArch != null' "$simplifyJson" >/dev/null 2>&1; then
+    cpuAbi=$(jq -r '.DeviceArch' "$simplifyJson" 2>/dev/null)  # Get Device Architecture from json
+  else
+    cpuAbi=$(getprop ro.product.cpu.abi)  # Get Device arch
+  fi
+
+
+  # Download bundletool
+  bundletoolJar=$(find "$Simplify" -type f -name "bundletool-all-*.jar" -print -quit 2>/dev/null)
+  if [ ! -f "$bundletoolJar" ]; then
+    bash $Simplify/dlGitHub.sh "google" "bundletool" "latest" ".jar" "$Simplify"
+    bundletoolJar=$(find "$Simplify" -type f -name "bundletool-all-*.jar" -print -quit)
+  fi
+
+  # Build apks from aab using bundletool
+  echo -e "$running Build apks from aab.."
+  $PREFIX/lib/jvm/java-$jdkVersion-openjdk/bin/java -jar $bundletoolJar build-apks --bundle=$aab_path --output=$apks_path --aapt2=~/aapt2 2>&1 | grep -v "WARNING: The APKs won't be signed"
+  if [ $? -eq 0 ] || [ -f "$apks_path" ]; then
+    echo "Success"
+    rm -f "$aab_path"  # remove aab file
+  fi
+
+  if [ "$cpuAbi" == "arm64-v8a" ]; then
+    cpuAbi="arm64_v8a"
+  elif [ "$cpuAbi" == "armeabi-v7a" ]; then
+    cpuAbi="armeabi_v7a"
+  fi
+  # Extract apks file
+  mkdir -p "$filename_wo_ext"
+  echo -e "$running Extracting apks.."
+  pv "$apks_path" | bsdtar -xf - -C "$filename_wo_ext" --include "splits/base-master.apk" --include "splits/base-$cpuAbi.apk" --include "splits/base-${lcd_dpi}.apk" --include "splits/base-$locale.apk"
+  if [ $? -eq 0 ]; then
+    rm -f "$apks_path"  # rm apks file
+  fi
+  cpuAbi=$(getprop ro.product.cpu.abi)  # Get Android arch
+
+  # Download APKEditor
+  bash $Simplify/dlGitHub.sh "REAndroid" "APKEditor" "latest" ".jar" "$Simplify"
+  APKEditor=$(find "$Simplify" -type f -name "APKEditor-*.jar" -print -quit)
+  
+  # Merge splits apks to standalone apk using APKEditor
+  echo -e "$running Merge splits apks to standalone apk.."
+  $PREFIX/lib/jvm/java-$jdkVersion-openjdk/bin/java -jar $APKEditor m -i "$filename_wo_ext/splits" -o "$apk_path"
+  rm -rf "$filename_wo_ext"
+
+  # Sign apk
+  echo -e "$running Sign apk.."
+  $PREFIX/lib/jvm/java-$jdkVersion-openjdk/bin/java -jar $PREFIX/share/java/apksigner.jar sign --ks $Simplify/ks.keystore --ks-pass pass:123456 --ks-key-alias ReVancedKey --key-pass pass:123456 --out "$singed_apk_path" "$apk_path"
+  $PREFIX/lib/jvm/java-$jdkVersion-openjdk/bin/keytool -printcert -jarfile "${singed_apk_path}" | grep -oP 'Owner: \K.*' 2>/dev/null
+  if [ $? -ne 0 ]; then
+    $PREFIX/lib/jvm/java-$jdkVersion-openjdk/bin/java -jar $PREFIX/share/java/apksigner.jar verify --print-certs "${signed_apk_path}" | grep -oP 'Signer #1 certificate DN: \K.*'
+  fi
+  
+  # Rename file using move command
+  if [ -f "$singed_apk_path" ]; then
+    rm -f "$apk_path" && rm -f "${singed_apk_path}.idsig"  # remove file
+    mv "$singed_apk_path" "$apk_path"
+  fi
+}
+
 # --- function to download & install patched apps ---
 dlPatchedApp() {
   local appName="${1}"
@@ -212,75 +278,15 @@ dlPatchedApp() {
         bash $Simplify/dlGitHub.sh "$owner" "$repo" "latest" ".apk" "$SimplUsr" "$assets"
         apk_path="$SimplUsr/$assets"
       else
-        # Download .aab file
-        dlUrl="https://github.com/KRTirtho/spotube/releases/download/nightly/Spotube-playstore-all-arch.aab"
+        # Download spotube .aab file
+        echo -e "$running Downloading $appName.."
+        bash $Simplify/dlGitHub.sh "$owner" "$repo" "nightly" ".apk" "$SimplUsr" "Spotube-playstore-all-arch.aab"
         assets_name="Spotube-playstore-all-arch.aab"
         aab_path="$SimplUsr/$assets_name"
-        echo -e "$running Downloading $appName.."
-        while true; do
-          aria2c -x 16 -s 16 --console-log-level=error --summary-interval=0 --download-result=hide -c -o "$assets_name" -d "$SimplUsr" "$dlUrl"
-          if [ $? -eq 0 ]; then
-            echo  # White Space
-            break
-          fi
-          echo -e "${bad} ${Red}Download failed! retrying in 5 seconds..${Reset}"
-          sleep 5  # Wait 5 seconds
-        done
-        
-        # Download bundletool
-        bundletoolJar=$(find "$Simplify" -type f -name "bundletool-all-*.jar" -print -quit 2>/dev/null)
-        if [ ! -f "$bundletoolJar" ]; then
-          bash $Simplify/dlGitHub.sh "google" "bundletool" "latest" ".jar" "$Simplify"
-          bundletoolJar=$(find "$Simplify" -type f -name "bundletool-all-*.jar" -print -quit)
-        fi
-        # Build apks from aab using bundletool
-        apks_path="$SimplUsr/Spotube-playstore-all-arch.apks"
-        echo -e "$running Build apks from aab.."
-        $PREFIX/lib/jvm/java-$jdkVersion-openjdk/bin/java -jar $bundletoolJar build-apks --bundle=$aab_path --output=$apks_path --aapt2=~/aapt2 2>&1 | grep -v "WARNING: The APKs won't be signed"
-        if [ $? -eq 0 ] || [ -f "$apks_path" ]; then
-          echo "Success"
-        fi
-        rm -f "$aab_path"
-        
-        # Extract apks file
-        if jq -e '.DeviceArch != null' "$simplifyJson" >/dev/null 2>&1; then
-          cpuAbi=$(jq -r '.DeviceArch' "$simplifyJson" 2>/dev/null)  # Get Device Architecture from json
-        else
-          cpuAbi=$(getprop ro.product.cpu.abi)  # Get Android arch
-        fi
-        if [ "$cpuAbi" == "arm64-v8a" ]; then
-          cpuAbi="arm64_v8a"
-        elif [ "$cpuAbi" == "armeabi-v7a" ]; then
-          cpuAbi="armeabi_v7a"
-        fi
-        mkdir -p "$SimplUsr/Spotube-playstore-all-arch"
-        echo -e "$running Extracting apks.."
-        pv "$apks_path" | bsdtar -xf - -C "$SimplUsr/Spotube-playstore-all-arch" --include "splits/base-master.apk" --include "splits/base-$cpuAbi.apk" --include "splits/base-${lcd_dpi}.apk" --include "splits/base-$locale.apk"
-        cpuAbi=$(getprop ro.product.cpu.abi)  # Get Android arch
-        rm -f "$apks_path"
-        # Merge splits apks to standalone apk using APKEditor
-        bash $Simplify/dlGitHub.sh "REAndroid" "APKEditor" "latest" ".jar" "$Simplify"
-        APKEditor=$(find "$Simplify" -type f -name "APKEditor-*.jar" -print -quit)
-        echo -e "$running Merge splits apks to standalone apk.."
-        $PREFIX/lib/jvm/java-$jdkVersion-openjdk/bin/java -jar $APKEditor m -i "$SimplUsr/Spotube-playstore-all-arch/splits" -o "$SimplUsr/Spotube-playstore-all-arch.apk"
-        rm -rf "$SimplUsr/Spotube-playstore-all-arch"
-        # Sign apk
-        apk_path="$SimplUsr/Spotube-playstore-all-arch-signed.apk"
-        echo -e "$running Sign apk.."
-        $PREFIX/lib/jvm/java-$jdkVersion-openjdk/bin/java -jar $PREFIX/share/java/apksigner.jar sign --ks $Simplify/ks.keystore --ks-pass pass:123456 --ks-key-alias ReVancedKey --key-pass pass:123456 --out "$apk_path" "$SimplUsr/Spotube-playstore-all-arch.apk"
-        $PREFIX/lib/jvm/java-$jdkVersion-openjdk/bin/keytool -printcert -jarfile "${apk_path}" | grep -oP 'Owner: \K.*' 2>/dev/null
-        if [ $? -eq 0 ]; then
-          rm -f "$SimplUsr/Spotube-playstore-all-arch.apk" && rm -f "${apk_path}.idsig"
-          mv "$SimplUsr/Spotube-playstore-all-arch-signed.apk" "$SimplUsr/Spotube-playstore-all-arch.apk"
-        elif [ $? -ne 0 ]; then
-          $PREFIX/lib/jvm/java-$jdkVersion-openjdk/bin/java -jar $PREFIX/share/java/apksigner.jar verify --print-certs "${apk_path}" | grep -oP 'Signer #1 certificate DN: \K.*'
-          if [ $? -eq 0 ]; then
-            rm -f "$SimplUsr/Spotube-playstore-all-arch.apk" && rm -f "${apk_path}.idsig"
-            mv "$SimplUsr/Spotube-playstore-all-arch-signed.apk" "$SimplUsr/Spotube-playstore-all-arch.apk"
-          fi
-        fi
-        apk_path="$SimplUsr/Spotube-playstore-all-arch.apk"
+        filename_wo_ext="${$aab_path%.*}"
+        apk_path="$basename_wo_ext.apk"
         assets=$(basename "$apk_path")
+        build_apks "$aab_path"  # build apk from aab by calling build_apks function
       fi
       if [ -f "$apk_path" ]; then
         echo -e "$info ${Green}Downloaded $appName APK found:${Reset} $apk_path"
