@@ -192,8 +192,6 @@ build_apks() {
   singed_apk_path="$filename_wo_ext-signed.apk"
   if jq -e '.DeviceArch != null' "$simplifyJson" >/dev/null 2>&1; then
     cpuAbi=$(jq -r '.DeviceArch' "$simplifyJson" 2>/dev/null)  # Get Device Architecture from json
-  else
-    cpuAbi=$(getprop ro.product.cpu.abi)  # Get Device arch
   fi
 
 
