@@ -426,7 +426,7 @@ changeVersionCode() {
   $PREFIX/lib/jvm/java-$jdkVersion-openjdk/bin/java -jar $apktoolJar -b --use-aapt1 "${filename_wo_ext}_src" -o "${filename_wo_ext}_src.apk"
   
   # Purge tmp dir
-  echo -e "$running Purging temporary files.."
+  echo -e "$running Purging temporary resource files & directory.."
   rm -rf "${filename_wo_ext}_src"
   
   # Signing APK
