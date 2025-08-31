@@ -196,11 +196,8 @@ build_apks() {
 
 
   # Download bundletool
-  bundletoolJar=$(find "$Simplify" -type f -name "bundletool-all-*.jar" -print -quit 2>/dev/null)
-  if [ ! -f "$bundletoolJar" ]; then
-    bash $Simplify/dlGitHub.sh "google" "bundletool" "latest" ".jar" "$Simplify"
-    bundletoolJar=$(find "$Simplify" -type f -name "bundletool-all-*.jar" -print -quit)
-  fi
+  bash $Simplify/dlGitHub.sh "google" "bundletool" "latest" ".jar" "$Simplify"
+  bundletoolJar=$(find "$Simplify" -type f -name "bundletool-all-*.jar" -print -quit)
 
   # Build apks from aab using bundletool
   echo -e "$running Build apks from aab.."
@@ -233,8 +230,8 @@ build_apks() {
   $PREFIX/lib/jvm/java-$jdkVersion-openjdk/bin/java -jar $APKEditor m -i "$filename_wo_ext/splits" -o "$apk_path"
   rm -rf "$filename_wo_ext"
 
-  # Sign apk
-  echo -e "$running Sign apk.."
+  # Signing apk
+  echo -e "$running Signing apk.."
   $PREFIX/lib/jvm/java-$jdkVersion-openjdk/bin/java -jar $PREFIX/share/java/apksigner.jar sign --ks $Simplify/ks.keystore --ks-pass pass:123456 --ks-key-alias ReVancedKey --key-pass pass:123456 --out "$singed_apk_path" "$apk_path"
   $PREFIX/lib/jvm/java-$jdkVersion-openjdk/bin/keytool -printcert -jarfile "${singed_apk_path}" | grep -oP 'Owner: \K.*' 2>/dev/null
   if [ $? -ne 0 ]; then

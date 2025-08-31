@@ -399,13 +399,66 @@ if [ "$ReadPatchesFile" -eq 1 ]; then
   
 fi
 
+changeVersionCode() {
+  versionCode="2147483647"  # Sets the maximum version code to prevent an update.
+  input_apk_path=${1}
+  filename_wo_ext="${input_apk_path%.*}"
+  input_apk_versionCode=$($HOME/aapt2 dump badging "$input_apk_path" 2>/dev/null | sed -n "s/.*versionCode='\([^']*\)'.*/\1/p")
+  
+  # Download apktool
+  bash $Simplify/dlGitHub.sh "iBotPeaches" "Apktool" "latest" ".jar" "$RV"
+  apktoolJar=$(find "$RV" -type f -name "apktool_*.jar" -print -quit)
+  
+  # Decoding
+  echo -e "$running Decoding resources.."
+  $PREFIX/lib/jvm/java-$jdkVersion-openjdk/bin/java -jar $apktoolJar d "$input_apk_path" -o "${filename_wo_ext}_src"
+  cat "${filename_wo_ext}_src/apktool.yml" | grep -E "versionCode"
+  
+  # Overwrite versionCode
+  sed -i 's/versionCode: [0-9]*/versionCode: $versionCode/' "${filename_wo_ext}_src/apktool.yml"
+  if grep -q "$versionCode" "${filename_wo_ext}_src/apktool.yml"; then
+    echo -e "$info \"Change version code\" succeeded"
+    cat "${filename_wo_ext}_src/apktool.yml" | grep -E "versionCode"
+  fi
+  
+  # Building
+  echo -e "$running Building modified resources.."
+  $PREFIX/lib/jvm/java-$jdkVersion-openjdk/bin/java -jar $apktoolJar -b --use-aapt1 "${filename_wo_ext}_src" -o "${filename_wo_ext}_src.apk"
+  
+  # Purge tmp dir
+  echo -e "$running Purging temporary files.."
+  rm -rf "${filename_wo_ext}_src"
+  
+  # Signing APK
+  echo -e "$running Signing APK.."
+  $PREFIX/lib/jvm/java-$jdkVersion-openjdk/bin/java -jar $PREFIX/share/java/apksigner.jar sign --ks $Simplify/ks.keystore --ks-pass pass:123456 --ks-key-alias ReVancedKey --key-pass pass:123456 --out "${filename_wo_ext}_src_signed.apk" "${filename_wo_ext}_src.apk"
+  $PREFIX/lib/jvm/java-$jdkVersion-openjdk/bin/keytool -printcert -jarfile "${filename_wo_ext}_src_signed.apk" | grep -oP 'Owner: \K.*' 2>/dev/null
+  if [ $? -ne 0 ]; then
+    $PREFIX/lib/jvm/java-$jdkVersion-openjdk/bin/java -jar $PREFIX/share/java/apksigner.jar verify --print-certs "${filename_wo_ext}_src_signed.apk" | grep -oP 'Signer #1 certificate DN: \K.*'
+  fi
+  
+  # Rename
+  if [ -f "${filename_wo_ext}_src_signed.apk" ]; then
+    output_apk_versionCode=$($HOME/aapt2 dump badging "${filename_wo_ext}_src_signed.apk" 2>/dev/null | sed -n "s/.*versionCode='\([^']*\)'.*/\1/p")
+    rm -f "$input_apk_path"  # remove input file
+    rm -f "${filename_wo_ext}_src.apk"
+    mv "${filename_wo_ext}_src_signed.apk" "$input_apk_path"
+    echo -e "$good ${Green}Successfully Change versionCode: $input_apk_versionCode → $output_apk_versionCode${Reset}"
+  fi
+}
+
 # --- function for common app installation prompt ---
 commonPrompt() {
     echo -e "[?] ${Yellow}Do you want to install ${appNameRef[0]} RV app? [Y/n] ${Reset}\c" && read opt
     case $opt in
       y*|Y*|"")
         if [ $pkgName == "com.instagram.android" ] || [ $pkgName == "com.facebook.katana" ] || [ $pkgName == "com.facebook.orca" ] || [ $pkgName == "com.instagram.barcelona" ] || [ $pkgName == "com.zhiliaoapp.musically" ]; then
-          echo -e "$notice ${Yellow}Warning! Disable auto updates for the patched app to avoid unexpected issues.${Reset}"
+          echo -e "[?] ${Yellow}Do you want to Change ${appNameRef[0]} RV app versionCode? [Y/n] ${Reset}\c" && read opt
+          case $opt in
+            y*|Y*|"") changeVersionCode "$outputAPK" ;;  # Change app versionCode by calling changeVersionCode method
+            n*|N*) echo -e "$notice ${Yellow}Warning! Disable auto updates for the patched app to avoid unexpected issues.${Reset}" ;;
+            *) echo -e "$info Invalid choice! Change ${appNameRef[0]} RV versionCode skipped." ;;
+          esac
         fi
         echo -e "$running Please Wait !! Installing Patched ${appNameRef[0]} RV apk.."
         bash $Simplify/apkInstall.sh "$outputAPK" "$pkgPatched" "$activityPatched"
