@@ -705,9 +705,10 @@ UninstallPatchedApp() {
         echo "Uninstalling: ${nameArr[idx]}"
         ~/rish -c "pm uninstall --user 0 ${pkgArr[idx]}"
       else
-        am start -a android.intent.action.DELETE -d package:"${pkgArr[idx]}" > /dev/null 2>&1
+        #am start -a android.intent.action.DELETE -d package:"${pkgArr[idx]}" > /dev/null 2>&1
+        am start -a android.intent.action.UNINSTALL_PACKAGE -d package:"${pkgArr[idx]}" > /dev/null 2>&1
         #echo "Opening App info Activity for: ${nameArr[idx]}"
-        #am start -a android.settings.APPLICATION_DETAILS_SETTINGS -d package:"${pkgArr[idx]}" > /dev/null 2>&1
+        am start -a android.settings.APPLICATION_DETAILS_SETTINGS -d package:"${pkgArr[idx]}" > /dev/null 2>&1
       fi
     else
       echo "Invalid selection! Please enter a number between 0 and $((${#nameArr[@]} - 1))."
