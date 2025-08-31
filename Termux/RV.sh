@@ -442,6 +442,7 @@ changeVersionCode() {
     output_apk_versionCode=$($HOME/aapt2 dump badging "${filename_wo_ext}_src_signed.apk" 2>/dev/null | sed -n "s/.*versionCode='\([^']*\)'.*/\1/p")
     rm -f "$input_apk_path"  # remove input file
     rm -f "${filename_wo_ext}_src.apk"
+    rm -f "${filename_wo_ext}_src_signed.apk.idsig"
     mv "${filename_wo_ext}_src_signed.apk" "$input_apk_path"
     echo -e "$good ${Green}Successfully Change versionCode: $input_apk_versionCode → $output_apk_versionCode${Reset}"
   fi
