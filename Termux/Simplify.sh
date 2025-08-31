@@ -602,7 +602,7 @@ change_jdk_version() {
       done
 
       # Prompt for version selection
-      read -p "Enter jdk version number [${jdkVersion[@]}]: " version
+      echo -e "Enter jdk version number [${jdkVersion[@]}]: \c" && read version
       
       # Check if input is empty
       if [ -z "$version" ]; then
