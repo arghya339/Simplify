@@ -493,8 +493,8 @@ comment
   # Zip aligning APK
   if [ -f "${filename_wo_ext}_src.apk" ]; then
     echo -e "$running Aligning APK.."
-    #~/Simplify/zipalign -v -f -p 4 "${filename_wo_ext}_src.apk" "${filename_wo_ext}_src_aligned.apk"  # -v = verbose - shows detailed progress info | -f = force - overwrites existing output file | -p = page-align - ensures proper alignment for .so files
-    $PREFIX/bin/zipalign -v -f -p 4 "${filename_wo_ext}_src.apk" "${filename_wo_ext}_src_aligned.apk"
+    #~/Simplify/zipalign -f 4 "${filename_wo_ext}_src.apk" "${filename_wo_ext}_src_aligned.apk"  # -v = verbose - shows detailed progress info | -f = force - overwrites existing output file | -p = page-align - ensures proper alignment for .so files - it's causes app crashes
+    $PREFIX/bin/zipalign -f 4 "${filename_wo_ext}_src.apk" "${filename_wo_ext}_src_aligned.apk"
   fi
   
   # Signing APK
