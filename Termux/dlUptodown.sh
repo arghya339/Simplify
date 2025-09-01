@@ -277,14 +277,17 @@ dlUptodown() {
       if [ -f $simplifyJson ]; then
         if [ $RipLib -eq 1 ]; then
           pv "$outputPath" | bsdtar -xf - -C "$Download/${appName}_v${appVersion}-${cpuAbi}/" --include "$pkgName.apk" "config.${cpuAbi//-/_}.apk" "config.${locale}.apk" "config.${dpi}.apk"
+          bsdtar_exit_code=$?
         elif [ $RipLib -eq 0 ]; then
           pv "$outputPath" | bsdtar -xf - -C "$Download/${appName}_v${appVersion}-${cpuAbi}/" --include "$pkgName.apk" "config.arm64_v8a.apk" "config.armeabi_v7a.apk" "config.x86_64.apk" "config.x86.apk" "config.${locale}.apk" "config.${dpi}.apk"
+          bsdtar_exit_code=$?
         fi
       else
         pv "$outputPath" | bsdtar -xf - -C "$Download/${appName}_v${appVersion}-${cpuAbi}/" --include "$pkgName.apk" "config.${cpuAbi//-/_}.apk" "config.${locale}.apk" "config.${dpi}.apk"
-        if [ ! -e "$Download/${appName}_v${appVersion}-${cpuAbi}/config.${dpi}.apk" ] || [ ! -e "$Download/${appName}_v${VERSION}-${cpuAbi}/config.${locale}.apk" ] || [ ! -e "$Download/${appName}_v${VERSION}-${cpuAbi}/config.${cpuAbi//-/_}.apk" ]; then  # check if file exists
-          pv "$outputPath" | bsdtar -xf - -C "$Download/${appName}_v${appVersion}-${cpuAbi}/"
-        fi
+        bsdtar_exit_code=$?
+      fi
+      if [ $bsdtar_exit_code -ne 0 ]; then  # check if bsdtar return exit code 1 (error)
+        pv "$outputPath" | bsdtar -xf - -C "$Download/${appName}_v${appVersion}-${cpuAbi}/"
       fi
       rm "$outputPath"
       echo -e "$running Merge splits apks to standalone lite apk.."

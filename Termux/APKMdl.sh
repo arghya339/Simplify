@@ -352,14 +352,17 @@ APKMdl() {
       if [ -f $simplifyJson ]; then
         if [ $RipLib -eq 1 ]; then
           pv "$outputPath" | bsdtar -xf - -C "$Download/${appName}_v${VERSION}-${cpuAbi}/" --include "base.apk" "split_config.${cpuAbi//-/_}.apk" "split_config.${locale}.apk" "split_config.${lcd_dpi}.apk"
+          bsdtar_exit_code=$?
         elif [ $RipLib -eq 0 ]; then
           pv "$outputPath" | bsdtar -xf - -C "$Download/${appName}_v${VERSION}-${cpuAbi}/" --include "base.apk" "split_config.arm64_v8a.apk" "split_config.armeabi_v7a.apk" "split_config.x86_64.apk" "split_config.x86.apk" "split_config.${locale}.apk" "split_config.${lcd_dpi}.apk"
+          bsdtar_exit_code=$?
         fi
       else
         pv "$outputPath" | bsdtar -xf - -C "$Download/${appName}_v${VERSION}-${cpuAbi}/" --include "base.apk" "split_config.${cpuAbi//-/_}.apk" "split_config.${locale}.apk" "split_config.${lcd_dpi}.apk"
-        if [ ! -e "$Download/${appName}_v${VERSION}-${cpuAbi}/split_config.${lcd_dpi}.apk" ] || [ ! -e "$Download/${appName}_v${VERSION}-${cpuAbi}/split_config.${locale}.apk" ] || [ ! -e "$Download/${appName}_v${VERSION}-${cpuAbi}/split_config.${cpuAbi//-/_}.apk" ]; then  # check if file exists
-          pv "$outputPath" | bsdtar -xf - -C "$Download/${appName}_v${VERSION}-${cpuAbi}/"
-        fi
+        bsdtar_exit_code=$?
+      fi
+      if [ $bsdtar_exit_code -ne 0 ]; then  # check if bsdtar return exit code 1 (error)
+        pv "$outputPath" | bsdtar -xf - -C "$Download/${appName}_v${VERSION}-${cpuAbi}/"
       fi
       rm "$outputPath"
       echo -e "$running Merge splits apkm to standalone lite apk.."
