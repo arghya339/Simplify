@@ -412,29 +412,67 @@ changeVersionCode() {
   # Decoding
   echo -e "$running Decoding resources.."
   $PREFIX/lib/jvm/java-$jdkVersion-openjdk/bin/java -jar $apktoolJar d -s --no-assets -f "$input_apk_path" -o "${filename_wo_ext}_src"  # -s,--no-src = Skip src (no smali files), Java bytecode (.dex files) decompilation. It's improve significant decompilation speed | --no-assets = Skip decoding assets folder (apk data) | -f,--force = force overwrite output directory (Auto deletes existing output dir) | Change versionCode failed: -r,--no-res --only-manifest
-  cat "${filename_wo_ext}_src/apktool.yml" | grep -E "versionCode"
+  if [ $? -eq 0 ]; then
+    sleep 0.5  # wait 500 milliseconds
+    # Wait for output dir (max 60 seconds)
+    wait_time=0
+    while [ ! -d "${filename_wo_ext}_src" ] && [ $wait_time -lt 60 ]; do
+      sleep 1
+      wait_time=$((wait_time + 1))
+    done
+    if [ ! -d "${filename_wo_ext}_src" ]; then
+      echo "$notice Not found output resource directory after waiting 60 seconds!"
+    else
+      # Wait for apktool.yml file (max 30 seconds)
+      wait_time=0
+      while [ ! -f "${filename_wo_ext}_src/apktool.yml" ] && [ $wait_time -lt 30 ]; do
+        sleep 1
+        ((wait_time++))  # wait_time=wait_time+1
+      done
+      if [ -f "${filename_wo_ext}_src/apktool.yml" ]; then
+        cat "${filename_wo_ext}_src/apktool.yml" | grep -E "versionCode"
+      else
+        echo "$notice Not found output resource files after waiting 30 seconds!"
+      fi
+    fi
+  else
+    rm -rf "${filename_wo_ext}_src"
+  fi  
   
   # Overwrite versionCode
-  sed -i '' "s/versionCode: [0-9]*/versionCode: $versionCode/" "${filename_wo_ext}_src/apktool.yml"
-  if grep -q "$versionCode" "${filename_wo_ext}_src/apktool.yml"; then
-    echo -e "$info \"Change version code\" succeeded"
-    cat "${filename_wo_ext}_src/apktool.yml" | grep -E "versionCode"
+  if [ -d "${filename_wo_ext}_src" ]; then
+    if [ -f "${filename_wo_ext}_src/apktool.yml" ]; then
+      sed -i '' "s/versionCode: [0-9]*/versionCode: $versionCode/" "${filename_wo_ext}_src/apktool.yml"
+      if grep -q "$versionCode" "${filename_wo_ext}_src/apktool.yml"; then
+        echo -e "$info \"Change version code\" succeeded"
+        cat "${filename_wo_ext}_src/apktool.yml" | grep -E "versionCode"
+      fi
+    fi
   fi
   
   # Building
-  echo -e "$running Building modified resources.."
-  $PREFIX/lib/jvm/java-$jdkVersion-openjdk/bin/java -jar $apktoolJar b --use-aapt1 "${filename_wo_ext}_src" -o "${filename_wo_ext}_src.apk"
+  if [ -d "${filename_wo_ext}_src" ]; then
+    echo -e "$running Building modified resources.."
+    $PREFIX/lib/jvm/java-$jdkVersion-openjdk/bin/java -jar $apktoolJar b --use-aapt1 "${filename_wo_ext}_src" -o "${filename_wo_ext}_src.apk"
+    if [ $? -nq 0 ] || [ ! -f "${filename_wo_ext}_src.apk" ]; then
+      rm -rf "${filename_wo_ext}_src"
+    fi
+  fi
   
   # Purge tmp dir
-  echo -e "$running Purging temporary resource files & directory.."
-  rm -rf "${filename_wo_ext}_src"
+  if [ -f "${filename_wo_ext}_src.apk" ] && [ -d "${filename_wo_ext}_src" ]; then
+    echo -e "$running Purging temporary resource files & directory.."
+    rm -rf "${filename_wo_ext}_src"
+  fi
   
   # Signing APK
-  echo -e "$running Signing APK.."
-  $PREFIX/lib/jvm/java-$jdkVersion-openjdk/bin/java -jar $PREFIX/share/java/apksigner.jar sign --ks $Simplify/ks.keystore --ks-pass pass:123456 --ks-key-alias ReVancedKey --key-pass pass:123456 --out "${filename_wo_ext}_src_signed.apk" "${filename_wo_ext}_src.apk"
-  $PREFIX/lib/jvm/java-$jdkVersion-openjdk/bin/keytool -printcert -jarfile "${filename_wo_ext}_src_signed.apk" | grep -oP 'Owner: \K.*' 2>/dev/null
-  if [ $? -ne 0 ]; then
-    $PREFIX/lib/jvm/java-$jdkVersion-openjdk/bin/java -jar $PREFIX/share/java/apksigner.jar verify --print-certs "${filename_wo_ext}_src_signed.apk" | grep -oP 'Signer #1 certificate DN: \K.*'
+  if [ -f "${filename_wo_ext}_src.apk" ]; then
+    echo -e "$running Signing APK.."
+    $PREFIX/lib/jvm/java-$jdkVersion-openjdk/bin/java -jar $PREFIX/share/java/apksigner.jar sign --ks $Simplify/ks.keystore --ks-pass pass:123456 --ks-key-alias ReVancedKey --key-pass pass:123456 --out "${filename_wo_ext}_src_signed.apk" "${filename_wo_ext}_src.apk"
+    $PREFIX/lib/jvm/java-$jdkVersion-openjdk/bin/keytool -printcert -jarfile "${filename_wo_ext}_src_signed.apk" | grep -oP 'Owner: \K.*' 2>/dev/null
+    if [ $? -ne 0 ]; then
+      $PREFIX/lib/jvm/java-$jdkVersion-openjdk/bin/java -jar $PREFIX/share/java/apksigner.jar verify --print-certs "${filename_wo_ext}_src_signed.apk" | grep -oP 'Signer #1 certificate DN: \K.*'
+    fi
   fi
   
   # Rename
@@ -456,7 +494,11 @@ commonPrompt() {
         if [ $pkgName == "com.instagram.android" ] || [ $pkgName == "com.facebook.katana" ] || [ $pkgName == "com.facebook.orca" ] || [ $pkgName == "com.instagram.barcelona" ] || [ $pkgName == "com.zhiliaoapp.musically" ]; then
           echo -e "[?] ${Yellow}Do you want to Change ${appNameRef[0]} RV app versionCode? [Y/n] ${Reset}\c" && read opt
           case $opt in
-            y*|Y*|"") changeVersionCode "$outputAPK" | tee "$SimplUsr/${appNameRef[0]}-RV_changeVersionCode-log.txt" ;;  # Change app versionCode by calling changeVersionCode method
+            y*|Y*|"") changeVersionCode "$outputAPK" | tee "$SimplUsr/${appNameRef[0]}-RV_changeVersionCode-log.txt"  # Change app versionCode by calling changeVersionCode method
+              if grep -q "OutOfMemory" "$SimplUsr/${appNameRef[0]}-RV_changeVersionCode-log.txt"; then
+                echo -e "$bad ${Red}OutOfMemoryError${Reset}: ${Yellow}Device RAM overloaded!${Reset}\n ${Blue}Solutions${Reset}:\n   1. ${Yellow}Close background apps.${Reset}\n   2. ${Yellow}Use device with ≥4GB ~ ≥6GB RAM for patching apk.${Reset}"
+              fi
+              ;;
             n*|N*) echo -e "$notice ${Yellow}Warning! Disable auto updates for the patched app to avoid unexpected issues.${Reset}" ;;
             *) echo -e "$info Invalid choice! Change ${appNameRef[0]} RV versionCode skipped." ;;
           esac
