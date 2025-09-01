@@ -484,7 +484,7 @@ changeVersionCode() {
   # Zip aligning APK
   if [ -f "${filename_wo_ext}_src.apk" ]; then
     echo -e "$running Aligning APK.."
-    ~/zipalign -v -f -p 4 "${filename_wo_ext}_src.apk" "${filename_wo_ext}_src_aligned.apk"  # -v = verbose - shows detailed progress info | -f = force - overwrites existing output file | -p = page-align - ensures proper alignment for .so files
+    ~/Simplify/zipalign -v -f -p 4 "${filename_wo_ext}_src.apk" "${filename_wo_ext}_src_aligned.apk"  # -v = verbose - shows detailed progress info | -f = force - overwrites existing output file | -p = page-align - ensures proper alignment for .so files
   fi
   
   # Signing APK
