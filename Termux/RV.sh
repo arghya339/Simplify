@@ -1229,7 +1229,11 @@ while true; do
         getVersion "$pkgName"
         pkgVersion="$pkgVersion"
       fi
-      Type="APK"
+      if [ "$cpuAbi" == "x86_64" ]; then
+        Type="BUNDLE"  # for x64, APK Type variant not available, only BUNDLE Type exist in variant page
+      else
+        Type="APK"
+      fi
       Arch=("$cpuAbi")
       activityPatched="com.facebook.orca/.auth.StartScreenActivity"
       build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "APKMirror" "fb_messenger_patches_args" "$pkgName" "$activityPatched" "" "" ""
