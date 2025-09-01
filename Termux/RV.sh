@@ -467,6 +467,7 @@ changeVersionCode() {
   fi
   
   # Download zipalign binary for Android from GitHub/@rendiix/termux-zipalign
+  <<comment
   arch=$(getprop ro.product.cpu.abi)  # Get Device arch
   if [ ! -f "$Simplify/zipalign" ]; then
     echo -e "$running Downloading zipalign binary for Android from ${Blue}https://github.com/rendiix/termux-zipalign/raw/refs/heads/main/prebuilt-binary/$arch/zipalign${Reset}.."
@@ -479,12 +480,21 @@ changeVersionCode() {
       ls -l "$Simplify/zipalign"
     fi
   fi
-  # curl -s https://raw.githubusercontent.com/rendiix/rendiix.github.io/master/install-repo.sh | bash && pkg install zipalign
+comment
+  if [ ! -f "$PREFIX/etc/apt/sources.list.d/rendiix.list" ]; then
+    echo -e "$running Installing rendiix repo.."
+    curl -s https://raw.githubusercontent.com/rendiix/rendiix.github.io/master/install-repo.sh | bash > /dev/null 2>&1
+  fi
+  if [ ! -f "$PREFIX/bin/zipalign" ]; then
+    echo -e "$running Installing zipalign pkg.."
+    pkg install zipalign -y > /dev/null 2>&1
+  fi
   
   # Zip aligning APK
   if [ -f "${filename_wo_ext}_src.apk" ]; then
     echo -e "$running Aligning APK.."
-    ~/Simplify/zipalign -v -f -p 4 "${filename_wo_ext}_src.apk" "${filename_wo_ext}_src_aligned.apk"  # -v = verbose - shows detailed progress info | -f = force - overwrites existing output file | -p = page-align - ensures proper alignment for .so files
+    #~/Simplify/zipalign -v -f -p 4 "${filename_wo_ext}_src.apk" "${filename_wo_ext}_src_aligned.apk"  # -v = verbose - shows detailed progress info | -f = force - overwrites existing output file | -p = page-align - ensures proper alignment for .so files
+    $PREFIX/bin/zipalign -v -f -p 4 "${filename_wo_ext}_src.apk" "${filename_wo_ext}_src_aligned.apk"
   fi
   
   # Signing APK
