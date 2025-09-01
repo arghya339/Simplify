@@ -451,7 +451,7 @@ changeVersionCode() {
   fi
   
   # Building
-  if [ -d "${filename_wo_ext}_src" ]; then
+  if [ -d "${filename_wo_ext}_src" ] && grep -q "$versionCode" "${filename_wo_ext}_src/apktool.yml"; then
     echo -e "$running Building modified resources.."
     $PREFIX/lib/jvm/java-$jdkVersion-openjdk/bin/java -jar $apktoolJar b --use-aapt1 "${filename_wo_ext}_src" -o "${filename_wo_ext}_src.apk"
     if [ $? -nq 0 ] || [ ! -f "${filename_wo_ext}_src.apk" ]; then
