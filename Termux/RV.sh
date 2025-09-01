@@ -479,11 +479,12 @@ changeVersionCode() {
       ls -l "$Simplify/zipalign"
     fi
   fi
+  # curl -s https://raw.githubusercontent.com/rendiix/rendiix.github.io/master/install-repo.sh | bash && pkg install zipalign
   
   # Zip aligning APK
   if [ -f "${filename_wo_ext}_src.apk" ]; then
     echo -e "$running Aligning APK.."
-    ~/zipalign -v 4 "${filename_wo_ext}_src.apk" "${filename_wo_ext}_src_aligned.apk"
+    ~/zipalign -v -f -p 4 "${filename_wo_ext}_src.apk" "${filename_wo_ext}_src_aligned.apk"  # -v = verbose - shows detailed progress info | -f = force - overwrites existing output file | -p = page-align - ensures proper alignment for .so files
   fi
   
   # Signing APK
