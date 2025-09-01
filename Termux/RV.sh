@@ -192,6 +192,7 @@ patch_app() {
     --custom-aapt2-binary="$HOME/aapt2" \
     --purge -f | tee "$log"
   else
+    ReVancedCLIJar=$(find "$RVX" -type f -name "revanced-cli-*-all.jar" -print -quit)
     $PREFIX/lib/jvm/java-$jdkVersion-openjdk/bin/java -jar $ReVancedCLIJar patch -p $PatchesRvp \
       -o "$outputAPK" "${stock_apk_ref}" \
       "${patches[@]}" \
