@@ -411,7 +411,7 @@ changeVersionCode() {
   
   # Decoding
   echo -e "$running Decoding resources.."
-  $PREFIX/lib/jvm/java-$jdkVersion-openjdk/bin/java -jar $apktoolJar d -f "$input_apk_path" -o "${filename_wo_ext}_src"
+  $PREFIX/lib/jvm/java-$jdkVersion-openjdk/bin/java -jar $apktoolJar d -s --no-assets -f "$input_apk_path" -o "${filename_wo_ext}_src"  # -s,--no-src = Skip src (no smali files), Java bytecode (.dex files) decompilation. It's improve significant decompilation speed | --no-assets = Skip decoding assets folder (apk data) | -f,--force = force overwrite output directory (Auto deletes existing output dir) | Change versionCode failed: -r,--no-res --only-manifest
   cat "${filename_wo_ext}_src/apktool.yml" | grep -E "versionCode"
   
   # Overwrite versionCode
