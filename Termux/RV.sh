@@ -442,7 +442,8 @@ changeVersionCode() {
   # Overwrite versionCode
   if [ -d "${filename_wo_ext}_src" ]; then
     if [ -f "${filename_wo_ext}_src/apktool.yml" ]; then
-      sed -i '' "s/versionCode: [0-9]*/versionCode: $versionCode/" "${filename_wo_ext}_src/apktool.yml"
+      sed -i.bak "s/versionCode: [0-9]*/versionCode: $versionCode/" "${filename_wo_ext}_src/apktool.yml"
+      #sed -i '' "s/versionCode: [0-9]*/versionCode: $versionCode/" "${filename_wo_ext}_src/apktool.yml"
       if grep -q "$versionCode" "${filename_wo_ext}_src/apktool.yml"; then
         echo -e "$info \"Change version code\" succeeded"
         cat "${filename_wo_ext}_src/apktool.yml" | grep -E "versionCode"
