@@ -466,23 +466,44 @@ changeVersionCode() {
     rm -rf "${filename_wo_ext}_src"
   fi
   
-  # Signing APK
+  # Download zipalign binary for Android from GitHub/@rendiix/termux-zipalign
+  arch=$(getprop ro.product.cpu.abi)  # Get Device arch
+  if [ -f "$Simplify/zipalign" ]; then
+    echo -e "$running Downloading zipalign binary for Android from ${Blue}https://github.com/rendiix/termux-zipalign/raw/refs/heads/main/prebuilt-binary/$arch/zipalign${Reset}.."
+    curl -L --progress-bar -o $Simplify/zipalign https://github.com/rendiix/termux-zipalign/raw/refs/heads/main/prebuilt-binary/$arch/zipalign
+    ls -l "$Simplify/zipalign"
+    echo -e "$running Give excute (--x) permissions to zipalign binary.."
+    chmod +x "$Simplify/zipalign"
+    if ls -l "$Simplify/zipalign" | grep -q "-rwx------"; then
+      echo -e "$good Successfully give exe (--x) permissions to zipalign"
+      ls -l "$Simplify/zipalign"
+    fi
+  fi
+  
+  # Zip aligning APK
   if [ -f "${filename_wo_ext}_src.apk" ]; then
+    echo -e "$running Aligning APK.."
+    ~/zipalign -v 4 "${filename_wo_ext}_src.apk" "${filename_wo_ext}_src_aligned.apk"
+  fi
+  
+  # Signing APK
+  if [ -f "${filename_wo_ext}_src_aligned.apk" ]; then
     echo -e "$running Signing APK.."
-    $PREFIX/lib/jvm/java-$jdkVersion-openjdk/bin/java -jar $PREFIX/share/java/apksigner.jar sign --ks $Simplify/ks.keystore --ks-pass pass:123456 --ks-key-alias ReVancedKey --key-pass pass:123456 --out "${filename_wo_ext}_src_signed.apk" "${filename_wo_ext}_src.apk"
-    $PREFIX/lib/jvm/java-$jdkVersion-openjdk/bin/keytool -printcert -jarfile "${filename_wo_ext}_src_signed.apk" | grep -oP 'Owner: \K.*' 2>/dev/null
+    $PREFIX/lib/jvm/java-$jdkVersion-openjdk/bin/java -jar $PREFIX/share/java/apksigner.jar sign --ks $Simplify/ks.keystore --ks-pass pass:123456 --ks-key-alias ReVancedKey --key-pass pass:123456 --out "${filename_wo_ext}_src_aligned_signed.apk" "${filename_wo_ext}_src_aligned.apk"
+    $PREFIX/lib/jvm/java-$jdkVersion-openjdk/bin/keytool -printcert -jarfile "${filename_wo_ext}_src_aligned_signed.apk" | grep -oP 'Owner: \K.*' 2>/dev/null
     if [ $? -ne 0 ]; then
-      $PREFIX/lib/jvm/java-$jdkVersion-openjdk/bin/java -jar $PREFIX/share/java/apksigner.jar verify --print-certs "${filename_wo_ext}_src_signed.apk" | grep -oP 'Signer #1 certificate DN: \K.*'
+      $PREFIX/lib/jvm/java-$jdkVersion-openjdk/bin/java -jar $PREFIX/share/java/apksigner.jar verify --print-certs "${filename_wo_ext}_src_aligned_signed.apk" | grep -oP 'Signer #1 certificate DN: \K.*'
     fi
   fi
   
   # Rename
-  if [ -f "${filename_wo_ext}_src_signed.apk" ]; then
-    output_apk_versionCode=$($HOME/aapt2 dump badging "${filename_wo_ext}_src_signed.apk" 2>/dev/null | sed -n "s/.*versionCode='\([^']*\)'.*/\1/p")
+  if [ -f "${filename_wo_ext}_src_aligned_signed.apk" ]; then
+    output_apk_versionCode=$($HOME/aapt2 dump badging "${filename_wo_ext}_src_aligned_signed.apk" 2>/dev/null | sed -n "s/.*versionCode='\([^']*\)'.*/\1/p")
     rm -f "$input_apk_path"  # remove input file
-    rm -f "${filename_wo_ext}_src.apk"
-    rm -f "${filename_wo_ext}_src_signed.apk.idsig"
-    mv "${filename_wo_ext}_src_signed.apk" "$input_apk_path"
+    rm -f "${filename_wo_ext}_src.apk"  # rm modified output apk
+    rm -f "${filename_wo_ext}_src_aligned.apk"  # rm zip aligning output apk
+    rm -f "${filename_wo_ext}_src_aligned_signed.apk.idsig"  # rm apksigner generated .idsig file
+    mv "${filename_wo_ext}_src_aligned_signed.apk" "$input_apk_path"  # rename file using move command
     echo -e "$good ${Green}Successfully Change versionCode: $input_apk_versionCode → $output_apk_versionCode${Reset}"
   fi
 }
