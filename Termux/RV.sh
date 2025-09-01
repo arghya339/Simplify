@@ -468,7 +468,7 @@ changeVersionCode() {
   
   # Download zipalign binary for Android from GitHub/@rendiix/termux-zipalign
   arch=$(getprop ro.product.cpu.abi)  # Get Device arch
-  if [ -f "$Simplify/zipalign" ]; then
+  if [ ! -f "$Simplify/zipalign" ]; then
     echo -e "$running Downloading zipalign binary for Android from ${Blue}https://github.com/rendiix/termux-zipalign/raw/refs/heads/main/prebuilt-binary/$arch/zipalign${Reset}.."
     curl -L --progress-bar -o $Simplify/zipalign https://github.com/rendiix/termux-zipalign/raw/refs/heads/main/prebuilt-binary/$arch/zipalign
     ls -l "$Simplify/zipalign"
