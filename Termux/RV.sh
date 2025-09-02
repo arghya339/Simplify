@@ -415,8 +415,6 @@ changeVersionCode() {
   echo -e "$running Decoding resources.."
   if [ "$input_apk_packageName" == "com.instagram.android" ] || [ "$input_apk_packageName" == "com.instagram.barcelona" ]; then
     $PREFIX/lib/jvm/java-$jdkVersion-openjdk/bin/java -jar $apktoolJar d -s -f "$input_apk_path" -o "${filename_wo_ext}_src"  # -s,--no-src = Skip src (no smali files), Java bytecode (.dex files) decompilation. It's improve significant decompilation speed | --no-assets = Skip decoding assets folder (apk data) - it's causes app crashes after aligning | -f,--force = force overwrite output directory (Auto deletes existing output dir) | Change versionCode failed: -r,--no-res --only-manifest
-  else
-    $PREFIX/lib/jvm/java-$jdkVersion-openjdk/bin/java -jar $apktoolJar d --only-manifest -f "$input_apk_path" -o "${filename_wo_ext}_src"  # Building failed: -s,--no-src
   fi
   if [ $? -eq 0 ]; then
     sleep 0.5  # wait 500 milliseconds
@@ -530,7 +528,7 @@ commonPrompt() {
     echo -e "[?] ${Yellow}Do you want to install ${appNameRef[0]} RV app? [Y/n] ${Reset}\c" && read opt
     case $opt in
       y*|Y*|"")
-        if [ $pkgName == "com.instagram.android" ] || [ $pkgName == "com.facebook.katana" ] || [ $pkgName == "com.facebook.orca" ] || [ $pkgName == "com.instagram.barcelona" ] || [ $pkgName == "com.zhiliaoapp.musically" ]; then
+        if [ $pkgName == "com.instagram.android" ] || [ $pkgName == "com.instagram.barcelona" ]; then
           echo -e "[?] ${Yellow}Do you want to Change ${appNameRef[0]} RV app versionCode? [Y/n] ${Reset}\c" && read opt
           case $opt in
             y*|Y*|"") changeVersionCode "$outputAPK" | tee "$SimplUsr/${appNameRef[0]}-RV_changeVersionCode-log.txt"  # Change app versionCode by calling changeVersionCode method
@@ -541,6 +539,8 @@ commonPrompt() {
             n*|N*) echo -e "$notice ${Yellow}Warning! Disable auto updates for the patched app to avoid unexpected issues.${Reset}" ;;
             *) echo -e "$info Invalid choice! Change ${appNameRef[0]} RV versionCode skipped." ;;
           esac
+        elif [ $pkgName == "com.facebook.katana" ] || [ $pkgName == "com.facebook.orca" ] || [ $pkgName == "com.zhiliaoapp.musically" ]; then
+          echo -e "$notice ${Yellow}Warning! Disable auto updates for the patched app to avoid unexpected issues.${Reset}"
         fi
         echo -e "$running Please Wait !! Installing Patched ${appNameRef[0]} RV apk.."
         bash $Simplify/apkInstall.sh "$outputAPK" "$pkgPatched" "$activityPatched"
