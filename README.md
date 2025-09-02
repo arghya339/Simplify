@@ -21,7 +21,7 @@ A Simple Cross Platform Automated ReVanced Shell Script for Patching apk
 ### Android
   - Open [Termux](https://github.com/termux/termux-app/releases) and run the script with the following command:
    
-  ```
+  ```sh
   curl -L --progress-bar -o "$HOME/.Simplify.sh" "https://raw.githubusercontent.com/arghya339/Simplify/refs/heads/main/Termux/Simplify.sh" && bash "$HOME/.Simplify.sh"
   ```
   - Run Simplify with these commands in Termux:
