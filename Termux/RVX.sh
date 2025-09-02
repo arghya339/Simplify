@@ -210,7 +210,7 @@ yt_patches_args=(
   -e "Hide shortcuts" -Oshorts=false
   -e "Visual preferences icons for YouTube" -OsettingsMenuIcon="extension"
   -e "Overlay buttons" -OiconType=thin
-  -e "Spoof streaming data" -OuseIOSClient
+  -e "Spoof streaming data" -OuseMobileWebClient=true
   -e "Settings for YouTube" -OinsertPosition="@string/about_key" -OrvxSettingsLabel=RVX
   -e "Force hide player buttons background"
   -e=MaterialYou -e Theme
@@ -237,7 +237,7 @@ yt_music_patches_args=(
   -e "Dark theme" -OmaterialYou=true
   -e "Visual preferences icons for YouTube Music" -OsettingsMenuIcon="extension"
   -e "Settings for YouTube Music" -OinsertPosition="settings_header_about_youtube_music" -OrvxSettingsLabel="RVX"
-  -e "Custom header for YouTube Music"
+  -e "Hide ads" -OhideFullscreenAds=true
   -e="Return YouTube Username" -e "Disable music video in album"
 )
 
