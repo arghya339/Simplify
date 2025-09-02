@@ -404,6 +404,7 @@ changeVersionCode() {
   versionCode="2147483647"  # Sets the maximum version code to prevent an update.
   input_apk_path=${1}
   filename_wo_ext="${input_apk_path%.*}"
+  input_apk_packageName=$($HOME/aapt2 dump badging "$input_apk_path" 2>/dev/null | awk -F"'" '/package/ {print $2}')
   input_apk_versionCode=$($HOME/aapt2 dump badging "$input_apk_path" 2>/dev/null | sed -n "s/.*versionCode='\([^']*\)'.*/\1/p")
   
   # Download apktool
@@ -412,7 +413,11 @@ changeVersionCode() {
   
   # Decoding
   echo -e "$running Decoding resources.."
-  $PREFIX/lib/jvm/java-$jdkVersion-openjdk/bin/java -jar $apktoolJar d -s -f "$input_apk_path" -o "${filename_wo_ext}_src"  # -s,--no-src = Skip src (no smali files), Java bytecode (.dex files) decompilation. It's improve significant decompilation speed | --no-assets = Skip decoding assets folder (apk data) - it's causes app crashes after aligning | -f,--force = force overwrite output directory (Auto deletes existing output dir) | Change versionCode failed: -r,--no-res --only-manifest
+  if [ "$input_apk_packageName" == "com.instagram.android" ] || [ "$input_apk_packageName" == "com.instagram.barcelona" ]; then
+    $PREFIX/lib/jvm/java-$jdkVersion-openjdk/bin/java -jar $apktoolJar d -s -f "$input_apk_path" -o "${filename_wo_ext}_src"  # -s,--no-src = Skip src (no smali files), Java bytecode (.dex files) decompilation. It's improve significant decompilation speed | --no-assets = Skip decoding assets folder (apk data) - it's causes app crashes after aligning | -f,--force = force overwrite output directory (Auto deletes existing output dir) | Change versionCode failed: -r,--no-res --only-manifest
+  else
+    $PREFIX/lib/jvm/java-$jdkVersion-openjdk/bin/java -jar $apktoolJar d --only-manifest -f "$input_apk_path" -o "${filename_wo_ext}_src"  # Building failed: -s,--no-src
+  fi
   if [ $? -eq 0 ]; then
     sleep 0.5  # wait 500 milliseconds
     # Wait for output dir (max 60 seconds)
