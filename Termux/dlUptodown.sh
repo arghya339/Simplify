@@ -274,6 +274,7 @@ dlUptodown() {
       APKEditor=$(find "$HOME/Simplify" -type f -name "APKEditor-*.jar" -print -quit)
       mkdir -p "$Download/${appName}_v${appVersion}-${cpuAbi}"
       echo -e "$running Extracting APKS content.."
+      termux-wake-lock
       if [ -f $simplifyJson ]; then
         if [ $RipLib -eq 1 ]; then
           pv "$outputPath" | bsdtar -xf - -C "$Download/${appName}_v${appVersion}-${cpuAbi}/" --include "$pkgName.apk" "config.${cpuAbi//-/_}.apk" "config.${locale}.apk" "config.${dpi}.apk"
@@ -292,6 +293,7 @@ dlUptodown() {
       rm "$outputPath"
       echo -e "$running Merge splits apks to standalone lite apk.."
       $PREFIX/lib/jvm/java-$jdkVersion-openjdk/bin/java -jar $APKEditor m -i "$Download/${appName}_v${appVersion}-${cpuAbi}" -o "$Download/${appName}_v${appVersion}-${cpuAbi}.apk"
+      termux-wake-unlock
       rm -rf "$Download/${appName}_v${appVersion}-${cpuAbi}"
     fi
     echo  # White Space

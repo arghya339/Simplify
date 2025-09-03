@@ -527,6 +527,7 @@ if [ $CheckTermuxUpdate -eq 1 ]; then
       echo -e "$notice Please rerun this script again after Termux app update!"
       echo -e "$running Installing app update and restarting Termux app.." && sleep 3
       if su -c "id" >/dev/null 2>&1; then
+        su -c "cmd deviceidle whitelist +com.termux"
         su -c "cp '$SimplUsr/termux-app_v${latestReleases}+github-debug_$cpuAbi.apk' '/data/local/tmp/termux-app_v${latestReleases}+github-debug_$cpuAbi.apk'"
         # Temporary Disable SELinux Enforcing during installation if it not in Permissive
         if [ "$(su -c 'getenforce 2>/dev/null')" = "Enforcing" ]; then
@@ -537,6 +538,12 @@ if [ $CheckTermuxUpdate -eq 1 ]; then
           su -c "pm install -i com.android.vending '/data/local/tmp/termux-app_v${latestReleases}+github-debug_$cpuAbi.apk'"
         fi
       else
+        if "$HOME/rish" -c "id" >/dev/null 2>&1; then
+          $HOME/rish -c "cmd deviceidle whitelist +com.termux"
+        else
+          echo -e "$info Please Disabled: ${Green}Battery optimization → Not optimized → All apps → Termux → Don't optiomize → DONE${Reset}" && sleep 6
+          am start -n com.android.settings/.Settings\$HighPowerApplicationsActivity &> /dev/null
+        fi
         bash $Simplify/apkInstall.sh "$SimplUsr/termux-app_v${latestReleases}+github-debug_$cpuAbi.apk" "com.termux" "com.termux/.app.TermuxActivity"
       fi
     else

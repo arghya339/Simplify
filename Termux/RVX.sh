@@ -394,7 +394,9 @@ build_app() {
   if [ -f "${stock_apk_ref[0]}" ]; then
     echo -e "$good ${Green}Downloaded ${appNameRef[0]} APK found:${Reset} ${stock_apk_ref[0]}"
     echo -e "$running Patching ${appNameRef[0]} RVX.."
+    termux-wake-lock
     patch_app "${stock_apk_ref[0]}" "$appPatchesArgs" "$outputAPK" "$log" "${appNameRef[0]}" "$bugReportUrl"
+    termux-wake-unlock
   fi
   
   if [ -f "$outputAPK" ]; then
@@ -407,7 +409,9 @@ build_app() {
             I*|i*|"")
               checkCoreLSPosed  # Call the check core patch functions
               echo -e "$running Copy signature from ${appNameRef[0]}.."
+              termux-wake-lock
               cs "${stock_apk_ref[0]}" "$outputAPK" "$SimplUsr/${appNameRef[0]}-RVX-CS_v${pkgVersion}-$Arch.apk"
+              termux-wake-unlock
               echo -e "$running Please Wait !! Installing Patched ${appNameRef[0]} RVX CS apk.."
               bash $Simplify/apkInstall.sh "$SimplUsr/${appNameRef[0]}-RVX-CS_v${pkgVersion}-$Arch.apk" "$pkgName" ""
               ;;

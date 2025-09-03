@@ -531,7 +531,10 @@ commonPrompt() {
         if [ $pkgName == "com.instagram.android" ] || [ $pkgName == "com.instagram.barcelona" ]; then
           echo -e "[?] ${Yellow}Do you want to Change ${appNameRef[0]} RV app versionCode? [Y/n] ${Reset}\c" && read opt
           case $opt in
-            y*|Y*|"") changeVersionCode "$outputAPK" | tee "$SimplUsr/${appNameRef[0]}-RV_changeVersionCode-log.txt"  # Change app versionCode by calling changeVersionCode method
+            y*|Y*|"")
+              termux-wake-lock
+              changeVersionCode "$outputAPK" | tee "$SimplUsr/${appNameRef[0]}-RV_changeVersionCode-log.txt"  # Change app versionCode by calling changeVersionCode method
+              termux-wake-unlock
               if grep -q "OutOfMemory" "$SimplUsr/${appNameRef[0]}-RV_changeVersionCode-log.txt"; then
                 echo -e "$bad ${Red}OutOfMemoryError${Reset}: ${Yellow}Device RAM overloaded!${Reset}\n ${Blue}Solutions${Reset}:\n   1. ${Yellow}Close background apps.${Reset}\n   2. ${Yellow}Use device with ≥4GB ~ ≥6GB RAM for patching apk.${Reset}"
               fi
@@ -616,7 +619,9 @@ build_app() {
   
   if [ -f "${stock_apk_path}" ]; then
     echo -e "$good ${Green}Downloaded ${appName} APK found:${Reset} ${stock_apk_path}"
+    termux-wake-lock
     patch_app "$stock_apk_path" "$appPatchesArgs" "$outputAPK" "${appName}"
+    termux-wake-unlock
   fi
   
   if [ -f "$outputAPK" ]; then
@@ -629,7 +634,9 @@ build_app() {
             I*|i*|"")
               checkCoreLSPosed  # Call the check core patch functions
               echo -e "$running Copy signature from ${appNameRef[0]}.."
+              termux-wake-lock
               cs "${stock_apk_path[0]}" "$outputAPK" "$SimplUsr/${appNameRef[0]}-RV-CS_v${pkgVersion}-${archRef[0]}.apk"
+              termux-wake-unlock
               echo -e "$running Please Wait !! Installing Patched ${appNameRef[0]} RV CS apk.."
               bash $Simplify/apkInstall.sh "$SimplUsr/${appNameRef[0]}-RV-CS_v${pkgVersion}-${archRef[0]}.apk" "$pkgName" ""
               ;;

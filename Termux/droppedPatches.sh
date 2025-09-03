@@ -139,7 +139,9 @@ build_app() {
   if [ -f "${stock_apk_path[0]}" ]; then
     echo -e "$good ${Green}Downloaded ${appNameRef[0]} APK found:${Reset} ${stock_apk_path[0]}"
     echo -e "$running Patching ${appNameRef[0]} Dropped.."
+    termux-wake-lock
     patch_app "stock_apk_path" "$outputAPK" "$log" "${appNameRef[0]}"
+    termux-wake-unlock
   fi
   
   if [ -f "$outputAPK" ]; then

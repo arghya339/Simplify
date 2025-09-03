@@ -349,6 +349,7 @@ APKMdl() {
       APKEditor=$(find "$Simplify" -type f -name "APKEditor-*.jar" -print -quit)
       mkdir -p "$Download/${appName}_v${VERSION}-${cpuAbi}"
       echo -e "$running Extracting APKM content.."
+      termux-wake-lock
       if [ -f $simplifyJson ]; then
         if [ $RipLib -eq 1 ]; then
           pv "$outputPath" | bsdtar -xf - -C "$Download/${appName}_v${VERSION}-${cpuAbi}/" --include "base.apk" "split_config.${cpuAbi//-/_}.apk" "split_config.${locale}.apk" "split_config.${lcd_dpi}.apk"
@@ -367,6 +368,7 @@ APKMdl() {
       rm "$outputPath"
       echo -e "$running Merge splits apkm to standalone lite apk.."
       $PREFIX/lib/jvm/java-$jdkVersion-openjdk/bin/java -jar $APKEditor m -i "$Download/${appName}_v${VERSION}-${cpuAbi}" -o "$Download/${appName}_v${VERSION}-${cpuAbi}.apk"
+      termux-wake-unlock
       rm -rf "$Download/${appName}_v${VERSION}-${cpuAbi}"
       echo
     fi

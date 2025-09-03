@@ -226,7 +226,9 @@ build_app() {
   if [ -f "${stock_apk_path}" ]; then
     echo -e "$good ${Green}Downloaded ${appNameRef[0]} APK found:${Reset} ${stock_apk_path}"
     echo -e "$running Patching ${appNameRef[0]} LSPatch.."
+    termux-wake-lock
     patch_app "${stock_apk_path}" "$module_apk_path" "${appNameRef[0]}" "$BugReportUrl"
+    termux-wake-unlock
   fi
   
   local output_apk_path=$(find "$SimplUsr" -type f -name "${stockFileNameWOExt}-*-lspatched.apk")
@@ -334,7 +336,9 @@ sign_app() {
       echo -e "$notice keytool error: SHA-256 digest error!"
       local output_apk_path="$SimplUsr/$stockFileNameWOExt-signed.apk"
       local fileName=$(basename "${output_apk_path}")
+      termux-wake-lock
       $PREFIX/lib/jvm/java-$jdkVersion-openjdk/bin/java -jar $PREFIX/share/java/apksigner.jar sign --ks $Simplify/ks.keystore --ks-pass pass:123456 --ks-key-alias ReVancedKey --key-pass pass:123456 --out "${output_apk_path}" "${stock_apk_path[0]}"
+      termux-wake-unlock
       rm "$output_apk_path.idsig"
       $PREFIX/lib/jvm/java-$jdkVersion-openjdk/bin/keytool -printcert -jarfile "${output_apk_path}" | grep -oP 'Owner: \K.*' 2>/dev/null
       if [ $? -ne 0 ]; then

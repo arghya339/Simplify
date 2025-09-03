@@ -281,7 +281,9 @@ dlPatchedApp() {
         filename_wo_ext="${aab_path%.*}"
         apk_path="$filename_wo_ext.apk"
         assets=$(basename "$apk_path")
+        termux-wake-lock
         build_apks "$aab_path"  # build apk from aab by calling build_apks function
+        termux-wake-unlock
       fi
       if [ -f "$apk_path" ]; then
         echo -e "$info ${Green}Downloaded $appName APK found:${Reset} $apk_path"

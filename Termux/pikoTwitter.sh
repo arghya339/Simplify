@@ -194,7 +194,9 @@ sleep 0.5  # Wait 500 milliseconds
 if [ -f "${stock_apk_path[0]}" ]; then
   echo -e "$good ${Green}Downloaded ${appName[0]} APK found:${Reset} ${stock_apk_path[0]}"
   echo -e "$running Patching Piko Twitter.."
+  termux-wake-lock
   patch_twitter "stock_apk_path" "$outputAPK"
+  termux-wake-unlock
 fi
 
 # --- app installation prompt ---
