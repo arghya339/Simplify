@@ -537,15 +537,18 @@ if [ $CheckTermuxUpdate -eq 1 ]; then
         # Temporary Disable SELinux Enforcing during installation if it not in Permissive
         if [ "$(su -c 'getenforce 2>/dev/null')" = "Enforcing" ]; then
           su -c "setenforce 0"  # set SELinux to Permissive mode to unblock unauthorized operations
+          su -c 'pm grant com.termux android.permission.POST_NOTIFICATIONS'
           su -c "cmd deviceidle whitelist +com.termux"
           touch "$Simplify/setenforce0"
           su -c "pm install -i com.android.vending '/data/local/tmp/termux-app_v${latestReleases}+github-debug_$cpuAbi.apk'"
         else
+          su -c 'pm grant com.termux android.permission.POST_NOTIFICATIONS'
           su -c "cmd deviceidle whitelist +com.termux"
           su -c "pm install -i com.android.vending '/data/local/tmp/termux-app_v${latestReleases}+github-debug_$cpuAbi.apk'"
         fi
       else
         if "$HOME/rish" -c "id" >/dev/null 2>&1; then
+          $HOME/rish -c 'pm grant com.termux android.permission.POST_NOTIFICATIONS'
           $HOME/rish -c "cmd deviceidle whitelist +com.termux"
           $HOME/rish -c "cmd appops set com.termux REQUEST_INSTALL_PACKAGES allow"
         else
@@ -595,15 +598,18 @@ if [ $CheckTermuxUpdate -eq 1 ]; then
         # Temporary Disable SELinux Enforcing during installation if it not in Permissive
         if [ "$(su -c 'getenforce 2>/dev/null')" = "Enforcing" ]; then
           su -c "setenforce 0"  # set SELinux to Permissive mode to unblock unauthorized operations
+          su -c 'pm grant com.termux android.permission.POST_NOTIFICATIONS'
           su -c "cmd deviceidle whitelist +com.termux"
           touch "$Simplify/setenforce0"
           su -c "pm install -i com.android.vending '/data/local/tmp/termux-app_v${lastReleases}+apt-android-$variant-github-debug_$cpuAbi.apk'"
         else
+          su -c 'pm grant com.termux android.permission.POST_NOTIFICATIONS'
           su -c "cmd deviceidle whitelist +com.termux"
           su -c "pm install -i com.android.vending '/data/local/tmp/termux-app_v${lastReleases}+apt-android-$variant-github-debug_$cpuAbi.apk'"
         fi
       else
         if "$HOME/rish" -c "id" >/dev/null 2>&1; then
+          $HOME/rish -c 'pm grant com.termux android.permission.POST_NOTIFICATIONS'
           $HOME/rish -c "cmd deviceidle whitelist +com.termux"
           $HOME/rish -c "cmd appops set com.termux REQUEST_INSTALL_PACKAGES allow"
         else
