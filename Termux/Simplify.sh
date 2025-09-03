@@ -281,6 +281,8 @@ if [ ! -f "$HOME/.shortcuts/simplify" ] || [ ! -f "$HOME/.termux/widget/dynamic_
     bash $Simplify/apkInstall.sh "$Widget" "com.termux.widget" "com.termux.widget/com.termux.widget.TermuxCreateShortcutActivity"  # Install Termux:Widget app using apkInstall.sh
     [ -f "$Widget" ] && rm -f "$Widget"  # if Termux:Widget app package exist then remove it 
   fi
+  echo -e "$info Please manually turn on: ${Green}Display over other apps → Termux → Allow display over other apps${Reset}" && sleep 6
+  am start -a android.settings.action.MANAGE_OVERLAY_PERMISSION &> /dev/null  # open manage overlay permission settings
   echo -e "$info From Termux:Widget app tap on ${Green}simplify → Add to home screen${Reset}. Opening Termux:Widget app in 6 seconds.." && sleep 6
   am start -n com.termux.widget/com.termux.widget.TermuxCreateShortcutActivity > /dev/null 2>&1  # open Termux:Widget app shortcut create activity (screen/view) to add shortcut on Launcher Home
 fi
