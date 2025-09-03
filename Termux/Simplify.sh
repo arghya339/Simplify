@@ -278,7 +278,7 @@ if [ ! -f "$HOME/.shortcuts/simplify" ] || [ ! -f "$HOME/.termux/widget/dynamic_
   if ! am start -n com.termux.widget/com.termux.widget.TermuxLaunchShortcutActivity > /dev/null 2>&1; then
     bash $Simplify/dlGitHub.sh "termux" "termux-widget" "latest" ".apk" "$SimplUsr"  # Download Termux:Widget app from GitHub using dlGitHub.sh
     Widget=$(find "$SimplUsr" -type f -name "termux-widget-app_v*+github.debug.apk" -print -quit)  # find downloaded Termux:Widget app package
-    bash $Simplify/apkInstall.sh "$Widget" "com.termux.widget" "com.termux.widget/com.termux.widget.TermuxCreateShortcutActivity"  # Install Termux:Widget app using apkInstall.sh
+    bash $Simplify/apkInstall.sh "$Widget" "" ""  # Install Termux:Widget app using apkInstall.sh
     [ -f "$Widget" ] && rm -f "$Widget"  # if Termux:Widget app package exist then remove it 
   fi
   if su -c "id" >/dev/null 2>&1; then
