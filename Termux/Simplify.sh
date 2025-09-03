@@ -1142,6 +1142,8 @@ while true; do
                     [ -d "$SimplUsr" ] && rm -rf "$SimplUsr"
                     [ -f "$HOME/.Simplify.sh" ] && rm -f "$HOME/.Simplify.sh"
                     [ -f "$PREFIX/bin/simplify" ] && rm -f "$PREFIX/bin/simplify"
+                    [ -f "$HOME/.shortcuts/simplify" ] && rm -f ~/.shortcuts/simplify
+                    [ -f "$HOME/.termux/widget/dynamic_shortcuts/simplify" ] && rm -f ~/.termux/widget/dynamic_shortcuts/simplify
                     pkgUninstall "aria2"  # aria2 uninstall
                     pkgUninstall "jq"  # jq uninstall
                     pkgUninstall "pup"  # pup uninstall
