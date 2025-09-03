@@ -272,7 +272,9 @@ if [ ! -f "$HOME/.shortcuts/simplify" ] || [ ! -f "$HOME/.termux/widget/dynamic_
   echo -e "$notice Please wait few seconds! Creating simplify shortcut to access simplify from Launcher Widget."
   mkdir -p ~/.shortcuts  # create $HOME/.shortcuts dir if it not exist
   echo "#\!/usr/bin/bash\nbash \$PREFIX/bin/simplify" > ~/.shortcuts/simplify  # create simplify shortcut script
+  mkdir -p ~/.termux/widget/dynamic_shortcuts
   echo "#\!/usr/bin/bash\nbash \$PREFIX/bin/simplify" > ~/.termux/widget/dynamic_shortcuts/simplify  # create simplify dynamic shortcut script
+  chmod +x ~/.termux/widget/dynamic_shortcuts/simplify  # give execute (--x) permissions to simplify script
   if ! am start -n com.termux.widget/com.termux.widget.TermuxCreateShortcutActivity > /dev/null 2>&1; then
     bash $Simplify/dlGitHub.sh "termux" "termux-widget" "latest" ".apk" "$SimplUsr"  # Download Termux:Widget app from GitHub using dlGitHub.sh
     Widget=$(find "$SimplUsr" -type f -name "termux-widget-app_v*+github.debug.apk" -print -quit)  # find downloaded Termux:Widget app package
