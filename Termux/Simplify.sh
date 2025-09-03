@@ -267,6 +267,22 @@ if su -c "id" >/dev/null 2>&1; then
   curl -sL -o "$Simplify/apkMount.sh" "https://raw.githubusercontent.com/arghya339/Simplify/refs/heads/main/Termux/apkMount.sh"
 fi
 
+# --- Create simplify shortcut on Laucher Home ---
+if [ ! -f "$HOME/.shortcuts/simplify" ] || [ ! -f "$HOME/.termux/widget/dynamic_shortcuts/simplify" ]; then
+  echo -e "$notice Please wait few seconds! Creating simplify shortcut to access simplify from Launcher Widget."
+  mkdir -p ~/.shortcuts  # create $HOME/.shortcuts dir if it not exist
+  echo "#\!/usr/bin/bash\nbash \$PREFIX/bin/simplify" > ~/.shortcuts/simplify  # create simplify shortcut script
+  echo "#\!/usr/bin/bash\nbash \$PREFIX/bin/simplify" > ~/.termux/widget/dynamic_shortcuts/simplify  # create simplify dynamic shortcut script
+  if ! am start -n com.termux.widget/com.termux.widget.TermuxCreateShortcutActivity > /dev/null 2>&1; then
+    bash $Simplify/dlGitHub.sh "termux" "termux-widget" "latest" ".apk" "$SimplUsr"  # Download Termux:Widget app from GitHub using dlGitHub.sh
+    Widget=$(find "$SimplUsr" -type f -name "termux-widget-app_v*+github.debug.apk" -print -quit)  # find downloaded Termux:Widget app package
+    bash $Simplify/apkInstall.sh "$Widget" "com.termux.widget" "com.termux.widget/com.termux.widget.TermuxCreateShortcutActivity"  # Install Termux:Widget app using apkInstall.sh
+    [ -f "$Widget" ] && rm -f "$Widget"  # if Termux:Widget app package exist then remove it 
+  fi
+  echo -e "$info From Termux:Widget app tap on ${Green}simplify → Add to home screen${Reset}. Opening Termux:Widget app in 6 seconds.." && sleep 6
+  am start -n com.termux.widget/com.termux.widget.TermuxCreateShortcutActivity > /dev/null 2>&1  # open Termux:Widget app shortcut create activity (screen/view) to add shortcut on Launcher Home
+fi
+
 # --- Download branding.zip ---
 if [ ! -d "$SimplUsr/.branding" ] && [ ! -f "$SimplUsr/branding.zip" ]; then
   echo -e "$running Downloading ${Red}branding.zip${Reset} from GitHub.."
