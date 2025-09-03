@@ -547,9 +547,12 @@ if [ $CheckTermuxUpdate -eq 1 ]; then
       else
         if "$HOME/rish" -c "id" >/dev/null 2>&1; then
           $HOME/rish -c "cmd deviceidle whitelist +com.termux"
+          $HOME/rish -c "cmd appops set com.termux REQUEST_INSTALL_PACKAGES allow"
         else
           echo -e "$info Please Disabled: ${Green}Battery optimization → Not optimized → All apps → Termux → Don't optiomize → DONE${Reset}" && sleep 6
           am start -n com.android.settings/.Settings\$HighPowerApplicationsActivity &> /dev/null
+          echo -e "$info Please Allow: ${Green}Install unknown apps → Termux → Allow from this source${Reset}" && sleep 6
+          am start -n com.android.settings/.Settings\$ManageExternalSourcesActivity &> /dev/null
         fi
         bash $Simplify/apkInstall.sh "$SimplUsr/termux-app_v${latestReleases}+github-debug_$cpuAbi.apk" "com.termux" "com.termux/.app.TermuxActivity"
       fi
@@ -602,9 +605,12 @@ if [ $CheckTermuxUpdate -eq 1 ]; then
       else
         if "$HOME/rish" -c "id" >/dev/null 2>&1; then
           $HOME/rish -c "cmd deviceidle whitelist +com.termux"
+          $HOME/rish -c "cmd appops set com.termux REQUEST_INSTALL_PACKAGES allow"
         else
           echo -e "$info Please Disabled: ${Green}Battery optimization → Not optimized → All apps → Termux → Don't optiomize → DONE${Reset}" && sleep 6
           am start -n com.android.settings/.Settings\$HighPowerApplicationsActivity &> /dev/null
+          echo -e "$info Please Allow: ${Green}Install unknown apps → Termux → Allow from this source${Reset}" && sleep 6
+          am start -n com.android.settings/.Settings\$ManageExternalSourcesActivity &> /dev/null
         fi
         bash $Simplify/apkInstall.sh "$SimplUsr/termux-app_v${latestReleases}+apt-android-$variant-github-debug_$cpuAbi.apk" "com.termux" "com.termux/.app.TermuxActivity"
       fi
