@@ -1201,7 +1201,7 @@ while true; do
     Instagram)
       pkgName="com.instagram.android"
       appName=("Instagram")
-      pkgVersion="394.0.0.46.81"
+      pkgVersion="396.0.0.46.242"
       #pkgVersion=""
       if [ -z "$pkgVersion" ]; then
         getVersion "$pkgName"
