@@ -324,8 +324,8 @@ fi
 
 Unmount() {
   su -c '/data/data/com.termux/files/usr/bin/bash -c '\''
-  pkgArr=("com.google.android.youtube" "com.google.android.apps.youtube.music" "com.google.android.apps.photos")
-  nameArr=("YouTube" "YouTube Music" "Google Photos")
+  pkgArr=("com.google.android.youtube" "com.google.android.apps.youtube.music" "com.google.android.apps.photos" "com.spotify.music")
+  nameArr=("YouTube" "YouTube Music" "Google Photos" "Spotify")
 
   if [ -d "/data/adb/revanced" ]; then
     while true; do

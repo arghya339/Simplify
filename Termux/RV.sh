@@ -239,12 +239,21 @@ else
   )
 fi
 
-spotify_patches_args=(
-  -e "Change lyrics provider"
-  -e "Custom theme"
+if su -c "id" >/dev/null 2>&1; then
+  spotify_patches_args=(
+    -e "Change lyrics provider"
+    -e "Custom theme"
   
-  -d "Hide Create button"
-)
+    -d "Hide Create button"
+ )
+else
+  spotify_patches_args=(
+    -e "Change lyrics provider"
+    -e "Custom theme"
+    -d "Spoof client"
+    -d "Hide Create button"
+ )
+fi
 
 tiktok_patches_args=(
   -e "SIM spoof"
@@ -376,6 +385,9 @@ if [ "$ReadPatchesFile" -eq 1 ]; then
             echo "-e \"Custom branding\" -O appName=\"YouTube RV\" -O iconPath=\"/sdcard/Simplify/.branding/youtube/launcher/google_family\"" >> "$SimplUsr/${arraynames[$i]}.txt"
           fi
         fi
+      fi
+      if su -c "id" >/dev/null 2>&1 && [ "${arraynames[$i]}" == "spotify_patches_args" ]; then
+        echo "-d \"Spoof client\"" >> "$SimplUsr/${arraynames[$i]}.txt"
       fi
     fi
   done
@@ -907,13 +919,16 @@ fi
 if  [[ $Android -ge 11  &&  ( "$cpuAbi" == "arm64-v8a" || "$cpuAbi" == "armeabi-v7a" ) ]]; then
   Facebook="Facebook"
 fi
+if su -c "id" >/dev/null 2>&1; then
+  Spotify="Spotify"
+fi
 
 # --- Arrays of apps list that required specific android version ---
 if [ $Android -ge 12 ]; then
   apps=(
     Quit
     YouTube
-    #Spotify
+    $Spotify
     TikTok
     Google\ Photos
     $googleRecorder
@@ -939,7 +954,7 @@ elif [ $Android -eq 11 ]; then
   apps=(
     Quit
     YouTube
-    #Spotify
+    $Spotify
     TikTok
     Google\ Photos
     $googleRecorder
@@ -964,7 +979,7 @@ elif [ $Android -eq 10 ]; then
   apps=(
     Quit
     YouTube
-    #Spotify
+    $Spotify
     TikTok
     Google\ Photos
     $googleRecorder
@@ -989,7 +1004,7 @@ elif [ $Android -eq 9 ]; then
   apps=(
     Quit
     YouTube
-    #Spotify
+    $Spotify
     TikTok
     Google\ Photos
     $Instagram
@@ -1012,7 +1027,7 @@ elif [ $Android -eq 8 ]; then
   apps=(
     Quit
     YouTube
-    #Spotify
+    $Spotify
     TikTok
     Google\ Photos
     $Instagram
@@ -1033,7 +1048,7 @@ elif [ $Android -eq 8 ]; then
 elif [ $Android -eq 7 ]; then
   apps=(
     Quit
-    #Spotify
+    $Spotify
     TikTok
     Google\ Photos
     $Instagram
