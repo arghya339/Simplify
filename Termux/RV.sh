@@ -637,7 +637,7 @@ build_app() {
   fi
   
   if [ -f "$outputAPK" ]; then
-    if [ "$pkgName" == "com.google.android.youtube" ] || [ "$pkgName" == "com.google.android.apps.photos" ] || [ "$pkgName" == "com.google.android.apps.recorder" ]; then
+    if [ "$pkgName" == "com.google.android.youtube" ] || [ "$pkgName" == "com.google.android.apps.photos" ] || [ "$pkgName" == "com.google.android.apps.recorder" ] || [ "$pkgName" == "com.spotify.music" ]; then
       if su -c "id" >/dev/null 2>&1; then
         
         if [ "$pkgName" == "com.google.android.youtube" ]; then
