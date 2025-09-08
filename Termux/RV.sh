@@ -243,14 +243,14 @@ if su -c "id" >/dev/null 2>&1; then
   spotify_patches_args=(
     -e "Change lyrics provider"
     -e "Custom theme"
-  
+    -d "Spoof client"
     -d "Hide Create button"
  )
 else
   spotify_patches_args=(
     -e "Change lyrics provider"
     -e "Custom theme"
-    -d "Spoof client"
+    
     -d "Hide Create button"
  )
 fi
