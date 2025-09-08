@@ -114,10 +114,11 @@ dlUptodown() {
         exit 1
       fi
       
-      hit=$(jq -r --arg v "$appVersion" '.data[] | select(.version == $v) | [.fileID, .version, .sdkVersion, .kindFile, .versionURL] | @tsv' <<<"$versions_json")  # Check if versions page contain target appVersion
+      hit=$(jq -r --arg v "$appVersion" '.data[] | select(.version == $v) | [.fileID, .version, .sdkVersion, .kindFile, .versionURL.url, .versionURL.extraURL, .versionURL.versionID] | @tsv' <<<"$versions_json")  # Check if versions page contain target appVersion
       # if $hit is non-empty, means found target appVersion then extract variables fields & break ∞ while loop
       if [ -n "$hit" ]; then
-        IFS=$'\t' read -r fileID version sdkVersion kindFile versionURL <<<"$hit"
+        IFS=$'\t' read -r fileID version sdkVersion kindFile baseUrl extraUrl versionID <<<"$hit"
+        versionURL="$baseUrl/$extraUrl/$versionID"
         echo -e "$info fileID (versionID)         : $fileID\n$info version                    : $version\n$info sdkVersion (minAndroid)    : $sdkVersion\n$info kindFile (fileType)        : $kindFile\n$good versionURL                 : ${Blue}$versionURL${Reset}"
         echo  # Space
         break  # brake the loop
