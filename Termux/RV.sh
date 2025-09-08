@@ -661,7 +661,7 @@ build_app() {
             N*|n*) echo -e "$notice ${appNameRef[0]} RV Installaion skipped!" ;;
             *) echo -e "$info Invalid choice! ${appNameRef[0]} RV Installaion skipped." ;;
           esac
-        elif [ "$pkgName" == "com.google.android.apps.photos" ] || [ "$pkgName" == "com.google.android.apps.recorder" ]; then
+        elif [ "$pkgName" == "com.google.android.apps.photos" ] || [ "$pkgName" == "com.google.android.apps.recorder" ] || [ "$pkgName" == "com.spotify.music" ]; then
           echo -e "[?] ${Yellow}Do you want to Mount ${appNameRef[0]} RV app? [Y/n] ${Reset}\c" && read opt
           case $opt in
             y*|Y*|"")
