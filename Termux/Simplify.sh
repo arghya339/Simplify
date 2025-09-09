@@ -612,6 +612,7 @@ if [ $CheckTermuxUpdate -eq 1 ]; then
           $HOME/rish -c 'pm grant com.termux android.permission.POST_NOTIFICATIONS'
           $HOME/rish -c "cmd deviceidle whitelist +com.termux"
           $HOME/rish -c "cmd appops set com.termux REQUEST_INSTALL_PACKAGES allow"
+          $HOME/rish -c "cmd appops set com.termux.widget REQUEST_INSTALL_PACKAGES allow"
         else
           echo -e "$info Please Disabled: ${Green}Battery optimization → Not optimized → All apps → Termux → Don't optiomize → DONE${Reset}" && sleep 6
           am start -n com.android.settings/.Settings\$HighPowerApplicationsActivity &> /dev/null
