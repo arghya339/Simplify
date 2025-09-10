@@ -91,20 +91,14 @@ dlUptodown() {
     # Build a slug-based URL (web address with human-readable keyword) ie. "Spotify Lite" → spotify-lite.en.uptodown.com/android) & check if it exists
     local slug; slug=$(echo "$appName" | tr '[:upper:]' '[:lower:]' | sed 's/ /-/g')  # Convert: uppercase → lowercase letters. Replace: Spaces with hyphen
     local appUrl="https://$slug.en.uptodown.com/android"
-    if curl -s --head --fail "$appUrl" >/dev/null; then
-      actualAppName=$(curl -sL "$appUrl" | pup 'h1#detail-app-name json{}' | jq -r '.[0].text' | xargs)
-      echo -e "$info actualAppName: $actualAppName"
-      echo -e "$info appUrl: ${Blue}$appUrl${Reset}"
-      echo  # White Space
-    else
+    if ! curl -s --head --fail "$appUrl" >/dev/null; then
       # Get Uptodown top search result
       appUrl=$(curl -sL -X POST "https://en.uptodown.com/android/search" -d "q=${app_name}" | pup '.item json{}' | jq '.[] | {name: .children[1].children[0].text, description: .children[2].text, url: .children[1].children[0].href}' | jq -r '.url' | head -1)
       curl -s --head --fail "$appUrl" >/dev/null || echo -e "$notice ${Red}404 Whoops!${Reset} The requested URL ${Blue}$appUrl${Reset} could not be found."; exit 1
-      echo -e "$info actualAppName: $actualAppName\n$info appUrl: ${Blue}$appUrl${Reset}\n"
     fi
-  else
-    echo -e "$info actualAppName: $actualAppName\n$info appUrl: ${Blue}$appUrl${Reset}\n"
   fi
+  actualAppName=$(curl -sL "$appUrl" | pup 'h1#detail-app-name json{}' | jq -r '.[0].text' | xargs)
+  echo -e "$info actualAppName: $actualAppName\n$info appUrl: ${Blue}$appUrl${Reset}\n"
   
   # --- SCRAPE VERSION URL ---
   data_code=$(curl -sL "$appUrl" | grep -i "data-code" | sed -n 's/.*data-code="\([0-9]*\)".*/\1/p')  # Get app ID on Uptodown
