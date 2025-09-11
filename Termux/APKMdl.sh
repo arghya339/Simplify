@@ -87,6 +87,47 @@ APKMdl() {
   local final_apk_link_content
   local FileName
   
+  # dynamically version_link scraping method (inefficient for old app versions)
+  scrapeVersionUrl() {
+    appLink="$1"  # app Url
+    version="$2"  # target app version
+    
+    local html_content  # local variable: accessible only inside this function
+    local second_last_segment  # this variable has local scope and is not accessible outside of this function
+
+    html_content=$(curl -sL --doh-url "$cloudflareDOH" -A "$USER_AGENT" -H "Referer: https://www.apkmirror.com/" "$appLink")  # get html from appLink
+    latestUploads=$(pup 'a[href*="?appcategory="] attr{href}' <<< "$html_content" | sed "s|^/|$APKM_DOMAIN/|")  # extract latest uploads page url for secific app using appLink page html
+    second_last_segment=$(echo "$latestUploads" | awk -F'appcategory=' '{print $2}')  # extract appName from lastestUploads page url
+    local appName; appName=$(pup 'h1 text{}' <<< "$html_content")  # get app name from appLink page html
+
+    echo -e "$running Scraping latest $appName uploads list from APKMirror..\n"
+    count="1"  # start searching target app vresion from first page (latest uploads)
+    while true; do
+      # for first page use lastestUploads url | https://www.apkmirror.com/uploads/?appcategory=$second_last_segment
+      # after first page use custom pattern lastestUploads url
+      if [ "$count" -ge 1 ]; then
+        latestUploads="https://www.apkmirror.com/uploads/page/$count/?appcategory=$second_last_segment"
+      fi
+      echo -e "$info Latest $appName Uploads - Page $count"
+      local HTML_CONTENT; HTML_CONTENT=$(curl -sL --doh-url "$cloudflareDOH" -A "$USER_AGENT" -H "Referer: https://www.apkmirror.com/" "$latestUploads")  # get html from latest uploads page
+      pup 'span.infoSlide-name:contains("Version:") + span.infoSlide-value text{}' <<< $HTML_CONTENT  # print Version list (30items/page) from latest uploads page html
+      # extract both title (appName version) & link (versionUrl)
+      local json_output; json_output=$(echo "$HTML_CONTENT" | pup 'a.fontBlack json{}' | jq -c '[.[] | select(.text != null and (.text | test("Wear OS|Android Automotive") | not)) | {title: .text, link: ("https://www.apkmirror.com" + .href)}]')
+      # try to match target version with a title in json_output and extract its link if found
+      version_link=$(echo "$json_output" | jq -r --arg version "$version" '.[] | select(.title | test($version)) | .link' | head -n1)
+      if [ -n "$version_link" ]; then
+        # if version_link populate (not empty) then print successfull messages
+        echo -e "$good Found version $version"
+        echo -e "$info version_link: ${Blue}$version_link${Reset}"
+        break  # break while loop
+      else
+        echo -e "$notice Version $version not found on page $count, moving to next page.."
+        ((count++))  # increase +1 page number
+        continue  # skip next iteration (remaining commands) of loop then continue to next iteration
+      fi
+    done  # end of while loop
+  }
+
   RESPONSE_JSON=$(curl -sS --doh-url "$cloudflareDOH" $APKM_REST_API_URL -A "$USER_AGENT" -H 'Accept: application/json' -H 'Content-Type: application/json' -H "Authorization: Basic $AUTH_TOKEN" -d "{\"pnames\":[\"$PKG_NAME\"]}")
   
   if [ $? -ne 0 ]; then
@@ -114,6 +155,9 @@ APKMdl() {
     fi
     if ! curl -sL --doh-url "$cloudflareDOH" -A "$USER_AGENT" -H "Referer: https://www.apkmirror.com/" --head --silent --fail "$version_link" >/dev/null 2>&1; then
       version_link="${appLink}${selectedApp}-${second_last_segment}-${VERSION}-release/"
+    fi
+    if ! curl -sL --doh-url "$cloudflareDOH" -A "$USER_AGENT" -H "Referer: https://www.apkmirror.com/" --head --silent --fail "$version_link" >/dev/null 2>&1; then
+      scrapeVersionUrl  # Fallback to scrapeVersionUrl if hardcoded pattern fails (inefficient for old versions)
     fi
     if ! curl -sL --doh-url "$cloudflareDOH" -A "$USER_AGENT" -H "Referer: https://www.apkmirror.com/" --head --silent --fail "$version_link" >/dev/null 2>&1; then
       echo -e "${notice} Version link could not be generated! Falling back to latest version."
