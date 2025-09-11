@@ -336,10 +336,11 @@ sign_app() {
       echo -e "$notice keytool error: SHA-256 digest error!"
       local output_apk_path="$SimplUsr/$stockFileNameWOExt-signed.apk"
       local fileName=$(basename "${output_apk_path}")
+      echo -e "$running Signing apk.."
       termux-wake-lock
       $PREFIX/lib/jvm/java-$jdkVersion-openjdk/bin/java -jar $PREFIX/share/java/apksigner.jar sign --ks $Simplify/ks.keystore --ks-pass pass:123456 --ks-key-alias ReVancedKey --key-pass pass:123456 --out "${output_apk_path}" "${stock_apk_path[0]}"
       termux-wake-unlock
-      rm "$output_apk_path.idsig"
+      rm -f "$output_apk_path.idsig"
       $PREFIX/lib/jvm/java-$jdkVersion-openjdk/bin/keytool -printcert -jarfile "${output_apk_path}" | grep -oP 'Owner: \K.*' 2>/dev/null
       if [ $? -ne 0 ]; then
         $PREFIX/lib/jvm/java-$jdkVersion-openjdk/bin/java -jar $PREFIX/share/java/apksigner.jar verify --print-certs "${output_apk_path}" | grep -oP 'Signer #1 certificate DN: \K.*'
