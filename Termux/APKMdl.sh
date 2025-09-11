@@ -157,7 +157,7 @@ APKMdl() {
       version_link="${appLink}${selectedApp}-${second_last_segment}-${VERSION}-release/"
     fi
     if ! curl -sL --doh-url "$cloudflareDOH" -A "$USER_AGENT" -H "Referer: https://www.apkmirror.com/" --head --silent --fail "$version_link" >/dev/null 2>&1; then
-      scrapeVersionUrl  # Fallback to scrapeVersionUrl if hardcoded pattern fails (inefficient for old versions)
+      scrapeVersionUrl "$appLink" "$VERSION"  # Fallback to scrapeVersionUrl if hardcoded pattern fails (inefficient for old versions)
     fi
     if ! curl -sL --doh-url "$cloudflareDOH" -A "$USER_AGENT" -H "Referer: https://www.apkmirror.com/" --head --silent --fail "$version_link" >/dev/null 2>&1; then
       echo -e "${notice} Version link could not be generated! Falling back to latest version."
