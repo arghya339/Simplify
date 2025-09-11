@@ -1156,7 +1156,7 @@ while true; do
     Spotify)
       pkgName="com.spotify.music"
       appName=("Spotify")
-      pkgVersion="9.0.76.1126"
+      pkgVersion="9.0.72.967"
       #pkgVersion=""
       if [ -z "$pkgVersion" ]; then
         getVersion "$pkgName"
