@@ -329,6 +329,7 @@ if [ $Android -ge 10 ]; then
     InnerTune
     Seal
     ytdlnis
+    RetroMusicPlayer
     #Spotify
     spotube
     TikTok
@@ -371,6 +372,7 @@ elif [ $Android -eq 9 ]; then
     InnerTune
     Seal
     ytdlnis
+    RetroMusicPlayer
     #Spotify
     spotube
     TikTok
@@ -412,6 +414,7 @@ elif [ $Android -eq 8 ]; then
     InnerTune
     Seal
     ytdlnis
+    RetroMusicPlayer
     #Spotify
     spotube
     TikTok
@@ -451,6 +454,7 @@ elif [ $Android -eq 7 ]; then
     InnerTune
     Seal
     ytdlnis
+    RetroMusicPlayer
     #Spotify
     spotube
     TikTok
@@ -477,6 +481,7 @@ elif [ $Android -eq 6 ]; then
     YTPro
     Tubular
     YouTube\ Music
+    RetroMusicPlayer
     TikTok
     Google\ Photos
     Nobook
@@ -498,6 +503,7 @@ elif [ $Android -eq 5 ]; then
     Vanced\ MicroG
     ReVanced\ GmsCore
     YouTube\ Music
+    RetroMusicPlayer
     TikTok
     Google\ Photos
     Nobook
@@ -739,6 +745,7 @@ while true; do
       activityApp="com.deniscerri.ytdl/.Default"
       dlApp "${appName}" "$owner" "$repo" "$release" "$regex" "$file_pattern" "$tag" "$assets" "$pkgApp" "$activityApp"
       ;;
+    RetroMusicPlayer) termux-open-url "https://play.google.com/store/apps/details?id=code.name.monkey.retromusic" ;;
     Spotify)
       appName="Spotify"
       owner="FiorenMas"
