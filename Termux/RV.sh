@@ -919,9 +919,9 @@ fi
 if  [[ $Android -ge 11  &&  ( "$cpuAbi" == "arm64-v8a" || "$cpuAbi" == "armeabi-v7a" ) ]]; then
   Facebook="Facebook"
 fi
-if su -c "id" >/dev/null 2>&1; then
-  Spotify="Spotify"
-fi
+#if su -c "id" >/dev/null 2>&1; then
+#  Spotify="Spotify"
+#fi
 
 # --- Arrays of apps list that required specific android version ---
 if [ $Android -ge 12 ]; then
