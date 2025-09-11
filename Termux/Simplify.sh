@@ -278,7 +278,7 @@ if [ ! -f "$HOME/.shortcuts/simplify" ] || [ ! -f "$HOME/.termux/widget/dynamic_
   if ! am start -n com.termux.widget/com.termux.widget.TermuxLaunchShortcutActivity > /dev/null 2>&1; then
     bash $Simplify/dlGitHub.sh "termux" "termux-widget" "latest" ".apk" "$SimplUsr"  # Download Termux:Widget app from GitHub using dlGitHub.sh
     Widget=$(find "$SimplUsr" -type f -name "termux-widget-app_v*+github.debug.apk" -print -quit)  # find downloaded Termux:Widget app package
-    bash $Simplify/apkInstall.sh "$Widget" "" ""  # Install Termux:Widget app using apkInstall.sh
+    bash $Simplify/apkInstall.sh "$Widget" ""  # Install Termux:Widget app using apkInstall.sh
     [ -f "$Widget" ] && rm -f "$Widget"  # if Termux:Widget app package exist then remove it 
   fi
   if su -c "id" >/dev/null 2>&1; then
@@ -557,7 +557,7 @@ if [ $CheckTermuxUpdate -eq 1 ]; then
           echo -e "$info Please Allow: ${Green}Install unknown apps → Termux → Allow from this source${Reset}" && sleep 6
           am start -n com.android.settings/.Settings\$ManageExternalSourcesActivity &> /dev/null
         fi
-        bash $Simplify/apkInstall.sh "$SimplUsr/termux-app_v${latestReleases}+github-debug_$cpuAbi.apk" "com.termux" "com.termux/.app.TermuxActivity"
+        bash $Simplify/apkInstall.sh "$SimplUsr/termux-app_v${latestReleases}+github-debug_$cpuAbi.apk" "com.termux/.app.TermuxActivity"
       fi
     else
       if [ -f "$SimplUsr/termux-app_v${latestReleases}+github-debug_$cpuAbi.apk" ]; then
@@ -619,7 +619,7 @@ if [ $CheckTermuxUpdate -eq 1 ]; then
           echo -e "$info Please Allow: ${Green}Install unknown apps → Termux → Allow from this source${Reset}" && sleep 6
           am start -n com.android.settings/.Settings\$ManageExternalSourcesActivity &> /dev/null
         fi
-        bash $Simplify/apkInstall.sh "$SimplUsr/termux-app_v${latestReleases}+apt-android-$variant-github-debug_$cpuAbi.apk" "com.termux" "com.termux/.app.TermuxActivity"
+        bash $Simplify/apkInstall.sh "$SimplUsr/termux-app_v${latestReleases}+apt-android-$variant-github-debug_$cpuAbi.apk" "com.termux/.app.TermuxActivity"
       fi
     else
       if [ -f "$SimplUsr/termux-app_v${lastReleases}+apt-android-$variant-github-debug_$cpuAbi.apk" ]; then
