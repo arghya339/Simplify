@@ -243,12 +243,12 @@ build_app() {
         I*|i*|"")
           checkCoreLSPosed  # Call the check core patch functions
           echo -e "$running Please Wait !! Installing Patched ${appNameRef[0]} LSPatch apk.."
-          bash $Simplify/apkInstall.sh "${output_apk_path}" "$pkgName" ""
+          bash $Simplify/apkInstall.sh "${output_apk_path}" ""
           ;;
         M*|m*)
           echo -e "$running Please Wait !! Mounting Patched ${appNameRef[0]} LSPatch apk.."
-          su -mm -c "/system/bin/sh $Simplify/apkMount.sh \"${stock_apk_path}\" \"${output_apk_path}\" \"${appName}\" \"$pkgName\" \"$pkgVersion\"" &> /dev/null
-          su -mm -c "/system/bin/sh $Simplify/apkMount.sh \"${stock_apk_path}\" \"${output_apk_path}\" \"${appName}\" \"$pkgName\" \"$pkgVersion\"" | tee "$SimplUsr/${appNameRef[0]}-LSPatch_mount-log.txt"
+          su -mm -c "/system/bin/sh $Simplify/apkMount.sh \"${stock_apk_path}\" \"${output_apk_path}\"" &> /dev/null
+          su -mm -c "/system/bin/sh $Simplify/apkMount.sh \"${stock_apk_path}\" \"${output_apk_path}\"" | tee "$SimplUsr/${appNameRef[0]}-LSPatch_mount-log.txt"
           rm -f "${output_apk_path}"
           ;;
         N*|n*) echo -e "$notice ${appNameRef[0]} LSPatch Installaion skipped!" ;;
@@ -261,7 +261,7 @@ build_app() {
       case $opt in
         y*|Y*|"")
           echo -e "$running Please Wait !! Installing Patched ${appNameRef[0]} LSPatch apk.."
-          bash $Simplify/apkInstall.sh "${output_apk_path}" "$pkgName" "$activityPatched"
+          bash $Simplify/apkInstall.sh "${output_apk_path}" "$activityPatched"
           ;;
         n*|N*) echo -e "$notice ${appNameRef[0]} LSPatch Installaion skipped!" ;;
         *) echo -e "$info Invalid choice! ${appNameRef[0]} LSPatch Installaion skipped." ;;
@@ -353,7 +353,7 @@ sign_app() {
     case $opt in
       y*|Y*|"")
         echo -e "$running Please Wait !! Installing Signed ${appNameRef[0]} apk.."
-        bash $Simplify/apkInstall.sh "${output_apk_path}" "$pkgName" "$activityPatched"
+        bash $Simplify/apkInstall.sh "${output_apk_path}" "$activityPatched"
         ;;
       n*|N*) echo -e "$notice ${appNameRef[0]} Signed Installaion skipped!" ;;
       *) echo -e "$info Invalid choice! ${appNameRef[0]} Signed Installaion skipped." ;;

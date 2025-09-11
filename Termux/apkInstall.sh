@@ -21,9 +21,9 @@ Android=$(getprop ro.build.version.release | cut -d. -f1)
 # Install final apk
 apkInstall() {
   local outputAPK=$1
+  local activity=$2
   local outputFileName=$(basename "$outputAPK")
-  local pkgName=$2
-  local activity=$3
+  pkgName=$($HOME/aapt2 dump badging "$outputAPK" 2>/dev/null | awk -F"'" '/package/ {print $2}')
   if su -c "id" >/dev/null 2>&1; then
     if [ "$(su -c 'getenforce 2>/dev/null')" = "Enforcing" ]; then
       su -c "setenforce 0"

@@ -21,11 +21,13 @@ Reset="\033[0m"
 apkMount() {
   # local variables
   local stock="${1}"
-  local stockFileName="$(basename "$stock")"
   local patched="${2}"
-  local appName="${3}"
-  local pkgName=$4
-  local versionName=$5
+  local stockFileName="$(basename "$stock")"
+  HOME="/data/data/com.termux/files/home"
+  stock_info=$($HOME/aapt2 dump badging "$stock" 2>/dev/null)
+  local appName=$(awk -F"'" '/application-label:/ {print $2}' <<< "$stock_info")
+  local pkgName=$(awk -F"'" '/package/ {print $2}' <<< "$stock_info")
+  local versionName=$(sed -n "s/.*versionName='\([^']*\)'.*/\1/p" <<< "$stock_info")
   local model=$(getprop ro.product.model)
   local stock_path=$(pm path "$pkgName" | grep base | sed "s/package://g")
 

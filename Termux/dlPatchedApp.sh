@@ -111,10 +111,10 @@ appInstall() {
           echo -e "$running Please Wait !! Installing ${appName} apk.."
         fi
         if [ "$repo" == "ReVancedApp-Actions" ] || [ "$repo" == "Revanced-And-Revanced-Extended-Non-Root" ] || [ "$repo" == "spotube" ]; then
-          bash $Simplify/apkInstall.sh "$apk_path" "$pkgPatched" "$activityPatched"
+          bash $Simplify/apkInstall.sh "$apk_path" "$activityPatched"
           data "$assets" "$updated_at" "$version"
         else
-          bash $Simplify/apkInstall.sh "$apk_path" "$pkgApp" "$activityApp"
+          bash $Simplify/apkInstall.sh "$apk_path" "$activityApp"
           if [ "$appName" == "CloudStream" ]; then
             if jq --arg appName "$appName" 'any(.[]; .assets == $appName)' "$dataJson" | grep -q false; then
               termux-open-url "https://rentry.co/cs3-repos"

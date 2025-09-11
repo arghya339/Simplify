@@ -205,7 +205,7 @@ if [ -f "$outputAPK" ]; then
   case $opt in
     y*|Y*|"")
       echo -e "$running Please Wait !! Installing Patched Piko Twitter apk.."
-      bash $Simplify/apkInstall.sh "$outputAPK" "$pkgName" "$activityPatched"
+      bash $Simplify/apkInstall.sh "$outputAPK" "$activityPatched"
       ;;
     n*|N*) echo -e "$notice Piko Twitter Installaion skipped!" ;;
     *) echo -e "$info Invalid choice! Piko Twitter Installaion skipped." ;;

@@ -348,7 +348,7 @@ commonPrompt() {
     case $opt in
       y*|Y*|"")
         echo -e "$running Please Wait !! Installing Patched ${appNameRef[0]} RVX apk.."
-        bash $Simplify/apkInstall.sh "$outputAPK" "$pkgPatched" "$activityPatched"
+        bash $Simplify/apkInstall.sh "$outputAPK" "$activityPatched"
         ;;
       n*|N*) echo -e "$notice ${appNameRef[0]} RVX Installaion skipped!" ;;
       *) echo -e "$info Invalid choice! ${appNameRef[0]} RVX Installaion skipped." ;;
@@ -413,12 +413,12 @@ build_app() {
               cs "${stock_apk_ref[0]}" "$outputAPK" "$SimplUsr/${appNameRef[0]}-RVX-CS_v${pkgVersion}-$Arch.apk"
               termux-wake-unlock
               echo -e "$running Please Wait !! Installing Patched ${appNameRef[0]} RVX CS apk.."
-              bash $Simplify/apkInstall.sh "$SimplUsr/${appNameRef[0]}-RVX-CS_v${pkgVersion}-$Arch.apk" "$pkgName" ""
+              bash $Simplify/apkInstall.sh "$SimplUsr/${appNameRef[0]}-RVX-CS_v${pkgVersion}-$Arch.apk" ""
               ;;
             M*|m*)
               echo -e "$running Please Wait !! Mounting Patched ${appNameRef[0]} RVX apk.."
-              su -mm -c "/system/bin/sh $Simplify/apkMount.sh \"${stock_apk_ref[0]}\" $outputAPK \"${appNameRef[0]}\" $pkgName $pkgVersion" &> /dev/null
-              su -mm -c "/system/bin/sh $Simplify/apkMount.sh \"${stock_apk_ref[0]}\" $outputAPK \"${appNameRef[0]}\" $pkgName $pkgVersion" | tee "$SimplUsr/${appNameRef[0]}-RVX_mount_log.txt"
+              su -mm -c "/system/bin/sh $Simplify/apkMount.sh \"${stock_apk_ref[0]}\" $outputAPK" &> /dev/null
+              su -mm -c "/system/bin/sh $Simplify/apkMount.sh \"${stock_apk_ref[0]}\" $outputAPK" | tee "$SimplUsr/${appNameRef[0]}-RVX_mount_log.txt"
               rm $outputAPK
               ;;
             N*|n*) echo -e "$notice ${appNameRef[0]} RVX Installaion skipped!" ;;
@@ -429,8 +429,8 @@ build_app() {
           case $opt in
             y*|Y*|"")
               echo -e "$running Please Wait !! Mounting Patched ${appNameRef[0]} RVX apk.."
-              su -mm -c "/system/bin/sh $Simplify/apkMount.sh \"${stock_apk_ref[0]}\" $outputAPK \"${appNameRef[0]}\" $pkgName $pkgVersion" &> /dev/null
-              su -mm -c "/system/bin/sh $Simplify/apkMount.sh \"${stock_apk_ref[0]}\" $outputAPK \"${appNameRef[0]}\" $pkgName $pkgVersion" | tee "$SimplUsr/${appNameRef[0]}-RVX_mount_log.txt"
+              su -mm -c "/system/bin/sh $Simplify/apkMount.sh \"${stock_apk_ref[0]}\" $outputAPK" &> /dev/null
+              su -mm -c "/system/bin/sh $Simplify/apkMount.sh \"${stock_apk_ref[0]}\" $outputAPK" | tee "$SimplUsr/${appNameRef[0]}-RVX_mount_log.txt"
               rm $outputAPK
               ;;
             n*|N*) echo -e "$notice ${appNameRef[0]} RVX Installaion skipped!" ;;
@@ -443,7 +443,7 @@ build_app() {
         case $opt in
           y*|Y*|"")
             echo -e "$running Please Wait !! Installing VancedMicroG apk.."
-            bash $Simplify/apkInstall.sh "$VancedMicroG" "com.mgoogle.android.gms" "com.mgoogle.android.gms/org.microg.gms.ui.SettingsActivity"
+            bash $Simplify/apkInstall.sh "$VancedMicroG" "com.mgoogle.android.gms/org.microg.gms.ui.SettingsActivity"
             ;;
           n*|N*) echo -e "$notice VancedMicroG Installaion skipped!" ;;
           *) echo -e "$info Invalid choice! VancedMicroG Installaion skipped." ;;

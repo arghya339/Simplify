@@ -558,7 +558,7 @@ commonPrompt() {
           echo -e "$notice ${Yellow}Warning! Disable auto updates for the patched app to avoid unexpected issues.${Reset}"
         fi
         echo -e "$running Please Wait !! Installing Patched ${appNameRef[0]} RV apk.."
-        bash $Simplify/apkInstall.sh "$outputAPK" "$pkgPatched" "$activityPatched"
+        bash $Simplify/apkInstall.sh "$outputAPK" "$activityPatched"
         ;;
       n*|N*) echo -e "$notice ${appNameRef[0]} RV Installaion skipped!" ;;
       *) echo -e "$info Invalid choice! ${appNameRef[0]} RV Installaion skipped." ;;
@@ -650,12 +650,12 @@ build_app() {
               cs "${stock_apk_path[0]}" "$outputAPK" "$SimplUsr/${appNameRef[0]}-RV-CS_v${pkgVersion}-${archRef[0]}.apk"
               termux-wake-unlock
               echo -e "$running Please Wait !! Installing Patched ${appNameRef[0]} RV CS apk.."
-              bash $Simplify/apkInstall.sh "$SimplUsr/${appNameRef[0]}-RV-CS_v${pkgVersion}-${archRef[0]}.apk" "$pkgName" ""
+              bash $Simplify/apkInstall.sh "$SimplUsr/${appNameRef[0]}-RV-CS_v${pkgVersion}-${archRef[0]}.apk" ""
               ;;
             M*|m*)
               echo -e "$running Please Wait !! Mounting Patched ${appNameRef[0]} RV apk.."
-              su -mm -c "/system/bin/sh $Simplify/apkMount.sh \"${stock_apk_path}\" \"$outputAPK\" \"${appName}\" \"$pkgName\" \"$pkgVersion\"" &> /dev/null
-              su -mm -c "/system/bin/sh $Simplify/apkMount.sh \"${stock_apk_path}\" \"$outputAPK\" \"${appName}\" \"$pkgName\" \"$pkgVersion\"" | tee "$SimplUsr/${appNameRef[0]}-RV_mount-log.txt"
+              su -mm -c "/system/bin/sh $Simplify/apkMount.sh \"${stock_apk_path}\" \"$outputAPK\"" &> /dev/null
+              su -mm -c "/system/bin/sh $Simplify/apkMount.sh \"${stock_apk_path}\" \"$outputAPK\"" | tee "$SimplUsr/${appNameRef[0]}-RV_mount-log.txt"
               rm -f "$outputAPK"
               ;;
             N*|n*) echo -e "$notice ${appNameRef[0]} RV Installaion skipped!" ;;
@@ -666,8 +666,8 @@ build_app() {
           case $opt in
             y*|Y*|"")
               echo -e "$running Please Wait !! Mounting Patched ${appNameRef[0]} RV apk.."
-              su -mm -c "/system/bin/sh $Simplify/apkMount.sh \"${stock_apk_path}\" \"$outputAPK\" \"${appName}\" \"$pkgName\" \"$pkgVersion\"" &> /dev/null
-              su -mm -c "/system/bin/sh $Simplify/apkMount.sh \"${stock_apk_path}\" \"$outputAPK\" \"${appName}\" \"$pkgName\" \"$pkgVersion\"" | tee "$SimplUsr/${appNameRef[0]}-RV_mount-log.txt"
+              su -mm -c "/system/bin/sh $Simplify/apkMount.sh \"${stock_apk_path}\" \"$outputAPK\"" &> /dev/null
+              su -mm -c "/system/bin/sh $Simplify/apkMount.sh \"${stock_apk_path}\" \"$outputAPK\"" | tee "$SimplUsr/${appNameRef[0]}-RV_mount-log.txt"
               rm -f "$outputAPK"
               ;;
             n*|N*) echo -e "$notice ${appNameRef[0]} RV Installaion skipped!" ;;
@@ -682,7 +682,7 @@ build_app() {
         case $opt in
           y*|Y*|"")
             echo -e "$running Please Wait !! Installing VancedMicroG apk.."
-            bash $Simplify/apkInstall.sh "$VancedMicroG" "com.mgoogle.android.gms" "com.mgoogle.android.gms/org.microg.gms.ui.SettingsActivity"
+            bash $Simplify/apkInstall.sh "$VancedMicroG" "com.mgoogle.android.gms/org.microg.gms.ui.SettingsActivity"
             ;;
           n*|N*) echo -e "$notice VancedMicroG Installaion skipped!" ;;
           *) echo -e "$info Invalid choice! VancedMicroG Installaion skipped." ;;
