@@ -43,10 +43,10 @@ apkInstall() {
     # Temporary Disable SELinux Enforcing during installation if it not in Permissive
     if [ "$(su -c 'getenforce 2>/dev/null')" = "Enforcing" ]; then
       su -c "setenforce 0"  # set SELinux to Permissive mode to unblock unauthorized operations
-      su -c "pm install -i com.android.vending '/data/local/tmp/$outputFileName'"
+      su -c "pm install -r --bypass-low-target-sdk-block -i com.android.vending '/data/local/tmp/$outputFileName'"
       su -c "setenforce 1"  # set SELinux to Enforcing mode to block unauthorized operations
     else
-      su -c "pm install -i com.android.vending '/data/local/tmp/$outputFileName'"
+      su -c "pm install -r --bypass-low-target-sdk-block -i com.android.vending '/data/local/tmp/$outputFileName'"
     fi
     am start -n "$activityClass" &> /dev/null  # launch app after update
     if [ $? != 0 ]; then
@@ -55,7 +55,7 @@ apkInstall() {
     su -c "rm -f '/data/local/tmp/$outputFileName'"
   elif "$HOME/rish" -c "id" >/dev/null 2>&1; then
     ~/rish -c "cp '$outputAPK' '/data/local/tmp/$outputFileName'" > /dev/null 2>&1  # copy apk to System dir
-    ./rish -c "pm install -r -i com.android.vending '/data/local/tmp/$outputFileName'" > /dev/null 2>&1  # -r=reinstall --force-uplow=downgrade
+    ./rish -c "pm install --bypass-low-target-sdk-block -r -i com.android.vending '/data/local/tmp/$outputFileName'" > /dev/null 2>&1  # -r=reinstall --force-uplow=downgrade
     am start -n "$activityClass" &> /dev/null  # launch app after update
     if [ $? != 0 ]; then
       ~/rish -c "monkey -p $pkgName -c android.intent.category.LAUNCHER 1" > /dev/null 2>&1
