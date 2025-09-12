@@ -55,7 +55,7 @@ apkInstall() {
     su -c "rm -f '/data/local/tmp/$outputFileName'"
   elif "$HOME/rish" -c "id" >/dev/null 2>&1; then
     ~/rish -c "cp '$outputAPK' '/data/local/tmp/$outputFileName'" > /dev/null 2>&1  # copy apk to System dir
-    ./rish -c "pm install --bypass-low-target-sdk-block -r -i com.android.vending '/data/local/tmp/$outputFileName'" > /dev/null 2>&1  # -r=reinstall --force-uplow=downgrade
+    ./rish -c "pm install --bypass-low-target-sdk-block -r -i com.android.vending '/data/local/tmp/$outputFileName'" > /dev/null 2>&1  # -r=reinstall
     am start -n "$activityClass" &> /dev/null  # launch app after update
     if [ $? != 0 ]; then
       ~/rish -c "monkey -p $pkgName -c android.intent.category.LAUNCHER 1" > /dev/null 2>&1
