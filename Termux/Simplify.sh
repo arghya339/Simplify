@@ -148,6 +148,7 @@ fi
 cpuAbi=$(getprop ro.product.cpu.abi)  # Get Android arch
 serial=$(su -c 'getprop ro.serialno')  # Get Serial Number required root
 model=$(getprop ro.product.model)  # Get Device Model
+pkg update > /dev/null 2>&1  # It downloads latest package list with versions from Termux remote repository, then compares them to local (installed) pkg versions, and shows a list of what can be upgraded if they are different.
 outdatedPKG=$(apt list --upgradable 2>/dev/null)  # list of outdated pkg
 installedPKG=$(pkg list-installed 2>/dev/null)  # list of installed pkg
 jdkVersion="21"
