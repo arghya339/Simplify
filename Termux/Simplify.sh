@@ -89,7 +89,7 @@ EOF
 )
 comment
 
-Android=$(getprop ro.build.version.release)  # Get Android version
+Android=$(getprop ro.build.version.release | cut -d. -f1)  # Get major Android version
 
 # --- Storage Permission Check Logic ---
 if ! ls /sdcard/ 2>/dev/null | grep -E -q "^(Android|Download)"; then

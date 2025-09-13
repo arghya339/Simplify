@@ -24,7 +24,7 @@ simplifyJson="$Simplify/simplify.json"  # Configuration file to store simplify s
 if jq -e '.AndroidVersion != null' "$simplifyJson" >/dev/null 2>&1; then
   Android=$(jq -r '.AndroidVersion' "$simplifyJson" 2>/dev/null)  # Get Android version from json
 else
-  Android=$(getprop ro.build.version.release)  # Get Android version
+  Android=$(getprop ro.build.version.release | cut -d. -f1)  # Get major Android version
 fi
 if jq -e '.DeviceArch != null' "$simplifyJson" >/dev/null 2>&1; then
   cpuAbi=$(jq -r '.DeviceArch' "$simplifyJson" 2>/dev/null)  # Get Device Architecture from json

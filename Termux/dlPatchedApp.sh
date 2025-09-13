@@ -19,7 +19,7 @@ Yellow="\033[93m"
 Reset="\033[0m"
 
 # --- Global Variables ---
-Android=$(getprop ro.build.version.release)  # Get Android version
+Android=$(getprop ro.build.version.release | cut -d. -f1)  # Get major Android version
 cpuAbi=$(getprop ro.product.cpu.abi)  # Get Android arch
 Model=$(getprop ro.product.model)  # Get Device Model
 locale=$(getprop persist.sys.locale | cut -d'-' -f1)  # Get System Languages

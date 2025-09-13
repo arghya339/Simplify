@@ -207,6 +207,6 @@ if [ "$(getenforce 2>/dev/null)" == "Enforcing" ]; then
 else
   apkMount "$@"
 fi
-# su -mm -c "/system/bin/sh apkMount.sh stock.apk patched.apk appName pkg.Name version.Name"  # Mount (Attached): -mm flag required for bind-mounting & unmounting.
+# su -mm -c "/system/bin/sh apkMount.sh stock.apk patched.apk"  # Mount (Attached): -mm flag required for bind-mounting & unmounting.
 # su -mm -c "/system/bin/sh /data/adb/post-fs-data.d/pkg.Name.sh"  # Unmount (Detached / Eject)
 ###############################################################################################
