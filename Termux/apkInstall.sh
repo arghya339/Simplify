@@ -34,6 +34,8 @@ apkInstall() {
     fi
   elif "$HOME/rish" -c "id" >/dev/null 2>&1; then
     local activityClass=$($HOME/rish -c "pm resolve-activity --brief $pkgName" | tail -n 1)
+  elif "$HOME/adb" -c "id" >/dev/null 2>&1; then
+    local activityClass=$($HOME/adb shell "pm resolve-activity --brief $pkgName" | tail -n 1)
   else
     local activityClass="$activity"
   fi
@@ -61,6 +63,11 @@ apkInstall() {
       ~/rish -c "monkey -p $pkgName -c android.intent.category.LAUNCHER 1" > /dev/null 2>&1
     fi
     $HOME/rish -c "rm -f '/data/local/tmp/$outputFileName'"  # Cleanup tmp APK
+  elif "$HOME/adb" shell "id" >/dev/null 2>&1; then
+    ~/adb shell pm install -r --bypass-low-target-sdk-block -i com.android.vending "$outputAPK" > /dev/null 2>&1
+    #~/adb shell cmd package install -r --bypass-low-target-sdk-block --bypass-low-target-sdk-block -i com.android.vending "$outputAPK" > /dev/null 2>&1
+    am start -n "$activityClass" &> /dev/null  # launch app after update
+    [ $? != 0 ] && ~/adb shell "monkey -p $pkgName -c android.intent.category.LAUNCHER 1" > /dev/null 2>&1
   elif [ "$Android" -le "6" ]; then
     am start -a android.intent.action.VIEW -t application/vnd.android.package-archive -d "file://$outputAPK" > /dev/null 2>&1  # Activity Manager
     sleep 15 && am start -n "$activityClass" &> /dev/null  # launch app after update
