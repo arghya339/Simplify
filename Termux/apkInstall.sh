@@ -65,7 +65,7 @@ apkInstall() {
     $HOME/rish -c "rm -f '/data/local/tmp/$outputFileName'"  # Cleanup tmp APK
   elif "$HOME/adb" -s $(~/adb devices | grep "emulator-*" | awk '{print $1}') shell "id" >/dev/null 2>&1; then
     ~/adb -s $(~/adb devices | grep "emulator-*" | cut -f1) shell pm install -r --bypass-low-target-sdk-block -i com.android.vending "$outputAPK" > /dev/null 2>&1
-    #~/adb -s $(~/adb devices | grep "emulator-*" | awk '{print $1}') shell cmd package install -r --bypass-low-target-sdk-block --bypass-low-target-sdk-block -i com.android.vending "$outputAPK" > /dev/null 2>&1
+    #~/adb -s $(~/adb devices | grep "emulator-*" | awk '{print $1}') shell cmd package install -r --bypass-low-target-sdk-block -i com.android.vending "$outputAPK" > /dev/null 2>&1
     am start -n "$activityClass" &> /dev/null  # launch app after update
     [ $? != 0 ] && ~/adb -s $(~/adb devices | grep "emulator-*" | awk '{print $1}') shell "monkey -p $pkgName -c android.intent.category.LAUNCHER 1" > /dev/null 2>&1
   elif [ "$Android" -le "6" ]; then
