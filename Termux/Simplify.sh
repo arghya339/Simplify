@@ -1183,8 +1183,8 @@ while true; do
                 [Tt]*)
                   if [ "$InstalledAsTestOnly" -eq 0 ]; then echo "InstalledAsTestOnly == false"; else echo "InstalledAsTestOnly == true"; fi
                   key="InstalledAsTestOnly"; value="$isT"
-                  m1="Installed as test-only app Enabled"
-                  m2="Installed as test-only app Disabled"
+                  m1="Installed as test-only Enabled"
+                  m2="Installed as test-only Disabled"
                   tfConfig "$key" "$value" "$m1" "$m2"
                   ;;
                 [Ll]*)
