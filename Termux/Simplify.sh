@@ -1142,7 +1142,7 @@ while true; do
             ;;
           [Jj]*) echo "openjdkVersion == $jdkVersion" && change_jdk_version ;;
           [Ii]*)
-            while true do;
+            while true; do
               InstallPackageFor=$(jq -r '.InstallPackageFor' "$simplifyJson" 2>/dev/null)
               KeepsData=$(jq -r '.KeepsData' "$simplifyJson" 2>/dev/null)
               GrantAllRuntimePermissions=$(jq -r '.GrantAllRuntimePermissions' "$simplifyJson" 2>/dev/null)
