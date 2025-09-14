@@ -1245,7 +1245,8 @@ while true; do
             am start -n "com.android.settings/.Settings\$WirelessDebuggingActivity" >/dev/null 2>&1
             [ $? -ne 0 ] && am start -n "com.android.settings/.Settings\$DevelopmentSettingsDashboardActivity" >/dev/null 2>&1 || am start -n com.android.settings/.Settings\$MyDeviceInfoActivity >/dev/null 2>&1
             read -r -p "HOST[:PORT] [PAIRING CODE] " input
-            ~/adb pair "$input"
+            host_port=$(echo "$input" | awk '{print $1}'); pairing_code=$(echo "$input" | awk '{print $2}')
+            ~/adb pair "$host_port" "$pairing_code"
             ;;
           [Qq]*) break ;;
           *) echo -e "$info Invalid input! Please enter P / L / D / R / S / T / O / B / U / J / I / A / Q." ;;
