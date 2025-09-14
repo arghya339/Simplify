@@ -1212,11 +1212,11 @@ while true; do
                   echo -e "P. Play Store\nI. Package Installer\nS. Shell\nA. ADB\n"
                   read -r -p "Installer: " i
                   case "$i" in
-                    [Pp]*) value="com.android.vending"; config "$key" "$value" && echo "${Green}Successfully set Installer as 'com.android.vending' (PlayStore)${Reset}" ;;
-                    [Ii]*) value="com.android.packageinstaller"; config "$key" "$value" && echo "${Green}Successfully set Installer as 'com.android.packageinstaller' (PackageInstaller)${Reset}" ;;
-                    [Ss]*) value="com.android.shell"; config "$key" "$value" && echo "${Green}Successfully set Installer as 'com.android.shell' (Shell)${Reset}" ;;
-                    [Aa]*) value="adb"; config "$key" "$value" && echo "${Green}Successfully set Installer as 'adb'${Reset}" ;;
-                    *) value="$isI"; config "$key" "$value" && echo "${Green}Successfully set Installer as 'com.android.vending' (PlayStore)${Reset}" ;;
+                    [Pp]*) value="com.android.vending"; config "$key" "$value" && echo -e "${Green}Successfully set Installer as 'com.android.vending' (PlayStore)${Reset}" ;;
+                    [Ii]*) value="com.android.packageinstaller"; config "$key" "$value" && echo -e "${Green}Successfully set Installer as 'com.android.packageinstaller' (PackageInstaller)${Reset}" ;;
+                    [Ss]*) value="com.android.shell"; config "$key" "$value" && echo -e "${Green}Successfully set Installer as 'com.android.shell' (Shell)${Reset}" ;;
+                    [Aa]*) value="adb"; config "$key" "$value" && echo -e "${Green}Successfully set Installer as 'adb'${Reset}" ;;
+                    *) value="$isI"; config "$key" "$value" && echo -e "${Green}Successfully set Installer as 'com.android.vending' (PlayStore)${Reset}" ;;
                   esac
                   ;; 
                 [Rr]*)
