@@ -1233,6 +1233,7 @@ while true; do
                   m2="Version Roolback Disabled"
                   tfConfig "$key" "$value" "$m1" "$m2"
                   ;;
+                [Qq]*) break ;;
                 *) echo -e "$info Invalid input! Please enter U / K / G / T / L / V / I / R / B / Q." ;;
               esac
             done
