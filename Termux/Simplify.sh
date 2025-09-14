@@ -159,7 +159,8 @@ RVX="$Simplify/RVX"
 pikoTwitter="$Simplify/pikoTwitter"
 Dropped="$Simplify/Dropped"
 LSPatch="$Simplify/LSPatch"
-mkdir -p "$Simplify" "$RV" "$RVX" "$pikoTwitter" "$Dropped" "$LSPatch" "$SimplUsr"
+POST_INSTALL="$Simplify/POST_INSTALL"
+mkdir -p "$Simplify" "$RV" "$RVX" "$pikoTwitter" "$Dropped" "$LSPatch" "$SimplUsr" "$POST_INSTALL"
 Download="/sdcard/Download"
 simplifyJson="$Simplify/simplify.json"  # Configuration file to store simplify settings
 isPreRelease=0  # Default value (false/off/0) for isPreRelease, it's enabled latest release for Patches source
@@ -173,6 +174,15 @@ isCheckTermuxUpdate=1
 CheckTermuxUpdate=$(jq -r '.CheckTermuxUpdate' "$simplifyJson" 2>/dev/null)  # Get CheckTermuxUpdate value from json
 isJdkVersion=21
 jdkVersion=$(jq -r '.openjdk' "$simplifyJson" 2>/dev/null)
+isU=0  # Install Package for 0 (default-user), possible 1 (all-users)
+isK=0  # Allow Downgrade with keeps App data 0 (false) because it's required reboot after pkg install, possible 1 (true)
+isG=0  # Grant All Runtime Permissions 0 (false) due to Security Risk, possible 1
+isT=0  # Installed as test-only app 0, possible 1
+isL=1  # Bypass Low Target SDK Bolck 1 (true) it's allow Android 14+ to install apps that target below API level 23 (Android 6 and below), possible value 0
+isV=1  # Disable Play Protect Package Verification 1 (true), possible 0
+isI="com.android.vending"  # default: PlayStore | possible Installer: com.android.packageinstaller (PackageInstaller), com.android.shell (Shell), adb
+isR=1  # Reinstall Existing Installed Package 1 (true) because without this app can't be installed if installed and to-be-installed version are same, possible 0
+isB=0  # Enable Version Roolback 0, possible 1
 
 # --- pkg uninstall function ---
 pkgUninstall() {
@@ -252,6 +262,13 @@ fi
 
 if [ "$(getprop ro.product.manufacturer)" == "Genymobile" ] && [ ! -f "$HOME/adb" ]; then
   curl -sL -o "$HOME/adb" "https://raw.githubusercontent.com/rendiix/termux-adb-fastboot/refs/heads/master/binary/${cpuAbi}/bin/adb" && chmod +x ~/adb
+fi
+
+if su -c "id" >/dev/null 2>&1 || "$HOME/rish" -c "id" >/dev/null 2>&1 || "$HOME/adb" -s $(~/adb devices | grep "emulator-*" | cut -f1) shell "id" >/dev/null 2>&1; then
+  if [ -n "$(find $POST_INSTALL -mindepth 1 -type f -o -type d -o -type l 2>/dev/null)" ]; then
+    file_path=$(find $POST_INSTALL -maxdepth 1 -type f -print -quit)
+    bash $Simplify/apkInstall.sh "$file_path" "" && rm -f "$file_path"
+  fi
 fi
 
 # --- Download and give execute (--x) permission to AAPT2 Binary ---
@@ -386,7 +403,9 @@ config() {
   jq --arg key "$key" --arg value "$value" '.[$key] = $value' "$simplifyJson" > temp.json && mv temp.json "$simplifyJson"
 }
 all_key=("FetchPreRelease" "RipLocale" "RipDpi" "RipLib" "ChangeRVXSource" "ReadPatchesFile" "Branding" "CheckTermuxUpdate" "openjdk")
+all_key+=("InstallPackageFor" "KeepsData" "GrantAllRuntimePermissions" "InstalledAsTestOnly" "BypassLowTargetSdkBolck" "DisablePlayProtect" "Installer" "Reinstall" "EnableRoolback")
 all_value=("$isPreRelease" "$isRipLocale" "$isRipDpi" "$isRipLib" "$isChangeRVXSource" "$isReadPatchesFile" "$branding" "$isCheckTermuxUpdate" "$isJdkVersion")
+all_value+=("$isU" "$isK" "$isG" "$isT" "$isL" "$isV" "$isI" "$isR" "$isB")
 # Loop through all keys and set values if they don't exist
 for i in "${!all_key[@]}"; do
   if ! jq -e --arg key "${all_key[i]}" 'has($key)' "$simplifyJson" >/dev/null; then
@@ -1059,7 +1078,11 @@ while true; do
         ReadPatchesFile="$(jq -r '.ReadPatchesFile' "$simplifyJson" 2>/dev/null)"
         Branding=$(jq -r '.Branding' "$simplifyJson" 2>/dev/null)
         jdkVersion=$(jq -r '.openjdk' "$simplifyJson" 2>/dev/null)
-        echo -e "P. FetchPreRelease\nL. RipLocale\nD. RipDpi\nR. RipLib\nS. Change RVX Source\nT. Add gh PAT (increases gh api rate limit)\nO. Import Custom PatchesOptions from file\nB. Change YouTube & YT Music AppIcon & Header\nU. Check Termux update on startup\nJ. Change Java version\nQ. Quit\n"
+        echo -e "P. FetchPreRelease\nL. RipLocale\nD. RipDpi\nR. RipLib\nS. Change RVX Source\nT. Add gh PAT (increases gh api rate limit)\nO. Import Custom PatchesOptions from file\nB. Change YouTube & YT Music AppIcon & Header\nU. Check Termux update on startup\nJ. Change Java version\nI. SU/ SUI/ ADB Installation Options"
+        if [ "$(getprop ro.product.manufacturer)" == "Genymobile" ] && ! "$HOME/adb" -s $(~/adb devices | grep "emulator-*" | awk '{print $1}') shell "id" >/dev/null 2>&1; then
+          echo "A. Pair ADB"
+        fi
+        echo -e "Q. Quit\n"
         read -r -p "Select: " opt
         case "$opt" in
           [Pp]*) if [ "$FetchPreRelease" == 0 ]; then echo "FetchPreRelease == false"; else echo "FetchPreRelease == true"; fi
@@ -1118,8 +1141,113 @@ while true; do
             tfConfig "$key" "$value" "$m1" "$m2"
             ;;
           [Jj]*) echo "openjdkVersion == $jdkVersion" && change_jdk_version ;;
+          [Ii]*)
+            while true do;
+              InstallPackageFor=$(jq -r '.InstallPackageFor' "$simplifyJson" 2>/dev/null)
+              KeepsData=$(jq -r '.KeepsData' "$simplifyJson" 2>/dev/null)
+              GrantAllRuntimePermissions=$(jq -r '.GrantAllRuntimePermissions' "$simplifyJson" 2>/dev/null)
+              InstalledAsTestOnly=$(jq -r '.InstalledAsTestOnly' "$simplifyJson" 2>/dev/null)
+              BypassLowTargetSdkBolck=$(jq -r '.BypassLowTargetSdkBolck' "$simplifyJson" 2>/dev/null)
+              DisablePlayProtect=$(jq -r '.DisablePlayProtect' "$simplifyJson" 2>/dev/null)
+              Installer=$(jq -r '.Installer' "$simplifyJson" 2>/dev/null)
+              Reinstall=$(jq -r '.Reinstall' "$simplifyJson" 2>/dev/null)
+              EnableRoolback=$(jq -r '.EnableRoolback' "$simplifyJson" 2>/dev/null)
+              echo -e "U. Install Package for *user\nK. Allow Downgrade with keeps App data (reboot required)\nG. Grant All Runtime/ Requested Permissions\nT. Installed as test-only app\nL. Bypass Low Target SDK Bolck\nV. Disable Play Protect Package Verification\nI. Installer\nR. Reinstall (Replace/ Upgrade) Existing Installed Package\nB. Enable Version Roolback\nQ. Quit\n"
+              read -r -p "Select: " opt
+              case "$opt" in
+                [Uu]*)
+                  if [ "$InstallPackageFor" -eq 0 ]; then echo "InstallPackageFor == 0 (default-user)"; else echo "InstallPackageFor == 1 (all-users)"; fi
+                  key="InstallPackageFor"
+                  echo -e "D. default-user\nA. all-users\n"
+                  read -r -p "Install Package for " u
+                  case "$u" in
+                    [Dd]*) value="0"; config "$key" "$value" && echo -e "${Green}Install Package for default-user set successfully!${Reset}" ;;
+                    [Aa]*) value="1"; config "$key" "$value" && echo -e "${Green}Install Package for all-user set successfully!${Reset}" ;;
+                    *) value="$isU"; config "$key" "$value" && echo -e "${Green}Install Package for default-user set successfully!${Reset}" ;;
+                  esac
+                  ;;
+                [Kk]*)
+                  if [ "$KeepsData" -eq 0 ]; then echo "KeepsData == false"; else echo "KeepsData == true"; fi
+                  key="KeepsData"; value="$isK"
+                  m1="Allow Downgrade with keeps App data Enabled"
+                  m2="Allow Downgrade with keeps App data Disabled"
+                  tfConfig "$key" "$value" "$m1" "$m2"
+                  ;;
+                [Gg]*)
+                  if [ "$GrantAllRuntimePermissions" -eq 0 ]; then echo "GrantAllRuntimePermissions == false"; else echo "GrantAllRuntimePermissions == true"; fi
+                  key="GrantAllRuntimePermissions"; value="$isG"
+                  m1="Grant All Runtime Permissions Enabled"
+                  m2="Grant All Runtime Permissions Disabled"
+                  tfConfig "$key" "$value" "$m1" "$m2"
+                  ;;
+                [Tt]*)
+                  if [ "$InstalledAsTestOnly" -eq 0 ]; then echo "InstalledAsTestOnly == false"; else echo "InstalledAsTestOnly == true"; fi
+                  key="InstalledAsTestOnly"; value="$isT"
+                  m1="Installed as test-only app Enabled"
+                  m2="Installed as test-only app Disabled"
+                  tfConfig "$key" "$value" "$m1" "$m2"
+                  ;;
+                [Ll]*)
+                  if [ "$BypassLowTargetSdkBolck" -eq 1 ]; then echo "BypassLowTargetSdkBolck == true"; else echo "BypassLowTargetSdkBolck == false"; fi
+                  key="BypassLowTargetSdkBolck"; value="$isL"
+                  m1="Bypass Low Target SDK Bolck Enabled"
+                  m2="Bypass Low Target SDK Bolck Disabled"
+                  tfConfig "$key" "$value" "$m1" "$m2"
+                  ;;
+                [Vv]*)
+                  if [ "$DisablePlayProtect" -eq 1 ]; then echo "DisablePlayProtect == true"; else echo "DisablePlayProtect == false"; fi
+                  key="DisablePlayProtect"; value="$isV"
+                  m1="Play Protect Package Verification Disabled"
+                  m2="Play Protect Package Verification Enabled"
+                  tfConfig "$key" "$value" "$m1" "$m2"
+                  ;;
+                [Ii]*)
+                  case "$Installer" in
+                    "com.android.vending") echo "Installer == com.android.vending (PlayStore)" ;;
+                    "com.android.packageinstaller") echo "Installer == com.android.packageinstaller (PackageInstaller)" ;;
+                    "com.android.shell") echo "Installer == com.android.shell (Shell)" ;;
+                    "adb") echo "Installer == adb" ;;
+                  esac
+                  key="Installer"
+                  echo -e "P. Play Store\nI. Package Installer\nS. Shell\nA. ADB\n"
+                  read -r -p "Installer: " i
+                  case "$i" in
+                    [Pp]*) value="com.android.vending"; config "$key" "$value" && echo "${Green}Successfully set Installer as 'com.android.vending' (PlayStore)${Reset}" ;;
+                    [Ii]*) value="com.android.packageinstaller"; config "$key" "$value" && echo "${Green}Successfully set Installer as 'com.android.packageinstaller' (PackageInstaller)${Reset}" ;;
+                    [Ss]*) value="com.android.shell"; config "$key" "$value" && echo "${Green}Successfully set Installer as 'com.android.shell' (Shell)${Reset}" ;;
+                    [Aa]*) value="adb"; config "$key" "$value" && echo "${Green}Successfully set Installer as 'adb'${Reset}" ;;
+                    *) value="$isI"; config "$key" "$value" && echo "${Green}Successfully set Installer as 'com.android.vending' (PlayStore)${Reset}" ;;
+                  esac
+                  ;; 
+                [Rr]*)
+                  if [ "$Reinstall" -eq 1 ]; then echo "Reinstall == true"; else echo "Reinstall == false"; fi
+                  key="Reinstall"; value="$isR"
+                  m1="Reinstall Existing Installed Package Enabled"
+                  m2="Reinstall Existing Installed Package Disabled"
+                  tfConfig "$key" "$value" "$m1" "$m2"
+                  ;;
+                [Bb]*)
+                  if [ "$EnableRoolback" -eq 0 ]; then echo "EnableRoolback == false"; else echo "EnableRoolback == true"; fi
+                  key="EnableRoolback"; value="$isB"
+                  m1="Version Roolback Enabled"
+                  m2="Version Roolback Disabled"
+                  tfConfig "$key" "$value" "$m1" "$m2"
+                  ;;
+                *) echo -e "$info Invalid input! Please enter U / K / G / T / L / V / I / R / B / Q." ;;
+              esac
+            done
+            ;;
+          [Aa]*)
+            echo -e "Enable Developer Options:\n  1. Open Settings app on your device\n  2. tap About Phone\n  3. Find & tap 7 times on Build Number\n  4. You may need to enter your lock screen password\n  >>You will see a toast message saying 'You are now a developer!'"
+            echo -e "Enable Wireless Debugging:\n  1. Go back to main Settings screen\n  2. Scroll down & tap System\n  3. Tap Developer Options\n  4. Scroll down & find Wireless Debugging\n  5. Toggle it ON\n  6. A new dialog box will appear with a warning. Read it and tap Allow"
+            echo -e "Pair Device with Pairing Code:\n  1. In Wireless Debugging menu, tap Pair device with pairing code. It will show you a IP address & port (e.g., 192.168.1.50:40435) and a 6-digit pairing code (e.g., 123456).\n  2. open Termux & enter [IP address:port] [Wi-Fi pairing code] (e.g., 192.168.1.50:40435 123456)\n"
+            am start -n "com.android.settings/.Settings\$WirelessDebuggingActivity" >/dev/null 2>&1
+            [ $? -ne 0 ] && am start -n "com.android.settings/.Settings\$DevelopmentSettingsDashboardActivity" >/dev/null 2>&1 || am start -n com.android.settings/.Settings\$MyDeviceInfoActivity >/dev/null 2>&1
+            read -r -p "HOST[:PORT] [PAIRING CODE] " input
+            ~/adb pair "$input"
+            ;;
           [Qq]*) break ;;
-          *) echo -e "$info Invalid input! Please enter P / L / D / R / S / T / O / B / U / J / Q." ;;
+          *) echo -e "$info Invalid input! Please enter P / L / D / R / S / T / O / B / U / J / I / A / Q." ;;
         esac
       done
       sleep 3
