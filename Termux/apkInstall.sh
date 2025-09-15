@@ -92,7 +92,7 @@ apkInstall() {
         su -c "reboot"
       fi
     fi
-    [ $DisablePlayProtect -eq 1 ] && $HOME/rish -c "settings put global package_verifier_user_consent 1"  # Enabled Play Protect
+    [ $DisablePlayProtect -eq 1 ] && su -c "settings put global package_verifier_user_consent 1"  # Enabled Play Protect
     am start -n "$activityClass" &> /dev/null  # launch app after update
     if [ $? != 0 ]; then
       su -c "monkey -p $pkgName -c android.intent.category.LAUNCHER 1" > /dev/null 2>&1
@@ -100,7 +100,7 @@ apkInstall() {
     su -c "rm -f '/data/local/tmp/$outputFileName'"
   elif "$HOME/rish" -c "id" >/dev/null 2>&1; then
     ~/rish -c "cp '$outputAPK' '/data/local/tmp/$outputFileName'" > /dev/null 2>&1  # copy apk to System dir
-    [ $DisablePlayProtect -eq 1 ] && su -c "settings put global package_verifier_user_consent -1"  # Disabled Play Protect
+    [ $DisablePlayProtect -eq 1 ] && $HOME/rish -c "settings put global package_verifier_user_consent -1"  # Disabled Play Protect
     output=$(~/rish -c "pm install ${cmd} '/data/local/tmp/$outputFileName'" 2>&1)  # -r=reinstall
     [ $DisablePlayProtect -eq 1 ] && ~/rish -c "settings put global package_verifier_user_consent 1"  # Enabled Play Protect
     if [[ $output == *"Downgrade detected"* ]] && [ $KeepsData -eq 1 ]; then
