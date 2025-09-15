@@ -148,11 +148,13 @@ fi
 cpuAbi=$(getprop ro.product.cpu.abi)  # Get Android arch
 serial=$(su -c 'getprop ro.serialno')  # Get Serial Number required root
 model=$(getprop ro.product.model)  # Get Device Model
-# If package installation was interrupted (lost connection, app force closed, etc.)
-# This command configures unpacked but unconfigured packages by creating symlinks, running post-install scripts, and setting up configuration files
-pkill apt && yes "N" | dpkg --configure -a; pkill apt  # The 'yes "N"' command continuously outputs "N" followed by newline (Enter). The pipe (|) feeds this output as automatic input to any prompts from dpkg
 pkg update > /dev/null 2>&1 || apt update >/dev/null 2>&1  # It downloads latest package list with versions from Termux remote repository, then compares them to local (installed) pkg versions, and shows a list of what can be upgraded if they are different.
 outdatedPKG=$(apt list --upgradable 2>/dev/null)  # list of outdated pkg
+if [ -z "$(head -2 <<< "$outdatedPkg" | tail -1)" ]; then
+  # If package installation was interrupted (lost connection, app force closed, etc.)
+  # This command configures unpacked but unconfigured packages by creating symlinks, running post-install scripts, and setting up configuration files
+  pkill apt && yes "N" | dpkg --configure -a; pkill apt  # The 'yes "N"' command continuously outputs "N" followed by newline (Enter). The pipe (|) feeds this output as automatic input to any prompts from dpkg
+fi
 installedPKG=$(pkg list-installed 2>/dev/null)  # list of installed pkg
 jdkVersion="21"
 SimplUsr="/sdcard/Simplify"
