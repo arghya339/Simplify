@@ -218,7 +218,7 @@ pkgInstall() {
   fi
 }
 
-pkgInstall "apt"  # apt update
+#pkgInstall "apt"  # apt update
 pkgInstall "dpkg"  # dpkg update
 pkgInstall "bash"  # bash update
 pkgInstall "termux-core"  # it's contains basic essential cli utilities, such as: ls, cp, mv, rm, mkdir, cat, echo, etc.
