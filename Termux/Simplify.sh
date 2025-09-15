@@ -199,7 +199,7 @@ pkgUninstall() {
 # --- pkg upgrade function ---
 pkgUpdate() {
   local pkg=$1
-  if echo $outdatedPKG | grep -q "^$pkg/" 2>/dev/null; then
+  if echo "$outdatedPKG" | grep -q "^$pkg/" 2>/dev/null; then
     echo -e "$running Upgrading $pkg pkg.."
     pkg upgrade "$pkg" -y > /dev/null 2>&1
   fi
