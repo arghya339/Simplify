@@ -198,7 +198,7 @@ pkgUpdate() {
   local pkg=$1
   if echo "$outdatedPKG" | grep -q "^$pkg/" 2>/dev/null; then
     echo -e "$running Upgrading $pkg pkg.."
-    pkg reinstall "$pkg" -y > /dev/null 2>&1
+    pkg install --only-upgrade "$pkg" -y > /dev/null 2>&1
   fi
 }
 
