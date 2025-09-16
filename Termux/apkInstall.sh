@@ -68,12 +68,13 @@ apkInstall() {
   fi
   
   if su -c "id" >/dev/null 2>&1; then
-    [ $DisablePlayProtect -eq 1 ] && su -c "settings put global package_verifier_user_consent -1"  # Disabled Play Protect
     su -c "cp '$outputAPK' '/data/local/tmp/$outputFileName'"
     # Temporary Disable SELinux Enforcing during installation if it not in Permissive
     if [ "$(su -c 'getenforce 2>/dev/null')" = "Enforcing" ]; then
       su -c "setenforce 0"  # set SELinux to Permissive mode to unblock unauthorized operations
+      [ $DisablePlayProtect -eq 1 ] && su -c "settings put global package_verifier_user_consent -1"  # Disabled Play Protect
       output=$(su -c "pm install ${cmd} '/data/local/tmp/$outputFileName'" 2>&1)
+      [ $DisablePlayProtect -eq 1 ] && su -c "settings put global package_verifier_user_consent 1"  # Enabled Play Protect
       if [[ $output == *"Downgrade detected"* ]] && [ $KeepsData -eq 1 ]; then
         echo -e "${Green}$appName uninstall successfully with keeps app data.${Reset}\n${Yellow}Don't forget to restart Simplify after reboot!${Reset}"
         su -c "cmd package uninstall -k $pkgName"
@@ -83,7 +84,9 @@ apkInstall() {
       fi
       su -c "setenforce 1"  # set SELinux to Enforcing mode to block unauthorized operations
     else
+      [ $DisablePlayProtect -eq 1 ] && su -c "settings put global package_verifier_user_consent -1"  # Disabled Play Protect
       output=$(su -c "pm install ${cmd} '/data/local/tmp/$outputFileName'" 2>&1)
+      [ $DisablePlayProtect -eq 1 ] && su -c "settings put global package_verifier_user_consent 1"  # Enabled Play Protect
       if [[ $output == *"Downgrade detected"* ]] && [ $KeepsData -eq 1 ]; then
         echo -e "${Green}$appName uninstall successfully with keeps app data.${Reset}\n${Yellow}Don't forget to restart Simplify after reboot!${Reset}"
         su -c "cmd package uninstall -k $pkgName"
@@ -92,7 +95,6 @@ apkInstall() {
         su -c "reboot"
       fi
     fi
-    [ $DisablePlayProtect -eq 1 ] && su -c "settings put global package_verifier_user_consent 1"  # Enabled Play Protect
     am start -n "$activityClass" &> /dev/null  # launch app after update
     if [ $? != 0 ]; then
       su -c "monkey -p $pkgName -c android.intent.category.LAUNCHER 1" > /dev/null 2>&1
