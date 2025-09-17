@@ -291,6 +291,8 @@ curl -sL "https://raw.githubusercontent.com/arghya339/Simplify/refs/heads/main/T
 
 curl -sL "https://raw.githubusercontent.com/arghya339/Simplify/refs/heads/main/Termux/dlUptodown.sh" --progress-bar -o $Simplify/dlUptodown.sh
 
+curl -sL -o $Simplify/dlAPKPure.sh "https://raw.githubusercontent.com/arghya339/Simplify/refs/heads/main/Termux/dlAPKPure.sh"
+
 curl -sL "https://raw.githubusercontent.com/arghya339/Simplify/refs/heads/main/Termux/apkInstall.sh" --progress-bar -o $Simplify/apkInstall.sh
 
 if su -c "id" >/dev/null 2>&1; then

@@ -604,6 +604,8 @@ build_app() {
     bash $Simplify/APKMdl.sh "$pkgName" "$pkgVersion" "$Type" "${archRef[0]}" "$os_val" "$dpi_val" "$or_val"  # Download stock apk from APKMirror
   elif [ "$web" == "Uptodown" ]; then
     bash $Simplify/dlUptodown.sh "${appNameRef[0]}" "$pkgVersion" "$Type" "${archRef[0]}"  # Download stock apk from Uptodown
+  elif [ "$web" == "APKPure" ]; then
+    bash $Simplify/dlAPKPure.sh "${appNameRef[0]}" "$pkgVersion" "${archRef[0]}"  # Download stock apk from APKPure
   fi
   sleep 0.5  # Wait 500 milliseconds
   if [ "$Type" == "APK" ] || [ "${orRef[0]}" == "Download APK" ] || [ "$Type" == "apk" ]; then
@@ -1216,16 +1218,27 @@ while true; do
     Instagram)
       pkgName="com.instagram.android"
       appName=("Instagram")
-      pkgVersion="396.0.0.46.242"
+      pkgVersion="397.1.0.52.81"
       #pkgVersion=""
       if [ -z "$pkgVersion" ]; then
         getVersion "$pkgName"
         pkgVersion="$pkgVersion"
       fi
-      Type="BUNDLE"
-      Arch=("$cpuAbi")
+      #web="APKMirror"
+      web="APKPure"
+      if [ $web == "APKMirror" ]; then
+        Type="BUNDLE"
+        Arch=("$cpuAbi")
+      else
+        if [ $cpuAbi == arm64-v8a ]; then
+          Arch=("380306835")
+        elif [ $cpuAbi == armeabi-v7a ]; then
+          Arch=("380306859")
+        fi
+        Type="APK"
+      fi
       activityPatched="com.instagram.android/.activity.MainTabActivity"
-      build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "APKMirror" "instagram_patches_args" "$pkgName" "$activityPatched" "" "" ""
+      build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "$web" "instagram_patches_args" "$pkgName" "$activityPatched" "" "" ""
       ;;
     Facebook)
       pkgName="com.facebook.katana"
@@ -1236,17 +1249,24 @@ while true; do
         getVersion "$pkgName"
         pkgVersion="$pkgVersion"
       fi
-      Arch=("$cpuAbi")
-      if [ $cpuAbi == arm64-v8a ] && [ $Android -ge 11 ]; then
-        Type="APK"
-      elif [ $cpuAbi == armeabi-v7a ] && [ $Android -ge 11 ]; then
-        Type="BUNDLE"
+      #web="APKMirror"
+      web="APKPure"
+      if [ $web == "APKMirror" ]; then
+        Arch=("$cpuAbi")
+        if [ $cpuAbi == arm64-v8a ] && [ $Android -ge 11 ]; then
+          Type="APK"
+        elif [ $cpuAbi == armeabi-v7a ] && [ $Android -ge 11 ]; then
+          Type="BUNDLE"
+        fi
+        Os=("Android 11+")
+        Dpi="nodpi"
+        Or=("Download APK")
+      else
+        if [ $cpuAbi == arm64-v8a ] && [ $Android -ge 11 ]; then Arch=("457020014"); elif [ $cpuAbi == armeabi-v7a ] && [ $Android -ge 11 ]; then Arch=("457020009"); fi
+        Type="APK"; Os=(); Dpi=""; Or=()
       fi
-      Os=("Android 11+")
-      Dpi="nodpi"
-      Or=("Download APK")
       activityPatched="com.facebook.katana/.LoginActivity"
-      build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "APKMirror" "facebook_patches_args" "$pkgName" "$activityPatched" "${Os[0]}" "$Dpi" "${Or[0]}"
+      build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "$web" "facebook_patches_args" "$pkgName" "$activityPatched" "${Os[0]}" "$Dpi" "${Or[0]}"
       ;;
     FacebookMessenger)
       pkgName="com.facebook.orca"
@@ -1257,14 +1277,27 @@ while true; do
         getVersion "$pkgName"
         pkgVersion="$pkgVersion"
       fi
-      if [ "$cpuAbi" == "x86_64" ]; then
-        Type="BUNDLE"  # for x64, APK Type variant not available, only BUNDLE Type exist in variant page
+      #web="APKMirror"
+      web="APKPure"
+      if [ $web == "APKMirror" ]; then
+        if [ "$cpuAbi" == "x86_64" ]; then
+          Type="BUNDLE"  # for x64, APK Type variant not available, only BUNDLE Type exist in variant page
+        else
+          Type="APK"
+        fi
+        Arch=("$cpuAbi")
       else
+        if [ $cpuAbi == arm64-v8a ]; then
+          Arch=("333817144")
+        elif [ $cpuAbi == armeabi-v7a ]; then
+          Arch=("333817140")
+        elif [ $cpuAbi == x86 ]; then
+          Arch=("333615840")
+        fi
         Type="APK"
       fi
-      Arch=("$cpuAbi")
       activityPatched="com.facebook.orca/.auth.StartScreenActivity"
-      build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "APKMirror" "fb_messenger_patches_args" "$pkgName" "$activityPatched" "" "" ""
+      build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "$web" "fb_messenger_patches_args" "$pkgName" "$activityPatched" "" "" ""
       ;;
     Lightroom)
       pkgName="com.adobe.lrmobile"
@@ -1385,10 +1418,25 @@ while true; do
         getVersion "$pkgName"
         pkgVersion="$pkgVersion"
       fi
-      Type="BUNDLE"
-      Arch=("$cpuAbi")
+      #web="APKMirror"
+      web="APKPure"
+      if [ $web == "APKMirror" ]; then
+        Type="BUNDLE"
+        Arch=("$cpuAbi")
+      else
+        if [ $cpuAbi == arm64-v8a ]; then
+          Arch=("505205644")
+        elif [ $cpuAbi == armeabi-v7a ]; then
+          Arch=("505205643")
+        elif [ $cpuAbi == x86_64 ]; then
+          Arch=("505205646")
+        else
+          Arch=("505205645")
+        fi
+        Type="APK"
+      fi
       activityPatched="com.instagram.barcelona/.mainactivity.BarcelonaActivity"
-      build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "APKMirror" "threads_patches_args" "$pkgName" "$activityPatched" "" "" ""
+      build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "$web" "threads_patches_args" "$pkgName" "$activityPatched" "" "" ""
       ;;
     Strava)
       pkgName="com.strava"
