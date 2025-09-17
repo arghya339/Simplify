@@ -1224,8 +1224,11 @@ while true; do
         getVersion "$pkgName"
         pkgVersion="$pkgVersion"
       fi
-      #web="APKMirror"
-      web="APKPure"
+      if [ $cpuAbi == x86_64 ] || [ $cpuAbi == x86 ]; then
+        web="APKMirror"
+      else
+        web="APKPure"
+      fi
       if [ $web == "APKMirror" ]; then
         Type="BUNDLE"
         Arch=("$cpuAbi")
@@ -1277,8 +1280,11 @@ while true; do
         getVersion "$pkgName"
         pkgVersion="$pkgVersion"
       fi
-      #web="APKMirror"
-      web="APKPure"
+      if [ "$cpuAbi" == "x86_64" ]; then
+        web="APKMirror"
+      else
+        web="APKPure"
+      fi
       if [ $web == "APKMirror" ]; then
         if [ "$cpuAbi" == "x86_64" ]; then
           Type="BUNDLE"  # for x64, APK Type variant not available, only BUNDLE Type exist in variant page
