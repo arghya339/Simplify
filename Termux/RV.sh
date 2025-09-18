@@ -1329,7 +1329,7 @@ while true; do
       ;;
     Viber)
       pkgName="com.viber.voip"
-      appName="Viber"
+      appName="Rakuten Viber Messenger"
       pkgVersion="26.1.2.0"
       #pkgVersion=""
       if [ -z "$pkgVersion" ]; then
