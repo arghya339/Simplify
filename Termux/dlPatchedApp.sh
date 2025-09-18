@@ -160,6 +160,8 @@ dlApp() {
   local assets="$8"
   if [ "$repo" == "spotube" ]; then
     local url="https://github.com/$owner/$repo/releases/download/v$tag/Spotube-android-all-arch.apk"
+    updated_at=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases/latest" | jq -r --arg assets "$assets" '.assets[] | select(.name == $assets) | .updated_at')
+    assets="$file_pattern"
   else
     local url="https://github.com/$owner/$repo/releases/download/v$tag/$assets"
   fi
@@ -181,10 +183,8 @@ dlApp() {
       # Download spotube .aab file
       echo -e "$running Downloading $appName.."
       bash $Simplify/dlGitHub.sh "$owner" "$repo" "latest" ".aab" "$SimplUsr" "$regex"
-      aab_path="$SimplUsr/$file_pattern"
-      filename_wo_ext="${aab_path%.*}"
-      apk_path="$filename_wo_ext.apk"
-      assets=$(basename "$apk_path")
+      aab_path="$SimplUsr/$regex"
+      apk_path="$SimplUsr/$file_pattern"
       termux-wake-lock
       build_apks "$aab_path"  # build apk from aab by calling build_apks function
       termux-wake-unlock
@@ -783,10 +783,11 @@ while true; do
       assets="Spotube-playstore-all-arch.aab"
       if [ "$FetchPreRelease" -eq 0 ]; then
         regex="Spotube-playstore-all-arch.aab"
+        file_pattern="Spotube-playstore-all-arch.apk"
         tag=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases/latest" | jq -r '.tag_name | sub("^v"; "")' 2>/dev/null)  # 5.0.0
         pkgApp="oss.krtirtho.spotube"
         activityApp="$pkgApp/com.ryanheise.audioservice.AudioServiceActivity"
-        dlApp "${appName}" "$owner" "$repo" "" "$regex" "$regex" "$tag" "$regex" "$pkgApp" "$activityApp"
+        dlApp "${appName}" "$owner" "$repo" "" "$regex" "$file_pattern" "$tag" "$regex" "$pkgApp" "$activityApp"
       else
         pkgPatched="oss.krtirtho.spotube.nightly"
         activityPatched="$pkgPatched/com.ryanheise.audioservice.AudioServiceActivity"
