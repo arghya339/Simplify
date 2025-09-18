@@ -150,6 +150,7 @@ serial=$(su -c 'getprop ro.serialno')  # Get Serial Number required root
 model=$(getprop ro.product.model)  # Get Device Model
 pkg update > /dev/null 2>&1 || apt update >/dev/null 2>&1  # It downloads latest package list with versions from Termux remote repository, then compares them to local (installed) pkg versions, and shows a list of what can be upgraded if they are different.
 outdatedPKG=$(apt list --upgradable 2>/dev/null)  # list of outdated pkg
+echo "$outdatedPKG" | grep -q "dpkg was interrupted" 2>/dev/null && { yes "N" | dpkg --configure -a; outdatedPKG=$(apt list --upgradable 2>/dev/null); }
 installedPKG=$(pkg list-installed 2>/dev/null)  # list of installed pkg
 jdkVersion="21"
 SimplUsr="/sdcard/Simplify"
@@ -198,7 +199,8 @@ pkgUpdate() {
   local pkg=$1
   if echo "$outdatedPKG" | grep -q "^$pkg/" 2>/dev/null; then
     echo -e "$running Upgrading $pkg pkg.."
-    pkg install --only-upgrade "$pkg" -y > /dev/null 2>&1
+    output=$(pkg install --only-upgrade "$pkg" -y 2>/dev/null)
+    echo "$output" | grep -q "dpkg was interrupted" 2>/dev/null && { yes "N" | dpkg --configure -a; yes "N" | pkg install --only-upgrade "$pkg" -y > /dev/null 2>&1; }
   fi
 }
 
@@ -216,14 +218,19 @@ pkgInstall() {
 #pkgInstall "apt"  # apt update
 pkgInstall "dpkg"  # dpkg update
 #pkgInstall "bash"  # bash update
+pkgInstall "libgnutls"  # pm apt & dpkg use it to securely download packages from repositories over HTTPS
+pkgInstall "coreutils"  # It provides basic file, shell, & text manipulation utilities. such as: ls, cp, mv, rm, mkdir, cat, echo, etc.
 pkgInstall "termux-core"  # it's contains basic essential cli utilities, such as: ls, cp, mv, rm, mkdir, cat, echo, etc.
 pkgInstall "termux-tools"  # it's provide essential commands, sush as: termux-change-repo, termux-setup-storage, termux-open, termux-share, etc.
 pkgInstall "termux-keyring"  # it's use during pkg install/update to verify digital signature of the pkg and remote repository
 pkgInstall "termux-am"  # termux am (activity manager) update
 pkgInstall "termux-am-socket"  # termux am socket (when run: am start -n activity ,termux-am take & send to termux-am-stcket and it's send to Termux Core to execute am command) update
+pkgInstall "inetutils"  # ping utils is provided by inetutils
+pkgInstall "util-linux"  # it provides: kill, killall, uptime, uname, chsh, lscpu
 pkgInstall "curl"  # curl update
 pkgInstall "libcurl"  # curl lib update
 pkgInstall "aria2"  # aria2 install/update
+pkgInstall "openssl"  # openssl install/update
 pkgInstall "jq"  # jq install/update
 pkgInstall "pup"  # pup install/update
 if [ -f "$simplifyJson" ]; then
@@ -1041,7 +1048,6 @@ while true; do
       ;;
     [Rr])
       if su -c "id" >/dev/null 2>&1; then
-        pkgInstall "openssl"  # openssl install/update
         pkgInstall "python"  # python install/update
         if ! pip list 2>/dev/null | grep -q "apksigcopier"; then
           pip install apksigcopier > /dev/null 2>&1  # install apksigcopier using pip
@@ -1053,7 +1059,6 @@ while true; do
       ;;
     [Xx])
       if su -c "id" >/dev/null 2>&1; then
-        pkgInstall "openssl"  # openssl install/update
         pkgInstall "python"  # python install/update
         if ! pip list 2>/dev/null | grep -q "apksigcopier"; then
           pip install apksigcopier > /dev/null 2>&1  # install apksigcopier using pip
