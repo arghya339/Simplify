@@ -373,6 +373,7 @@ if [ $Android -ge 10 ]; then
     ${novaLauncher}
     Lawnchair
     Solid\ Explorer
+    Proton\ Mail
     Tasker
   )
 elif [ $Android -eq 9 ]; then
@@ -416,6 +417,7 @@ elif [ $Android -eq 9 ]; then
     ${novaLauncher}
     Lawnchair
     Solid\ Explorer
+    Proton\ Mail
     Tasker
   )
 elif [ $Android -eq 8 ]; then
@@ -1159,6 +1161,15 @@ while true; do
       assets="solid-explorer-$cpuAbi-scrazzz.apk"
       pkgPatched="pl.solidexplorer2"
       activityPatched="pl.solidexplorer2/pl.solidexplorer.SolidExplorer"
+      dlPatchedApp "${appName}" "$owner" "$repo" "$assets" "$pkgPatched" "$activityPatched"
+      ;;
+    Proton\ Mail)
+      appName="Proton Mail"
+      owner="FiorenMas"
+      repo="Revanced-And-Revanced-Extended-Non-Root"
+      [ "$FetchPreRelease" -eq 0 ] && assets="protonmail-revanced.apk" || assets="protonmail-beta-revanced.apk"
+      pkgPatched="ch.protonmail.android"
+      activityPatched="ch.protonmail.android/.MainActivity"
       dlPatchedApp "${appName}" "$owner" "$repo" "$assets" "$pkgPatched" "$activityPatched"
       ;;
     Tasker)
