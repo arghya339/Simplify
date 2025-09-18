@@ -110,7 +110,7 @@ appInstall() {
         else
           echo -e "$running Please Wait !! Installing ${appName} apk.."
         fi
-        if [ "$repo" == "ReVancedApp-Actions" ] || [ "$repo" == "Revanced-And-Revanced-Extended-Non-Root" ] || [ "$repo" == "spotube" ]; then
+        if [ "$repo" == "ReVancedApp-Actions" ] || [ "$repo" == "Revanced-And-Revanced-Extended-Non-Root" ] || { [ "$repo" == "spotube" ] && [ -n "$updated_at" ]; }; then
           bash $Simplify/apkInstall.sh "$apk_path" "$activityPatched"
           data "$assets" "$updated_at" "$version"
         else
@@ -160,7 +160,6 @@ dlApp() {
   local assets="$8"
   if [ "$repo" == "spotube" ]; then
     local url="https://github.com/$owner/$repo/releases/download/v$tag/Spotube-android-all-arch.apk"
-    updated_at=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases/latest" | jq -r --arg assets "$assets" '.assets[] | select(.name == $assets) | .updated_at')
     assets="$file_pattern"
   else
     local url="https://github.com/$owner/$repo/releases/download/v$tag/$assets"
