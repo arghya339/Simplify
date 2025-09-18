@@ -83,7 +83,7 @@ dlGitHub() {
       echo -e "$info latestReleases: $latestReleases"
     else
       if [ "$repo" == "ReVancedApp-Actions" ] || [ "$repo" == "Revanced-And-Revanced-Extended-Non-Root" ]; then
-        echo -e "$info latestReleases: all"
+        latestReleases="all"; echo -e "$info latestReleases: $latestReleases"
       else
         latestReleases=$(jq -r '.tag_name | sub("^v"; "")' <<< "$ghApiResponseJson")
         echo -e "$info latestReleases: v$latestReleases"
