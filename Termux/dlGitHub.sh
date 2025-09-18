@@ -72,7 +72,9 @@ dlGitHub() {
   }
 
   if [ "$releases" == "latest" ]; then
-    ghApiResponseJson=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases/latest")
+    if [ "$repo" != "ReVancedApp-Actions" ] || [ "$repo" != "Revanced-And-Revanced-Extended-Non-Root" ]; then
+      ghApiResponseJson=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases/latest")
+    fi
     if [ "$repo" == "APKEditor" ]; then
       latestReleases=$(jq -r '.tag_name | sub("^V"; "")' <<< "$ghApiResponseJson")  # 1.4.3
       echo -e "$info latestReleases: V$latestReleases"
@@ -80,10 +82,10 @@ dlGitHub() {
       latestReleases=$(jq -r '.tag_name' <<< "$ghApiResponseJson")  # 0.23.5.17
       echo -e "$info latestReleases: $latestReleases"
     else
-      latestReleases=$(jq -r '.tag_name | sub("^v"; "")' <<< "$ghApiResponseJson")
       if [ "$repo" == "ReVancedApp-Actions" ] || [ "$repo" == "Revanced-And-Revanced-Extended-Non-Root" ]; then
-        echo -e "$info latestReleases: $latestReleases"
+        echo -e "$info latestReleases: all"
       else
+        latestReleases=$(jq -r '.tag_name | sub("^v"; "")' <<< "$ghApiResponseJson")
         echo -e "$info latestReleases: v$latestReleases"
       fi
     fi
@@ -112,8 +114,7 @@ dlGitHub() {
     fi
     
     if [ "$repo" == "ReVancedApp-Actions" ] || [ "$repo" == "Revanced-And-Revanced-Extended-Non-Root" ]; then
-      findFile="$dir/$assetsName"
-      fileBaseName=$(basename $findFile 2>/dev/null)
+      findFile="$dir/$assetsName"; fileBaseName="$assetsName"
     else
       findFile=$(find "$dir" -type f -name "$assetsNamePattern" -print -quit)
       fileBaseName=$(basename $findFile 2>/dev/null)
@@ -132,15 +133,20 @@ dlGitHub() {
         fi
       fi
     elif [ "$repo" == "ReVancedApp-Actions" ] || [ "$repo" == "Revanced-And-Revanced-Extended-Non-Root" ] || [ "$repo" == "FreeTubeAndroid" ] || [ "$repo" == "bundletool" ] || [ "$repo" == "twitter-apk" ] || [ "$repo" == "lawnchair" ] || [ "$repo" == "Nagram" ]; then
-      if [ "$assetsName" != "$fileBaseName" ]; then
-        [ -n "$fileBaseName" ] && echo -e "$notice diffs: $assetsName ~ $fileBaseName"
+      dlUrl="https://github.com/$owner/$repo/releases/download/${latestReleases}/$assetsName"
+      findFile="$dir/$assetsName"
+      if [ "$repo" == "ReVancedApp-Actions" ] || [ "$repo" == "Revanced-And-Revanced-Extended-Non-Root" ]; then
         [ -f "$findFile" ] && rm "$findFile"
-        dlUrl="https://github.com/$owner/$repo/releases/download/${latestReleases}/$assetsName"
-        findFile="$dir/$assetsName"
-        if [ "$repo" == "ReVancedApp-Actions" ] || [ "$repo" == "Revanced-And-Revanced-Extended-Non-Root" ] || [ "$repo" == "bundletool" ] || [ "$repo" == "twitter-apk" ] || [ "$repo" == "Nagram" ]; then
-          dl "aria2" "$dlUrl" "$findFile"
-        else
-          dl "curl" "$dlUrl" "$findFile"
+        dl "aria2" "$dlUrl" "$findFile"
+      else
+        if [ "$assetsName" != "$fileBaseName" ]; then
+          [ -n "$fileBaseName" ] && echo -e "$notice diffs: $assetsName ~ $fileBaseName"
+          [ -f "$findFile" ] && rm "$findFile"
+          if [ "$repo" == "bundletool" ] || [ "$repo" == "twitter-apk" ] || [ "$repo" == "Nagram" ]; then
+            dl "aria2" "$dlUrl" "$findFile"
+          else
+            dl "curl" "$dlUrl" "$findFile"
+          fi
         fi
       fi
     else 
