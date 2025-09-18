@@ -158,7 +158,11 @@ dlApp() {
   local file_pattern="$6"
   local tag="$7"
   local assets="$8"
-  local url="https://github.com/$owner/$repo/releases/download/$tag/$assets"
+  if [ "$repo" == "spotube" ]; then
+    local url="https://github.com/$owner/$repo/releases/download/$tag/Spotube-android-all-arch.apk"
+  else
+    local url="https://github.com/$owner/$repo/releases/download/$tag/$assets"
+  fi
   local pkgApp="$9"
   local activityApp="$10"
   
@@ -173,9 +177,22 @@ dlApp() {
   if [ "$tag" == "$version" ] && [ "$app_updated_at" == "$updated_at" ]; then
     echo -e "$notice ${Yellow}$appName Already up to date!${Reset}"
   else
-    echo -e "$running Downloading $appName from GitHub.."
-    bash $Simplify/dlGitHub.sh "$owner" "$repo" "$release" ".apk" "$SimplUsr" "$regex"
-    apk_path=$(find "$SimplUsr" -type f -name "$file_pattern" -print -quit)
+    if [ "$repo" == "spotube" ]; then
+      # Download spotube .aab file
+      echo -e "$running Downloading $appName.."
+      bash $Simplify/dlGitHub.sh "$owner" "$repo" "latest" ".aab" "$SimplUsr" "$regex"
+      aab_path="$SimplUsr/$file_pattern"
+      filename_wo_ext="${aab_path%.*}"
+      apk_path="$filename_wo_ext.apk"
+      assets=$(basename "$apk_path")
+      termux-wake-lock
+      build_apks "$aab_path"  # build apk from aab by calling build_apks function
+      termux-wake-unlock
+    else
+      echo -e "$running Downloading $appName from GitHub.."
+      bash $Simplify/dlGitHub.sh "$owner" "$repo" "$release" ".apk" "$SimplUsr" "$regex"
+      apk_path=$(find "$SimplUsr" -type f -name "$file_pattern" -print -quit)
+    fi
     if [ -f "$apk_path" ]; then
       echo -e "$info ${Green}Downloaded $appName APK found:${Reset} $apk_path"
       version=$($HOME/aapt2 dump badging $apk_path 2>/dev/null | sed -n "s/.*versionName='\([^']*\)'.*/\1/p")
@@ -764,9 +781,17 @@ while true; do
       owner="KRTirtho"
       repo="spotube"
       assets="Spotube-playstore-all-arch.aab"
-      pkgPatched="oss.krtirtho.spotube.nightly"
-      activityPatched="oss.krtirtho.spotube.nightly/com.ryanheise.audioservice.AudioServiceActivity"
-      dlPatchedApp "${appName}" "$owner" "$repo" "$assets" "$pkgPatched" "$activityPatched"
+      if [ "$FetchPreRelease" -eq 0 ]; then
+        regex="Spotube-playstore-all-arch.aab"
+        tag=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases/latest" | jq -r '.tag_name | sub("^v"; "")' 2>/dev/null)  # 5.0.0
+        pkgApp="oss.krtirtho.spotube"
+        activityApp="$pkgApp/com.ryanheise.audioservice.AudioServiceActivity"
+        dlApp "${appName}" "$owner" "$repo" "" "$regex" "$regex" "$tag" "$regex" "$pkgApp" "$activityApp"
+      else
+        pkgPatched="oss.krtirtho.spotube.nightly"
+        activityPatched="$pkgPatched/com.ryanheise.audioservice.AudioServiceActivity"
+        dlPatchedApp "${appName}" "$owner" "$repo" "$assets" "$pkgPatched" "$activityPatched"
+      fi
       ;;
     TikTok)
       appName="TikTok"
