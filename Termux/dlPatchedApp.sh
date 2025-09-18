@@ -372,6 +372,7 @@ if [ $Android -ge 10 ]; then
     SoundCloud
     ${novaLauncher}
     Lawnchair
+    Solid\ Explorer
     Tasker
   )
 elif [ $Android -eq 9 ]; then
@@ -414,6 +415,7 @@ elif [ $Android -eq 9 ]; then
     SoundCloud
     ${novaLauncher}
     Lawnchair
+    Solid\ Explorer
     Tasker
   )
 elif [ $Android -eq 8 ]; then
@@ -455,6 +457,7 @@ elif [ $Android -eq 8 ]; then
     SoundCloud
     ${novaLauncher}
     Lawnchair
+    Solid\ Explorer
     Tasker
   )
 elif [ $Android -eq 7 ]; then
@@ -486,6 +489,7 @@ elif [ $Android -eq 7 ]; then
     WeatherMaster
     Twitch
     Tumblr
+    Solid\ Explorer
     Tasker
   )
 elif [ $Android -eq 6 ]; then
@@ -509,6 +513,7 @@ elif [ $Android -eq 6 ]; then
     CloudStream
     WeatherMaster
     Twitch
+    Solid\ Explorer
     Tasker
   )
 elif [ $Android -eq 5 ]; then
@@ -531,6 +536,7 @@ elif [ $Android -eq 5 ]; then
     CloudStream
     WeatherMaster
     Twitch
+    Solid\ Explorer
     Tasker
   )
 elif [ $Android -eq 4 ]; then
@@ -538,6 +544,7 @@ elif [ $Android -eq 4 ]; then
     Quit
     ReVanced\ GmsCore
     RAR
+    Solid\ Explorer
   )
 fi
 
@@ -1144,6 +1151,15 @@ while true; do
       pkgApp="app.lawnchair.lawnfeed"
       activityApp=
       dlApp "${appName}" "$owner" "$repo" "$release" "" "$file_pattern" "$tag" "$assets" "$pkgApp" "$activityApp"
+      ;;
+    Solid\ Explorer)
+      appName="Solid Explorer"
+      owner="FiorenMas"
+      repo="Revanced-And-Revanced-Extended-Non-Root"
+      assets="solid-explorer-$cpuAbi-scrazzz.apk"
+      pkgPatched="pl.solidexplorer2"
+      activityPatched="pl.solidexplorer2/pl.solidexplorer.SolidExplorer"
+      dlPatchedApp "${appName}" "$owner" "$repo" "$assets" "$pkgPatched" "$activityPatched"
       ;;
     Tasker)
       appName="Tasker"
