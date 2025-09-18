@@ -173,6 +173,12 @@ patch_app() {
       -e "Spoof SIM country" -OnetworkCountryIso="US (United States)" -OsimCountryIso="US (United States)"
       -e "Disable Pairip license check"
     )
+  elif [ "$appName" == "Viber" ]; then
+    universalPatches=(
+      -e "Spoof SIM country" -OnetworkCountryIso="US (United States)" -OsimCountryIso="US (United States)"
+      -e "Disable Pairip license check"
+      -e "Remove screenshot restriction"
+    )
   else
     universalPatches=(
       -e "Change version code" -OversionCode="2147483647" 
@@ -275,6 +281,8 @@ facebook_patches_args=()
 
 fb_messenger_patches_args=()
 
+viber_patches_args=()
+
 lightroom_patches_args=()
 
 photomath_patches_args=()
@@ -327,19 +335,19 @@ if [ "$ReadPatchesFile" -eq 1 ]; then
     # [3] Photos
     ''
     
-    # [4] Instagram, [5] Facebook, [6] FbMessenger, [7] Lightroom, [8] Photomath, [9] Duolingo, [10] RAR | No default patches
-    '' '' '' '' '' '' ''
+    # [4] Instagram, [5] Facebook, [6] FbMessenger, [7] Viber, [8] Lightroom, [9] Photomath, [10] Duolingo, [11] RAR | No default patches
+    '' '' '' '' '' '' '' ''
     
-    # [11] PrimeVideo
+    # [12] PrimeVideo
     '-e "Rename shared permissions"'
     
-    # [12] Twitch | No default patches
+    # [13] Twitch | No default patches
     ''
     
-    # [13] Tumblr
+    # [14] Tumblr
     '-e "Fix old versions"'
     
-    # [14] Threads, [15] Strava, [16] SoundCloud, [17] ProtonMail, [18] MyFitnessPal, [19] Crunchyroll, [20] Cricbuzz | No default patches
+    # [15] Threads, [16] Strava, [17] SoundCloud, [18] ProtonMail, [19] MyFitnessPal, [20] Crunchyroll, [21] Cricbuzz | No default patches
     '' '' '' '' '' '' ''
   )
   
@@ -352,6 +360,7 @@ if [ "$ReadPatchesFile" -eq 1 ]; then
     instagram_patches_args
     facebook_patches_args
     fb_messenger_patches_args
+    viber_patches_args
     lightroom_patches_args
     photomath_patches_args
     duolingo_patches_args
@@ -810,6 +819,10 @@ listOfPatches() {
       pkgName="com.instagram.barcelona"
       getListOfPatches "$pkgName"
       ;;
+    Viber)
+      pkgName="com.viber.voip"
+      getListOfPatches "$pkgName"
+      ;;
     Lightroom)
       pkgName="com.adobe.lrmobile"
       getListOfPatches "$pkgName"
@@ -878,6 +891,7 @@ listOfPatches() {
   Facebook arm32 + x86 8.0+
   Facebook Messenger arm64 + x64 9.0+
   Facebook Messenger arm32 + x86 5.0+
+  Viber 5.0+
   Lightroom 8.0+
   Photomath 5.0+
   Duolingo 10+
@@ -937,6 +951,7 @@ if [ $Android -ge 12 ]; then
     $Instagram
     $Facebook
     ${fbMessenger}
+    Viber
     Lightroom
     Photomath
     Duolingo
@@ -963,6 +978,7 @@ elif [ $Android -eq 11 ]; then
     $Instagram
     $Facebook
     ${fbMessenger}
+    Viber
     Lightroom
     Photomath
     Duolingo
@@ -988,6 +1004,7 @@ elif [ $Android -eq 10 ]; then
     $Instagram
     $Facebook
     ${fbMessenger}
+    Viber
     Lightroom
     Photomath
     Duolingo
@@ -1012,6 +1029,7 @@ elif [ $Android -eq 9 ]; then
     $Instagram
     $Facebook
     ${fbMessenger}
+    Viber
     Lightroom
     Photomath
     RAR
@@ -1035,6 +1053,7 @@ elif [ $Android -eq 8 ]; then
     $Instagram
     $Facebook
     ${fbMessenger}
+    Viber
     Lightroom
     Photomath
     RAR
@@ -1055,6 +1074,7 @@ elif [ $Android -eq 7 ]; then
     Google\ Photos
     $Instagram
     ${fbMessenger}
+    Viber
     Photomath
     RAR
     ${amazonPrimeVideo}
@@ -1068,6 +1088,7 @@ elif [ $Android -eq 6 ]; then
     TikTok
     Google\ Photos
     ${fbMessenger}
+    Viber
     Photomath
     RAR
     ${amazonPrimeVideo}
@@ -1080,6 +1101,7 @@ elif [ $Android -eq 5 ]; then
     TikTok
     Google\ Photos
     ${fbMessenger}
+    Viber
     Photomath
     RAR
     ${amazonPrimeVideo}
@@ -1304,6 +1326,20 @@ while true; do
       fi
       activityPatched="com.facebook.orca/.auth.StartScreenActivity"
       build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "$web" "fb_messenger_patches_args" "$pkgName" "$activityPatched" "" "" ""
+      ;;
+    Viber)
+      pkgName="com.viber.voip"
+      appName="Viber"
+      pkgVersion="26.1.2.0"
+      #pkgVersion=""
+      if [ -z "$pkgVersion" ]; then
+        getVersion "$pkgName"
+        pkgVersion="$pkgVersion"
+      fi
+      Type="BUNDLE"
+      Arch=("universal")
+      activityPatched="com.viber.voip/.WelcomeActivity"
+      build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "APKMirror" "viber_patches_args" "$pkgName" "$activityPatched" "" "" ""
       ;;
     Lightroom)
       pkgName="com.adobe.lrmobile"
