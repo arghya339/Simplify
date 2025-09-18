@@ -151,7 +151,7 @@ dlGitHub() {
           dl "curl" "$dlUrl" "$findFile"
         else
           dlUrl="https://github.com/$owner/$repo/releases/download/v${latestReleases}/$assetsName"
-          if [ "$repo" == "revanced-cli" ] || { [ "$repo" == "revanced-patches" ] && { [ "$owner" == "inotia00" ] || [ "$owner" == "anddea" ]; }; } || [ "$repo" == "Nekogram" ]; then
+          if [ "$repo" == "revanced-cli" ] || { [ "$repo" == "revanced-patches" ] && { [ "$owner" == "inotia00" ] || [ "$owner" == "anddea" ]; }; } || [ "$repo" == "Nekogram" ] || [ "$repo" == "spotube" ]; then
             dl "aria2" "$dlUrl" "$findFile"
           else
             dl "curl" "$dlUrl" "$findFile"
