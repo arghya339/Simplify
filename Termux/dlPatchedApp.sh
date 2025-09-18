@@ -159,9 +159,9 @@ dlApp() {
   local tag="$7"
   local assets="$8"
   if [ "$repo" == "spotube" ]; then
-    local url="https://github.com/$owner/$repo/releases/download/$tag/Spotube-android-all-arch.apk"
+    local url="https://github.com/$owner/$repo/releases/download/v$tag/Spotube-android-all-arch.apk"
   else
-    local url="https://github.com/$owner/$repo/releases/download/$tag/$assets"
+    local url="https://github.com/$owner/$repo/releases/download/v$tag/$assets"
   fi
   local pkgApp="$9"
   local activityApp="$10"
