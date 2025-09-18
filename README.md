@@ -18,7 +18,7 @@ A Simple Cross Platform Automated ReVanced Shell Script for Patching apk
 - Latest Microsoft PowerShell (and you can check PowerShell Version uisng following command ~ `$PSVersionTable`) or Terminal (~ `zsh --version`) or Termux (~ `termux-info`)
 
 ## Usage
-### Android
+### ![Android](https://img.shields.io/badge/Android-3DDC84?style=for-the-badge&logo=android&logoColor=white)
   - Open [Termux](https://github.com/termux/termux-app/releases) and type following command and press `Enter` key twice:
   
   ```sh
@@ -33,7 +33,7 @@ A Simple Cross Platform Automated ReVanced Shell Script for Patching apk
   simplify
   ```
 
-### macOS
+### ![macOS](https://img.shields.io/badge/mac%20os-000000?style=for-the-badge&logo=macos&logoColor=F0F0F0)
   - Open `Terminal` and run the script with the following command:
    
   ```
@@ -44,7 +44,7 @@ A Simple Cross Platform Automated ReVanced Shell Script for Patching apk
   zsh $HOME/Downloads/RVX.zsh
   ```
 
-### Windows10/11
+### ![Windows](https://img.shields.io/badge/Windows-0078D6?style=for-the-badge&logo=windows&logoColor=white)
   - Open `Windows Terminal (Admin)`
   - Install Microsoft PowerShell on Windows using winget (Windows built in package manager): ~ `winget install Microsoft.PowerShell --accept-source-agreements --silent --force`
   - Check MsPS Verison ~ `pwsh -v`
