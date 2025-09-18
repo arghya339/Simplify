@@ -173,7 +173,7 @@ patch_app() {
       -e "Spoof SIM country" -OnetworkCountryIso="US (United States)" -OsimCountryIso="US (United States)"
       -e "Disable Pairip license check"
     )
-  elif [ "$appName" == "Viber" ]; then
+  elif [ "$appName" == "Rakuten Viber Messenger" ]; then
     universalPatches=(
       -e "Spoof SIM country" -OnetworkCountryIso="US (United States)" -OsimCountryIso="US (United States)"
       -e "Disable Pairip license check"
