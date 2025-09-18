@@ -86,7 +86,7 @@ dlUptodown() {
   # --- UPTODOWN SEARCH ---
   app_name=$(echo "$appName" | tr '[:upper:]' '[:lower:]')  # convert $appName to lowercase | Spotify → spotify | Spotify Lite → spotify lite
   # Search app_name on Uptodown and extract url fild with matching appName with name fild
-  appUrl=$(curl -sL -X POST "https://en.uptodown.com/android/search" -d "q=${app_name}" | pup '.item json{}' | jq --arg appName "$appName" '.[] | select(.children[1].children[0].text == $appName) | .children[1].children[0].href' | tr -d '"')
+  appUrl=$(curl -sL -X POST "https://en.uptodown.com/android/search" -d "q=${app_name}" | pup '.item json{}' | jq --arg appName "$appName" '.[] | select(.children[1].children[0].text == $appName) | .children[1].children[0].href' | tr -d '"' | head -1)
   if [ -z "$appUrl" ]; then
     # Build a slug-based URL (web address with human-readable keyword) ie. "Spotify Lite" → spotify-lite.en.uptodown.com/android) & check if it exists
     local slug; slug=$(echo "$appName" | tr '[:upper:]' '[:lower:]' | sed 's/ /-/g')  # Convert: uppercase → lowercase letters. Replace: Spaces with hyphen
