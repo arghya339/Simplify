@@ -614,7 +614,7 @@ build_app() {
   elif [ "$web" == "Uptodown" ]; then
     bash $Simplify/dlUptodown.sh "${appNameRef[0]}" "$pkgVersion" "$Type" "${archRef[0]}"  # Download stock apk from Uptodown
   elif [ "$web" == "APKPure" ]; then
-    bash $Simplify/dlAPKPure.sh "${appNameRef[0]}" "$pkgVersion" "${archRef[0]}"  # Download stock apk from APKPure
+    bash $Simplify/dlAPKPure.sh "${appNameRef[0]}" "$pkgName" "$pkgVersion" "${archRef[0]}"  # Download stock apk from APKPure
   fi
   sleep 0.5  # Wait 500 milliseconds
   if [ "$Type" == "APK" ] || [ "${orRef[0]}" == "Download APK" ] || [ "$Type" == "apk" ]; then
