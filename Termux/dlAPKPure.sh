@@ -103,7 +103,7 @@ searchUrl="https://apkpure.com/search?q=$app_name"  # APKPure search url pattern
 if [ -n "$pkgName" ]; then
   apiUrl="https://apkpure.com/api/v1/search_suggestion_new?key=${app_name}&limit=20"
   aria2c -q -o response.json "${ALL_HEADER[@]}" --connect-timeout=30 --save-cookies=cookies.txt --check-certificate=false --referer="https://apkpure.com" --async-dns=true --async-dns-server="$cloudflareIP" "$apiUrl"
-  appUrl="https://apkpure.com$(jq -r --arg pkgName "$pkgName" '.[] | select(.packageName? == $pkgName) | .url' response.json)" && rm -f response.json || { rm -f response.json; appUrl=""; }
+  appUrl=$(jq -r --arg pkgName "$pkgName" '.[] | select(.packageName? == $pkgName) | .fullUrl' response.json) && rm -f response.json || { rm -f response.json; appUrl=""; }
 fi
 if [ -z "$appUrl" ] || [ -z "$pkgName" ]; then
   aria2c -q -o apkpure_page.html -d "$HOME" "${ALL_HEADER[@]}" --connect-timeout=30 --save-cookies=cookies.txt --check-certificate=false --referer="https://apkpure.com" --async-dns=true --async-dns-server="$cloudflareIP" "$searchUrl" && search_html_content=$(cat "$HOME/apkpure_page.html") && rm -f ~/apkpure_page.html
