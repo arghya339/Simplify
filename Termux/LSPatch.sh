@@ -169,7 +169,7 @@ build_app() {
   local activityPatched=$10
 
   if [ "${appNameRef[0]}" == "Discord" ]; then
-    assetsName="com.discord_289.20-Stable-289020_4arch_7dpi_25lang.apks"
+    assetsName="com.discord_297.14-Stable-297014_4arch_7dpi_24lang.apks"
     dlUrl="https://github.com/arghya339/Simplify/releases/download/all/$assetsName"
     echo -e "$running Downloading ${appNameRef[0]}.."
     while true; do
@@ -500,7 +500,7 @@ while true; do
     Discord)
       appName=("Discord")
       pkgName="com.discord"
-      pkgVersion="289.20-Stable"
+      pkgVersion="297.14-Stable"
       Type="apks"
       Arch=("universal")
       releasesTagName=$(curl -s ${auth} "https://api.github.com/repos/revenge-mod/revenge-xposed/releases/latest" | jq -r '.tag_name')  # 1202
