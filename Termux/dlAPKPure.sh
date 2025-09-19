@@ -128,7 +128,7 @@ else
   if grep -q "Free Online APK Downloader" "$HOME/apkpure_page.html" 2>/dev/null; then
     echo -e "$bad Target version $targetVersion not found!"
     echo -e "$notice Available Version:\n$all_verison_list"
-    rm -f "$HOME/apkpure_page.html"; exit 1
+    rm -f "$HOME/apkpure_page.html"; rm -f cookies.txt; exit 1
   fi
   rm -f ~/apkpure_page.html
 fi
