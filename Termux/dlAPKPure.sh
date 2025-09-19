@@ -123,9 +123,14 @@ size=$(echo "$all_version_url_list" | jq -r --arg ver "$targetVersion" '.[] | se
 if [[ -n "$versionUrl" && "$versionUrl" != "null" ]]; then
   echo -e "$info versionUrl: ${Blue}$versionUrl${Reset}\n"
 else
-  versionUrl="$AllVersions/$targetVersion"  # build custom version url pattern
-  #echo -e "$bad Target version $targetVersion not found!"
-  #echo -e "$notice Available Version:\n$all_verison_list"
+  versionUrl="$appUrl/download/$targetVersion"  # build custom version url pattern
+  aria2c -q -o apkpure_page.html -d "$HOME" "${ALL_HEADER[@]}" --connect-timeout=30 --save-cookies=cookies.txt --load-cookies=cookies.txt --check-certificate=false --referer="$appUrl" --async-dns=true --async-dns-server="$cloudflareIP" "$versionUrl"
+  if grep -q "Free Online APK Downloader" "$HOME/apkpure_page.html" 2>/dev/null; then
+    echo -e "$bad Target version $targetVersion not found!"
+    echo -e "$notice Available Version:\n$all_verison_list"
+    rm -f "$HOME/apkpure_page.html"; exit 1
+  fi
+  rm -f ~/apkpure_page.html
 fi
 
 # --- Extract real APK Download link from version page ---
