@@ -20,8 +20,14 @@ Reset="\033[0m"
 
 # --- Global Variable ---
 APKM_REST_API_URL="https://www.apkmirror.com/wp-json/apkm/v1/app_exists/"
-milestone=$(curl -sL "https://chromiumdash.appspot.com/fetch_releases?channel=Stable&platform=Android&num=1" | jq -r '.[0].milestone') || milestone=140; milestone=${milestone:-"140"}
-USER_AGENT="Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/${milestone}.0.0.0 Mobile Safari/537.36"  # HTML User Agent: chrome://version/
+Android=$(getprop ro.build.version.release)
+Model=$(getprop ro.product.model)
+Build=$(getprop ro.build.id)
+K="$Model Build/$Build"
+#milestone=$(curl -sL "https://chromiumdash.appspot.com/fetch_releases?channel=Stable&platform=Android&num=1" | jq -r '.[0].milestone') || milestone=140; milestone=${milestone:-"140"}
+#USER_AGENT="Mozilla/5.0 (Linux; Android $Android; $K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/${milestone}.0.0.0 Mobile Safari/537.36"  # HTML User Agent: chrome://version/
+version=$(curl -sL "https://chromiumdash.appspot.com/fetch_releases?channel=Stable&platform=Android&num=1" | jq -r '.[0].version') || version="140.0.0.0"
+USER_AGENT="Mozilla/5.0 (Linux; Android $Android; $K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/${version} Mobile Safari/537.36"
 AUTH_TOKEN="YXBpLXRvb2xib3gtZm9yLWdvb2dsZS1wbGF5OkNiVVcgQVVMZyBNRVJXIHU4M3IgS0s0SCBEbmJL"
 cloudflareDOH="https://cloudflare-dns.com/dns-query"
 cloudflareIP="1.1.1.1,1.0.0.1"
@@ -87,6 +93,13 @@ APKMdl() {
   local final_apk_link_content
   local FileName
   
+  cf_chl_error() {
+    echo -e "$bad ${Red}Cloudflare security challenge detected!${Reset} ${Yellow}This webpage is protected by Cloudflare's anti-bot system.${Reset}\n ${Blue}Solutions${Reset}:\n   1. ${Yellow}Please try again after some time.${Reset}\n   2. ${Yellow}Disable your VPN if you are connected to one.${Reset}\n   3. ${Yellow}Connect to a Cloudflare WARP proxy and try again.${Reset}"
+    sleep 12
+    am start -n com.cloudflare.onedotonedotonedotone/com.cloudflare.app.presentation.main.SplashActivity &> /dev/null || termux-open-url "https://play.google.com/store/apps/details?id=com.cloudflare.onedotonedotonedotone"
+    exit 1
+  }
+
   # dynamically version_link scraping method (inefficient for old app versions)
   scrapeVersionUrl() {
     appLink="$1"  # app Url
@@ -96,6 +109,7 @@ APKMdl() {
     local second_last_segment  # this variable has local scope and is not accessible outside of this function
 
     html_content=$(curl -sL --doh-url "$cloudflareDOH" -A "$USER_AGENT" -H "Referer: https://www.apkmirror.com/" "$appLink")  # get html from appLink
+    echo "$html_content" | grep -q "_cf_chl_" 2>/dev/null && cf_chl_error
     latestUploads=$(pup 'a[href*="?appcategory="] attr{href}' <<< "$html_content" | sed "s|^/|$APKM_DOMAIN/|")  # extract latest uploads page url for secific app using appLink page html
     second_last_segment=$(echo "$latestUploads" | awk -F'appcategory=' '{print $2}')  # extract appName from lastestUploads page url
     local appName; appName=$(pup 'h1 text{}' <<< "$html_content")  # get app name from appLink page html
@@ -177,10 +191,7 @@ APKMdl() {
   
   echo -e "$running Scraping variant details from: ${Blue}$version_link${Reset}"
   html_content=$(curl -sL --doh-url "$cloudflareDOH" -A "$USER_AGENT" -H "Referer: https://www.apkmirror.com/" "$version_link")
-  if [ $? -ne 0 ]; then
-    echo -e "$bad Error: Scraping variant info failed for ${Blue}apkmirror.com${Reset}.\nTry again later..."
-    return 1
-  fi
+  echo "$html_content" | grep -q "_cf_chl_" 2>/dev/null && cf_chl_error
   
   variantsJson=$(echo "$html_content" | pup 'div.table-row json{}')
 
@@ -288,10 +299,7 @@ APKMdl() {
   echo -e "$running Scraping actual download button from: ${Blue}$Link${Reset}"
   # Fetch the HTML of the download page
   HTML_CONTENT=$(curl -sL --doh-url "$cloudflareDOH" -A "$USER_AGENT" -H "Referer: https://www.apkmirror.com/" "$Link")
-  if [ $? -ne 0 ] || [ -z "$HTML_CONTENT" ]; then
-    echo -e "$bad Error: Scraping download url failed for ${Blue}apkmirror.com${Reset}.\nTry again later..."
-    return 1
-  fi
+  echo "$HTML_CONTENT" | grep -q "_cf_chl_" 2>/dev/null && cf_chl_error
   
   or=$(echo "$HTML_CONTENT" | pup -p --charset utf-8 'a.downloadButton text{}, p:contains("- or -") text{}' 2>/dev/null)
   if [ -n "$or" ]; then
@@ -319,10 +327,7 @@ APKMdl() {
   if [ -n "$final_apk_link" ]; then
     echo -e "$running Fetching intermediate download button content from: ${Blue}$final_apk_link${Reset}"
     final_apk_link_content=$(curl -sL --doh-url $cloudflareDOH -A "$USER_AGENT" -H "Referer: $Link" "$final_apk_link")
-    if [ $? -ne 0 ]; then
-      echo -e "$bad Error: failed to fetch content for intermediate download page ${Blue}$final_apk_link${Reset}!" >&2
-      return 1
-    fi
+    echo "$final_apk_link_content" | grep -q "_cf_chl_" 2>/dev/null && cf_chl_error
     if [ -z "$final_apk_link_content" ]; then
       echo -e "$bad Error: Fetched empty content from intermediate download page ${Blue}$final_apk_link${Reset}!" >&2
       return 1

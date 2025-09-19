@@ -558,7 +558,7 @@ while true; do
       pkgVersion=""
       Type="BUNDLE"
       Arch=("universal")
-      activityPatched=""
+      activityPatched="com.cloudflare.onedotonedotonedotone/com.cloudflare.app.presentation.main.SplashActivity"
       sign_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "APKMirror" "$pkgName" "$activityPatched"
       ;;
   esac
