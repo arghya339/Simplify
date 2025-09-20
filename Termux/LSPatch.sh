@@ -74,6 +74,7 @@ LSPatch="$Simplify/LSPatch"
 SimplUsr="/sdcard/Simplify"  # /storage/emulated/0/Simplify dir
 mkdir -p "$Simplify" "$LSPatch" "$SimplUsr"  # Create $Simplify, $LSPatch and $SimplUsr dir if it does't exist
 Download="/sdcard/Download"  # Download dir
+FetchPreRelease=$(jq -r '.FetchPreRelease' "$simplifyJson" 2>/dev/null)
 if [ -f "$HOME/.config/gh/hosts.yml" ] && gh auth status > /dev/null 2>&1; then
   # oauth_token: gho_************************************
   token=$(grep -A2 "users:" ~/.config/gh/hosts.yml | grep -v "users:" | grep -A1 "oauth_token:" | awk '/oauth_token:/ {getline; print $2}')
@@ -169,34 +170,50 @@ build_app() {
   local activityPatched=$10
 
   if [ "${appNameRef[0]}" == "Discord" ]; then
-    assetsName="com.discord_297.14-Stable-297014_4arch_7dpi_24lang.apks"
-    dlUrl="https://github.com/arghya339/Simplify/releases/download/all/$assetsName"
-    echo -e "$running Downloading ${appNameRef[0]}.."
-    while true; do
-      aria2c -x 16 -s 16 --console-log-level=error --summary-interval=0 --download-result=hide -c -o "${appNameRef}_v${pkgVersion}-${archRef[0]}.${Type}" -d "$Download" "$dlUrl"
-      if [ $? -eq 0 ]; then
-        echo  # White Space
-        break
-      fi
-      echo -e "${bad} ${Red}Download failed! retrying in 5 seconds..${Reset}"
-      sleep 5
-    done
-    stock_apks_path=("$Download/${appNameRef}_v${pkgVersion}-${archRef[0]}.${Type}")
-    mkdir -p "$Download/${appNameRef}_v${pkgVersion}-${cpuAbi}"
-    echo -e "$running Extracting APKS content.."
-    if [ $RipLib -eq 1 ]; then
-      pv "$stock_apks_path" | bsdtar -xf - -C "$Download/${appNameRef}_v${pkgVersion}-${cpuAbi}/" --include "base.apk" "split_config.${cpuAbi//-/_}.apk" "split_config.${locale}.apk" "split_config.${lcd_dpi}.apk"
-    elif [ $RipLib -eq 0 ]; then
-      pv "$stock_apks_path" | bsdtar -xf - -C "$Download/${appNameRef}_v${pkgVersion}-${cpuAbi}/" --include "base.apk" "split_config.arm64_v8a.apk" "split_config.armeabi_v7a.apk" "split_config.x86_64.apk" "split_config.x86.apk" "split_config.${locale}.apk" "split_config.${lcd_dpi}.apk"
+    # src: https://github.com/revenge-mod/revenge-manager/blob/85fdd3c2d25e509960bdb99e0e9882b16f5d541f/app/src/main/java/app/revenge/manager/installer/step/download/DownloadBaseStep.kt#L20
+    baseUrl="https://tracker.vendetta.rocks/tracker/download/$pkgVersion/base"  # Size >= 100 MB
+    # src: https://github.com/revenge-mod/revenge-manager/blob/85fdd3c2d25e509960bdb99e0e9882b16f5d541f/app/src/main/java/app/revenge/manager/installer/step/download/DownloadLangStep.kt#L20
+    langUrl="https://tracker.vendetta.rocks/tracker/download/$pkgVersion/config.en"  # Size >= 58 KB
+    # src: https://github.com/revenge-mod/revenge-manager/blob/85fdd3c2d25e509960bdb99e0e9882b16f5d541f/app/src/main/java/app/revenge/manager/installer/step/download/DownloadResourcesStep.kt#L20
+    resourcesUrl="https://tracker.vendetta.rocks/tracker/download/$pkgVersion/config.xxhdpi"  # Size >= 13 MB
+    if [ "$cpuAbi" == "arm64-v8a" ]; then cpuAbi="arm64_v8a"; elif [ "$cpuAbi" == "armeabi-v7a" ]; then cpuAbi="armeabi_v7a"; fi
+    # src: https://github.com/revenge-mod/revenge-manager/blob/85fdd3c2d25e509960bdb99e0e9882b16f5d541f/app/src/main/java/app/revenge/manager/installer/step/download/DownloadLibsStep.kt#L26
+    libsUrl="https://tracker.vendetta.rocks/tracker/download/$pkgVersion/config.$cpuAbi"  # Size >= 60 MB
+    dlDIR="$Download/Discord_v$pkgVersion"
+    dl() {
+      dlUtility=$1
+      dlUrl="$2"
+      fileName="$3"
+      echo -e "$running Downloading $fileName.."
+      while true; do
+        if [ "$dlUtility" == "curl" ]; then
+          curl -L -C - --progress-bar -o "$dlDIR/$fileName" "$dlUrl"
+          exit_status=$?
+        else
+          aria2c -x 16 -s 16 --console-log-level=error --summary-interval=0 --download-result=hide -c -o "$fileName" -d "$dlDIR" "$dlUrl"
+          exit_status=$?
+        fi
+        [ $exit_status -eq 0 ] && { echo; break; }
+        echo -e "${bad} ${Red}Download failed! retrying in 5 seconds..${Reset}"; sleep 5
+      done
+    }
+    if [ ! -f "$dlDIR.apk" ]; then
+      findFile=$(find "$Download" -type f -name "Discord_v*.apk" -print -quit)
+      [ "$dlDIR.apk" != "$findFile" ] && rm -f "$findFile"
+      mkdir -p "$dlDIR"
+      dl "aria2" "$baseUrl" "base.apk"
+      dl "curl" "$langUrl" "config.en"
+      dl "curl" "$resourcesUrl" "config.xxhdpi"
+      dl "aria2" "$libUrl" "config.$cpuAbi"
+    
+      bash $Simplify/dlGitHub.sh "REAndroid" "APKEditor" "latest" ".jar" "$Simplify"
+      APKEditor=$(find "$Simplify" -type f -name "APKEditor-*.jar" -print -quit)
+      echo -e "$running Merge splits apks to standalone lite apk.."
+      $PREFIX/lib/jvm/java-$jdkVersion-openjdk/bin/java -jar $APKEditor m -i "$dlDIR" -o "$dlDIR.apk"
+      rm -rf "$dlDIR"
+      echo  # Space
     fi
-    rm -f "$stock_apks_path"
-    stock_apk_path=("$Download/${appNameRef}_v${pkgVersion}-${cpuAbi}.apk")
-    bash $Simplify/dlGitHub.sh "REAndroid" "APKEditor" "latest" ".jar" "$Simplify"
-    APKEditor=$(find "$Simplify" -type f -name "APKEditor-*.jar" -print -quit)
-    echo -e "$running Merge splits apks to standalone lite apk.."
-    $PREFIX/lib/jvm/java-$jdkVersion-openjdk/bin/java -jar $APKEditor m -i "$Download/${appNameRef}_v${pkgVersion}-${cpuAbi}" -o "$stock_apk_path"
-    rm -rf "$Download/${appNameRef}_v${pkgVersion}-${cpuAbi}"
-    echo  # Space
+    cpuAbi=$(getprop ro.product.cpu.abi)  # Get Android arch
   else
     if [ "$web" == "APKMirror" ]; then
       bash $Simplify/APKMdl.sh "$pkgName" "$pkgVersion" "$Type" "${archRef[0]}"  # Download stock apk from APKMirror
@@ -220,7 +237,8 @@ build_app() {
       stock_apk_path="$Download/${appNameRef[0]}_v${pkgVersion}-$cpuAbi.apk"
     fi
   fi
-  
+  [ "${appNameRef[0]}" == "Discord" ] && stock_apk_path="$dlDIR.apk"
+
   local stockFileName=$(basename "${stock_apk_path}")
   local stockFileNameWOExt="${stockFileName%.*}"
   if [ -f "${stock_apk_path}" ]; then
@@ -500,18 +518,23 @@ while true; do
     Discord)
       appName=("Discord")
       pkgName="com.discord"
-      pkgVersion="297.14-Stable"
-      Type="apks"
-      Arch=("universal")
-      releasesTagName=$(curl -s ${auth} "https://api.github.com/repos/revenge-mod/revenge-xposed/releases/latest" | jq -r '.tag_name')  # 1202
-      releasesName=$(curl -s ${auth} "https://api.github.com/repos/revenge-mod/revenge-xposed/releases/latest" | jq -r '.name')  # 1.2.2
+      # src: https://github.com/revenge-mod/revenge-manager/blob/85fdd3c2d25e509960bdb99e0e9882b16f5d541f/app/src/main/java/app/revenge/manager/domain/manager/PreferenceManager.kt#L81
+      # src: https://github.com/revenge-mod/revenge-manager/blob/85fdd3c2d25e509960bdb99e0e9882b16f5d541f/app/src/main/java/app/revenge/manager/network/service/RestService.kt#L25
+      if [ "$FetchPreRelease" -eq 0 ]; then
+        pkgVersion=$(curl -sL https://tracker.vendetta.rocks/tracker/index | jq -r '.[].stable')
+      else
+        pkgVersion=$(curl -sL https://tracker.vendetta.rocks/tracker/index | jq -r '.[].beta')
+      fi
+      ghApiResponseJson=$(curl -s ${auth} "https://api.github.com/repos/revenge-mod/revenge-xposed/releases/latest")
+      releasesTagName=$(jq -r '.tag_name' <<< "$ghApiResponseJson")  # 1202
+      releasesName=$(jq -r '.name' <<< "$ghApiResponseJson")  # 1.2.2
       dlLink="https://github.com/revenge-mod/revenge-xposed/releases/download/$releasesTagName/app-release.apk"
       module_apk_path="$LSPatch/revenge-xposed-${releasesName}.apk"
       curl -L --progress-bar -C - -o "$module_apk_path" "$dlLink"
       echo -e "$info module_apk_path: $module_apk_path"
       activityPatched="com.discord/.main.MainDefault"
       BugReport="https://github.com/revenge-mod/revenge-xposed/issues/new"
-      build_app "$pkgName" "appName" "$pkgVersion" "$Type" "$Arch" "" "$module_apk_path" "$BugReport" "$pkgName" "$activityPatched"
+      build_app "$pkgName" "appName" "$pkgVersion" "" "" "" "$module_apk_path" "$BugReport" "$pkgName" "$activityPatched"
       ;;
     LINE)
       appName=("LINE")
@@ -541,8 +564,9 @@ while true; do
       fi
       Type="APK"
       Arch=("$cpuAbi")
-      releasesTagName=$(curl -s ${auth} "https://api.github.com/repos/Xposed-Modules-Repo/io.github.vvb2060.callrecording/releases/latest" | jq -r '.tag_name')  # 2-1.1
-      releasesName=$(curl -s ${auth} "https://api.github.com/repos/Xposed-Modules-Repo/io.github.vvb2060.callrecording/releases/latest" | jq -r '.name')  # 1.1
+      ghApiResponseJson=$(curl -s ${auth} "https://api.github.com/repos/Xposed-Modules-Repo/io.github.vvb2060.callrecording/releases/latest")
+      releasesTagName=$(jq -r '.tag_name' <<< "$ghApiResponseJson")  # 2-1.1
+      releasesName=$(jq -r '.name' <<< "$ghApiResponseJson")  # 1.1
       dlUrl="https://github.com/Xposed-Modules-Repo/io.github.vvb2060.callrecording/releases/download/${releasesTagName}/app-release.apk"
       curl -L --progress-bar -C - -o "$LSPatch/callrecording-${releasesName}.apk" "$dlUrl"
       module_apk_path=$(find "$LSPatch" -type f -name "callrecording-*.apk")
