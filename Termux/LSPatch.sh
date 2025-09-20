@@ -191,9 +191,9 @@ build_app() {
           exit_status=$?
         else
           aria2c -x 16 -s 16 --console-log-level=error --summary-interval=0 --download-result=hide -c -o "$fileName" -d "$dlDIR" "$dlUrl"
-          exit_status=$?
+          exit_status=$?; echo
         fi
-        [ $exit_status -eq 0 ] && { echo; break; }
+        [ $exit_status -eq 0 ] && break
         echo -e "${bad} ${Red}Download failed! retrying in 5 seconds..${Reset}"; sleep 5
       done
     }
