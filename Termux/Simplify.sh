@@ -219,7 +219,7 @@ pkgInstall() {
 pkgInstall "dpkg"  # dpkg update
 #pkgInstall "bash"  # bash update
 pkgInstall "libgnutls"  # pm apt & dpkg use it to securely download packages from repositories over HTTPS
-pkgInstall "coreutils"  # It provides basic file, shell, & text manipulation utilities. such as: ls, cp, mv, rm, mkdir, cat, echo, etc.
+#pkgInstall "coreutils"  # It provides basic file, shell, & text manipulation utilities. such as: ls, cp, mv, rm, mkdir, cat, echo, etc.
 pkgInstall "termux-core"  # it's contains basic essential cli utilities, such as: ls, cp, mv, rm, mkdir, cat, echo, etc.
 pkgInstall "termux-tools"  # it's provide essential commands, sush as: termux-change-repo, termux-setup-storage, termux-open, termux-share, etc.
 pkgInstall "termux-keyring"  # it's use during pkg install/update to verify digital signature of the pkg and remote repository
@@ -230,7 +230,7 @@ pkgInstall "util-linux"  # it provides: kill, killall, uptime, uname, chsh, lscp
 pkgInstall "curl"  # curl update
 pkgInstall "libcurl"  # curl lib update
 pkgInstall "aria2"  # aria2 install/update
-pkgInstall "openssl"  # openssl install/update
+#pkgInstall "openssl"  # openssl install/update
 pkgInstall "jq"  # jq install/update
 pkgInstall "pup"  # pup install/update
 if [ -f "$simplifyJson" ]; then
