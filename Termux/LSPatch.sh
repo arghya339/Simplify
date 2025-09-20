@@ -204,7 +204,7 @@ build_app() {
       dl "aria2" "$baseUrl" "base.apk"
       dl "curl" "$langUrl" "config.en"
       dl "curl" "$resourcesUrl" "config.xxhdpi"
-      dl "aria2" "$libUrl" "config.$cpuAbi"
+      dl "aria2" "$libsUrl" "config.$cpuAbi"
     
       bash $Simplify/dlGitHub.sh "REAndroid" "APKEditor" "latest" ".jar" "$Simplify"
       APKEditor=$(find "$Simplify" -type f -name "APKEditor-*.jar" -print -quit)
@@ -525,6 +525,7 @@ while true; do
       else
         pkgVersion=$(curl -sL https://tracker.vendetta.rocks/tracker/index | jq -r '.[].beta')
       fi
+      Arch=()
       ghApiResponseJson=$(curl -s ${auth} "https://api.github.com/repos/revenge-mod/revenge-xposed/releases/latest")
       releasesTagName=$(jq -r '.tag_name' <<< "$ghApiResponseJson")  # 1202
       releasesName=$(jq -r '.name' <<< "$ghApiResponseJson")  # 1.2.2
@@ -534,7 +535,7 @@ while true; do
       echo -e "$info module_apk_path: $module_apk_path"
       activityPatched="com.discord/.main.MainDefault"
       BugReport="https://github.com/revenge-mod/revenge-xposed/issues/new"
-      build_app "$pkgName" "appName" "$pkgVersion" "" "" "" "$module_apk_path" "$BugReport" "$pkgName" "$activityPatched"
+      build_app "$pkgName" "appName" "$pkgVersion" "" "$Arch" "" "$module_apk_path" "$BugReport" "$pkgName" "$activityPatched"
       ;;
     LINE)
       appName=("LINE")
