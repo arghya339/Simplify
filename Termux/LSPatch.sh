@@ -202,9 +202,9 @@ build_app() {
       [ "$dlDIR.apk" != "$findFile" ] && rm -f "$findFile"
       mkdir -p "$dlDIR"
       dl "aria2" "$baseUrl" "base.apk"
-      dl "curl" "$langUrl" "config.en"
-      dl "curl" "$resourcesUrl" "config.xxhdpi"
-      dl "aria2" "$libsUrl" "config.$cpuAbi"
+      dl "curl" "$langUrl" "config.en.apk"
+      dl "curl" "$resourcesUrl" "config.xxhdpi.apk"
+      dl "aria2" "$libsUrl" "config.$cpuAbi.apk"
     
       bash $Simplify/dlGitHub.sh "REAndroid" "APKEditor" "latest" ".jar" "$Simplify"
       APKEditor=$(find "$Simplify" -type f -name "APKEditor-*.jar" -print -quit)
