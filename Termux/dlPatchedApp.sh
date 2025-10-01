@@ -354,6 +354,7 @@ if [ $Android -ge 10 ]; then
     $Facebook
     Nobook
     ${fbMessenger}
+    Threads
     Nagram
     Nekogram
     Twitter
@@ -399,6 +400,7 @@ elif [ $Android -eq 9 ]; then
     $Facebook
     Nobook
     ${fbMessenger}
+    Threads
     Nagram
     Nekogram
     Twitter
@@ -443,6 +445,7 @@ elif [ $Android -eq 8 ]; then
     $Facebook
     Nobook
     ${fbMessenger}
+    Threads
     Nagram
     Nekogram
     Twitter
@@ -876,6 +879,15 @@ while true; do
       fi
       pkgPatched="com.facebook.orca"
       activityPatched="com.facebook.orca/.auth.StartScreenActivity"
+      dlPatchedApp "${appName}" "$owner" "$repo" "$assets" "$pkgPatched" "$activityPatched"
+      ;;
+    Threads)
+      appName="Threads"
+      owner="FiorenMas"
+      repo="Revanced-And-Revanced-Extended-Non-Root"
+      [ "$FetchPreRelease" -eq 0 ] && assets="threads-$cpuAbi-revanced.apk" || assets="threads-beta-$cpuAbi-revanced.apk"
+      pkgPatched="com.instagram.barcelona"
+      activityPatched="com.instagram.barcelona/.mainactivity.BarcelonaActivity"
       dlPatchedApp "${appName}" "$owner" "$repo" "$assets" "$pkgPatched" "$activityPatched"
       ;;
     Nagram)
