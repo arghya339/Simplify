@@ -375,6 +375,7 @@ if [ $Android -ge 10 ]; then
     Lawnchair
     Solid\ Explorer
     Proton\ Mail
+    Crunchyroll
     Tasker
   )
 elif [ $Android -eq 9 ]; then
@@ -420,6 +421,7 @@ elif [ $Android -eq 9 ]; then
     Lawnchair
     Solid\ Explorer
     Proton\ Mail
+    Crunchyroll
     Tasker
   )
 elif [ $Android -eq 8 ]; then
@@ -463,6 +465,7 @@ elif [ $Android -eq 8 ]; then
     ${novaLauncher}
     Lawnchair
     Solid\ Explorer
+    Crunchyroll
     Tasker
   )
 elif [ $Android -eq 7 ]; then
@@ -1182,6 +1185,15 @@ while true; do
       [ "$FetchPreRelease" -eq 0 ] && assets="protonmail-revanced.apk" || assets="protonmail-beta-revanced.apk"
       pkgPatched="ch.protonmail.android"
       activityPatched="ch.protonmail.android/.MainActivity"
+      dlPatchedApp "${appName}" "$owner" "$repo" "$assets" "$pkgPatched" "$activityPatched"
+      ;;
+    Crunchyroll)
+      appName="Crunchyroll"
+      owner="FiorenMas"
+      repo="Revanced-And-Revanced-Extended-Non-Root"
+      [ "$FetchPreRelease" -eq 0 ] && assets="crunchyroll-revanced.apk" || assets="crunchyroll-beta-revanced.apk"
+      pkgPatched="com.crunchyroll.crunchyroid"
+      activityPatched="com.crunchyroll.crunchyroid/com.ellation.crunchyroll.presentation.startup.StartupActivity"
       dlPatchedApp "${appName}" "$owner" "$repo" "$assets" "$pkgPatched" "$activityPatched"
       ;;
     Tasker)
