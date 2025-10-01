@@ -324,6 +324,7 @@ fi
 
 if [ $cpuAbi == "arm64-v8a" ] || [ $cpuAbi == "armeabi-v7a" ]; then
   novaLauncher="NovaLauncher"
+  amazonPrimeVideo="AmazonPrimeVideo"
 fi
 
 if  [[ $Android -ge 11  &&  ( "$cpuAbi" == "arm64-v8a" || "$cpuAbi" == "armeabi-v7a" ) ]]; then
@@ -364,6 +365,7 @@ if [ $Android -ge 10 ]; then
     Photomath
     Duolingo
     RAR
+    ${amazonPrimeVideo}
     CloudStream
     Breezy\ Weather
     WeatherMaster
@@ -410,6 +412,7 @@ elif [ $Android -eq 9 ]; then
     Adobe\ Lightroom
     Photomath
     RAR
+    ${amazonPrimeVideo}
     CloudStream
     Breezy\ Weather
     WeatherMaster
@@ -455,6 +458,7 @@ elif [ $Android -eq 8 ]; then
     Adobe\ Lightroom
     Photomath
     RAR
+    ${amazonPrimeVideo}
     CloudStream
     Breezy\ Weather
     WeatherMaster
@@ -493,6 +497,7 @@ elif [ $Android -eq 7 ]; then
     Nekogram
     Photomath
     RAR
+    ${amazonPrimeVideo}
     CloudStream
     WeatherMaster
     Twitch
@@ -518,6 +523,7 @@ elif [ $Android -eq 6 ]; then
     Nekogram
     Photomath
     RAR
+    ${amazonPrimeVideo}
     CloudStream
     WeatherMaster
     Twitch
@@ -541,6 +547,7 @@ elif [ $Android -eq 5 ]; then
     Nekogram
     Photomath
     RAR
+    ${amazonPrimeVideo}
     CloudStream
     WeatherMaster
     Twitch
@@ -1008,6 +1015,15 @@ while true; do
       fi
       pkgPatched="com.rarlab.rar"
       activityPatched="com.rarlab.rar/.MainActivity"
+      dlPatchedApp "${appName}" "$owner" "$repo" "$assets" "$pkgPatched" "$activityPatched"
+      ;;
+    AmazonPrimeVideo)
+      appName="Amazon Prime Video"
+      owner="FiorenMas"
+      repo="Revanced-And-Revanced-Extended-Non-Root"
+      [ "$FetchPreRelease" -eq 0 ] && assets="prime-video-$cpuAbi-revanced.apk" || assets="prime-video-beta-$cpuAbi-revanced.apk"
+      pkgPatched="com.amazon.avod.thirdpartyclient"
+      activityPatched="com.amazon.avod.thirdpartyclient/.LauncherActivity"
       dlPatchedApp "${appName}" "$owner" "$repo" "$assets" "$pkgPatched" "$activityPatched"
       ;;
     CloudStream)
