@@ -20,6 +20,12 @@ Orange="\e[38;5;208m"
 Reset="\033[0m"
 
 # --- Global Variables ---
+Android=$(getprop ro.build.version.release)
+Model=$(getprop ro.product.model)
+Build=$(getprop ro.build.id)
+K="$Model Build/$Build"
+version=$(curl -sL "https://chromiumdash.appspot.com/fetch_releases?channel=Stable&platform=Android&num=1" | jq -r '.[0].version') || version="140.0.0.0"
+USER_AGENT="Mozilla/5.0 (Linux; Android $Android; $K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/${version} Mobile Safari/537.36"
 Download="/sdcard/Download"  # Download dir
 Simplify="$HOME/Simplify"
 simplifyJson="$Simplify/simplify.json"  # Configuration file to store simplify settings
@@ -86,15 +92,15 @@ dlUptodown() {
   # --- UPTODOWN SEARCH ---
   app_name=$(echo "$appName" | tr '[:upper:]' '[:lower:]')  # convert $appName to lowercase | Spotify → spotify | Spotify Lite → spotify lite
   # Search app_name on Uptodown and extract url fild with matching appName with name fild
-  appUrl=$(curl -sL -X POST "https://en.uptodown.com/android/search" -d "q=${app_name}" | pup '.item json{}' | jq --arg appName "$appName" '.[] | select(.children[1].children[0].text == $appName) | .children[1].children[0].href' | tr -d '"' | head -1)
+  appUrl=$(curl -sL -A "$USER_AGENT" -X POST "https://en.uptodown.com/android/search" -d "q=${app_name}" | pup '.item json{}' | jq --arg appName "$appName" '.[] | select(.children[1].children[0].text == $appName) | .children[1].children[0].href' | tr -d '"' | head -1)
   if [ -z "$appUrl" ]; then
     # Build a slug-based URL (web address with human-readable keyword) ie. "Spotify Lite" → spotify-lite.en.uptodown.com/android) & check if it exists
     local slug; slug=$(echo "$appName" | tr '[:upper:]' '[:lower:]' | sed 's/ /-/g')  # Convert: uppercase → lowercase letters. Replace: Spaces with hyphen
     local appUrl="https://$slug.en.uptodown.com/android"
-    if ! curl -s --head --fail "$appUrl" >/dev/null; then
+    if ! curl -sL -A "$USER_AGENT" --head --fail "$appUrl" >/dev/null; then
       # Get Uptodown top search result
-      appUrl=$(curl -sL -X POST "https://en.uptodown.com/android/search" -d "q=${app_name}" | pup '.item json{}' | jq '.[] | {name: .children[1].children[0].text, description: .children[2].text, url: .children[1].children[0].href}' | jq -r '.url' | head -1)
-      curl -s --head --fail "$appUrl" >/dev/null || echo -e "$notice ${Red}404 Whoops!${Reset} The requested URL ${Blue}$appUrl${Reset} could not be found."; exit 1
+      appUrl=$(curl -sL -A "$USER_AGENT" -X POST "https://en.uptodown.com/android/search" -d "q=${app_name}" | pup '.item json{}' | jq '.[] | {name: .children[1].children[0].text, description: .children[2].text, url: .children[1].children[0].href}' | jq -r '.url' | head -1)
+      curl -sL -A "$USER_AGENT" --head --fail "$appUrl" >/dev/null || echo -e "$notice ${Red}404 Whoops!${Reset} The requested URL ${Blue}$appUrl${Reset} could not be found."; exit 1
     fi
   fi
   actualAppName=$(curl -sL "$appUrl" | pup 'h1#detail-app-name json{}' | jq -r '.[0].text' | xargs)
