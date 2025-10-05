@@ -1200,10 +1200,17 @@ while true; do
         getVersion "$pkgName"
         pkgVersion="$pkgVersion"
       fi
-      Type="APK"
-      Arch=("arm64-v8a + armeabi-v7a")
+      #web=APKMirror
+      web="Uptodown"
+      if [ "$web" == "APKMirror" ]; then
+        Type="APK"
+        Arch=("arm64-v8a + armeabi-v7a")
+      else
+        Type="apk"
+        Arch=("arm64-v8a, armeabi-v7a")
+      fi
       activityPatched="com.zhiliaoapp.musically/com.ss.android.ugc.aweme.splash.SplashActivity"
-      build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "APKMirror" "tiktok_patches_args" "$pkgName" "$activityPatched" "" "" ""
+      build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "$web" "tiktok_patches_args" "$pkgName" "$activityPatched" "" "" ""
       ;;
     Google\ Photos)
       pkgName="com.google.android.apps.photos"
