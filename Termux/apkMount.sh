@@ -26,7 +26,7 @@ apkMount() {
   HOME="/data/data/com.termux/files/home"
   stock_info=$($HOME/aapt2 dump badging "$stock" 2>/dev/null)
   local appName=$(awk -F"'" '/application-label:/ {print $2}' <<< "$stock_info")
-  local pkgName=$(awk -F"'" '/package/ {print $2}' <<< "$stock_info")
+  local pkgName=$(awk -F"'" '/package/ {print $2}' <<< "$stock_info" | head -1)
   local versionName=$(sed -n "s/.*versionName='\([^']*\)'.*/\1/p" <<< "$stock_info")
   local model=$(getprop ro.product.model)
   local stock_path=$(pm path "$pkgName" | grep base | sed "s/package://g")

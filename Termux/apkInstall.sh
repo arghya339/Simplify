@@ -49,7 +49,7 @@ apkInstall() {
   local activity=$2  # for non-rooted user to launch app after installtion
   local outputFileName=$(basename "$outputAPK")
   app_info=$($HOME/aapt2 dump badging "$outputAPK" 2>/dev/null)
-  pkgName=$(awk -F"'" '/package/ {print $2}' <<< "$app_info")
+  pkgName=$(awk -F"'" '/package/ {print $2}' <<< "$app_info" | head -1)
   appName=$(awk -F"'" '/application-label:/ {print $2}' <<< "$app_info")
   if su -c "id" >/dev/null 2>&1; then
     if [ "$(su -c 'getenforce 2>/dev/null')" = "Enforcing" ]; then
