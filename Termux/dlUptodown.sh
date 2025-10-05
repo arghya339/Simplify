@@ -103,18 +103,18 @@ dlUptodown() {
       curl -sL -A "$USER_AGENT" --head --fail "$appUrl" >/dev/null || echo -e "$notice ${Red}404 Whoops!${Reset} The requested URL ${Blue}$appUrl${Reset} could not be found."; exit 1
     fi
   fi
-  actualAppName=$(curl -sL "$appUrl" | pup 'h1#detail-app-name json{}' | jq -r '.[0].text' | xargs)
+  actualAppName=$(curl -sL -A "$USER_AGENT" "$appUrl" | pup 'h1#detail-app-name json{}' | jq -r '.[0].text' | xargs)
   echo -e "$info actualAppName: $actualAppName\n$info appUrl: ${Blue}$appUrl${Reset}\n"
   
   # --- SCRAPE VERSION URL ---
-  data_code=$(curl -sL "$appUrl" | grep -i "data-code" | sed -n 's/.*data-code="\([0-9]*\)".*/\1/p')  # Get app ID on Uptodown
+  data_code=$(curl -sL -A "$USER_AGENT" "$appUrl" | grep -i "data-code" | sed -n 's/.*data-code="\([0-9]*\)".*/\1/p')  # Get app ID on Uptodown
   echo -e "$info ${appName}'s appID (data_code): $data_code"
   
   if [ $data_code ]; then
     page=1  # Start Uptodown’s OLDER VERSIONS Page from 1
     fileID=""  # initializes variable with empty value
     while true ; do
-      versions_json=$(curl -s "$appUrl/apps/$data_code/versions/$page")  # Uptodown’s OLDER VERSIONS Page Url
+      versions_json=$(curl -sL -A "$USER_AGENT" "$appUrl/apps/$data_code/versions/$page")  # Uptodown’s OLDER VERSIONS Page Url
       # Stop if the API is out of pages
       if [ "$(jq '.data | length' <<<"$versions_json")" -eq 0 ]; then
         echo -e "$notice Version $appVersion not found!" >&2
@@ -136,21 +136,21 @@ dlUptodown() {
   fi
   
   # --- SCRAPE DOWNLOAD URL ---
-  data_version=$(curl -sL "$versionURL" | grep -oP '<button class="button variants" data-version="\K[^"]+')  # 'ALL VARIANTS' BUTTON ID
+  data_version=$(curl -sL -A "$USER_AGENT" "$versionURL" | grep -oP '<button class="button variants" data-version="\K[^"]+')  # 'ALL VARIANTS' BUTTON ID
   if [ -z "$data_version" ]; then
-    data_url=$(curl -sL "$versionURL" | grep -oP 'data-url="\K[^"]+' | head -n1)
+    data_url=$(curl -sL -A "$USER_AGENT" "$versionURL" | grep -oP 'data-url="\K[^"]+' | head -n1)
     echo -e "$info data_url: ${Cyan}$data_url${Reset}"
     
     dlUrl="https://dw.uptodown.com/dwn/${data_url}"
     echo -e "$info dlUrl: ${Blue}$dlUrl${Reset}"
   else
-   data_version=$(curl -sL "$versionURL" | grep -oP '<button class="button variants" data-version="\K[^"]+')  # 'ALL VARIANTS' BUTTON ID
+   data_version=$(curl -sL -A "$USER_AGENT" "$versionURL" | grep -oP '<button class="button variants" data-version="\K[^"]+')  # 'ALL VARIANTS' BUTTON ID
     echo -e "$info data_version (ALL VARIANTS BUTTON ID): $data_version"
     
     appLink=$(dirname $appUrl)  # https://app.en.uptodown.com/~~android~~
     echo -e "$info appLink: ${Blue}$appLink${Reset}"
     
-    files_json=$(curl -sL "$appLink/app/${data_code}/version/${data_version}/files" | jq -r '.content')  # 'ALL VARIANTS' NETWORK RESPONSE HEADERS
+    files_json=$(curl -sL -A "$USER_AGENT" "$appLink/app/${data_code}/version/${data_version}/files" | jq -r '.content')  # 'ALL VARIANTS' NETWORK RESPONSE HEADERS
     #echo -e "$notice files_json (ALL VARIANTS RESPONSE): $files_json"  # for debug
     
     versionLink=$(dirname $versionURL)  # https://app.en.uptodown.com/android/download/~~fileID~~
@@ -177,7 +177,7 @@ dlUptodown() {
         if [ "$Arch" == "$arch_clean" ] && [ "$Type" == "$type" ]; then
           data_file_id=$(pup "div.variant:nth-of-type($n) > .v-report attr{data-file-id}" <<<"$files_json")
           location_url="$versionLink/${data_file_id}-x"
-          data_url=$(curl -sL "$location_url" | grep -oP 'data-url="\K[^"]+' | head -n1)
+          data_url=$(curl -sL -A "$USER_AGENT" "$location_url" | grep -oP 'data-url="\K[^"]+' | head -n1)
           dlUrl="https://dw.uptodown.com/dwn/${data_url}"
           echo -e "$info Auto Selected: [$n]"
           echo "arch     : $arch"
@@ -195,9 +195,9 @@ dlUptodown() {
   
   # --- Extract app info ---
   if [ -z "$data_version" ]; then
-    local raw_info=$(curl -s -L "$versionURL")  # Get raw info
+    local raw_info=$(curl -sL -A "$USER_AGENT" "$versionURL")  # Get raw info
   else
-    local raw_info=$(curl -s -L "$location_url")
+    local raw_info=$(curl -sL -A "$USER_AGENT" "$location_url")
   fi
   
   # Extract each field individually
@@ -261,7 +261,7 @@ dlUptodown() {
   apks_path=("$Download/${appName}_v${appVersion}-${Arch}.$file_ext")
   if [ ! -f "${apk_path[0]}" ] || [ ! -f "${apks_path[0]}" ]; then
     echo -e "$running Downloading $actualAppName.."
-    aria2c -x 16 -s 16 --console-log-level=error --summary-interval=0 --download-result=hide -c -o "${appName}_v${appVersion}-$Arch.$file_ext" -d "$Download" "$dlUrl"
+    aria2c -U "User-Agent: $USER_AGENT" -x 16 -s 16 --console-log-level=error --summary-interval=0 --download-result=hide -c -o "${appName}_v${appVersion}-$Arch.$file_ext" -d "$Download" "$dlUrl"
     dlStatus=$?
     echo  # White Space
     outputPath="$Download/${appName}_v${appVersion}-$Arch.$file_ext"
