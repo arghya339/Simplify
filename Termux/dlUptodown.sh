@@ -116,7 +116,7 @@ dlUptodown() {
     while true ; do
       versions_json=$(curl -sL -A "$USER_AGENT" "$appUrl/apps/$data_code/versions/$page")  # Uptodown’s OLDER VERSIONS Page Url
       # Stop if the API is out of pages
-      if [ "$(jq '.data | length' <<<"$versions_json")" -eq 0 ]; then
+      if [ $(jq '.data | length' <<< "$versions_json") -eq 0 ]; then
         echo -e "$notice Version $appVersion not found!" >&2
         exit 1
       fi
