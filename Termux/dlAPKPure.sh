@@ -95,7 +95,6 @@ targetVersionCode="$4"  # Target Version Code (optional), required only if versi
 #######################
 
 app_name=$(echo "$appName" | tr '[:upper:]' '[:lower:]' | sed 's/ /+/g')  # Convert appName into lower+case letters with replace space with + | YouTube → youtube | YouTube Music → youtube+music
-searchUrl="https://apkpure.com/search?q=$app_name"  # APKPure search url pattern
 
 # --- APKPure Search ---
 # aria2c docs: https://aria2.github.io/manual/en/html/aria2c.html#options
@@ -104,8 +103,11 @@ if [ -n "$pkgName" ]; then
   apiUrl="https://apkpure.com/api/v1/search_suggestion_new?key=${app_name}&limit=20"
   aria2c -q -o response.json "${ALL_HEADER[@]}" --connect-timeout=30 --save-cookies=cookies.txt --check-certificate=false --referer="https://apkpure.com" --async-dns=true --async-dns-server="$cloudflareIP" "$apiUrl"
   appUrl=$(jq -r --arg pkgName "$pkgName" '.[] | select(.packageName? == $pkgName) | .fullUrl' response.json) && rm -f response.json || { rm -f response.json; appUrl=""; }
+else
+  appUrl=""
 fi
-if [ -z "$appUrl" ] || [ -z "$pkgName" ]; then
+if [ -z "$appUrl" ]; then
+  searchUrl="https://apkpure.com/search?q=$app_name"  # APKPure search url pattern
   aria2c -q -o apkpure_page.html -d "$HOME" "${ALL_HEADER[@]}" --connect-timeout=30 --save-cookies=cookies.txt --check-certificate=false --referer="https://apkpure.com" --async-dns=true --async-dns-server="$cloudflareIP" "$searchUrl" && search_html_content=$(cat "$HOME/apkpure_page.html") && rm -f ~/apkpure_page.html
   #echo "$search_html_content" > ~/apkpure_page.html  # for debug
   appUrl=$(pup 'div.first-info.brand-info json{}' <<< "$search_html_content" | jq -r '{name: .[0].children[1].children[0].children[0].text, url: .[0].children[0].href} | .url')

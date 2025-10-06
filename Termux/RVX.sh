@@ -737,12 +737,12 @@ while true; do
       build_app "$pkgName" "$pkgVersion" "$Type" "$Arch" "APKMirror" "stock_apk_path" "reddit_patches_args" "$outputAPK" "$log" "appName" "$BugReportUrl" "$pkgName" "$activityPatched"
       ;;
     NetWall)
-      appName=("NetWall")
+      appName=("NetWall N")
       pkgName="com.ysy.app.firewall"
       pkgVersion="1.2.10"
       Type="XAPK"
       Arch="17"
-      stock_apk_path=("$Download/NetWall_v${pkgVersion}-$Arch.apk")
+      stock_apk_path=("$Download/NetWall N_v${pkgVersion}-$Arch.apk")
       outputAPK="$SimplUsr/NetWall-RVX_v${pkgVersion}-arm64-v8a.apk"
       log="$SimplUsr/NetWall-RVX_patch-log.txt"
       activityPatched="com.ysy.app.firewall/b.B"
