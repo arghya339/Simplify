@@ -174,7 +174,7 @@ dl_rv_cli_v3() {
   ReVancedCLIv4="$RV4/revanced-cli-3.1.4-all.jar"
   if [ ! -f "$ReVancedCLIv4" ]; then
     echo -e "$running Downloading revanced-cli-3.1.4-all.jar.."
-    url="https://github.com/inotia00/revanced-cli/releases/download/v3.1.4/revanced-cli-3.1.4-all.jar"
+    url="https://github.com/kitadai31/revanced-cli/releases/download/v3.1.4/revanced-cli-3.1.4-all.jar"
     while true; do
       #curl -L --progress-bar -C - -o "$ReVancedCLIv4" "$url"
       aria2c -x 16 -s 16 --console-log-level=error --summary-interval=0 --download-result=hide -c -o "$(basename "$ReVancedCLIv4")" -d "$(dirname "$ReVancedCLIv4")" "$url"
@@ -229,7 +229,7 @@ patch_app() {
     $PREFIX/lib/jvm/java-$jdkVersion-openjdk/bin/java -jar $ReVancedCLIv4 patch $stock_apk_path -o $outputAPK -m $IntegrationsApk -b $PatchesJar \
       -i "materialyou" -i "spoof-streaming-data" -e "hide-autoplay-button" -e "hide-cast-button"  -e "hide-create-button" -e "hide-endscreen-overlay" -e "hide-next-prev-button" \
       -e "hide-player-captions-button" -e "hide-player-overlay-filter" -e "hide-shorts-button" -e "switch-create-notification" \
-      --custom-aapt2-binary="$HOME/aapt2" --purge | tee "$log"  # --options $SimplUsr/options.json $ripLib 
+      --custom-aapt2-binary="$HOME/aapt2" --purge $ripLib | tee "$log"  # --options $SimplUsr/options.json
   elif [ $Android -eq 5 ] && [ "$appName" == "YouTube" ]; then
     $PREFIX/lib/jvm/java-$jdkVersion-openjdk/bin/java -jar $ReVancedCLIv4 patch $stock_apk_path -o $outputAPK -m $IntegrationsApk --options $SimplUsr/options.json -b $PatchesJar \
       -i patch-options -i custom-branding-icon-afn-blue -i custom-branding-icon-revancify -i materialyou -i spoof-app-version \
