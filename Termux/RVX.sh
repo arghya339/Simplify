@@ -232,6 +232,8 @@ patch_app() {
       --custom-aapt2-binary="$HOME/aapt2" --purge $ripLib | tee "$log"  # --options $SimplUsr/options.json
   elif [ $Android -eq 5 ] && [ "$appName" == "YouTube" ]; then
     $PREFIX/lib/jvm/java-$jdkVersion-openjdk/bin/java -jar $ReVancedCLIv4 patch $stock_apk_path -o $outputAPK -m $IntegrationsApk --options $SimplUsr/options.json -b $PatchesJar \
+      -i patch-options -i custom-branding-icon-afn-blue -i custom-branding-icon-revancify -i materialyou -i spoof-app-version \
+      -e custom-branding-icon-afn-red -e hide-autoplay-button -e hide-cast-buttom -e hide-create-button -e hide-endscreen-overlay -e hide-next-prev-button -e hide-player-captions-button -e hide-player-overlay-filter -e hide-shorts-button -e hide-snackbar -e switch-create-notification \
       --custom-aapt2-binary="$HOME/aapt2" --purge $ripLib | tee "$log"
   else
     $PREFIX/lib/jvm/java-$jdkVersion-openjdk/bin/java -jar $ReVancedCLIJar patch -p $PatchesRvp \
