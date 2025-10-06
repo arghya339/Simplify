@@ -399,7 +399,7 @@ build_app() {
   local outputAPK=$8
   local fileName=$(basename $outputAPK)
   local log=$9
-  local -n appNameRef=$10
+  local -n appNameRef=${10}
   local bugReportUrl=$11
   local pkgPatched=$12
   local activityPatched=$13
