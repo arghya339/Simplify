@@ -112,6 +112,7 @@ if [ -z "$appUrl" ]; then
   aria2c -q -o apkpure_page.html -d "$HOME" "${ALL_HEADER[@]}" --connect-timeout=30 --save-cookies=cookies.txt --check-certificate=false --referer="https://apkpure.com" --async-dns=true --async-dns-server="$cloudflareIP" "$searchUrl" && search_html_content=$(cat "$HOME/apkpure_page.html") && rm -f ~/apkpure_page.html
   #echo "$search_html_content" > ~/apkpure_page.html  # for debug
   appUrl=$(pup 'div.first-info.brand-info json{}' <<< "$search_html_content" | jq -r '{name: .[0].children[1].children[0].children[0].text, url: .[0].children[0].href} | .url')
+  [ "$appUrl" == "null" ] && appUrl=""
   [ -z "$appUrl" ] && appUrl=$(pup '#search-app-list li:first-child a attr{href}' <<< "$search_html_content")  # extract first result from search-app-list
 fi
 echo -e "$info appUrl: ${Blue}$appUrl${Reset}\n"
