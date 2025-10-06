@@ -224,6 +224,7 @@ patch_app() {
     curl -sL -C - -o $SimplUsr/options.json https://raw.githubusercontent.com/arghya339/ReVancedApp-Actions/refs/heads/main/src/options/revanced-extended-android-5.json
   fi
   
+  echo -e "$running Patching ${appName} RVX.."
   if [[ ( $Android -eq 7 || $Android -eq 6 ) && ( "$appName" == "YouTube" ) && ( $ChangeRVXSource -eq 1 ) ]]; then
     $PREFIX/lib/jvm/java-$jdkVersion-openjdk/bin/java -jar $ReVancedCLIv4 patch $stock_apk_path -o $outputAPK -m $IntegrationsApk -b $PatchesJar \
       -i "materialyou" -i "spoof-streaming-data" -e "hide-autoplay-button" -e "hide-cast-button"  -e "hide-create-button" -e "hide-endscreen-overlay" -e "hide-next-prev-button" \
@@ -465,7 +466,6 @@ build_app() {
   
   if [ -f "${stock_apk_ref[0]}" ]; then
     echo -e "$good ${Green}Downloaded ${appNameRef[0]} APK found:${Reset} ${stock_apk_ref[0]}"
-    echo -e "$running Patching ${appNameRef[0]} RVX.."
     termux-wake-lock
     patch_app "${stock_apk_ref[0]}" "$appPatchesArgs" "$outputAPK" "$log" "${appNameRef[0]}" "$bugReportUrl"
     termux-wake-unlock
