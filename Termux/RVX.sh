@@ -694,22 +694,14 @@ while true; do
     YouTube)
       pkgName="com.google.android.youtube"
       Arch="universal"
-      if su -c "id" >/dev/null 2>&1; then
-        Type="APK"
-        stock_apk_path=("$Download/YouTube_v${pkgVersion}-$Arch.apk")
-      else
-        Type="BUNDLE"
-        stock_apk_path=("$Download/YouTube_v${pkgVersion}-$cpuAbi.apk")
-      fi
+      if su -c "id" >/dev/null 2>&1; then Type="APK"; else Type="BUNDLE"; fi
       if [ $Android -ge 8 ]; then
         if [ "$ChangeRVXSource" == 0 ]; then
           pkgVersion="20.12.46"
           Type="APK"
-          stock_apk_path=("$Download/YouTube_v${pkgVersion}-$Arch.apk")
         else
           pkgVersion="20.21.37"
           Type="APK"
-          stock_apk_path=("$Download/YouTube_v${pkgVersion}-$Arch.apk")
         fi
         if [ -z "$pkgVersion" ]; then
           getVersion "$pkgName"
@@ -722,6 +714,7 @@ while true; do
         pkgVersion="16.40.36"
         BugReportUrl="https://github.com/d4n3436/revanced-patches-android5/issues/new?template=bug-issue.yml"
       fi
+      [ $Type == "APK" ] && stock_apk_path=("$Download/YouTube_v${pkgVersion}-$Arch.apk") || stock_apk_path=("$Download/YouTube_v${pkgVersion}-$cpuAbi.apk")
       outputAPK="$SimplUsr/YouTube-RVX_v${pkgVersion}-$cpuAbi.apk"
       log="$SimplUsr/YouTube-RVX_patch-log.txt"
       appName=("YouTube")
