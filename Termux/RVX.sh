@@ -204,7 +204,7 @@ patch_app() {
     bash $Simplify/dlGitHub.sh "kitadai31" "revanced-patches-android6-7" "$release" ".rvp" "$RVX6_7"
     PatchesRvp=$(find "$RVX6_7" -type f -name "patches-*.rvp" -print -quit)
     echo -e "$info ${Blue}PatchesRvp:${Reset} $PatchesRvp"
-  if [[ ( $Android -eq 7 || $Android -eq 6 ) && ( "$appName" == "YouTube" ) && ( $ChangeRVXSource -eq 1 ) ]]; then
+  elif [[ ( $Android -eq 7 || $Android -eq 6 ) && ( "$appName" == "YouTube" ) && ( $ChangeRVXSource -eq 1 ) ]]; then
     dl_rv_cli_v4
     bash $Simplify/dlGitHub.sh "arghya339" "revanced-patches-android6-7" "latest" ".jar" "$RV4"
     PatchesJar=$(find "$RV4" -type f -name "revanced-patches-*.jar" -print -quit)
