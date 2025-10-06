@@ -39,8 +39,9 @@ fi
 Serial=$(su -c 'getprop ro.serialno')  # Get Serial Number required root
 Model=$(getprop ro.product.model)  # Get Device Model
 RVX="$Simplify/RVX"
+RV4="$RVX/RV4"
 SimplUsr="/sdcard/Simplify"  # /storage/emulated/0/Simplify dir
-mkdir -p "$Simplify" "$RVX" "$SimplUsr"  # Create $Simplify, $RVX and $SimplUsr dir if it does't exist
+mkdir -p "$Simplify" "$RVX" "$RV4" "$SimplUsr"  # Create $Simplify, $RVX, $RV4 and $SimplUsr dir if it does't exist
 RVX6_7="$Simplify/RVX6-7"  # RVX for Android 6 and 7
 [[ $Android -eq 7 || $Android -eq 6 ]] && mkdir -p "$RVX6_7"  # Create $RVX6_7 dir if Android version is 6 or 7
 Download="/sdcard/Download"  # Download dir
@@ -168,6 +169,26 @@ if [ ! -f "$RVX/rvx-options.json" ]; then
 fi
 comment
 
+# --- Download ReVanced CLI v4 ---
+dl_rv_cli_v4() {
+  ReVancedCLIv4="$RV4/revanced-cli-4.6.2-all.jar"
+  if [ ! -f "$ReVancedCLIv4" ]; then
+    echo -e "$running Downloading revanced-cli-4.6.2-all.jar.."
+    url="https://github.com/inotia00/revanced-cli/releases/download/v4.6.2/revanced-cli-4.6.2-all.jar"
+    while true; do
+      #curl -L --progress-bar -C - -o "$ReVancedCLIv4" "$url"
+      aria2c -x 16 -s 16 --console-log-level=error --summary-interval=0 --download-result=hide -c -o "$(basename "$ReVancedCLIv4")" -d "$(dirname "$ReVancedCLIv4")" "$url"
+      if [ $? -eq 0 ]; then
+        echo  # White Space
+        break
+      fi
+      echo -e "${bad} ${Red}Download failed! retrying in 5 seconds..${Reset}"
+      sleep 5  # Wait 5 seconds
+    done
+  fi
+  echo -e "$info ${Blue}ReVancedCLIJar:${Reset} $ReVancedCLIv4"
+}
+
 #  --- Patching Apps Method ---
 patch_app() {
   local stock_apk_path=$1
@@ -178,19 +199,48 @@ patch_app() {
   local appName="$5"
   local Url=$6
   
+  ReVancedCLIJar=$(find "$RVX" -type f -name "revanced-cli-*-all.jar" -print -quit)
   if [[ ( $Android -eq 7 || $Android -eq 6 ) && "$appName" == "YouTube" ]]; then
     bash $Simplify/dlGitHub.sh "kitadai31" "revanced-patches-android6-7" "$release" ".rvp" "$RVX6_7"
     PatchesRvp=$(find "$RVX6_7" -type f -name "patches-*.rvp" -print -quit)
     echo -e "$info ${Blue}PatchesRvp:${Reset} $PatchesRvp"
+  if [[ ( $Android -eq 7 || $Android -eq 6 ) && ( "$appName" == "YouTube" ) && ( $ChangeRVXSource -eq 1 ) ]]; then
+    dl_rv_cli_v4
+    bash $Simplify/dlGitHub.sh "arghya339" "revanced-patches-android6-7" "latest" ".jar" "$RV4"
+    PatchesJar=$(find "$RV4" -type f -name "revanced-patches-*.jar" -print -quit)
+    echo -e "$info ${Blue}PatchesJar:${Reset} $PatchesJar"
+    bash $Simplify/dlGitHub.sh "arghya339" "revanced-integrations" "latest" ".apk" "$RV4"
+    IntegrationsApk=$(find "$RV4" -type f -name "revanced-integrations-*.apk" -print -quit)
+    echo -e "$info ${Blue}IntegrationsApk:${Reset} $IntegrationsApk"
+    #curl -sL -C - -o $SimplUsr/options.json https://raw.githubusercontent.com/arghya339/ReVancedApp-Actions/refs/heads/main/src/options/revanced-extended-android-6-7-arghya339.json
+  elif [ $Android -eq 5 ] && [ "$appName" == "YouTube" ]; then
+    dl_rv_cli_v4
+    bash $Simplify/dlGitHub.sh "d4n3436" "revanced-patches-android5" "latest" ".jar" "$RV4"
+    PatchesJar=$(find "$RV4" -type f -name "revanced-patches-*.jar" -print -quit)
+    echo -e "$info ${Blue}PatchesJar:${Reset} $PatchesJar"
+    bash $Simplify/dlGitHub.sh "d4n3436" "revanced-integrations" "latest" ".apk" "$RV4"
+    IntegrationsApk=$(find "$RV4" -type f -name "revanced-integrations-*.apk" -print -quit)
+    echo -e "$info ${Blue}IntegrationsApk:${Reset} $IntegrationsApk"
+    curl -sL -C - -o $SimplUsr/options.json https://raw.githubusercontent.com/arghya339/ReVancedApp-Actions/refs/heads/main/src/options/revanced-extended-android-5.json
   fi
   
-  $PREFIX/lib/jvm/java-$jdkVersion-openjdk/bin/java -jar $ReVancedCLIJar patch -p $PatchesRvp \
-    -o "$outputAPK" "$stock_apk_path" \
-    "${patches[@]}" \
-    -e "Change version code" -OversionCode="2147483647" \
-    --custom-aapt2-binary="$HOME/aapt2" \
-    --purge $ripLib -f | tee "$log"
-  
+  if [[ ( $Android -eq 7 || $Android -eq 6 ) && ( "$appName" == "YouTube" ) && ( $ChangeRVXSource -eq 1 ) ]]; then
+    $PREFIX/lib/jvm/java-$jdkVersion-openjdk/bin/java -jar $ReVancedCLIv4 patch $stock_apk_path -o $outputAPK -m $IntegrationsApk -b $PatchesJar \
+      -i "materialyou" -i "spoof-streaming-data" -e "hide-autoplay-button" -e "hide-cast-button"  -e "hide-create-button" -e "hide-endscreen-overlay" -e "hide-next-prev-button" \
+      -e "hide-player-captions-button" -e "hide-player-overlay-filter" -e "hide-shorts-button" -e "switch-create-notification" \
+      --purge $ripLib | tee "$log"  # --options $SimplUsr/options.json
+  elif [ $Android -eq 5 ] && [ "$appName" == "YouTube" ]; then
+    $PREFIX/lib/jvm/java-$jdkVersion-openjdk/bin/java -jar $ReVancedCLIv4 patch $stock_apk_path -o $outputAPK -m $IntegrationsApk --options $SimplUsr/options.json -b $PatchesJar \
+      --purge $ripLib | tee "$log"
+  else
+    $PREFIX/lib/jvm/java-$jdkVersion-openjdk/bin/java -jar $ReVancedCLIJar patch -p $PatchesRvp \
+      -o "$outputAPK" "$stock_apk_path" \
+      "${patches[@]}" \
+      -e "Change version code" -OversionCode="2147483647" \
+      --custom-aapt2-binary="$HOME/aapt2" \
+      --purge $ripLib -f | tee "$log"
+  fi
+
   if [ ! -f "$outputAPK" ] && [ -f "$stock_apk_path" ]; then
     echo -e "$bad Oops, $appName Patching failed !! Logs saved to "$log". Share the Patchlog to developer."
     termux-open-url "$Url"
@@ -599,6 +649,7 @@ elif [ $Android -eq 6 ]; then
 elif [ $Android -eq 5 ]; then
   apps=(
     Quit
+    YouTube
     "YT Music"
   )
 fi
@@ -667,6 +718,9 @@ while true; do
       elif [ $Android -eq 7 ] || [ $Android -eq 6 ]; then
         pkgVersion="17.34.36"
         BugReportUrl="https://github.com/kitadai31/revanced-patches-android6-7/issues/new?template=bug_report.yml"
+      elif [ $Android -eq 5 ]; then
+        pkgVersion="16.40.36"
+        BugReportUrl="https://github.com/d4n3436/revanced-patches-android5/issues/new?template=bug-issue.yml"
       fi
       outputAPK="$SimplUsr/YouTube-RVX_v${pkgVersion}-$cpuAbi.apk"
       log="$SimplUsr/YouTube-RVX_patch-log.txt"
