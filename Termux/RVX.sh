@@ -423,7 +423,7 @@ build_app() {
   
   if [ -f "$outputAPK" ]; then
     
-    if [ $pkgName == "com.google.android.youtube" ] || [ $pkgName == "com.google.android.apps.youtube.music" ]; then
+    if [ $pkgName == "com.google.android.youtube" ] || [ $pkgName == "com.google.android.apps.youtube.music" ] || [ "$pkgName" == "com.spotify.music" ]; then
       if su -c "id" >/dev/null 2>&1; then
         if [ "$pkgName" == "com.google.android.youtube" ]; then
           echo -e "[?] ${Yellow}Please select installation type - 'M' for Mount or 'I' for SU-Install or 'N' for Installation cancel. [M/i/N]: ${Reset}\c" && read opt
