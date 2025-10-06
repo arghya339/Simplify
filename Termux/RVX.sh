@@ -169,12 +169,12 @@ if [ ! -f "$RVX/rvx-options.json" ]; then
 fi
 comment
 
-# --- Download ReVanced CLI v4 ---
-dl_rv_cli_v4() {
-  ReVancedCLIv4="$RV4/revanced-cli-4.6.2-all.jar"
+# --- Download ReVanced CLI v3 ---
+dl_rv_cli_v3() {
+  ReVancedCLIv4="$RV4/revanced-cli-3.1.4-all.jar"
   if [ ! -f "$ReVancedCLIv4" ]; then
-    echo -e "$running Downloading revanced-cli-4.6.2-all.jar.."
-    url="https://github.com/inotia00/revanced-cli/releases/download/v4.6.2/revanced-cli-4.6.2-all.jar"
+    echo -e "$running Downloading revanced-cli-3.1.4-all.jar.."
+    url="https://github.com/inotia00/revanced-cli/releases/download/v3.1.4/revanced-cli-3.1.4-all.jar"
     while true; do
       #curl -L --progress-bar -C - -o "$ReVancedCLIv4" "$url"
       aria2c -x 16 -s 16 --console-log-level=error --summary-interval=0 --download-result=hide -c -o "$(basename "$ReVancedCLIv4")" -d "$(dirname "$ReVancedCLIv4")" "$url"
@@ -205,7 +205,7 @@ patch_app() {
     PatchesRvp=$(find "$RVX6_7" -type f -name "patches-*.rvp" -print -quit)
     echo -e "$info ${Blue}PatchesRvp:${Reset} $PatchesRvp"
   elif [[ ( $Android -eq 7 || $Android -eq 6 ) && ( "$appName" == "YouTube" ) && ( $ChangeRVXSource -eq 1 ) ]]; then
-    dl_rv_cli_v4
+    dl_rv_cli_v3
     bash $Simplify/dlGitHub.sh "arghya339" "revanced-patches-android6-7" "latest" ".jar" "$RV4"
     PatchesJar=$(find "$RV4" -type f -name "revanced-patches-*.jar" -print -quit)
     echo -e "$info ${Blue}PatchesJar:${Reset} $PatchesJar"
@@ -214,7 +214,7 @@ patch_app() {
     echo -e "$info ${Blue}IntegrationsApk:${Reset} $IntegrationsApk"
     #curl -sL -C - -o $SimplUsr/options.json https://raw.githubusercontent.com/arghya339/ReVancedApp-Actions/refs/heads/main/src/options/revanced-extended-android-6-7-arghya339.json
   elif [ $Android -eq 5 ] && [ "$appName" == "YouTube" ]; then
-    dl_rv_cli_v4
+    dl_rv_cli_v3
     bash $Simplify/dlGitHub.sh "d4n3436" "revanced-patches-android5" "latest" ".jar" "$RV4"
     PatchesJar=$(find "$RV4" -type f -name "revanced-patches-*.jar" -print -quit)
     echo -e "$info ${Blue}PatchesJar:${Reset} $PatchesJar"
@@ -708,6 +708,7 @@ while true; do
           pkgVersion="$pkgVersion"
         fi
       elif [ $Android -eq 7 ] || [ $Android -eq 6 ]; then
+        Type="APK"
         pkgVersion="17.34.36"
         BugReportUrl="https://github.com/kitadai31/revanced-patches-android6-7/issues/new?template=bug_report.yml"
       elif [ $Android -eq 5 ]; then
