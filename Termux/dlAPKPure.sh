@@ -103,6 +103,7 @@ if [ -n "$pkgName" ]; then
   apiUrl="https://apkpure.com/api/v1/search_suggestion_new?key=${app_name}&limit=20"
   aria2c -q -o response.json "${ALL_HEADER[@]}" --connect-timeout=30 --save-cookies=cookies.txt --check-certificate=false --referer="https://apkpure.com" --async-dns=true --async-dns-server="$cloudflareIP" "$apiUrl"
   appUrl=$(jq -r --arg pkgName "$pkgName" '.[] | select(.packageName? == $pkgName) | .fullUrl' response.json) && rm -f response.json || { rm -f response.json; appUrl=""; }
+  [ "$appUrl" == "null" ] && appUrl=""
 else
   appUrl=""
 fi
