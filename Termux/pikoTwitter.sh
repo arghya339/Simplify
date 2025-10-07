@@ -38,8 +38,9 @@ else
 fi
 Model=$(getprop ro.product.model)  # Get Device Model
 pikoTwitter="$Simplify/pikoTwitter"
+RVX="$Simplify/RVX"
 SimplUsr="/sdcard/Simplify"  # /storage/emulated/0/Simplify dir
-mkdir -p "$Simplify" "$pikoTwitter" "$SimplUsr"  # Create $Simplify, $RV, $RVX and $SimplUsr dir if it does't exist
+mkdir -p "$Simplify" "$pikoTwitter" "$RVX" "$SimplUsr"  # Create $Simplify, $pikoTwitter, $RVX and $SimplUsr dir if it does't exist
 Download="/sdcard/Download"  # Download dir
 FetchPreRelease=$(jq -r '.FetchPreRelease' "$simplifyJson" 2>/dev/null)
 RipLib="$(jq -r '.RipLib' "$simplifyJson" 2>/dev/null)"
