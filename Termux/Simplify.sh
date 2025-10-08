@@ -456,6 +456,40 @@ tfConfig() {
   done
 }
 
+token() {
+  echo -e "${running} Creating Personal Access Token.."
+  termux-open-url "https://github.com/settings/tokens/new?scopes=public_repo&description=Simplify"  # Create a PAT with scope `public_repo`
+  echo -n "PAT: "  # Display prompt
+  # Read characters one by one
+  while IFS= read -r -n 1 char; do
+    # Handle Enter key (newline)
+    if [[ "$char" == $'\0' || "$char" == $'\n' || "$char" == $'\r' ]]; then
+      # Only break if input is not empty, input not start with space & pat is valid
+      if [[ -n "$input" && ! "$input" =~ ^[[:space:]] ]]; then
+        tag=$(curl -sL -H "Authorization: Bearer $input" "https://api.github.com/repos/ReVanced/revanced-patches/releases/latest" | jq -r '.tag_name')
+        if [[ $tag == v* ]] && [ $tag != "null" ]; then
+          echo -e "$good ${Green}Successfully added your GitHub PAT!${Reset}"
+          echo -e "$notice ${Yellow}Your GitHub API rate limit has been increased.${Reset}"
+          break
+        fi
+      else
+        continue
+      fi
+    fi
+    # Handle backspace/ delete
+    if [[ "$char" == $'\177' || "$char" == $'\b' ]]; then
+      if [ -n "$input" ]; then
+        input="${input%?}"  # Remove last char from input & store in input
+        echo -ne "\b \b"  # Move cursor back, print space, move cursor back again
+      fi
+      continue
+    fi
+    input+="$char"  # Add character to input
+    echo -n "*"  # Display asterisk
+  done
+  config "PAT" "$input"
+}
+
 pat() {
   while true; do
     if { [ -f "$HOME/.config/gh/hosts.yml" ] && ! grep -q "{}" "$HOME/.config/gh/hosts.yml" 2>/dev/null; } || { [ -f "$simplifyJson" ] && jq -e '.PAT' "$simplifyJson" >/dev/null 2>&1; }; then
@@ -495,23 +529,7 @@ pat() {
               fi
               ;;
             [Pp]*)
-              echo -e "${running} Creating Personal Access Token.."
-              termux-open-url "https://github.com/settings/tokens/new?scopes=public_repo&description=Simplify"  # Create a PAT with the scope `public_repo`
-              echo -e "${Yellow}Please copy the generated Simplify PAT & paste it here:${Reset} \c" && read -r pat
-              if [[ $pat == ghp_* ]] && [ $pat != "" ]; then
-                config "PAT" "$pat"
-                PAT=$(jq -r '.PAT' "$simplifyJson" 2>/dev/null)
-                gh_api_response=$(auth="-H \"Authorization: Bearer $PAT\"" && owner="ReVanced" && repo="revanced-patches" && curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases/latest" | jq -r '.tag_name')
-                if [[ $gh_api_response == v* ]] && [ $gh_api_response != "null" ]; then
-                  echo -e "$good ${Green}Successfully added your GitHub PAT!${Reset}"
-                  echo -e "$notice ${Yellow}Your GitHub API rate limit has been increased.${Reset}"
-                  break
-                fi
-              else
-                echo -e "${bad} ${Red}Invalid PAT! Please try again.${Reset}"
-                jq 'del(.PAT)' "$simplifyJson" > temp.json && mv temp.json "$simplifyJson"  # Delete PAT key from simplify.json
-                termux-open-url "https://github.com/settings/tokens"
-              fi
+              token  # Call token functions to add pat
               ;;
             *) echo -e "${info} Invalid input! Please enter gh or pat." ;;
           esac
