@@ -471,6 +471,11 @@ token() {
           echo -e "\n$good ${Green}Successfully added your GitHub PAT!${Reset}"
           echo -e "$notice ${Yellow}Your GitHub API rate limit has been increased.${Reset}"
           break
+        else
+          echo -ne "\r\033[K"  # Clear previous prompt line
+          echo -e "$notice ${Yellow}Invalid PAT!${Reset}"  # Display messages if pat is not valid
+          input=""  # Clear input variable's value
+          echo -n "PAT: "  # Display prompt
         fi
       else
         continue
