@@ -491,10 +491,10 @@ token() {
     fi
     # Handle delete ($'\E[3~')
     # /bin/bash -c 'read -r -p "Type any ESC key: " input && printf "You Entered: %q\n" "$input"'  # q=safelyQuoted
-    if [[ "$char" == $'\x1b' ]]; then
-      read -rsn 1 -t 0.1 seq1
+    if [[ "$char" == $'\E' ]]; then
+      read -rsn1 -t 0.1 seq1
       if [[ "$seq1" == '[' ]]; then
-        read -rsn 2 -t 0.1 seq2
+        read -rsn2 -t 0.1 seq2
         case "$seq2" in
           '3~')  # Delete key
             if [ -n "$input" ]; then
