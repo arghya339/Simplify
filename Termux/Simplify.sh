@@ -533,6 +533,7 @@ pat() {
               ;;
             [Pp]*)
               token  # Call token functions to add pat
+              break
               ;;
             *) echo -e "${info} Invalid input! Please enter gh or pat." ;;
           esac
