@@ -464,7 +464,7 @@ token() {
   while IFS= read -rsn 1 char; do
     # Handle Enter key (newline)
     if [[ "$char" == $'\0' || "$char" == $'\n' || "$char" == $'\r' ]]; then
-      # Only break if input is not empty, input not start with space & pat is valid
+      # Only break if input is not empty, input not start with space, input doesn't contain space & pat is valid
       if [[ -n "$input" && ! "$input" =~ ^[[:space:]] && ! "$input" =~ [[:space:]] ]]; then
         tag=$(curl -sL -H "Authorization: Bearer $input" "https://api.github.com/repos/ReVanced/revanced-patches/releases/latest" | jq -r '.tag_name')
         if [[ $tag == v* ]] && [ $tag != "null" ]; then
