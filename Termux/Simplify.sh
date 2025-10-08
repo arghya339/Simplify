@@ -484,8 +484,11 @@ token() {
       fi
       continue
     fi
-    input+="$char"  # Add character to input
-    echo -n "*"  # Display asterisk
+    # Only add printable characters (excluding control characters)
+    if [[ "$char" =~ [[:print:]] ]]; then
+      input+="$char"  # Add character to input
+      echo -n "*"  # Display asterisk
+    fi
   done
   config "PAT" "$input"
 }
