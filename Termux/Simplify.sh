@@ -461,7 +461,7 @@ token() {
   termux-open-url "https://github.com/settings/tokens/new?scopes=public_repo&description=Simplify"  # Create a PAT with scope `public_repo`
   echo -n "PAT: "  # Display prompt
   # Read characters one by one
-  while IFS= read -r -n 1 char; do
+  while IFS= read -rsn 1 char; do
     # Handle Enter key (newline)
     if [[ "$char" == $'\0' || "$char" == $'\n' || "$char" == $'\r' ]]; then
       # Only break if input is not empty, input not start with space & pat is valid
