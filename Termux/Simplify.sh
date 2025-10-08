@@ -468,7 +468,7 @@ token() {
       if [[ -n "$input" && ! "$input" =~ ^[[:space:]] ]]; then
         tag=$(curl -sL -H "Authorization: Bearer $input" "https://api.github.com/repos/ReVanced/revanced-patches/releases/latest" | jq -r '.tag_name')
         if [[ $tag == v* ]] && [ $tag != "null" ]; then
-          echo -e "$good ${Green}Successfully added your GitHub PAT!${Reset}"
+          echo -e "\n$good ${Green}Successfully added your GitHub PAT!${Reset}"
           echo -e "$notice ${Yellow}Your GitHub API rate limit has been increased.${Reset}"
           break
         fi
