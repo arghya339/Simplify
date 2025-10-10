@@ -181,7 +181,17 @@ confirmPrompt() {
     show_prompt() {
       echo -ne "\r\033[K"  # n=noNewLine r=returnCursorToStartOfLine \033[K=clearLine
       echo -ne "$last_line "
-      [ $Selected -eq 0 ] && echo -ne "${whiteBG}➤ ${prompt_buttons[0]} $Reset   ${prompt_buttons[1]}" || echo -ne "  ${prompt_buttons[0]}  ${whiteBG}➤ ${prompt_buttons[1]} $Reset"  # highlight selected bt with white bg
+      if [ ${#lines[@]} -eq 2 ]; then
+        [ $Selected -eq 0 ] && echo -ne "${whiteBG}➤ ${prompt_buttons[0]} $Reset   ${prompt_buttons[1]}" || echo -ne "  ${prompt_buttons[0]}  ${whiteBG}➤ ${prompt_buttons[1]} $Reset"  # highlight selected bt with white bg
+      elif [ ${#lines[@]} -eq 3 ]; then
+        if [ $Selected -eq 0 ]; then
+          echo -ne "${whiteBG}➤ ${prompt_buttons[0]} $Reset   ${prompt_buttons[1]}"
+        elif [ $Selected -eq 1 ]; then
+          echo -ne "  ${prompt_buttons[0]}  ${whiteBG}➤ ${prompt_buttons[1]} $Reset  ${prompt_buttons[2]}"
+        elif [ $Selected -eq 2 ]; then
+          echo -ne "  ${prompt_buttons[0]}  ${prompt_buttons[1]}  ${whiteBG}➤ ${prompt_buttons[2]} $Reset"
+        fi
+      fi
     }; show_prompt
 
     read -rsn1 key
@@ -194,8 +204,9 @@ confirmPrompt() {
           '[D') Selected=0 ;;  # left arrow key
         esac
         ;;
-      [Yy]*) Selected=0; show_prompt; break ;;
-      [Nn]*) Selected=1; show_prompt; break ;;
+      [Yy]*|[Ii]*) Selected=0; show_prompt; break ;;
+      [Nn]*|[Mm]*) Selected=1; show_prompt; break ;;
+      [Cc]*) Selected=2; show_prompt; break ;;
       "") break ;;  # Enter key
     esac
   done
