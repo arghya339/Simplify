@@ -1287,10 +1287,10 @@ while true; do
               Installer=$(jq -r '.Installer' "$simplifyJson" 2>/dev/null)
               Reinstall=$(jq -r '.Reinstall' "$simplifyJson" 2>/dev/null)
               EnableRoolback=$(jq -r '.EnableRoolback' "$simplifyJson" 2>/dev/null)
-              echo -e "U. Install Package for *user\nK. Allow Downgrade with keeps App data (reboot required)\nG. Grant All Runtime/ Requested Permissions\nT. Installed as test-only app\nL. Bypass Low Target SDK Bolck\nV. Disable Play Protect Package Verification\nI. Installer\nR. Reinstall (Replace/ Upgrade) Existing Installed Package\nB. Enable Version Roolback\nQ. Quit\n"
-              read -r -p "Select: " opt
-              case "$opt" in
-                [Uu]*)
+              options=("Install Package for *user" "Allow Downgrade with keeps App data (reboot required)" "Grant All Runtime/ Requested Permissions" Installed\ as\ test-only\ app Bypass\ Low\ Target\ SDK\ Bolck Disable\ Play\ Protect\ Package\ Verification Installer "Reinstall (Replace/ Upgrade) Existing Installed Package" Enable\ Version\ Roolback)
+              buttons=("<Select>" "<Back>"); if menu "options" "buttons"; then selected="${options[$selected]}"; else break; fi
+              case "$selected" in
+                "Install Package for *user")
                   if [ "$InstallPackageFor" -eq 0 ]; then echo "InstallPackageFor == 0 (default-user)"; else echo "InstallPackageFor == 1 (all-users)"; fi
                   key="InstallPackageFor"
                   echo -e "D. default-user\nA. all-users\n"
@@ -1301,42 +1301,42 @@ while true; do
                     *) value="$isU"; config "$key" "$value" && echo -e "${Green}Install Package for default-user set successfully!${Reset}" ;;
                   esac
                   ;;
-                [Kk]*)
+                "Allow Downgrade with keeps App data (reboot required)")
                   if [ "$KeepsData" -eq 0 ]; then echo "KeepsData == false"; else echo "KeepsData == true"; fi
                   key="KeepsData"; value="$isK"
                   m1="Allow Downgrade with keeps App data Enabled"
                   m2="Allow Downgrade with keeps App data Disabled"
                   tfConfig "$key" "$value" "$m1" "$m2"
                   ;;
-                [Gg]*)
+                "Grant All Runtime/ Requested Permissions")
                   if [ "$GrantAllRuntimePermissions" -eq 0 ]; then echo "GrantAllRuntimePermissions == false"; else echo "GrantAllRuntimePermissions == true"; fi
                   key="GrantAllRuntimePermissions"; value="$isG"
                   m1="Grant All Runtime Permissions Enabled"
                   m2="Grant All Runtime Permissions Disabled"
                   tfConfig "$key" "$value" "$m1" "$m2"
                   ;;
-                [Tt]*)
+                Installed\ as\ test-only\ app)
                   if [ "$InstalledAsTestOnly" -eq 0 ]; then echo "InstalledAsTestOnly == false"; else echo "InstalledAsTestOnly == true"; fi
                   key="InstalledAsTestOnly"; value="$isT"
                   m1="Installed as test-only Enabled"
                   m2="Installed as test-only Disabled"
                   tfConfig "$key" "$value" "$m1" "$m2"
                   ;;
-                [Ll]*)
+                Bypass\ Low\ Target\ SDK\ Bolck)
                   if [ "$BypassLowTargetSdkBolck" -eq 1 ]; then echo "BypassLowTargetSdkBolck == true"; else echo "BypassLowTargetSdkBolck == false"; fi
                   key="BypassLowTargetSdkBolck"; value="$isL"
                   m1="Bypass Low Target SDK Bolck Enabled"
                   m2="Bypass Low Target SDK Bolck Disabled"
                   tfConfig "$key" "$value" "$m1" "$m2"
                   ;;
-                [Vv]*)
+                Disable\ Play\ Protect\ Package\ Verification)
                   if [ "$DisablePlayProtect" -eq 1 ]; then echo "DisablePlayProtect == true"; else echo "DisablePlayProtect == false"; fi
                   key="DisablePlayProtect"; value="$isV"
                   m1="Play Protect Package Verification Disabled"
                   m2="Play Protect Package Verification Enabled"
                   tfConfig "$key" "$value" "$m1" "$m2"
                   ;;
-                [Ii]*)
+                Installer)
                   case "$Installer" in
                     "com.android.vending") echo "Installer == com.android.vending (PlayStore)" ;;
                     "com.android.packageinstaller") echo "Installer == com.android.packageinstaller (PackageInstaller)" ;;
@@ -1344,32 +1344,31 @@ while true; do
                     "adb") echo "Installer == adb" ;;
                   esac
                   key="Installer"
-                  echo -e "P. Play Store\nI. Package Installer\nS. Shell\nA. ADB\n"
-                  read -r -p "Installer: " i
-                  case "$i" in
-                    [Pp]*) value="com.android.vending"; config "$key" "$value" && echo -e "${Green}Successfully set Installer as 'com.android.vending' (PlayStore)${Reset}" ;;
-                    [Ii]*) value="com.android.packageinstaller"; config "$key" "$value" && echo -e "${Green}Successfully set Installer as 'com.android.packageinstaller' (PackageInstaller)${Reset}" ;;
-                    [Ss]*) value="com.android.shell"; config "$key" "$value" && echo -e "${Green}Successfully set Installer as 'com.android.shell' (Shell)${Reset}" ;;
-                    [Aa]*) value="adb"; config "$key" "$value" && echo -e "${Green}Successfully set Installer as 'adb'${Reset}" ;;
-                    *) value="$isI"; config "$key" "$value" && echo -e "${Green}Successfully set Installer as 'com.android.vending' (PlayStore)${Reset}" ;;
-                  esac
+                  options=(Play\ Store Package\ Installer Shell ADB)
+                  while true; do
+                    buttons=("<Select>" "<Back>"); if menu "options" "buttons"; then selected="${options[$selected]}"; else break; fi
+                    case "$selected" in
+                      Play\ Store) value="com.android.vending"; config "$key" "$value" && echo -e "${Green}Successfully set Installer as 'com.android.vending' (PlayStore)${Reset}" ;;
+                      Package\ Installer) value="com.android.packageinstaller"; config "$key" "$value" && echo -e "${Green}Successfully set Installer as 'com.android.packageinstaller' (PackageInstaller)${Reset}" ;;
+                      Shell) value="com.android.shell"; config "$key" "$value" && echo -e "${Green}Successfully set Installer as 'com.android.shell' (Shell)${Reset}" ;;
+                      ADB) value="adb"; config "$key" "$value" && echo -e "${Green}Successfully set Installer as 'adb'${Reset}" ;;
+                    esac
+                  done
                   ;; 
-                [Rr]*)
+                "Reinstall (Replace/ Upgrade) Existing Installed Package")
                   if [ "$Reinstall" -eq 1 ]; then echo "Reinstall == true"; else echo "Reinstall == false"; fi
                   key="Reinstall"; value="$isR"
                   m1="Reinstall Existing Installed Package Enabled"
                   m2="Reinstall Existing Installed Package Disabled"
                   tfConfig "$key" "$value" "$m1" "$m2"
                   ;;
-                [Bb]*)
+                Enable\ Version\ Roolback)
                   if [ "$EnableRoolback" -eq 0 ]; then echo "EnableRoolback == false"; else echo "EnableRoolback == true"; fi
                   key="EnableRoolback"; value="$isB"
                   m1="Version Roolback Enabled"
                   m2="Version Roolback Disabled"
                   tfConfig "$key" "$value" "$m1" "$m2"
                   ;;
-                [Qq]*) break ;;
-                *) echo -e "$info Invalid input! Please enter U / K / G / T / L / V / I / R / B / Q." ;;
               esac
             done
             ;;
