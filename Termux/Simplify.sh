@@ -979,7 +979,7 @@ Unmount() {
     '\'''
 
     # Get Selection
-    buttons=("<Select>" "<Back>"); if menu "nameList" "buttons"; then selected="${nameList[$selected]}"; else break; fi
+    buttons=("<Select>" "<Back>"); if menu "nameList" "buttons"; then selected="${nameArr[$selected]}"; else break; fi
       
     # process selection
     su -c '/data/data/com.termux/files/usr/bin/bash -c '\''
