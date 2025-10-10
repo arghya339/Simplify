@@ -610,40 +610,6 @@ pat() {
   done
 }
 
-change_yt_ytm_app_icon_header() {
-  while true; do
-    echo -e "G. google_family\nP. pink\nV. vanced_light\nR. revancify_blue\n"
-    read -r -p "changeYouTubeYTMusicAppIconHeader [G/P/V/R]: " opt
-    case "$opt" in
-      [Gg]*)
-        branding="google_family"
-        config "Branding" "$branding"
-        echo -e "$good ${Green}appIconHeader successfully set to google_family!${Reset}"
-        break
-        ;;
-      [Pp]*)
-        branding=pink
-        config "Branding" "$branding"
-        echo -e "$good ${Green}appIconHeader successfully set to pink!${Reset}"
-        break
-        ;;
-      [Vv]*)
-        branding="vanced_light"
-        config "Branding" "$branding"
-        echo -e "$good ${Green}appIconHeader successfully set to vanced_light!${Reset}"
-        break
-        ;;
-      [Rr]*)
-        branding="revancify_blue"
-        config "Branding" "$branding"
-        echo -e "$good ${Green}appIconHeader successfully set to revancify_blue!${Reset}"
-        break
-        ;;
-      *) echo -e "$info Invalid input! Please enter G or P or V or R." ;;
-    esac
-  done
-}
-
 if [ $CheckTermuxUpdate -eq 1 ]; then
   if [ $Android -ge 8 ]; then
     latestReleases=$(curl -s https://api.github.com/repos/termux/termux-app/releases/latest | jq -r '.tag_name | sub("^v"; "")')  # 0.118.0
@@ -1310,7 +1276,32 @@ while true; do
             m2="Recommended PatchesOptions Loading from Script"
             tfConfig "$key" "$value" "$m1" "$m2"
             ;;
-          "Change YouTube & YT Music AppIcon & Header") echo "changeYouTubeYTMusicAppIconHeader == $Branding" && change_yt_ytm_app_icon_header ;;
+          "Change YouTube & YT Music AppIcon & Header")
+            echo "changeYouTubeYTMusicAppIconHeader == $Branding"
+            options=(google_family pink vanced_light revancify_blue); buttons=("<Select>" "<Back>"); if menu "options" "buttons"; then selected="${options[$selected]}"; else break; fi
+            case "$selected" in
+              [Gg]*)
+                branding="google_family"
+                config "Branding" "$branding"
+                echo -e "$good ${Green}appIconHeader successfully set to google_family!${Reset}"
+                ;;
+              [Pp]*)
+                branding=pink
+                config "Branding" "$branding"
+                echo -e "$good ${Green}appIconHeader successfully set to pink!${Reset}"
+                ;;
+              [Vv]*)
+                branding="vanced_light"
+                config "Branding" "$branding"
+                echo -e "$good ${Green}appIconHeader successfully set to vanced_light!${Reset}"
+                ;;
+              [Rr]*)
+                branding="revancify_blue"
+                config "Branding" "$branding"
+                echo -e "$good ${Green}appIconHeader successfully set to revancify_blue!${Reset}"
+                ;;
+            esac
+            ;;
           Check\ Termux\ update\ on\ startup) if [ $CheckTermuxUpdate -eq 1 ]; then echo "CheckTermuxUpdate == true"; else echo "CheckTermuxUpdate == false"; fi
             key="CheckTermuxUpdate" && value="$isCheckTermuxUpdate"
             m1="Check for Termux app updates on startup"
