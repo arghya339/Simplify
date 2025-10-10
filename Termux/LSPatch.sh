@@ -578,6 +578,7 @@ menu() {
       [0-9])
         read -rsn2 -t0.5 key2
         [ -n $key2 ] && key="$key${key2}"
+        key=$((10#$key))  # Convert to integer (decimal)
         if [ $key -eq 0 ]; then
           selected_option=$((${#options[@]} - 1))
         elif [ $key -gt ${#options[@]} ]; then
