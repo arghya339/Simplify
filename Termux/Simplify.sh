@@ -1259,7 +1259,7 @@ while true; do
               sleep 0.5  # wait 500 milliseconds
             done
             # Select JDK versions
-            buttons=("<Select>" "<Back>"); if menu "jdkVersion" "buttons"; then version="${options[$selected]}"; fi
+            buttons=("<Select>" "<Back>"); if menu "jdkVersion" "buttons"; then version="${jdkVersion[$selected]}"; fi
             # Set JDK versions
             if [ -n "$version" ]; then
               echo -e "$info Selected: openjdk-$version"
