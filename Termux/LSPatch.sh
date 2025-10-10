@@ -181,9 +181,9 @@ confirmPrompt() {
     show_prompt() {
       echo -ne "\r\033[K"  # n=noNewLine r=returnCursorToStartOfLine \033[K=clearLine
       echo -ne "$last_line "
-      if [ ${#lines[@]} -eq 2 ]; then
+      if [ ${#prompt_buttons[@]} -eq 2 ]; then
         [ $Selected -eq 0 ] && echo -ne "${whiteBG}➤ ${prompt_buttons[0]} $Reset   ${prompt_buttons[1]}" || echo -ne "  ${prompt_buttons[0]}  ${whiteBG}➤ ${prompt_buttons[1]} $Reset"  # highlight selected bt with white bg
-      elif [ ${#lines[@]} -eq 3 ]; then
+      elif [ ${#prompt_buttons[@]} -eq 3 ]; then
         if [ $Selected -eq 0 ]; then
           echo -ne "${whiteBG}➤ ${prompt_buttons[0]} $Reset   ${prompt_buttons[1]}"
         elif [ $Selected -eq 1 ]; then
