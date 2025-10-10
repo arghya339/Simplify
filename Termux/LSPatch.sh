@@ -200,8 +200,14 @@ confirmPrompt() {
       # /bin/bash -c 'read -r -p "Type any ESC key: " input && printf "You Entered: %q\n" "$input"'  # q=safelyQuoted
         read -rsn2 -t 0.1 key2  # -r=readRawInput -s=silent(noOutput) -t=timeout -n2=readTwoChar | waits upto 0.1s=100ms to read key 
         case $key2 in 
-          '[C') Selected=1 ;;  # right arrow key
-          '[D') Selected=0 ;;  # left arrow key
+          '[C')  # right arrow key
+            Selected=$((Selected + 1))
+            [ $Selected -gt ${#prompt_buttons[@]} ] && Selected=$((${#prompt_buttons[@]} - 1))
+            ;;
+          '[D')  # left arrow key
+            Selected=$((Selected - 1))
+            [ $Selected -lt 0 ] && Selected=0
+            ;;
         esac
         ;;
       [Yy]*|[Ii]*) Selected=0; show_prompt; break ;;
