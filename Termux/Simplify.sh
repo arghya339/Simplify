@@ -1278,15 +1278,13 @@ while true; do
                   esac
                   key="Installer"
                   options=(Play\ Store Package\ Installer Shell ADB)
-                  while true; do
-                    buttons=("<Select>" "<Back>"); if menu "options" "buttons"; then selected="${options[$selected]}"; else break; fi
-                    case "$selected" in
-                      Play\ Store) value="com.android.vending"; config "$key" "$value" && echo -e "${Green}Successfully set Installer as 'com.android.vending' (PlayStore)${Reset}" ;;
-                      Package\ Installer) value="com.android.packageinstaller"; config "$key" "$value" && echo -e "${Green}Successfully set Installer as 'com.android.packageinstaller' (PackageInstaller)${Reset}" ;;
-                      Shell) value="com.android.shell"; config "$key" "$value" && echo -e "${Green}Successfully set Installer as 'com.android.shell' (Shell)${Reset}" ;;
-                      ADB) value="adb"; config "$key" "$value" && echo -e "${Green}Successfully set Installer as 'adb'${Reset}" ;;
-                    esac
-                  done
+                  buttons=("<Select>" "<Back>"); if menu "options" "buttons"; then selected="${options[$selected]}"; else break; fi
+                  case "$selected" in
+                    Play\ Store) value="com.android.vending"; config "$key" "$value" && echo -e "${Green}Successfully set Installer as 'com.android.vending' (PlayStore)${Reset}" ;;
+                    Package\ Installer) value="com.android.packageinstaller"; config "$key" "$value" && echo -e "${Green}Successfully set Installer as 'com.android.packageinstaller' (PackageInstaller)${Reset}" ;;
+                    Shell) value="com.android.shell"; config "$key" "$value" && echo -e "${Green}Successfully set Installer as 'com.android.shell' (Shell)${Reset}" ;;
+                    ADB) value="adb"; config "$key" "$value" && echo -e "${Green}Successfully set Installer as 'adb'${Reset}" ;;
+                  esac
                   ;; 
                 "Reinstall (Replace/ Upgrade) Existing Installed Package")
                   if [ "$Reinstall" -eq 1 ]; then echo "Reinstall == true"; else echo "Reinstall == false"; fi
