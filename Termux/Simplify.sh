@@ -1370,12 +1370,12 @@ while true; do
           Uninstall\ Patched\ Apps) UninstallPatchedApp ;;
           Unmount\ Patched\ Apps) Unmount && sleep 3 ;;
           Uninstall\ Simplify)
-            echo -ne "${Yellow}Are you sure you want to uninstall Simplify? [Y/n]${Reset}: " && read -r userInput
+            buttons=("<Yes>" "<No>"); confirmPrompt "Are you sure you want to uninstall Simplify?" "buttons" "1" && userInput=Yes || userInput=No
             case "$userInput" in
               [Yy]*)
-                echo -ne "${Red}Type '://' to confirm uninstallation: ${Reset}" && read -r finalInput
+                echo -ne "${Red}Type 'yes' in capital to continue: ${Reset}" && read -r finalInput
                 case "$finalInput" in
-                  "://")
+                  YES)
                     [ -d "$Simplify" ] && rm -rf "$Simplify"
                     [ -d "$SimplUsr" ] && rm -rf "$SimplUsr"
                     [ -f "$HOME/.Simplify.sh" ] && rm -f "$HOME/.Simplify.sh"
