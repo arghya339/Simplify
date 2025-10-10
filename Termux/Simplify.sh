@@ -362,54 +362,6 @@ if [ ! -f "$Simplify/ks.keystore" ]; then
   $PREFIX/lib/jvm/java-$jdkVersion-openjdk/bin/keytool -list -v -keystore $Simplify/ks.keystore -storepass 123456 | grep -oP '(?<=Owner:).*' | xargs
 fi
 
-Unmount() {
-  su -c '/data/data/com.termux/files/usr/bin/bash -c '\''
-  pkgArr=("com.google.android.youtube" "com.google.android.apps.youtube.music" "com.google.android.apps.photos" "com.spotify.music")
-  nameArr=("YouTube" "YouTube Music" "Google Photos" "Spotify")
-
-  if [ -d "/data/adb/revanced" ]; then
-    while true; do
-      nameList=()  # Clear nameList array first
-      index=0  # This ensures sequential numbering
-    
-      # Build available apps list
-      for i in "${!pkgArr[@]}"; do 
-        if [ -e "/data/adb/revanced/${pkgArr[$i]}/" ]; then
-          nameList[$index]="${nameArr[$i]}"
-          ((index++))
-        fi
-      done
-
-      # Exit if no apps available
-      [ ${#nameList[@]} -eq 0 ] && { echo "No apps available!"; break; }
-    
-      # Display menu
-      echo "Available apps:"
-      for i in "${!nameList[@]}"; do
-        echo "$i. ${nameList[$i]}"
-      done
-
-      # Get user input
-      read -p "Enter index [0-$(( ${#nameList[@]} - 1 ))] or 'Q' to quit: " idx
-    
-      [[ "$idx" =~ [Qq] ]] && break
-    
-      # Validate and process selection
-      if [[ "$idx" =~ ^[0-9]+$ ]] && [ "$idx" -lt "${#nameList[@]}" ]; then
-        for i in "${!nameArr[@]}"; do
-          if [ "${nameArr[$i]}" = "${nameList[$idx]}" ]; then
-            su -mm -c "/system/bin/sh /data/adb/post-fs-data.d/${pkgArr[$i]}.sh"
-            break
-          fi
-        done
-      else
-        echo "Invalid selection!"
-      fi
-    done
-  fi
-  '\'''
-}
-
 config() {
   local key="$1"
   local value="$2"
@@ -848,134 +800,6 @@ DeletePatchesOption() {
   echo "Cleanup complete!"
 }
 
-UninstallPatchedApp() {
-  local pkgArr=(
-    "app.revanced.android.youtube"
-    "app.rvx.android.youtube"
-    "app.rvx.android.apps.youtube.music"
-    "com.spotify.music"
-    "com.zhiliaoapp.musically"
-    "app.revanced.android.photos"
-    "com.instagram.android"
-    "com.facebook.katana"
-    "com.facebook.orca"
-    "com.reddit.frontpage"
-    "com.twitter.android"
-    "com.adobe.lrmobile"
-    "com.microblink.photomath"
-    "com.duolingo"
-    "com.rarlab.rar"
-    "com.amazon.avod.thirdpartyclient"
-    "tv.twitch.android.app"
-    "com.tumblr"
-    "com.instagram.barcelona"
-    "com.strava"
-    "com.soundcloud.android"
-    "ch.protonmail.android"
-    "com.myfitnesspal.android"
-    "com.teslacoilsw.launcher"
-    "net.dinglisch.android.taskerm"
-    "com.crunchyroll.crunchyroid"
-    "com.cricbuzz.android"
-  )
-  local nameArr=(
-    "YouTube RV" "YouTube" "YT Music" "Spotify" "TikTok" "Google Photos" "Instagram" "Facebook" "Facebook Messenger" "Reddit" "X" "Adobe Lightroom Mobile" "Photomath" "Duolingo" "RAR" "Amazon Prime Video" 
-    "Twitch" "Tumblr" "Threads" "Strava" "SoundCloud" "Proton Mail" "Calorie Counter MyFitnessPal" "NovaLauncher" "Tasker" "Crunchyroll" "Cricbuzz Cricket Scores and News"
-  )
-  
-  while true; do
-    
-    # Display menu
-    echo "Available apps:"
-    for i in "${!nameArr[@]}"; do
-      echo "$i. ${nameArr[i]}"
-    done
-
-    # Get user input
-    read -p "Enter index [0-$(( ${#nameArr[@]} - 1 ))] or 'Q' to quit: " idx
-    
-    [[ "$idx" =~ [Qq] ]] && break
-    
-    # Validate and process selection
-    if [[ "$idx" =~ ^[0-9]+$ ]] && [ "$idx" -lt "${#nameArr[@]}" ]; then
-      if su -c "id" >/dev/null 2>&1; then
-        echo "Uninstalling: ${nameArr[idx]}"
-        if [ "$(su -c 'getenforce 2>/dev/null')" = "Enforcing" ]; then
-          su -c "setenforce 0"  # set SELinux to Permissive mode to unblock unauthorized operations
-          su -c "pm uninstall --user 0 ${pkgArr[idx]}"
-          su -c "setenforce 1"  # set SELinux to Enforcing mode to block unauthorized operations
-        else
-          su -c "pm uninstall --user 0 ${pkgArr[idx]}"
-        fi
-      elif "$HOME/rish" -c "id" >/dev/null 2>&1; then
-        echo "Uninstalling: ${nameArr[idx]}"
-        ~/rish -c "pm uninstall --user 0 ${pkgArr[idx]}"
-      else
-        #am start -a android.intent.action.DELETE -d package:"${pkgArr[idx]}" > /dev/null 2>&1
-        am start -a android.intent.action.UNINSTALL_PACKAGE -d package:"${pkgArr[idx]}" > /dev/null 2>&1
-        sleep 6  # wait 6 seconds
-        #echo "Opening App info Activity for: ${nameArr[idx]}"
-        am start -a android.settings.APPLICATION_DETAILS_SETTINGS -d package:"${pkgArr[idx]}" > /dev/null 2>&1
-      fi
-    else
-      echo "Invalid selection! Please enter a number between 0 and $((${#nameArr[@]} - 1))."
-    fi
-
-  done
-}
-
-# --- Feature request prompt ---
-feature() {
-  echo -e "${Yellow}Do you want any new feature in this script? [Y/n]${Reset}: \c" && read userInput
-  case "$userInput" in
-    [Yy]*)
-      echo -e "${running} Creating feature request template using your key words.."
-      echo -e "Describe the new feature: \c" && read feature_description
-      termux-open-url "https://github.com/arghya339/Simplify/issues/new?title=Feature&body=$feature_description"
-      echo -e "${Green}❤️ Thanks for your suggestion!${Reset}"
-      ;;
-    [Nn]*) echo -e "${running} Proceeding.." ;;
-    *) echo -e "${info} ${Blue}Invalid input! Please enter Yes or No.${Reset}" ;;
-  esac
-}
-
-# --- Bug report prompt ---
-bug() {
-  echo -e "${Yellow}Did you find any bugs? [Y/n]${Reset}: \c" && read userInput
-  case "$userInput" in
-    [Yy]*)
-      echo -e "${running} Creating bug report template uisng your keywords.."
-      echo -e "Describe the bug: \c" && read issue_description
-      termux-open-url "https://github.com/arghya339/Simplify/issues/new?title=Bug&body=$issue_description"
-      echo -e "${Green}🖤 Thanks for the report!${Reset}"
-      ;;
-    [Nn]*) echo -e "${Green}💐 Thanks for chosing Simplify!${Reset}" ;;
-    *) echo -e "${info} ${Blue}Invalid input! Please enter Yes or No.${Reset}" ;;
-  esac
-}
-
-# --- Open support URL in the default browser ---
-support() {
-  echo -e "${Yellow}⭐ Star & 🍻 Fork me.."
-  termux-open-url "https://github.com/arghya339/Simplify"
-  echo -e "${Yellow}💲 Donation: PayPal/@arghyadeep339"
-  termux-open-url "https://www.paypal.com/paypalme/arghyadeep339"
-  echo -e "${Yellow}🔔 Subscribe: YouTube/@MrPalash360"
-  termux-open-url "https://www.youtube.com/channel/UC_OnjACMLvOR9SXjDdp2Pgg/videos?sub_confirmation=1"
-  #echo -e "${Yellow}📣 Follow: Telegram"
-  #termux-open-url "https://t.me/MrPalash360"
-  #echo -e "${Yellow}💬 Join: Telegram"
-  #termux-open-url "https://t.me/MrPalash360Discussion"
-}
-
-# --- Show developer info ---
-about() {
-  echo -e "${Green}✨ Powered by ReVanced (revanced.app)"
-  termux-open-url "https://revanced.app/"
-  echo -e "${Green}🧑‍💻 Author arghya339 (github.com/arghya339)"
-  echo
-}
-
 menu() {
   local -n menu_options=$1
   local -n menu_buttons=$2
@@ -1054,6 +878,172 @@ menu() {
   if [ $selected_button -eq $((${#menu_buttons[@]} - 1)) ]; then
     [ "${menu_buttons[$((${#menu_buttons[@]} - 1))]}" == "<Back>" ] && { printf '\033[2J\033[3J\033[H'; return 1; } || { [ $isOverwriteTermuxProp -eq 1 ] && sed -i '/allow-external-apps/s/^/# /' "$HOME/.termux/termux.properties"; printf '\033[2J\033[3J\033[H'; echo "Script exited !!"; exit 0; }
   fi
+}
+
+UninstallPatchedApp() {
+  local pkgArr=(
+    "app.revanced.android.youtube"
+    "app.rvx.android.youtube"
+    "app.rvx.android.apps.youtube.music"
+    "com.spotify.music"
+    "com.zhiliaoapp.musically"
+    "app.revanced.android.photos"
+    "com.instagram.android"
+    "com.facebook.katana"
+    "com.facebook.orca"
+    "com.reddit.frontpage"
+    "com.twitter.android"
+    "com.adobe.lrmobile"
+    "com.microblink.photomath"
+    "com.duolingo"
+    "com.rarlab.rar"
+    "com.amazon.avod.thirdpartyclient"
+    "tv.twitch.android.app"
+    "com.tumblr"
+    "com.instagram.barcelona"
+    "com.strava"
+    "com.soundcloud.android"
+    "ch.protonmail.android"
+    "com.myfitnesspal.android"
+    "com.teslacoilsw.launcher"
+    "net.dinglisch.android.taskerm"
+    "com.crunchyroll.crunchyroid"
+    "com.cricbuzz.android"
+  )
+  local nameArr=(
+    "YouTube RV" "YouTube" "YT Music" "Spotify" "TikTok" "Google Photos" "Instagram" "Facebook" "Facebook Messenger" "Reddit" "X" "Adobe Lightroom Mobile" "Photomath" "Duolingo" "RAR" "Amazon Prime Video" 
+    "Twitch" "Tumblr" "Threads" "Strava" "SoundCloud" "Proton Mail" "Calorie Counter MyFitnessPal" "NovaLauncher" "Tasker" "Crunchyroll" "Cricbuzz Cricket Scores and News"
+  )
+  
+  while true; do
+    
+    # Display menu
+    echo "Available apps:"
+    for i in "${!nameArr[@]}"; do
+      echo "$i. ${nameArr[i]}"
+    done
+
+    # Get user input
+    read -p "Enter index [0-$(( ${#nameArr[@]} - 1 ))] or 'Q' to quit: " idx
+    
+    [[ "$idx" =~ [Qq] ]] && break
+    
+    # Validate and process selection
+    if [[ "$idx" =~ ^[0-9]+$ ]] && [ "$idx" -lt "${#nameArr[@]}" ]; then
+      if su -c "id" >/dev/null 2>&1; then
+        echo "Uninstalling: ${nameArr[idx]}"
+        if [ "$(su -c 'getenforce 2>/dev/null')" = "Enforcing" ]; then
+          su -c "setenforce 0"  # set SELinux to Permissive mode to unblock unauthorized operations
+          su -c "pm uninstall --user 0 ${pkgArr[idx]}"
+          su -c "setenforce 1"  # set SELinux to Enforcing mode to block unauthorized operations
+        else
+          su -c "pm uninstall --user 0 ${pkgArr[idx]}"
+        fi
+      elif "$HOME/rish" -c "id" >/dev/null 2>&1; then
+        echo "Uninstalling: ${nameArr[idx]}"
+        ~/rish -c "pm uninstall --user 0 ${pkgArr[idx]}"
+      else
+        #am start -a android.intent.action.DELETE -d package:"${pkgArr[idx]}" > /dev/null 2>&1
+        am start -a android.intent.action.UNINSTALL_PACKAGE -d package:"${pkgArr[idx]}" > /dev/null 2>&1
+        sleep 6  # wait 6 seconds
+        #echo "Opening App info Activity for: ${nameArr[idx]}"
+        am start -a android.settings.APPLICATION_DETAILS_SETTINGS -d package:"${pkgArr[idx]}" > /dev/null 2>&1
+      fi
+    else
+      echo "Invalid selection! Please enter a number between 0 and $((${#nameArr[@]} - 1))."
+    fi
+
+  done
+}
+
+Unmount() {
+  su -c '/data/data/com.termux/files/usr/bin/bash -c '\''
+  pkgArr=("com.google.android.youtube" "com.google.android.apps.youtube.music" "com.google.android.apps.photos" "com.spotify.music")
+  nameArr=("YouTube" "YouTube Music" "Google Photos" "Spotify")
+
+  if [ -d "/data/adb/revanced" ]; then
+    while true; do
+      nameList=()  # Clear nameList array first
+      index=0  # This ensures sequential numbering
+    
+      # Build available apps list
+      for i in "${!pkgArr[@]}"; do 
+        if [ -e "/data/adb/revanced/${pkgArr[$i]}/" ]; then
+          nameList[$index]="${nameArr[$i]}"
+          ((index++))
+        fi
+      done
+
+      # Exit if no apps available
+      [ ${#nameList[@]} -eq 0 ] && { echo "No apps available!"; break; }
+      
+      # Get Selection
+      buttons=("<Select>" "<Back>"); if menu "nameList" "buttons"; then selected="${nameList[$selected]}"; else break; fi
+      
+      # process selection
+      if [ -n "$selected"]; then
+        for i in "${!nameArr[@]}"; do
+          if [ "${nameArr[$i]}" = "${nameList[$selected]}" ]; then
+            su -mm -c "/system/bin/sh /data/adb/post-fs-data.d/${pkgArr[$i]}.sh"
+            break
+          fi
+        done
+      fi
+    done
+  fi
+  '\'''
+}
+
+# --- Feature request prompt ---
+feature() {
+  echo -e "${Yellow}Do you want any new feature in this script? [Y/n]${Reset}: \c" && read userInput
+  case "$userInput" in
+    [Yy]*)
+      echo -e "${running} Creating feature request template using your key words.."
+      echo -e "Describe the new feature: \c" && read feature_description
+      termux-open-url "https://github.com/arghya339/Simplify/issues/new?title=Feature&body=$feature_description"
+      echo -e "${Green}❤️ Thanks for your suggestion!${Reset}"
+      ;;
+    [Nn]*) echo -e "${running} Proceeding.." ;;
+    *) echo -e "${info} ${Blue}Invalid input! Please enter Yes or No.${Reset}" ;;
+  esac
+}
+
+# --- Bug report prompt ---
+bug() {
+  echo -e "${Yellow}Did you find any bugs? [Y/n]${Reset}: \c" && read userInput
+  case "$userInput" in
+    [Yy]*)
+      echo -e "${running} Creating bug report template uisng your keywords.."
+      echo -e "Describe the bug: \c" && read issue_description
+      termux-open-url "https://github.com/arghya339/Simplify/issues/new?title=Bug&body=$issue_description"
+      echo -e "${Green}🖤 Thanks for the report!${Reset}"
+      ;;
+    [Nn]*) echo -e "${Green}💐 Thanks for chosing Simplify!${Reset}" ;;
+    *) echo -e "${info} ${Blue}Invalid input! Please enter Yes or No.${Reset}" ;;
+  esac
+}
+
+# --- Open support URL in the default browser ---
+support() {
+  echo -e "${Yellow}⭐ Star & 🍻 Fork me.."
+  termux-open-url "https://github.com/arghya339/Simplify"
+  echo -e "${Yellow}💲 Donation: PayPal/@arghyadeep339"
+  termux-open-url "https://www.paypal.com/paypalme/arghyadeep339"
+  echo -e "${Yellow}🔔 Subscribe: YouTube/@MrPalash360"
+  termux-open-url "https://www.youtube.com/channel/UC_OnjACMLvOR9SXjDdp2Pgg/videos?sub_confirmation=1"
+  #echo -e "${Yellow}📣 Follow: Telegram"
+  #termux-open-url "https://t.me/MrPalash360"
+  #echo -e "${Yellow}💬 Join: Telegram"
+  #termux-open-url "https://t.me/MrPalash360Discussion"
+}
+
+# --- Show developer info ---
+about() {
+  echo -e "${Green}✨ Powered by ReVanced (revanced.app)"
+  termux-open-url "https://revanced.app/"
+  echo -e "${Green}🧑‍💻 Author arghya339 (github.com/arghya339)"
+  echo
 }
 
 while true; do
