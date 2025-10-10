@@ -957,30 +957,32 @@ UninstallPatchedApp() {
 }
 
 Unmount() {
-  su -c '/data/data/com.termux/files/usr/bin/bash -c '\''
   pkgArr=("com.google.android.youtube" "com.google.android.apps.youtube.music" "com.google.android.apps.photos" "com.spotify.music")
   nameArr=("YouTube" "YouTube Music" "Google Photos" "Spotify")
-
-  if [ -d "/data/adb/revanced" ]; then
-    while true; do
-      nameList=()  # Clear nameList array first
-      index=0  # This ensures sequential numbering
+  while true; do
+    su -c '/data/data/com.termux/files/usr/bin/bash -c '\''
+      if [ -d "/data/adb/revanced" ]; then
+        nameList=()  # Clear nameList array first
+        index=0  # This ensures sequential numbering
     
-      # Build available apps list
-      for i in "${!pkgArr[@]}"; do 
-        if [ -e "/data/adb/revanced/${pkgArr[$i]}/" ]; then
-          nameList[$index]="${nameArr[$i]}"
-          ((index++))
-        fi
-      done
+        # Build available apps list
+        for i in "${!pkgArr[@]}"; do 
+          if [ -e "/data/adb/revanced/${pkgArr[$i]}/" ]; then
+            nameList[$index]="${nameArr[$i]}"
+            ((index++))
+          fi
+        done
 
-      # Exit if no apps available
-      [ ${#nameList[@]} -eq 0 ] && { echo "No apps available!"; break; }
+        # Exit if no apps available
+        [ ${#nameList[@]} -eq 0 ] && { echo "No apps available!"; break; }
+      fi
+    '\'''
+
+    # Get Selection
+    buttons=("<Select>" "<Back>"); if menu "nameList" "buttons"; then selected="${nameList[$selected]}"; else break; fi
       
-      # Get Selection
-      buttons=("<Select>" "<Back>"); if menu "nameList" "buttons"; then selected="${nameList[$selected]}"; else break; fi
-      
-      # process selection
+    # process selection
+    su -c '/data/data/com.termux/files/usr/bin/bash -c '\''
       if [ -n "$selected"]; then
         for i in "${!nameArr[@]}"; do
           if [ "${nameArr[$i]}" = "${nameList[$selected]}" ]; then
@@ -989,9 +991,8 @@ Unmount() {
           fi
         done
       fi
-    done
-  fi
-  '\'''
+    '\'''
+  done
 }
 
 # --- Feature request prompt ---
