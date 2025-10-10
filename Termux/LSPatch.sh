@@ -583,7 +583,7 @@ menu() {
         elif [ $key -gt ${#options[@]} ]; then
           selected_option=0
         else
-          selected_option=$(($key - 1))
+          selected_option=$((key - 1))
         fi
         show_menu; sleep 0.5; break
        ;;
