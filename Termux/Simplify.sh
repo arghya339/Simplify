@@ -67,6 +67,7 @@ BoldGreen="\033[92;1m"
 Red="\033[91m"
 Blue="\033[94m"
 White="\033[37m"
+whiteBG="\e[47m\e[30m"
 Yellow="\033[93m"
 Reset="\033[0m"
 
@@ -1078,19 +1079,93 @@ about() {
   echo
 }
 
+menu() {
+  local -n menu_options=$1
+  local -n menu_buttons=$2
+  
+  selected_option=0
+  selected_button=0
+  
+  show_menu() {
+    printf '\033[2J\033[3J\033[H'
+    echo -e "${BoldGreen}$print_simplify${Reset}" && echo ""  # call print_simplify function
+    echo "Navigate with [↑] [↓] [←] [→]"
+    echo -e "Select with [↵]\n"
+    for ((i=0; i<=$((${#menu_options[@]} - 1)); i++)); do
+      if [ $i -eq $selected_option ]; then
+        echo -e "${whiteBG}➤ ${menu_options[$i]} $Reset"
+      else
+        [ $(($i + 1)) -le 9 ] && echo " $(($i + 1)). ${menu_options[$i]}" || echo "$(($i + 1)). ${menu_options[$i]}"
+      fi
+    done
+    echo
+    for ((i=0; i<=$((${#menu_buttons[@]} - 1)); i++)); do
+      if [ $i -eq $selected_button ]; then
+        [ $i -eq 0 ] && echo -ne "${whiteBG}➤ ${menu_buttons[$i]} $Reset" || echo -ne "  ${whiteBG}➤ ${menu_buttons[$i]} $Reset"
+      else
+        [ $i -eq 0 ] && echo -n "  ${menu_buttons[$i]}" || echo -n "   ${menu_buttons[$i]}"
+      fi
+    done
+    echo
+  }
+
+  printf '\033[?25l'
+  while true; do
+    show_menu
+    read -rsn1 key
+    case $key in
+      $'\E')  # ESC
+        # /bin/bash -c 'read -r -p "Type any ESC key: " input && printf "You Entered: %q\n" "$input"'  # q=safelyQuoted
+        read -rsn2 -t 0.1 key2
+        case "$key2" in
+          '[A')  # Up arrow
+            selected_option=$((selected_option - 1))
+            [ $selected_option -lt 0 ] && selected_option=$((${#menu_options[@]} - 1))
+            ;;
+          '[B')  # Down arrow
+            selected_option=$((selected_option + 1))
+            [ $selected_option -ge ${#menu_options[@]} ] && selected_option=0
+            ;;
+          '[C')  # Right arrow
+            [ $selected_button -lt $((${#menu_buttons[@]} - 1)) ] && selected_button=$((selected_button + 1))
+            ;;
+          '[D')  # Left arrow
+            [ $selected_button -gt 0 ] && selected_button=$((selected_button - 1))
+            ;;
+        esac
+        ;;
+      '')  # Enter key
+        break
+        ;;
+      [0-9])
+        read -rsn2 -t0.5 key2
+        [ -n $key2 ] && key="$key${key2}"
+        if [ $key -eq 0 ]; then
+          selected_option=$((${#options[@]} - 1))
+        elif [ $key -gt ${#options[@]} ]; then
+          selected_option=0
+        else
+          selected_option=$(($key - 1))
+        fi
+        show_menu; sleep 0.5; break
+       ;;
+    esac
+  done
+  printf '\033[?25h'
+
+  [ $selected_button -eq 0 ] && { printf '\033[2J\033[3J\033[H'; selected=$selected_option; }
+  [ $selected_button -eq $((${#menu_buttons[@]} - 1)) ] && { [ $isOverwriteTermuxProp -eq 1 ] && sed -i '/allow-external-apps/s/^/# /' "$HOME/.termux/termux.properties"; printf '\033[2J\033[3J\033[H'; echo "Script exited !!"; exit 0; }
+}
+
 while true; do
-  clear  # Clear
-  # Apply the eye color to the simplify shape and print it
-  echo -e "${BoldGreen}$print_simplify${Reset}" && echo ""  # Space
-  echo -e "P. Download Patched App\nR. ReVanced\nX. ReVanced Extended\nT. Piko Twitter\nD. Dropped Patches\nL. LSPatch\nC. Configuration\nM. Miscellaneous\nF. Feature request\nB. Bug report\nS. Support\nA. About\nQ. Quit\n"
-  echo -n "Select Patches source: " && read source
-  case $source in
-    [Pp])
+  options=(Download\ Patched\ App ReVanced ReVanced\ Extended Piko\ Twitter Dropped\ Patches LSPatch Configuration Miscellaneous Feature\ request Bug\ report Support About); buttons=("<Select>" "<Exit>"); menu "options" "buttons"; selected="${options[$selected]}"
+  case "$selected" in
+    Download\ Patched\ App)
       curl -sL -o "$Simplify/dlPatchedApp.sh" "https://raw.githubusercontent.com/arghya339/Simplify/refs/heads/main/Termux/dlPatchedApp.sh"
       bash "$Simplify/dlPatchedApp.sh"
       sleep 3
       ;;
-    [Rr])
+    ReVanced)
       if su -c "id" >/dev/null 2>&1; then
         pkgInstall "python"  # python install/update
         if ! pip list 2>/dev/null | grep -q "apksigcopier"; then
@@ -1101,7 +1176,7 @@ while true; do
       bash "$RV/RV.sh"
       sleep 3
       ;;
-    [Xx])
+    ReVanced\ Extended)
       if su -c "id" >/dev/null 2>&1; then
         pkgInstall "python"  # python install/update
         if ! pip list 2>/dev/null | grep -q "apksigcopier"; then
@@ -1112,22 +1187,22 @@ while true; do
       bash "$RVX/RVX.sh"
       sleep 3
       ;;
-    [Tt])
+    Piko\ Twitter)
       curl -sL -o "$pikoTwitter/pikoTwitter.sh" "https://raw.githubusercontent.com/arghya339/Simplify/refs/heads/main/Termux/pikoTwitter.sh"
       bash "$pikoTwitter/pikoTwitter.sh"
       sleep 3
       ;;
-    [Dd])
+    Dropped\ Patches)
       curl -sL -o "$Dropped/droppedPatches.sh" "https://raw.githubusercontent.com/arghya339/Simplify/refs/heads/main/Termux/droppedPatches.sh"
       bash "$Dropped/droppedPatches.sh"
       sleep 3
       ;;
-    [Ll])
+    LSPatch)
       curl -sL -o "$LSPatch/LSPatch.sh" "https://raw.githubusercontent.com/arghya339/Simplify/refs/heads/main/Termux/LSPatch.sh"
       bash "$LSPatch/LSPatch.sh"
       sleep 3
       ;;
-    [Cc]*)
+    Configuration)
       while true; do
         FetchPreRelease=$(jq -r '.FetchPreRelease' "$simplifyJson" 2>/dev/null)
         RipLocale="$(jq -r '.RipLocale' "$simplifyJson" 2>/dev/null)"
@@ -1313,7 +1388,7 @@ while true; do
       done
       sleep 3
       ;;
-    [Mm]*)
+    Miscellaneous)
       while true; do
         echo -e "\nV. Spoof Android Version\nA. Spoof Device Architecture\nD. Delete patched apk file\nL. Delete Patch Log\nP. Delete list-patches file\nO. Delete PatchesOption file\nU. Uninstall Patched Apps\nM. Unmount Patched Apps\nS. Uninstall Simplify\nQ. Quit\n"
         read -r -p "Select: " misc
@@ -1371,12 +1446,10 @@ while true; do
       done
       sleep 3
       ;;
-    [Ff]*) feature && sleep 3 ;;
-    [Bb]*) bug && sleep 3 ;;
-    [Ss]*) support && sleep 3 ;;
-    [Aa]*) about && sleep 3 ;;
-    [Qq]*) if [ $isOverwriteTermuxProp -eq 1 ]; then sed -i '/allow-external-apps/s/^/# /' "$HOME/.termux/termux.properties";fi && clear && break ;;
-    *) echo -e "$info Invalid input! Please enter: P / R / X / T / D / L / C / M / F / B / S / A / Q" && sleep 3 ;;
+    Feature\ request) feature && sleep 3 ;;
+    Bug\ report) bug && sleep 3 ;;
+    Support) support && sleep 3 ;;
+    About) about && sleep 3 ;;
   esac
 done
 ####################################################################################################################################################
