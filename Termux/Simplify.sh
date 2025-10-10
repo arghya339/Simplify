@@ -1321,7 +1321,8 @@ while true; do
       ;;
     Miscellaneous)
       while true; do
-        options=(Spoof\ Android\ Version Spoof\ Device\ Architecture Delete\ patched\ apk\ file Delete\ Patch\ Log Delete\ list-patches\ file Delete\ PatchesOption\ file Uninstall\ Patched\ Apps Unmount\ Patched\ Apps Uninstall\ Simplify)
+        options=(Spoof\ Android\ Version Spoof\ Device\ Architecture Delete\ patched\ apk\ file Delete\ Patch\ Log Delete\ list-patches\ file Delete\ PatchesOption\ file Uninstall\ Patched\ Apps Uninstall\ Simplify)
+        su -c "id" >/dev/null 2>&1 && options+=(Unmount\ Patched\ Apps)
         buttons=("<Select>" "<Back>"); if menu "options" "buttons"; then selected="${options[$selected]}"; else break; fi
         case "$selected" in
           Spoof\ Android\ Version) overwriteVersion ;;
