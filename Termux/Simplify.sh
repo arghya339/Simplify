@@ -1154,7 +1154,9 @@ menu() {
   printf '\033[?25h'
 
   [ $selected_button -eq 0 ] && { printf '\033[2J\033[3J\033[H'; selected=$selected_option; }
-  [ $selected_button -eq $((${#menu_buttons[@]} - 1)) ] && { [ $isOverwriteTermuxProp -eq 1 ] && sed -i '/allow-external-apps/s/^/# /' "$HOME/.termux/termux.properties"; printf '\033[2J\033[3J\033[H'; echo "Script exited !!"; exit 0; }
+  if [ $selected_button -eq $((${#menu_buttons[@]} - 1)) ]; then
+    [ "${menu_buttons[$((${#menu_buttons[@]} - 1))]}" == "<Back>" ] && { printf '\033[2J\033[3J\033[H'; break; } || { [ $isOverwriteTermuxProp -eq 1 ] && sed -i '/allow-external-apps/s/^/# /' "$HOME/.termux/termux.properties"; printf '\033[2J\033[3J\033[H'; echo "Script exited !!"; exit 0; }
+  fi
 }
 
 while true; do
@@ -1212,13 +1214,12 @@ while true; do
         ReadPatchesFile="$(jq -r '.ReadPatchesFile' "$simplifyJson" 2>/dev/null)"
         Branding=$(jq -r '.Branding' "$simplifyJson" 2>/dev/null)
         jdkVersion=$(jq -r '.openjdk' "$simplifyJson" 2>/dev/null)
-        echo -e "P. FetchPreRelease\nL. RipLocale\nD. RipDpi\nR. RipLib\nS. Change RVX Source\nT. Add gh PAT (increases gh api rate limit)\nO. Import Custom PatchesOptions from file\nB. Change YouTube & YT Music AppIcon & Header\nU. Check Termux update on startup\nJ. Change Java version\nI. SU/ SUI/ ADB Installation Options"
+        options=(FetchPreRelease RipLocale RipDpi RipLib Change\ RVX\ Source "Add gh PAT (increases gh api rate limit)" Import\ Custom\ PatchesOptions\ from\ file "Change YouTube & YT Music AppIcon & Header" Check\ Termux\ update\ on\ startup Change\ Java\ version "SU/ SUI/ ADB Installation Options")
         if [ "$(getprop ro.product.manufacturer)" == "Genymobile" ] && ! "$HOME/adb" -s $(~/adb devices 2>/dev/null | head -2 | tail -1 | awk '{print $1}') shell "id" >/dev/null 2>&1; then
-          echo "A. Pair ADB"
+          options+=(Pair\ ADB)
         fi
-        echo -e "Q. Quit\n"
-        read -r -p "Select: " opt
-        case "$opt" in
+        buttons=("<Select>" "<Back>"); menu "options" "buttons"; selected="${options[$selected]}"
+        case "$selected" in
           [Pp]*) if [ "$FetchPreRelease" == 0 ]; then echo "FetchPreRelease == false"; else echo "FetchPreRelease == true"; fi
             key="FetchPreRelease" && value="$isPreRelease"
             m1="Last Pre Release Patches will be fetched"
