@@ -418,7 +418,6 @@ fi
 # --- Arrays of apps list that required specific android version ---
 if [ $Android -ge 10 ]; then
   apps=(
-    Quit
     ${Snapchat}
     Discord
     ${LINE}
@@ -427,7 +426,6 @@ if [ $Android -ge 10 ]; then
   )
 elif [ $Android -eq 9 ]; then
   apps=(
-    Quit
     ${Snapchat}
     Discord
     ${googleDialer}
@@ -435,27 +433,23 @@ elif [ $Android -eq 9 ]; then
   )
 elif [ $Android -eq 8 ]; then
   apps=(
-    Quit
     ${Snapchat}
     Discord
     "1.1.1.1 + WARP"
   )
 elif [ $Android -eq 7 ]; then
   apps=(
-    Quit
     ${Snapchat}
     Discord
     "1.1.1.1 + WARP"
   )
 elif [ $Android -eq 6 ]; then
   apps=(
-    Quit
     ${Snapchat}
     "1.1.1.1 + WARP"
   )
 elif [ $Android -eq 5 ]; then
   apps=(
-    Quit
     ${Snapchat}
     "1.1.1.1 + WARP"
   )
