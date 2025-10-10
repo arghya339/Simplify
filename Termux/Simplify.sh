@@ -985,7 +985,7 @@ Unmount() {
     su -c '/data/data/com.termux/files/usr/bin/bash -c '\''
       if [ -n "$selected"]; then
         for i in "${!nameArr[@]}"; do
-          if [ "${nameArr[$i]}" = "${nameList[$selected]}" ]; then
+          if [ "${nameArr[$i]}" = "$selected" ]; then
             su -mm -c "/system/bin/sh /data/adb/post-fs-data.d/${pkgArr[$i]}.sh"
             break
           fi
