@@ -465,7 +465,6 @@ menu() {
   
   show_menu() {
     printf '\033[2J\033[3J\033[H'
-    echo -e "${BoldGreen}$print_simplify${Reset}" && echo ""  # call print_simplify function
     echo "Navigate with [↑] [↓] [←] [→]"
     echo -e "Select with [↵]\n"
     for ((i=0; i<=$((${#menu_options[@]} - 1)); i++)); do
