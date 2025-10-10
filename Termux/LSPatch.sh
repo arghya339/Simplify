@@ -323,14 +323,14 @@ build_app() {
       
       buttons=("<Install>" "<Mount>" "<Cancel>")
       confirmPrompt "Select ${appNameRef[0]} LSPatch installation operation" "buttons"
-      if [ $? -eq 0 ]; then opt=Install; elif [ $? -eq 1 ]; then opt=Mount; else opt=Cancel; fi
+      if [ $? -eq 0 ]; then opt=Install; elif [ $? -eq 1 ]; then opt=Mount; elif [ $? -eq 2 ]; then opt=Cancel; fi
       case $opt in
-        I*|i*|"")
+        Install)
           checkCoreLSPosed  # Call the check core patch functions
           echo -e "$running Please Wait !! Installing Patched ${appNameRef[0]} LSPatch apk.."
           bash $Simplify/apkInstall.sh "${output_apk_path}" ""
           ;;
-        M*|m*)
+        Mount)
           echo -e "$running Please Wait !! Mounting Patched ${appNameRef[0]} LSPatch apk.."
           su -mm -c "/system/bin/sh $Simplify/apkMount.sh \"${stock_apk_path}\" \"${output_apk_path}\"" &> /dev/null
           su -mm -c "/system/bin/sh $Simplify/apkMount.sh \"${stock_apk_path}\" \"${output_apk_path}\"" | tee "$SimplUsr/${appNameRef[0]}-LSPatch_mount-log.txt"
