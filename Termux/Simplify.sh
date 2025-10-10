@@ -1220,37 +1220,37 @@ while true; do
         fi
         buttons=("<Select>" "<Back>"); if menu "options" "buttons"; then selected="${options[$selected]}"; else break; fi
         case "$selected" in
-          [Pp]*) if [ "$FetchPreRelease" == 0 ]; then echo "FetchPreRelease == false"; else echo "FetchPreRelease == true"; fi
+          FetchPreRelease) if [ "$FetchPreRelease" == 0 ]; then echo "FetchPreRelease == false"; else echo "FetchPreRelease == true"; fi
             key="FetchPreRelease" && value="$isPreRelease"
             m1="Last Pre Release Patches will be fetched"
             m2="Latest Release Patches will be fetched"
             tfConfig "$key" "$value" "$m1" "$m2"
             ;;
-          [Ll]*) if [ "$RipLocale" == 1 ]; then echo "RipLocale == true"; else echo "RipLocale == false"; fi
+          RipLocale) if [ "$RipLocale" == 1 ]; then echo "RipLocale == true"; else echo "RipLocale == false"; fi
             key="RipLocale" && value="$isRipLocale"
             m1="Device specific locale will be kept in patched apk file"
             m2="All locale will be kept in patched apk file"
             tfConfig "$key" "$value" "$m1" "$m2"
             ;;
-          [Dd]*) if [ "$RipDpi" == 1 ]; then echo "RipDpi == true"; else echo "RipDpi == false"; fi
+          RipDpi) if [ "$RipDpi" == 1 ]; then echo "RipDpi == true"; else echo "RipDpi == false"; fi
             key="RipDpi" && value="$isRipDpi"
             m1="Device specific dpi will be kept in patched apk file"
             m2="All dpi will be kept in patched apk file"
             tfConfig "$key" "$value" "$m1" "$m2"
             ;;
-          [Rr]*) if [ "$RipLib" == 1 ]; then echo "RipLib == true"; else echo "RipLib == false"; fi
+          RipLib) if [ "$RipLib" == 1 ]; then echo "RipLib == true"; else echo "RipLib == false"; fi
             key="RipLib" && value="$isRipLib"
             m1="Device specific arch lib will be kept in patched apk file"
             m2="All lib dir will be kept in patched apk file"
             tfConfig "$key" "$value" "$m1" "$m2"
             ;;
-          [Ss]*) if [ "$ChangeRVXSource" == 0 ]; then echo "ChangeRVXSource == false"; else echo "ChangeRVXSource == true"; fi
+          Change\ RVX\ Source) if [ "$ChangeRVXSource" == 0 ]; then echo "ChangeRVXSource == false"; else echo "ChangeRVXSource == true"; fi
             key="ChangeRVXSource" && value="$isChangeRVXSource"
             m1="RVX Patches source will be changed to forked (@anddea)"
             m2="RVX Patches source will remain official (@inotia00)"
             tfConfig "$key" "$value" "$m1" "$m2"
             ;;
-          [Tt]*) 
+          "Add gh PAT (increases gh api rate limit)") 
             if { [ -f "$simplifyJson" ] && jq -e '.PAT' "$simplifyJson" >/dev/null 2>&1; } || { gh auth status > /dev/null 2>&1 && [ -f "$HOME/.config/gh/hosts.yml" ]; }; then
               if jq -e '.PAT' "$simplifyJson" >/dev/null 2>&1; then
                 echo -e "$info ${Green}PAT: ghp_************************************${Reset}"
@@ -1262,21 +1262,21 @@ while true; do
             fi
             pat  # Call the pat function to create & add GitHub token
             ;;
-          [Oo]*) if [ "$ReadPatchesFile" == 0 ]; then echo "ReadPatchesFile == false"; else echo "ReadPatchesFile == true"; fi
+          Import\ Custom\ PatchesOptions\ from\ file) if [ "$ReadPatchesFile" == 0 ]; then echo "ReadPatchesFile == false"; else echo "ReadPatchesFile == true"; fi
             key="ReadPatchesFile" && value="$isReadPatchesFile"
             m1="Custom PatchesOptions Loading from File"
             m2="Recommended PatchesOptions Loading from Script"
             tfConfig "$key" "$value" "$m1" "$m2"
             ;;
-          [Bb]*) echo "changeYouTubeYTMusicAppIconHeader == $Branding" && change_yt_ytm_app_icon_header ;;
-          [Uu]*) if [ $CheckTermuxUpdate -eq 1 ]; then echo "CheckTermuxUpdate == true"; else echo "CheckTermuxUpdate == false"; fi
+          "Change YouTube & YT Music AppIcon & Header") echo "changeYouTubeYTMusicAppIconHeader == $Branding" && change_yt_ytm_app_icon_header ;;
+          Check\ Termux\ update\ on\ startup) if [ $CheckTermuxUpdate -eq 1 ]; then echo "CheckTermuxUpdate == true"; else echo "CheckTermuxUpdate == false"; fi
             key="CheckTermuxUpdate" && value="$isCheckTermuxUpdate"
             m1="Check for Termux app updates on startup"
             m2="Never check for Termux app updates on startup"
             tfConfig "$key" "$value" "$m1" "$m2"
             ;;
-          [Jj]*) echo "openjdkVersion == $jdkVersion" && change_jdk_version ;;
-          [Ii]*)
+          Change\ Java\ version) echo "openjdkVersion == $jdkVersion" && change_jdk_version ;;
+          "SU/ SUI/ ADB Installation Options")
             while true; do
               InstallPackageFor=$(jq -r '.InstallPackageFor' "$simplifyJson" 2>/dev/null)
               KeepsData=$(jq -r '.KeepsData' "$simplifyJson" 2>/dev/null)
@@ -1373,7 +1373,7 @@ while true; do
               esac
             done
             ;;
-          [Aa]*)
+          Pair\ ADB)
             echo -e "Enable Developer Options:\n  1. Open Settings app on your device\n  2. tap About Phone\n  3. Find & tap 7 times on Build Number\n  4. You may need to enter your lock screen password\n  >>You will see a toast message saying 'You are now a developer!'"
             echo -e "Enable Wireless Debugging:\n  1. Go back to main Settings screen\n  2. Scroll down & tap System\n  3. Tap Developer Options\n  4. Scroll down & find Wireless Debugging\n  5. Toggle it ON\n  6. A new dialog box will appear with a warning. Read it and tap Allow"
             echo -e "Pair Device with Pairing Code:\n  1. In Wireless Debugging menu, tap Pair device with pairing code. It will show you a IP address & port (e.g., 192.168.1.50:40435) and a 6-digit pairing code (e.g., 123456).\n  2. open Termux & enter [IP address:port] [Wi-Fi pairing code] (e.g., 192.168.1.50:40435 123456)\n"
@@ -1383,8 +1383,6 @@ while true; do
             host_port=$(echo "$input" | awk '{print $1}'); pairing_code=$(echo "$input" | awk '{print $2}')
             ~/adb pair "$host_port" "$pairing_code"
             ;;
-          [Qq]*) break ;;
-          *) echo -e "$info Invalid input! Please enter P / L / D / R / S / T / O / B / U / J / I / A / Q." ;;
         esac
       done
       sleep 3
