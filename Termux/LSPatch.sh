@@ -323,7 +323,8 @@ build_app() {
       
       buttons=("<Install>" "<Mount>" "<Cancel>")
       confirmPrompt "Select ${appNameRef[0]} LSPatch installation operation" "buttons"
-      if [ $? -eq 0 ]; then opt=Install; elif [ $? -eq 1 ]; then opt=Mount; elif [ $? -eq 2 ]; then opt=Cancel; fi
+      exit_status=$?
+      if [ $exit_status -eq 0 ]; then opt=Install; elif [ $exit_status -eq 1 ]; then opt=Mount; elif [ $exit_status -eq 2 ]; then opt=Cancel; fi
       case $opt in
         Install)
           checkCoreLSPosed  # Call the check core patch functions
