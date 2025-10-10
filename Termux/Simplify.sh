@@ -1388,18 +1388,18 @@ while true; do
       ;;
     Miscellaneous)
       while true; do
-        echo -e "\nV. Spoof Android Version\nA. Spoof Device Architecture\nD. Delete patched apk file\nL. Delete Patch Log\nP. Delete list-patches file\nO. Delete PatchesOption file\nU. Uninstall Patched Apps\nM. Unmount Patched Apps\nS. Uninstall Simplify\nQ. Quit\n"
-        read -r -p "Select: " misc
-        case "$misc" in
-          [Vv]*) overwriteVersion ;;
-          [Aa]*) overwriteArch ;;
-          [Dd]*) DeletePatchedApk ;;
-          [Ll]*) DeletePatchLog ;;
-          [Pp]*) DeleteListPatches ;;
-          [Oo]*) DeletePatchesOption ;;
-          [Uu]*) UninstallPatchedApp ;;
-          [Mm]*) Unmount && sleep 3 ;;
-          [Ss]*)
+        options=(Spoof\ Android\ Version Spoof\ Device\ Architecture Delete\ patched\ apk\ file Delete\ Patch\ Log Delete\ list-patches\ file Delete\ PatchesOption\ file Uninstall\ Patched\ Apps Unmount\ Patched\ Apps Uninstall\ Simplify)
+        buttons=("<Select>" "<Back>"); if menu "options" "buttons"; then selected="${options[$selected]}"; else break; fi
+        case "$selected" in
+          Spoof\ Android\ Version) overwriteVersion ;;
+          Spoof\ Device\ Architecture) overwriteArch ;;
+          Delete\ patched\ apk\ file) DeletePatchedApk ;;
+          Delete\ Patch\ Log) DeletePatchLog ;;
+          Delete\ list-patches\ file) DeleteListPatches ;;
+          Delete\ PatchesOption\ file) DeletePatchesOption ;;
+          Uninstall\ Patched\ Apps) UninstallPatchedApp ;;
+          Unmount\ Patched\ Apps) Unmount && sleep 3 ;;
+          Uninstall\ Simplify)
             echo -ne "${Yellow}Are you sure you want to uninstall Simplify? [Y/n]${Reset}: " && read -r userInput
             case "$userInput" in
               [Yy]*)
@@ -1438,8 +1438,6 @@ while true; do
               *) echo -e "$info ${Blue}Invalid input! Uninstallation skipped.${Reset}" ;;
             esac
             ;;
-          [Qq]*) break ;;
-          *) echo -e "$info Invalid input! Please enter V or A or D or L or P or O or U or M or S." ;;
         esac
       done
       sleep 3
