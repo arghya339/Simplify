@@ -757,52 +757,6 @@ overwriteVersion() {
   done
 }
 
-overwriteArch() {
-  if jq -e '.DeviceArch != null' "$simplifyJson" >/dev/null 2>&1; then
-    cpuAbi=$(jq -r '.DeviceArch' "$simplifyJson" 2>/dev/null)  # Get Device Architecture from json
-    echo -e "$info Device architecture spoofed to $cpuAbi!"
-  else
-    echo -e "$info Device architecture not spoofed yet!"
-  fi
-  while true; do
-    echo -e "0. Disabled spoofing\n8. arm64-v8a\n7. armeabi-v7a\n4. x86_64\n6. x86\n"
-    read -r -p "Select: " arch
-    case "$arch" in
-      0)
-        echo -e "$running Disabling device architecture spoofing.."
-        jq -e 'del(.DeviceArch)' "$simplifyJson" > temp.json && mv temp.json "$simplifyJson"  # Delete DeviceArch key from simplify.json
-        echo -e "$good ${Green}Device architecture spoofing disabled successfully!${Reset}"
-        break
-        ;;
-      8)
-        echo -e "$running Spoofing device architecture to arm64-v8a.."
-        config "DeviceArch" "arm64-v8a"
-        echo -e "$good ${Green}Device architecture spoofed to arm64-v8a successfully!${Reset}"
-        break
-        ;;
-      7)
-        echo -e "$running Spoofing device architecture to armeabi-v7a.."
-        config "DeviceArch" "armeabi-v7a"
-        echo -e "$good ${Green}Device architecture spoofed to armeabi-v7a successfully!${Reset}"
-        break
-        ;;
-      4)
-        echo -e "$running Spoofing device architecture to x86_64.."
-        config "DeviceArch" "x86_64"
-        echo -e "$good ${Green}Device architecture spoofed to x86_64 successfully!${Reset}"
-        break
-        ;;
-      6)
-        echo -e "$running Spoofing device architecture to x86.."
-        config "DeviceArch" "x86"
-        echo -e "$good ${Green}Device architecture spoofed to x86 successfully!${Reset}"
-        break
-        ;;
-      *) echo -e "$info Invalid input! Please enter 0, 8, 7, 4, 6." ;;
-    esac
-  done
-}
-
 DeletePatchedApk() {
   local nameArr=("YouTube" "YT-Music" "Spotify" "TikTok" "Google Photos" "Instagram" "Facebook" "Facebook Messenger" "Reddit" "X" "Adobe Lightroom Mobile" "Photomath" "Duolingo" "RAR" "Amazon Prime Video" "Twitch" "Tumblr" "Threads" "Strava" "SoundCloud" "Proton Mail" "Calorie Counter MyFitnessPal" "NovaLauncher" "Tasker" "Crunchyroll" "Cricbuzz Cricket Scores and News")
   for app in "${nameArr[@]}"; do
@@ -1380,7 +1334,44 @@ while true; do
         buttons=("<Select>" "<Back>"); if menu "options" "buttons"; then selected="${options[$selected]}"; else break; fi
         case "$selected" in
           Spoof\ Android\ Version) overwriteVersion ;;
-          Spoof\ Device\ Architecture) overwriteArch ;;
+          Spoof\ Device\ Architecture)
+            if jq -e '.DeviceArch != null' "$simplifyJson" >/dev/null 2>&1; then
+              cpuAbi=$(jq -r '.DeviceArch' "$simplifyJson" 2>/dev/null)  # Get Device Architecture from json
+              echo -e "$info Device architecture spoofed to $cpuAbi!"
+            else
+              echo -e "$info Device architecture not spoofed yet!"
+            fi
+            options=(Disabled\ Arch\ spoofing arm64-v8a armeabi-v7a x86_64 x86); buttons=("<Select>" "<Back>"); if menu "options" "buttons"; then arch="${options[$selected]}"; fi
+            if [ -n "$arch" ]; then
+              case "$arch" in
+                Disabled\ Arch\ spoofing)
+                  echo -e "$running Disabling device architecture spoofing.."
+                  jq -e 'del(.DeviceArch)' "$simplifyJson" > temp.json && mv temp.json "$simplifyJson"  # Delete DeviceArch key from simplify.json
+                  echo -e "$good ${Green}Device architecture spoofing disabled successfully!${Reset}"
+                  ;;
+                arm64-v8a)
+                  echo -e "$running Spoofing device architecture to arm64-v8a.."
+                  config "DeviceArch" "arm64-v8a"
+                  echo -e "$good ${Green}Device architecture spoofed to arm64-v8a successfully!${Reset}"
+                  ;;
+                armeabi-v7a)
+                  echo -e "$running Spoofing device architecture to armeabi-v7a.."
+                  config "DeviceArch" "armeabi-v7a"
+                  echo -e "$good ${Green}Device architecture spoofed to armeabi-v7a successfully!${Reset}"
+                  ;;
+                x86_64)
+                  echo -e "$running Spoofing device architecture to x86_64.."
+                  config "DeviceArch" "x86_64"
+                  echo -e "$good ${Green}Device architecture spoofed to x86_64 successfully!${Reset}"
+                  ;;
+                x86)
+                  echo -e "$running Spoofing device architecture to x86.."
+                  config "DeviceArch" "x86"
+                  echo -e "$good ${Green}Device architecture spoofed to x86 successfully!${Reset}"
+                  ;;
+              esac
+            fi
+            ;;
           Delete\ patched\ apk\ file) DeletePatchedApk ;;
           Delete\ Patch\ Log) DeletePatchLog ;;
           Delete\ list-patches\ file) DeleteListPatches ;;
