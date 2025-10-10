@@ -959,39 +959,39 @@ UninstallPatchedApp() {
 Unmount() {
   pkgArr=("com.google.android.youtube" "com.google.android.apps.youtube.music" "com.google.android.apps.photos" "com.spotify.music")
   nameArr=("YouTube" "YouTube Music" "Google Photos" "Spotify")
-  while true; do
-    su -c '/data/data/com.termux/files/usr/bin/bash -c '\''
-      if [ -d "/data/adb/revanced" ]; then
-        nameList=()  # Clear nameList array first
-        index=0  # This ensures sequential numbering
     
-        # Build available apps list
-        for i in "${!pkgArr[@]}"; do 
-          if [ -e "/data/adb/revanced/${pkgArr[$i]}/" ]; then
-            nameList[$index]="${nameArr[$i]}"
-            ((index++))
-          fi
-        done
-
-        # Exit if no apps available
-        [ ${#nameList[@]} -eq 0 ] && { echo "No apps available!"; break; }
+  while true; do
+    # Build available apps list
+    nameList=()
+    index=0
+    
+    # Check which apps are available for unmounting
+    for i in "${!pkgArr[@]}"; do 
+      if su -c "[ -e '/data/adb/revanced/${pkgArr[$i]}/' ]" 2>/dev/null; then
+        nameList[$index]="${nameArr[$i]}"
+        ((index++))
       fi
-    '\'''
+    done
+    
+    [ ${#nameList[@]} -eq 0 ] && { echo -e "$info No mounted apps available to unmount!"; break; }  # Exit if no apps available
 
     # Get Selection
-    buttons=("<Select>" "<Back>"); if menu "nameList" "buttons"; then selected="${nameArr[$selected]}"; else break; fi
-      
-    # process selection
-    su -c '/data/data/com.termux/files/usr/bin/bash -c '\''
-      if [ -n "$selected"]; then
-        for i in "${!nameArr[@]}"; do
-          if [ "${nameArr[$i]}" = "$selected" ]; then
-            su -mm -c "/system/bin/sh /data/adb/post-fs-data.d/${pkgArr[$i]}.sh"
-            break
-          fi
-        done
-      fi
-    '\'''
+    buttons=("<Select>" "<Back>")
+    if menu "nameList" "buttons"; then 
+      selected="${nameList[$selected]}"
+            
+      # Process selection
+      for i in "${!nameArr[@]}"; do
+        if [ "${nameArr[$i]}" = "$selected" ]; then
+          echo -e "$running Unmounting ${nameArr[$i]}..."
+          su -c "/system/bin/sh /data/adb/post-fs-data.d/${pkgArr[$i]}.sh" 2>/dev/null
+          echo -e "$good ${Green}Successfully unmounted ${nameArr[$i]}!${Reset}"
+          break
+        fi
+      done
+    else 
+      break
+    fi
   done
 }
 
