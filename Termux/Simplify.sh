@@ -732,67 +732,6 @@ if [ $CheckTermuxUpdate -eq 1 ]; then
   fi
 fi
 
-change_jdk_version() {
-  # Get available JDK versions
-  attempt=0
-  while true; do
-    jdkVersion=($(pkg search openjdk 2>&1 | grep -E "^openjdk-[0-9]+/" | awk -F'[-/ ]' '{print $2}'))
-    if [ $attempt -eq 7 ]; then
-      echo -e "$notice Not found any java version in search result, after 7 attempts."
-      break
-    fi
-    if [ ${#jdkVersion[@]} -ne 0 ]; then
-      break
-    fi  
-    ((attempt++))
-    sleep 0.5  # wait 500 milliseconds
-  done
-  
-  if [ ${#jdkVersion[@]} -ne 0 ]; then
-    while true; do
-      # Display available versions
-      echo -e "$info Available openjdk versions:"
-      for i in "${!jdkVersion[@]}"; do
-        echo "▶ openjdk-${jdkVersion[$i]}"
-      done
-
-      # Prompt for version selection
-      echo -e "Enter jdk version number [${jdkVersion[@]}]: \c" && read version
-      
-      # if press enter key (input is empty) chose default openjdk version
-      if [ -z "$version" ]; then
-        version="$isJdkVersion"
-      fi
-
-      # Check if input is a valid number
-      if [[ ! "$version" =~ ^[0-9]+$ ]]; then
-        echo -e "$notice $version not a valid number! Please enter a valid openjdk version number."
-        continue  # skips current iteration & continue next iteration
-      fi
-
-      # Check if entered version exists in the array
-      found=false
-      for available_version in "${jdkVersion[@]}"; do
-        if [ "$available_version" = "$version" ]; then
-          found=true
-          break
-        fi
-      done
-    
-      # Display result
-      if [ "$found" = true ]; then
-        echo -e "$info Selected: openjdk-$version"
-        config "openjdk" "$version"
-        pkgInstall "openjdk-$version"  # java install/update
-        echo -e "$good ${Green}Java version change successfully!${Reset}"
-        break
-      else
-        echo -e "$notice openjdk-$version is not available! Available: ${jdkVersion[*]}"
-      fi
-    done
-  fi
-}
-
 overwriteVersion() {
   if jq -e '.AndroidVersion != null' "$simplifyJson" >/dev/null 2>&1; then
     Android=$(jq -r '.AndroidVersion' "$simplifyJson" 2>/dev/null)  # Get Android version from json
@@ -1308,7 +1247,27 @@ while true; do
             m2="Never check for Termux app updates on startup"
             tfConfig "$key" "$value" "$m1" "$m2"
             ;;
-          Change\ Java\ version) echo "openjdkVersion == $jdkVersion" && change_jdk_version ;;
+          Change\ Java\ version)
+            echo "openjdkVersion == $jdkVersion"
+            # Get available JDK versions
+            attempt=0
+            while true; do
+              jdkVersion=($(pkg search openjdk 2>&1 | grep -E "^openjdk-[0-9]+/" | awk -F'[-/ ]' '{print $2}'))
+              [ $attempt -eq 7 ] && { echo -e "$notice Not found any java version in search result, after 7 attempts."; break; }
+              [ ${#jdkVersion[@]} -ne 0 ] && break
+              ((attempt++))
+              sleep 0.5  # wait 500 milliseconds
+            done
+            # Select JDK versions
+            buttons=("<Select>" "<Back>"); if menu "jdkVersion" "buttons"; then version="${options[$selected]}"; fi
+            # Set JDK versions
+            if [ -n "$version" ]; then
+              echo -e "$info Selected: openjdk-$version"
+              config "openjdk" "$version"
+              pkgInstall "openjdk-$version"  # java install/update
+              echo -e "$good ${Green}Java version change successfully!${Reset}"
+            fi
+            ;;
           "SU/ SUI/ ADB Installation Options")
             while true; do
               InstallPackageFor=$(jq -r '.InstallPackageFor' "$simplifyJson" 2>/dev/null)
