@@ -304,7 +304,9 @@ build_app() {
     
     if [ "$pkgName" == "com.google.android.dialer" ]; then
       
-      echo -e "[?] ${Yellow}Please select installation type - 'M' for Mount or 'I' for SU-Install or 'N' for Installation cancel. [M/i/N]: ${Reset}\c" && read opt
+      buttons=("<Install>" "<Mount>" "<Cancel>")
+      confirmPrompt "Select ${appNameRef[0]} LSPatch installation operation" "buttons"
+      if [ $? -eq 0 ]; then opt=Install; elif [ $? -eq 1 ]; then opt=Mount; else opt=Cancel; fi
       case $opt in
         I*|i*|"")
           checkCoreLSPosed  # Call the check core patch functions
@@ -317,8 +319,7 @@ build_app() {
           su -mm -c "/system/bin/sh $Simplify/apkMount.sh \"${stock_apk_path}\" \"${output_apk_path}\"" | tee "$SimplUsr/${appNameRef[0]}-LSPatch_mount-log.txt"
           rm -f "${output_apk_path}"
           ;;
-        N*|n*) echo -e "$notice ${appNameRef[0]} LSPatch Installaion skipped!" ;;
-        *) echo -e "$info Invalid choice! ${appNameRef[0]} LSPatch Installaion skipped." ;;
+        Cancel) echo -e "$notice ${appNameRef[0]} LSPatch Installaion skipped!" ;;
       esac
     
     else
