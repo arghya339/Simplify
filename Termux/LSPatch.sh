@@ -185,11 +185,11 @@ confirmPrompt() {
         [ $Selected -eq 0 ] && echo -ne "${whiteBG}➤ ${prompt_buttons[0]} $Reset   ${prompt_buttons[1]}" || echo -ne "  ${prompt_buttons[0]}  ${whiteBG}➤ ${prompt_buttons[1]} $Reset"  # highlight selected bt with white bg
       elif [ ${#prompt_buttons[@]} -eq 3 ]; then
         if [ $Selected -eq 0 ]; then
-          echo -ne "${whiteBG}➤ ${prompt_buttons[0]} $Reset   ${prompt_buttons[1]}   ${prompt_buttons[2]}"
+          echo -ne "${whiteBG}➤ ${prompt_buttons[0]} $Reset   ${prompt_buttons[1]}    ${prompt_buttons[2]}"
         elif [ $Selected -eq 1 ]; then
-          echo -ne "  ${prompt_buttons[0]}  ${whiteBG}➤ ${prompt_buttons[1]} $Reset  ${prompt_buttons[2]}"
+          echo -ne "  ${prompt_buttons[0]}  ${whiteBG}➤ ${prompt_buttons[1]} $Reset   ${prompt_buttons[2]}"
         elif [ $Selected -eq 2 ]; then
-          echo -ne "  ${prompt_buttons[0]}  ${prompt_buttons[1]}   ${whiteBG}➤ ${prompt_buttons[2]} $Reset"
+          echo -ne "  ${prompt_buttons[0]}    ${prompt_buttons[1]}  ${whiteBG}➤ ${prompt_buttons[2]} $Reset"
         fi
       fi
     }; show_prompt
