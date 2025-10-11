@@ -1045,7 +1045,6 @@ menu() {
 
   show_menu() {
     printf '\033[2J\033[3J\033[H'
-    echo -e "${BoldGreen}$print_simplify${Reset}" && echo ""  # call print_simplify function
     # Display guide
     echo -n "Navigate with [↑] [↓] [←] [→]"
     [ $total_pages -gt 1 ] && echo -n " [PGUP] [PGDN]"
@@ -1149,7 +1148,7 @@ menu() {
 }
 
 while true; do
-  buttons=("<Select>" "<Back>"); if menu "options" "buttons"; then selected="${options[$selected]}"; else break; fi
+  buttons=("<Select>" "<Back>"); if menu "options" "buttons" "20"; then selected="${options[$selected]}"; else break; fi
   
   # main conditional control flow
   case "$selected" in
