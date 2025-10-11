@@ -261,13 +261,18 @@ dlUptodown() {
   apks_path=("$Download/${appName}_v${appVersion}-${Arch}.$file_ext")
   if [ ! -f "${apk_path[0]}" ] || [ ! -f "${apks_path[0]}" ]; then
     echo -e "$running Downloading $actualAppName.."
-    aria2c -U "User-Agent: $USER_AGENT" -x 16 -s 16 --console-log-level=error --summary-interval=0 --download-result=hide -c -o "${appName}_v${appVersion}-$Arch.$file_ext" -d "$Download" "$dlUrl"
-    dlStatus=$?
-    echo  # White Space
-    outputPath="$Download/${appName}_v${appVersion}-$Arch.$file_ext"
-    if [ $dlStatus == 0 ]; then
-      echo -e "$good Download complete. file saved to ${Cyan}$outputPath${Reset}"
-    fi
+    while true; do
+      aria2c -U "User-Agent: $USER_AGENT" -x 16 -s 16 --console-log-level=error --summary-interval=0 --download-result=hide -c -o "${appName}_v${appVersion}-$Arch.$file_ext" -d "$Download" "$dlUrl"
+      dlStatus=$?
+      echo  # White Space
+      if [ $dlStatus == 0 ]; then
+        outputPath="$Download/${appName}_v${appVersion}-$Arch.$file_ext"
+        echo -e "$good Download complete. file saved to ${Cyan}$outputPath${Reset}"
+        break
+      else
+        echo -e "$bad Download failed! retrying in 5 secons.." && sleep 5
+      fi
+    done
     
     sha256sum=$(sha256sum "$outputPath" | cut -d' ' -f1)
     if [ "$sha256sum" == "$SHA256" ]; then
