@@ -188,6 +188,70 @@ patch_twitter() {
   fi
 }
 
+confirmPrompt() {
+  Prompt=${1}
+  local -n prompt_buttons=$2
+  Selected=${3:-0}  # :- set value as 0 if unset
+  maxLen=50
+  
+  # breaks long prompts into multiple lines (50 characters per line)
+  lines=()  # empty array
+  while [ -n "$Prompt" ]; do
+    lines+=("${Prompt:0:$maxLen}")  # take first 50 characters from $Prompt starting at index 0
+    Prompt="${Prompt:$maxLen}"  # removes first 50 characters from $Prompt by starting at 50 to 0
+  done
+  
+  # print all-lines except last-line
+  last_line_index=$(( ${#lines[@]} - 1 ))  # ${#lines[@]} = number of elements in lines array
+  for (( i=0; i<last_line_index; i++ )); do
+    echo -e "${lines[i]}"
+  done
+  last_line="${lines[$last_line_index]}"
+  
+  echo -ne '\033[?25l'  # Hide cursor
+  while true; do
+    show_prompt() {
+      echo -ne "\r\033[K"  # n=noNewLine r=returnCursorToStartOfLine \033[K=clearLine
+      echo -ne "$last_line "
+      if [ ${#prompt_buttons[@]} -eq 2 ]; then
+        [ $Selected -eq 0 ] && echo -ne "${whiteBG}➤ ${prompt_buttons[0]} $Reset   ${prompt_buttons[1]}" || echo -ne "  ${prompt_buttons[0]}  ${whiteBG}➤ ${prompt_buttons[1]} $Reset"  # highlight selected bt with white bg
+      elif [ ${#prompt_buttons[@]} -eq 3 ]; then
+        if [ $Selected -eq 0 ]; then
+          echo -ne "${whiteBG}➤ ${prompt_buttons[0]} $Reset   ${prompt_buttons[1]}    ${prompt_buttons[2]}"
+        elif [ $Selected -eq 1 ]; then
+          echo -ne "  ${prompt_buttons[0]}  ${whiteBG}➤ ${prompt_buttons[1]} $Reset   ${prompt_buttons[2]}"
+        elif [ $Selected -eq 2 ]; then
+          echo -ne "  ${prompt_buttons[0]}    ${prompt_buttons[1]}  ${whiteBG}➤ ${prompt_buttons[2]} $Reset"
+        fi
+      fi
+    }; show_prompt
+
+    read -rsn1 key
+    case $key in
+      $'\E')
+      # /bin/bash -c 'read -r -p "Type any ESC key: " input && printf "You Entered: %q\n" "$input"'  # q=safelyQuoted
+        read -rsn2 -t 0.1 key2  # -r=readRawInput -s=silent(noOutput) -t=timeout -n2=readTwoChar | waits upto 0.1s=100ms to read key 
+        case $key2 in 
+          '[C')  # right arrow key
+            Selected=$((Selected + 1))
+            [ $Selected -gt ${#prompt_buttons[@]} ] && Selected=$((${#prompt_buttons[@]} - 1))
+            ;;
+          '[D')  # left arrow key
+            Selected=$((Selected - 1))
+            [ $Selected -lt 0 ] && Selected=0
+            ;;
+        esac
+        ;;
+      [Yy]*|[Ii]*) Selected=0; show_prompt; break ;;
+      [Nn]*|[Mm]*) Selected=1; show_prompt; break ;;
+      [Cc]*) Selected=2; show_prompt; break ;;
+      "") break ;;  # Enter key
+    esac
+  done
+  echo -e '\033[?25h' # Show cursor
+  return $Selected  # return Selected int index from this fun
+}
+
 # --- Twitter app Info ---
 appName=("X")
 pkgName="com.twitter.android"
@@ -218,17 +282,16 @@ fi
 
 # --- app installation prompt ---
 if [ -f "$outputAPK" ]; then
-  echo -e "[?] ${Yellow}Do you want to install Piko Twitter app? [Y/n] ${Reset}\c" && read opt
+  buttons=("<Yes>" "<No>"); confirmPrompt "Do you want to install Piko Twitter app?" "buttons" && opt=Yes || opt=No
   case $opt in
     y*|Y*|"")
       echo -e "$running Please Wait !! Installing Patched Piko Twitter apk.."
       bash $Simplify/apkInstall.sh "$outputAPK" "$activityPatched"
       ;;
     n*|N*) echo -e "$notice Piko Twitter Installaion skipped!" ;;
-    *) echo -e "$info Invalid choice! Piko Twitter Installaion skipped." ;;
   esac
     
-  echo -e "[?] ${Yellow}Do you want to Share Piko Twitter app? [Y/n] ${Reset}\c" && read opt
+  buttons=("<Yes>" "<No>"); confirmPrompt "Do you want to Share Piko Twitter app?" "buttons" "1" && opt=Yes || opt=No
   case $opt in
     y*|Y*|"")
       echo -e "$running Please Wait !! Sharing Patched Piko Twitter apk.."
@@ -241,7 +304,6 @@ if [ -f "$outputAPK" ]; then
         am start -a android.intent.action.VIEW -d "content://com.android.externalstorage.documents/document/primary:Simplify" -t "vnd.android.document/directory" -n com.android.documentsui/com.android.documentsui.files.FilesActivity > /dev/null 2>&1  # Open Android Files
       fi
       ;;
-    *) echo -e "$info Invalid choice! Piko Twitter Sharing skipped." ;;
   esac
 fi
 #######################################################################
