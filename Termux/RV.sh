@@ -857,7 +857,6 @@ options=(CHANGELOG Spoof\ Device\ Arch List\ of\ Patches)
 # --- Arrays of apps list that required specific android version ---
 if [ $Android -ge 12 ]; then
   apps=(
-    Quit
     YouTube
     $Spotify
     TikTok
@@ -884,7 +883,6 @@ if [ $Android -ge 12 ]; then
   )
 elif [ $Android -eq 11 ]; then
   apps=(
-    Quit
     YouTube
     $Spotify
     TikTok
@@ -910,7 +908,6 @@ elif [ $Android -eq 11 ]; then
   )
 elif [ $Android -eq 10 ]; then
   apps=(
-    Quit
     YouTube
     $Spotify
     TikTok
@@ -936,7 +933,6 @@ elif [ $Android -eq 10 ]; then
   )
 elif [ $Android -eq 9 ]; then
   apps=(
-    Quit
     YouTube
     $Spotify
     TikTok
@@ -960,7 +956,6 @@ elif [ $Android -eq 9 ]; then
   )
 elif [ $Android -eq 8 ]; then
   apps=(
-    Quit
     YouTube
     $Spotify
     TikTok
@@ -983,7 +978,6 @@ elif [ $Android -eq 8 ]; then
   )
 elif [ $Android -eq 7 ]; then
   apps=(
-    Quit
     $Spotify
     TikTok
     Google\ Photos
@@ -999,7 +993,6 @@ elif [ $Android -eq 7 ]; then
   )
 elif [ $Android -eq 6 ]; then
   apps=(
-    Quit
     TikTok
     Google\ Photos
     ${fbMessenger}
@@ -1012,7 +1005,6 @@ elif [ $Android -eq 6 ]; then
   )
 elif [ $Android -eq 5 ]; then
   apps=(
-    Quit
     TikTok
     Google\ Photos
     ${fbMessenger}
@@ -1024,10 +1016,7 @@ elif [ $Android -eq 5 ]; then
     Cricbuzz
   )
 elif [ $Android -eq 4 ]; then
-  apps=(
-    Quit
-    RAR
-  )
+  apps=(RAR)
 fi
 
 options+=(${apps[@]})
