@@ -591,15 +591,15 @@ menu() {
   done
   printf '\033[?25h'
 
-  [ $selected_button -eq 0 ] && { printf '\033[2J\033[3J\033[H'; selected=$selected_option; }
+  [ $selected_button -eq 0 ] && { printf '\033[2J\033[3J\033[H'; selected=$selected_option; echo "selected: $selected"; }
   if [ $selected_button -eq $((${#menu_buttons[@]} - 1)) ]; then
     [ "${menu_buttons[$((${#menu_buttons[@]} - 1))]}" == "<Back>" ] && { printf '\033[2J\033[3J\033[H'; return 1; } || { [ $isOverwriteTermuxProp -eq 1 ] && sed -i '/allow-external-apps/s/^/# /' "$HOME/.termux/termux.properties"; printf '\033[2J\033[3J\033[H'; echo "Script exited !!"; exit 0; }
   fi
 }
 
 while true; do
-  buttons=("<Select>" "<Back>"); selected=""; if menu "apps" "buttons"; then selected="${apps[$selected]}"; else break; fi
-  
+  buttons=("<Select>" "<Back>"); selected=""; if menu "apps" "buttons"; then { echo "selected: $selected"; selected="${apps[$selected]}"; }; else break; fi
+  echo "selected: $selected"
   # main conditional control flow
   case "$selected" in
     Snapchat)
