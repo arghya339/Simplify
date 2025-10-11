@@ -585,7 +585,7 @@ menu() {
         else
           selected_option=$((key - 1))
         fi
-        show_menu; echo "key: $key, selected_option: $selected_option"; sleep 0.5; break
+        show_menu; echo "key: $key, selected_option: $selected_option"; sleep 30; break
        ;;
     esac
   done
