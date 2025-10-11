@@ -721,8 +721,9 @@ while true; do
       fi
       ;;
     List\ of\ Patches)
-      unset apps[0] apps[1] apps[2]; apps=("${apps[@]}")  # Remove element at index 0,1,2 and reindex
-      buttons=("<Select>" "<Back>"); if menu "apps" "buttons"; then selected="${apps[$selected]}"; fi
+      apps_list=("${apps[@]}")
+      unset apps_list[0] apps_list[1] apps_list[2]; apps_list=("${apps_list[@]}")  # Remove element at index 0,1,2 and reindex
+      buttons=("<Select>" "<Back>"); if menu "apps_list" "buttons"; then selected="${apps_list[$selected]}"; fi
       if [ -n "$selected" ]; then
         case "$selected" in
           YouTube)
