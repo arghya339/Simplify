@@ -1137,7 +1137,7 @@ menu() {
 }
 
 while true; do
-  buttons=("<Select>" "<Back>"); if menu "options" "buttons" "20"; then selected="${options[$selected]}"; else break; fi
+  buttons=("<Select>" "<Back>"); if menu "options" "buttons" "22"; then selected="${options[$selected]}"; else break; fi
   
   # main conditional control flow
   case "$selected" in
@@ -1189,7 +1189,7 @@ while true; do
       apps_list=(universal-patches)
       apps_list+=("${apps[@]}")
       
-      buttons=("<Select>" "<Back>"); if menu "apps_list" "buttons" "20"; then selected="${apps_list[$selected]}"; fi
+      buttons=("<Select>" "<Back>"); if menu "apps_list" "buttons" "22"; then selected="${apps_list[$selected]}"; fi
       if [ -n "$selected" ]; then
         case "$selected" in
           universal-patches)
