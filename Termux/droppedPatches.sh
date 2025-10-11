@@ -318,6 +318,7 @@ while true; do
       activityPatched="net.dinglisch.android.taskerm/.Tasker"
       build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "$outputAPK" "$log" "$pkgName" "$activityPatched"
       ;;
-  esac  
+  esac
+  sleep 5  # wait 5 seconds
 done
 ###################################################################################################################
