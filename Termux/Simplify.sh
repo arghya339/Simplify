@@ -951,41 +951,29 @@ UninstallPatchedApp() {
   )
   
   while true; do
+    buttons=("<Select>" "<Back>"); if menu "nameArr" "buttons" "15"; then selected=$selected; else break; fi
     
-    # Display menu
-    echo "Available apps:"
-    for i in "${!nameArr[@]}"; do
-      echo "$i. ${nameArr[i]}"
-    done
-
-    # Get user input
-    read -p "Enter index [0-$(( ${#nameArr[@]} - 1 ))] or 'Q' to quit: " idx
-    
-    [[ "$idx" =~ [Qq] ]] && break
-    
-    # Validate and process selection
-    if [[ "$idx" =~ ^[0-9]+$ ]] && [ "$idx" -lt "${#nameArr[@]}" ]; then
+    # Process selection
+    if [ -n "$selected" ] && [[ "$selected" == [0-9] ]]; then
       if su -c "id" >/dev/null 2>&1; then
-        echo "Uninstalling: ${nameArr[idx]}"
+        echo "$running Uninstalling ${nameArr[$selected]}.."
         if [ "$(su -c 'getenforce 2>/dev/null')" = "Enforcing" ]; then
           su -c "setenforce 0"  # set SELinux to Permissive mode to unblock unauthorized operations
-          su -c "pm uninstall --user 0 ${pkgArr[idx]}"
+          su -c "pm uninstall --user 0 ${pkgArr[$selected]}"
           su -c "setenforce 1"  # set SELinux to Enforcing mode to block unauthorized operations
         else
-          su -c "pm uninstall --user 0 ${pkgArr[idx]}"
+          su -c "pm uninstall --user 0 ${pkgArr[$selected]}"
         fi
       elif "$HOME/rish" -c "id" >/dev/null 2>&1; then
-        echo "Uninstalling: ${nameArr[idx]}"
-        ~/rish -c "pm uninstall --user 0 ${pkgArr[idx]}"
+        echo "$running Uninstalling ${nameArr[$selected]}.."
+        ~/rish -c "pm uninstall --user 0 ${pkgArr[$selected]}"
       else
-        #am start -a android.intent.action.DELETE -d package:"${pkgArr[idx]}" > /dev/null 2>&1
-        am start -a android.intent.action.UNINSTALL_PACKAGE -d package:"${pkgArr[idx]}" > /dev/null 2>&1
+        #am start -a android.intent.action.DELETE -d package:"${pkgArr[$selected]}" > /dev/null 2>&1
+        am start -a android.intent.action.UNINSTALL_PACKAGE -d package:"${pkgArr[$selected]}" > /dev/null 2>&1
         sleep 6  # wait 6 seconds
-        #echo "Opening App info Activity for: ${nameArr[idx]}"
-        am start -a android.settings.APPLICATION_DETAILS_SETTINGS -d package:"${pkgArr[idx]}" > /dev/null 2>&1
+        #echo "Opening App info Activity for: ${nameArr[selected]}"
+        am start -a android.settings.APPLICATION_DETAILS_SETTINGS -d package:"${pkgArr[$selected]}" > /dev/null 2>&1
       fi
-    else
-      echo "Invalid selection! Please enter a number between 0 and $((${#nameArr[@]} - 1))."
     fi
 
   done
