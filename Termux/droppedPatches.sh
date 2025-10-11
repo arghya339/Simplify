@@ -212,7 +212,7 @@ build_app() {
   
   if [ -f "$outputAPK" ]; then
 
-    buttons=("<Yes>" "<No>"); confirmPrompt "Do you want to Install ${appNameRef[0]} LSPatch app?" "buttons" && opt=Yes || opt=No
+    buttons=("<Yes>" "<No>"); confirmPrompt "Do you want to Install ${appNameRef[0]} Dropped app?" "buttons" && opt=Yes || opt=No
     case $opt in
       y*|Y*|"")
         echo -e "$notice ${Yellow}Warning! Disable auto updates for the patched app to avoid unexpected issues.${Reset}"
@@ -222,7 +222,7 @@ build_app() {
       n*|N*) echo -e "$notice ${appNameRef[0]} Dropped Installaion skipped!" ;;
     esac
     
-    buttons=("<Yes>" "<No>"); confirmPrompt "Do you want to Share ${appNameRef[0]} LSPatch app?" "buttons" "1" && opt=Yes || opt=No
+    buttons=("<Yes>" "<No>"); confirmPrompt "Do you want to Share ${appNameRef[0]} Dropped app?" "buttons" "1" && opt=Yes || opt=No
     case $opt in
       y*|Y*|"")
         echo -e "$running Please Wait !! Sharing Patched ${appNameRef[0]} Dropped apk.."
