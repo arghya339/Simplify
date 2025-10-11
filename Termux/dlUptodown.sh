@@ -265,7 +265,7 @@ dlUptodown() {
       aria2c -U "User-Agent: $USER_AGENT" -x 16 -s 16 --console-log-level=error --summary-interval=0 --download-result=hide -c -o "${appName}_v${appVersion}-$Arch.$file_ext" -d "$Download" "$dlUrl"
       dlStatus=$?
       echo  # White Space
-      if [ $dlStatus == 0 ]; then
+      if [ $dlStatus -eq 0 ]; then
         outputPath="$Download/${appName}_v${appVersion}-$Arch.$file_ext"
         echo -e "$good Download complete. file saved to ${Cyan}$outputPath${Reset}"
         break
