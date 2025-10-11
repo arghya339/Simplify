@@ -843,7 +843,6 @@ menu() {
         [ $i -eq 0 ] && echo -n "  ${menu_buttons[$i]}" || echo -n "   ${menu_buttons[$i]}"
       fi
     done
-    echo
   }
 
   printf '\033[?25l'
