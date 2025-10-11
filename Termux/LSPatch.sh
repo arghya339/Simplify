@@ -576,8 +576,6 @@ menu() {
         break
         ;;
       [0-9])
-        #read -rsn2 -t0.5 key2
-        #[[ "$key2" == [0-9] ]] && { key="${key}${key2}"; key=$((10#$key)); }  # Convert to integer (decimal) from strings
         if [ $key -eq 0 ]; then
           selected_option=$((${#menu_options[@]} - 1))
         elif [ $key -gt ${#menu_options[@]} ]; then
@@ -585,21 +583,21 @@ menu() {
         else
           selected_option=$((key - 1))
         fi
-        show_menu; echo "key: $key, selected_option: $selected_option"; sleep 30; break
+        show_menu; sleep 0.5; break
        ;;
     esac
   done
   printf '\033[?25h'
 
-  [ $selected_button -eq 0 ] && { printf '\033[2J\033[3J\033[H'; selected=$selected_option; echo "selected: $selected"; }
+  [ $selected_button -eq 0 ] && { printf '\033[2J\033[3J\033[H'; selected=$selected_option;}
   if [ $selected_button -eq $((${#menu_buttons[@]} - 1)) ]; then
     [ "${menu_buttons[$((${#menu_buttons[@]} - 1))]}" == "<Back>" ] && { printf '\033[2J\033[3J\033[H'; return 1; } || { [ $isOverwriteTermuxProp -eq 1 ] && sed -i '/allow-external-apps/s/^/# /' "$HOME/.termux/termux.properties"; printf '\033[2J\033[3J\033[H'; echo "Script exited !!"; exit 0; }
   fi
 }
 
 while true; do
-  buttons=("<Select>" "<Back>"); selected=""; if menu "apps" "buttons"; then { echo "selected: $selected"; selected="${apps[$selected]}"; }; else break; fi
-  echo "selected: $selected"
+  buttons=("<Select>" "<Back>"); selected=""; if menu "apps" "buttons"; then selected="${apps[$selected]}"; else break; fi
+  
   # main conditional control flow
   case "$selected" in
     Snapchat)
