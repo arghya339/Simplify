@@ -544,13 +544,77 @@ comment
   fi
 }
 
+confirmPrompt() {
+  Prompt=${1}
+  local -n prompt_buttons=$2
+  Selected=${3:-0}  # :- set value as 0 if unset
+  maxLen=50
+  
+  # breaks long prompts into multiple lines (50 characters per line)
+  lines=()  # empty array
+  while [ -n "$Prompt" ]; do
+    lines+=("${Prompt:0:$maxLen}")  # take first 50 characters from $Prompt starting at index 0
+    Prompt="${Prompt:$maxLen}"  # removes first 50 characters from $Prompt by starting at 50 to 0
+  done
+  
+  # print all-lines except last-line
+  last_line_index=$(( ${#lines[@]} - 1 ))  # ${#lines[@]} = number of elements in lines array
+  for (( i=0; i<last_line_index; i++ )); do
+    echo -e "${lines[i]}"
+  done
+  last_line="${lines[$last_line_index]}"
+  
+  echo -ne '\033[?25l'  # Hide cursor
+  while true; do
+    show_prompt() {
+      echo -ne "\r\033[K"  # n=noNewLine r=returnCursorToStartOfLine \033[K=clearLine
+      echo -ne "$last_line "
+      if [ ${#prompt_buttons[@]} -eq 2 ]; then
+        [ $Selected -eq 0 ] && echo -ne "${whiteBG}➤ ${prompt_buttons[0]} $Reset   ${prompt_buttons[1]}" || echo -ne "  ${prompt_buttons[0]}  ${whiteBG}➤ ${prompt_buttons[1]} $Reset"  # highlight selected bt with white bg
+      elif [ ${#prompt_buttons[@]} -eq 3 ]; then
+        if [ $Selected -eq 0 ]; then
+          echo -ne "${whiteBG}➤ ${prompt_buttons[0]} $Reset   ${prompt_buttons[1]}    ${prompt_buttons[2]}"
+        elif [ $Selected -eq 1 ]; then
+          echo -ne "  ${prompt_buttons[0]}  ${whiteBG}➤ ${prompt_buttons[1]} $Reset   ${prompt_buttons[2]}"
+        elif [ $Selected -eq 2 ]; then
+          echo -ne "  ${prompt_buttons[0]}    ${prompt_buttons[1]}  ${whiteBG}➤ ${prompt_buttons[2]} $Reset"
+        fi
+      fi
+    }; show_prompt
+
+    read -rsn1 key
+    case $key in
+      $'\E')
+      # /bin/bash -c 'read -r -p "Type any ESC key: " input && printf "You Entered: %q\n" "$input"'  # q=safelyQuoted
+        read -rsn2 -t 0.1 key2  # -r=readRawInput -s=silent(noOutput) -t=timeout -n2=readTwoChar | waits upto 0.1s=100ms to read key 
+        case $key2 in 
+          '[C')  # right arrow key
+            Selected=$((Selected + 1))
+            [ $Selected -gt ${#prompt_buttons[@]} ] && Selected=$((${#prompt_buttons[@]} - 1))
+            ;;
+          '[D')  # left arrow key
+            Selected=$((Selected - 1))
+            [ $Selected -lt 0 ] && Selected=0
+            ;;
+        esac
+        ;;
+      [Yy]*|[Ii]*) Selected=0; show_prompt; break ;;
+      [Nn]*|[Mm]*) Selected=1; show_prompt; break ;;
+      [Cc]*) Selected=2; show_prompt; break ;;
+      "") break ;;  # Enter key
+    esac
+  done
+  echo -e '\033[?25h' # Show cursor
+  return $Selected  # return Selected int index from this fun
+}
+
 # --- function for common app installation prompt ---
 commonPrompt() {
-    echo -e "[?] ${Yellow}Do you want to install ${appNameRef[0]} RV app? [Y/n] ${Reset}\c" && read opt
+    buttons=("<Yes>" "<No>"); confirmPrompt "Do you want to install ${appNameRef[0]} RV app?" "buttons" && opt=Yes || opt=No
     case $opt in
       y*|Y*|"")
         if [ $pkgName == "com.instagram.android" ] || [ $pkgName == "com.instagram.barcelona" ]; then
-          echo -e "[?] ${Yellow}Do you want to Change ${appNameRef[0]} RV app versionCode? [Y/n] ${Reset}\c" && read opt
+          buttons=("<Yes>" "<No>"); confirmPrompt "Do you want to Change ${appNameRef[0]} RV app versionCode?" "buttons" && opt=Yes || opt=No
           case $opt in
             y*|Y*|"")
               termux-wake-lock
@@ -561,7 +625,6 @@ commonPrompt() {
               fi
               ;;
             n*|N*) echo -e "$notice ${Yellow}Warning! Disable auto updates for the patched app to avoid unexpected issues.${Reset}" ;;
-            *) echo -e "$info Invalid choice! Change ${appNameRef[0]} RV versionCode skipped." ;;
           esac
         elif [ $pkgName == "com.facebook.katana" ] || [ $pkgName == "com.facebook.orca" ] || [ $pkgName == "com.zhiliaoapp.musically" ]; then
           echo -e "$notice ${Yellow}Warning! Disable auto updates for the patched app to avoid unexpected issues.${Reset}"
@@ -570,10 +633,9 @@ commonPrompt() {
         bash $Simplify/apkInstall.sh "$outputAPK" "$activityPatched"
         ;;
       n*|N*) echo -e "$notice ${appNameRef[0]} RV Installaion skipped!" ;;
-      *) echo -e "$info Invalid choice! ${appNameRef[0]} RV Installaion skipped." ;;
     esac
     
-    echo -e "[?] ${Yellow}Do you want to Share ${appNameRef[0]} RV app? [Y/n] ${Reset}\c" && read opt
+    buttons=("<Yes>" "<No>"); confirmPrompt "Do you want to Share ${appNameRef[0]} RV app?" "buttons" "1" && opt=Yes || opt=No
     case $opt in
       y*|Y*|"")
         echo -e "$running Please Wait !! Sharing Patched ${appNameRef[0]} RV apk.."
@@ -586,7 +648,6 @@ commonPrompt() {
           am start -a android.intent.action.VIEW -d "content://com.android.externalstorage.documents/document/primary:Simplify" -t "vnd.android.document/directory" -n com.android.documentsui/com.android.documentsui.files.FilesActivity > /dev/null 2>&1  # Open Android Files
         fi
         ;;
-        *) echo -e "$info Invalid choice! ${appNameRef[0]} RV Sharing skipped." ;;
     esac
 }
 
@@ -652,7 +713,10 @@ build_app() {
       if su -c "id" >/dev/null 2>&1; then
         
         if [ "$pkgName" == "com.google.android.youtube" ]; then
-          echo -e "[?] ${Yellow}Please select installation type - 'M' for Mount or 'I' for SU-Install or 'N' for Installation cancel. [M/i/N]: ${Reset}\c" && read opt
+          buttons=("<Install>" "<Mount>" "<Cancel>")
+          confirmPrompt "Select ${appNameRef[0]} RV installation operation" "buttons"
+          exit_status=$?
+          if [ $exit_status -eq 0 ]; then opt=Install; elif [ $exit_status -eq 1 ]; then opt=Mount; elif [ $exit_status -eq 2 ]; then opt=Cancel; fi
           case $opt in
             I*|i*|"")
               checkCoreLSPosed  # Call the check core patch functions
@@ -669,11 +733,10 @@ build_app() {
               su -mm -c "/system/bin/sh $Simplify/apkMount.sh \"${stock_apk_path}\" \"$outputAPK\"" | tee "$SimplUsr/${appNameRef[0]}-RV_mount-log.txt"
               rm -f "$outputAPK"
               ;;
-            N*|n*) echo -e "$notice ${appNameRef[0]} RV Installaion skipped!" ;;
-            *) echo -e "$info Invalid choice! ${appNameRef[0]} RV Installaion skipped." ;;
+            C*|c*) echo -e "$notice ${appNameRef[0]} RV Installaion skipped!" ;;
           esac
         elif [ "$pkgName" == "com.google.android.apps.photos" ] || [ "$pkgName" == "com.google.android.apps.recorder" ] || [ "$pkgName" == "com.spotify.music" ]; then
-          echo -e "[?] ${Yellow}Do you want to Mount ${appNameRef[0]} RV app? [Y/n] ${Reset}\c" && read opt
+          buttons=("<Yes>" "<No>"); confirmPrompt "Do you want to Mount ${appNameRef[0]} RV app?" "buttons" && opt=Yes || opt=No
           case $opt in
             y*|Y*|"")
               echo -e "$running Please Wait !! Mounting Patched ${appNameRef[0]} RV apk.."
@@ -682,21 +745,19 @@ build_app() {
               rm -f "$outputAPK"
               ;;
             n*|N*) echo -e "$notice ${appNameRef[0]} RV Installaion skipped!" ;;
-            *) echo -e "$info Invalid choice! ${appNameRef[0]} RV Installaion skipped." ;;
           esac
         fi
       
       else
         
         echo -e "$info VancedMicroG is used to run MicroG services without root. \nYouTube and YouTube Music won't work without it. \nIf you already have VancedMicroG, You don't need to install it."
-        echo -e "[?] ${Yellow}Do you want to install VancedMicroG app? [Y/n]${Reset} \c" && read opt
+        buttons=("<Yes>" "<No>"); confirmPrompt "Do you want to install VancedMicroG app?" "buttons" && opt=Yes || opt=No
         case $opt in
           y*|Y*|"")
             echo -e "$running Please Wait !! Installing VancedMicroG apk.."
             bash $Simplify/apkInstall.sh "$VancedMicroG" "com.mgoogle.android.gms/org.microg.gms.ui.SettingsActivity"
             ;;
           n*|N*) echo -e "$notice VancedMicroG Installaion skipped!" ;;
-          *) echo -e "$info Invalid choice! VancedMicroG Installaion skipped." ;;
         esac
         commonPrompt
         
