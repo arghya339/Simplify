@@ -561,7 +561,7 @@ build_app() {
               su -mm -c "/system/bin/sh $Simplify/apkMount.sh \"${stock_apk_ref[0]}\" $outputAPK" | tee "$SimplUsr/${appNameRef[0]}-RVX_mount_log.txt"
               rm $outputAPK
               ;;
-            N*|n*) echo -e "$notice ${appNameRef[0]} RVX Installaion skipped!" ;;
+            C*|c*) echo -e "$notice ${appNameRef[0]} RVX Installaion skipped!" ;;
           esac
         else
           buttons=("<Yes>" "<No>"); confirmPrompt "Do you want to Mount ${appNameRef[0]} RVX app?" "buttons" && opt=Yes || opt=No
