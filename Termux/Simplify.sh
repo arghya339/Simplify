@@ -803,23 +803,39 @@ DeletePatchesOption() {
 menu() {
   local -n menu_options=$1
   local -n menu_buttons=$2
+  items_per_page=${3:-12}  # Default to 12 if items/page not provided
   
   selected_option=0
   selected_button=0
   
+  current_page=0
+  total_pages=$(( (${#menu_options[@]} + items_per_page - 1) / items_per_page ))  # Convert to integer from floating point page number
+
   show_menu() {
     printf '\033[2J\033[3J\033[H'
     echo -e "${BoldGreen}$print_simplify${Reset}" && echo ""  # call print_simplify function
-    echo "Navigate with [↑] [↓] [←] [→]"
-    echo -e "Select with [↵]\n"
-    for ((i=0; i<=$((${#menu_options[@]} - 1)); i++)); do
+    # Display guide
+    echo -n "Navigate with [↑] [↓] [←] [→]"
+    [ $total_pages -gt 1 ] && echo -n " [PGUP] [PGDN]"
+    echo -e "\nSelect with [↵]\n"
+    
+    # Calculate start and end indices for current page
+    start_index=$(( current_page * items_per_page ))
+    end_index=$(( start_index + (items_per_page - 1) ))
+    [ $end_index -ge ${#menu_options[@]} ] && end_index=$((${#menu_options[@]} - 1))
+    
+    # Display menu options for current page
+    for ((i=start_index; i<=end_index; i++)); do
       if [ $i -eq $selected_option ]; then
         echo -e "${whiteBG}➤ ${menu_options[$i]} $Reset"
       else
         [ $(($i + 1)) -le 9 ] && echo " $(($i + 1)). ${menu_options[$i]}" || echo "$(($i + 1)). ${menu_options[$i]}"
       fi
     done
-    echo
+    
+    [ $total_pages -gt 1 ] && echo -e "\nPage: $((current_page + 1))/$total_pages\n" || echo  # Display page info if multiple pages exist
+    
+    # Display buttons
     for ((i=0; i<=$((${#menu_buttons[@]} - 1)); i++)); do
       if [ $i -eq $selected_button ]; then
         [ $i -eq 0 ] && echo -ne "${whiteBG}➤ ${menu_buttons[$i]} $Reset" || echo -ne "  ${whiteBG}➤ ${menu_buttons[$i]} $Reset"
@@ -842,16 +858,34 @@ menu() {
           '[A')  # Up arrow
             selected_option=$((selected_option - 1))
             [ $selected_option -lt 0 ] && selected_option=$((${#menu_options[@]} - 1))
+            current_page=$((selected_option / items_per_page))  # Auto switch page
             ;;
           '[B')  # Down arrow
             selected_option=$((selected_option + 1))
             [ $selected_option -ge ${#menu_options[@]} ] && selected_option=0
+            current_page=$((selected_option / items_per_page))  # Auto switch page
             ;;
           '[C')  # Right arrow
             [ $selected_button -lt $((${#menu_buttons[@]} - 1)) ] && selected_button=$((selected_button + 1))
             ;;
           '[D')  # Left arrow
             [ $selected_button -gt 0 ] && selected_button=$((selected_button - 1))
+            ;;
+          '[5') # Page Up
+            read -rsn1 -t 0.1 key3
+            if [ "$key3" == "~" ]; then
+              current_page=$((current_page - 1))
+              [ $current_page -lt 0 ] && current_page=$((total_pages - 1))
+              selected_option=$((current_page * items_per_page))  # Update selected option to start indices on new page
+            fi
+            ;;
+          '[6') # Page Down
+            read -rsn1 -t 0.1 key3
+            if [ "$key3" == "~" ]; then
+              current_page=$((current_page + 1))
+              [ $current_page -ge $total_pages ] && current_page=0
+              selected_option=$((current_page * items_per_page))  # Update selected option to start indices on new page
+            fi
             ;;
         esac
         ;;
@@ -868,6 +902,7 @@ menu() {
         else
           selected_option=$(($key - 1))
         fi
+        current_page=$((selected_option / items_per_page))  # Auto switch page
         show_menu; sleep 0.5; break
        ;;
     esac
