@@ -193,11 +193,13 @@ fi
 # --- Arrays of apps list that required specific android version ---
 if [ $Android -ge 8 ]; then
   apps=(
+    CHANGELOG
     ${novaLauncher}
     Tasker
   )
 elif [ $Android -eq 7 ] || [ $Android -eq 6 ] || [ $Android -eq 5 ]; then
   apps=(
+    CHANGELOG
     Tasker
   )
 fi
@@ -284,6 +286,7 @@ while true; do
   
   # main conditional control flow
   case "$selected" in
+    CHANGELOG) curl -sL ${auth} "https://api.github.com/repos/indrastorms/Dropped-Patches/releases/latest" | jq -r .body | glow ;;  # Display release notes
     NovaLauncher)
       pkgName="com.teslacoilsw.launcher"
       appName=("Nova Launcher")
