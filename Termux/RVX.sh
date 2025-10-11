@@ -15,6 +15,7 @@ Red="\033[91m"
 Blue="\033[94m"
 Cyan="\033[96m"
 White="\033[37m"
+whiteBG="\e[47m\e[30m"
 Yellow="\033[93m"
 Reset="\033[0m"
 
@@ -530,52 +531,6 @@ build_app() {
   fi
 }
 
-# --- function to overwriting cpuAbi value ---
-overwriteArch() {
-  if jq -e '.DeviceArch != null' "$simplifyJson" >/dev/null 2>&1; then
-    cpuAbi=$(jq -r '.DeviceArch' "$simplifyJson" 2>/dev/null)  # Get Device Architecture from json
-    echo -e "$info Device architecture spoofed to $cpuAbi!"
-  else
-    echo -e "$info Device architecture not spoofed yet!"
-  fi
-    echo -e "0. Disabled spoofing\n8. arm64-v8a\n7. armeabi-v7a\n4. x86_64\n6. x86\n"
-    read -r -p "Select: " arch
-    case "$arch" in
-      0)
-        echo -e "$running Disabling device architecture spoofing.."
-        jq -e 'del(.DeviceArch)' "$simplifyJson" > temp.json && mv temp.json "$simplifyJson"  # Delete DeviceArch key from simplify.json
-        echo -e "$good ${Green}Device architecture spoofing disabled successfully!${Reset}"
-        ;;
-      8)
-        echo -e "$running Spoofing device architecture to arm64-v8a.."
-        jq ".DeviceArch = \"arm64-v8a\"" "$simplifyJson" > temp.json && mv temp.json "$simplifyJson"
-        echo -e "$good ${Green}Device architecture spoofed to arm64-v8a successfully!${Reset}"
-        ;;
-      7)
-        echo -e "$running Spoofing device architecture to armeabi-v7a.."
-        jq ".DeviceArch = \"armeabi-v7a\"" "$simplifyJson" > temp.json && mv temp.json "$simplifyJson"
-        echo -e "$good ${Green}Device architecture spoofed to armeabi-v7a successfully!${Reset}"
-        ;;
-      4)
-        echo -e "$running Spoofing device architecture to x86_64.."
-        jq ".DeviceArch = \"x86_64\"" "$simplifyJson" > temp.json && mv temp.json "$simplifyJson"
-        echo -e "$good ${Green}Device architecture spoofed to x86_64 successfully!${Reset}"
-        ;;
-      6)
-        echo -e "$running Spoofing device architecture to x86.."
-        jq ".DeviceArch = \"x86\"" "$simplifyJson" > temp.json && mv temp.json "$simplifyJson"
-        echo -e "$good ${Green}Device architecture spoofed to x86 successfully!${Reset}"
-        ;;
-      *) echo -e "$info Invalid input! Please enter 0, 8, 7, 4, 6." ;;
-    esac
-  # update cpuAbi value
-  if jq -e '.DeviceArch != null' "$simplifyJson" >/dev/null 2>&1; then
-    cpuAbi=$(jq -r '.DeviceArch' "$simplifyJson" 2>/dev/null)  # Get Device Architecture from json
-  else
-    cpuAbi=$(getprop ro.product.cpu.abi)  # Get Android arch
-  fi
-}
-
 # --- Function to retrieve the list of patches for a specific filtered app
 getListOfPatches() {
   local pkgName=$1
@@ -583,33 +538,6 @@ getListOfPatches() {
   if [ "$ReadPatchesFile" -eq 1 ]; then
     $PREFIX/lib/jvm/java-$jdkVersion-openjdk/bin/java -jar $ReVancedCLIJar list-patches -d=true -f=$pkgName -i=true -o=true -p=false -u -v=false $PatchesRvp > "$SimplUsr/${pkgName}_list-patches.txt"
   fi
-}
-
-# conditional flow to get list of patches
-listOfPatches() {
-  local clean_idx=${idx%\?}
-  case "${apps[$clean_idx]}" in
-    YouTube)
-      pkgName="com.google.android.youtube"
-      getListOfPatches "$pkgName"
-      ;;
-    YT\ Music)
-      pkgName="com.google.android.apps.youtube.music"
-      getListOfPatches "$pkgName"
-      ;;
-    Spotify)
-      pkgName="com.spotify.music"
-      getListOfPatches "$pkgName"
-      ;;
-    Reddit)
-      pkgName="com.reddit.frontpage"
-      getListOfPatches "$pkgName"
-      ;;
-    NetWall)
-      pkgName="com.ysy.app.firewall"
-      getListOfPatches "$pkgName"
-     ;;
-  esac
 }
 
 if [ $ChangeRVXSource -eq 1 ]; then
@@ -620,7 +548,9 @@ fi
 # --- Arrays of apps list that required specific android version ---
 if [ $Android -ge 13 ]; then
   apps=(
-    Quit
+    CHANGELOG
+    Spoof\ Device\ Arch
+    List\ of\ Patches
     YouTube
     YT\ Music
     $Spotify
@@ -629,7 +559,9 @@ if [ $Android -ge 13 ]; then
   )
 elif [ $Android -eq 9 ] || [ $Android -eq 10 ] || [ $Android -eq 11 ] || [ $Android -eq 12 ]; then
   apps=(
-    Quit
+    CHANGELOG
+    Spoof\ Device\ Arch
+    List\ of\ Patches
     YouTube
     YT\ Music
     $Spotify
@@ -637,62 +569,185 @@ elif [ $Android -eq 9 ] || [ $Android -eq 10 ] || [ $Android -eq 11 ] || [ $Andr
   )
 elif [ $Android -eq 8 ] || [ $Android -eq 7 ]; then
   apps=(
-    Quit
+    CHANGELOG
+    Spoof\ Device\ Arch
+    List\ of\ Patches
     YouTube
     YT\ Music
     $Spotify
   )
 elif [ $Android -eq 6 ]; then
   apps=(
-    Quit
+    CHANGELOG
+    Spoof\ Device\ Arch
+    List\ of\ Patches
     YouTube
     YT\ Music
   )
 elif [ $Android -eq 5 ]; then
   apps=(
-    Quit
+    CHANGELOG
+    Spoof\ Device\ Arch
+    List\ of\ Patches
     YouTube
     "YT Music"
   )
 fi
 
-while true; do
-  # Display the apps list
-  echo -e "$info Available apps:"
-  echo -e "↵   . CHANGELOG"
-  echo -e "Arch. Spoof Device Arch"
-  echo -e "i?  . List of Patches"
-  for i in "${!apps[@]}"; do
-    printf "%d   . %s\n" "$i" "${apps[$i]}"
+menu() {
+  local -n menu_options=$1
+  local -n menu_buttons=$2
+  
+  selected_option=0
+  selected_button=0
+  
+  show_menu() {
+    printf '\033[2J\033[3J\033[H'
+    echo "Navigate with [↑] [↓] [←] [→]"
+    echo -e "Select with [↵]\n"
+    for ((i=0; i<=$((${#menu_options[@]} - 1)); i++)); do
+      if [ $i -eq $selected_option ]; then
+        echo -e "${whiteBG}➤ ${menu_options[$i]} $Reset"
+      else
+        [ $(($i + 1)) -le 9 ] && echo " $(($i + 1)). ${menu_options[$i]}" || echo "$(($i + 1)). ${menu_options[$i]}"
+      fi
+    done
+    echo
+    for ((i=0; i<=$((${#menu_buttons[@]} - 1)); i++)); do
+      if [ $i -eq $selected_button ]; then
+        [ $i -eq 0 ] && echo -ne "${whiteBG}➤ ${menu_buttons[$i]} $Reset" || echo -ne "  ${whiteBG}➤ ${menu_buttons[$i]} $Reset"
+      else
+        [ $i -eq 0 ] && echo -n "  ${menu_buttons[$i]}" || echo -n "   ${menu_buttons[$i]}"
+      fi
+    done
+    echo
+  }
+
+  printf '\033[?25l'
+  while true; do
+    show_menu
+    read -rsn1 key
+    case $key in
+      $'\E')  # ESC
+        # /bin/bash -c 'read -r -p "Type any ESC key: " input && printf "You Entered: %q\n" "$input"'  # q=safelyQuoted
+        read -rsn2 -t 0.1 key2
+        case "$key2" in
+          '[A')  # Up arrow
+            selected_option=$((selected_option - 1))
+            [ $selected_option -lt 0 ] && selected_option=$((${#menu_options[@]} - 1))
+            ;;
+          '[B')  # Down arrow
+            selected_option=$((selected_option + 1))
+            [ $selected_option -ge ${#menu_options[@]} ] && selected_option=0
+            ;;
+          '[C')  # Right arrow
+            [ $selected_button -lt $((${#menu_buttons[@]} - 1)) ] && selected_button=$((selected_button + 1))
+            ;;
+          '[D')  # Left arrow
+            [ $selected_button -gt 0 ] && selected_button=$((selected_button - 1))
+            ;;
+        esac
+        ;;
+      '')  # Enter key
+        break
+        ;;
+      [0-9])
+        if [ $key -eq 0 ]; then
+          selected_option=$((${#menu_options[@]} - 1))
+        elif [ $key -gt ${#menu_options[@]} ]; then
+          selected_option=0
+        else
+          selected_option=$((key - 1))
+        fi
+        show_menu; sleep 0.5; break
+       ;;
+    esac
   done
+  printf '\033[?25h'
 
-  # Ask for an index, showing the valid range
-  max=$(( ${#apps[@]} - 1 ))  # highest legal index
-  read -rp "Enter the index [0-${max}] of apps you want to patch: " idx
-
-  # Validate and respond
-  if [ "$idx" == 0 ]; then
-    break  # break the while loop
-  elif [[ "$idx" =~ ^[0-9]+$ ]] && (( idx >= 0 && idx <= max )); then
-    echo -e "$notice Selected: ${apps[$idx]}"
-  elif [[ "$idx" =~ ^[0-9]+\?$ ]]; then
-    listOfPatches  # Call the listOfPatches function
-    continue
-  elif [[ "$idx" =~ ^[aA][rR][cC][hH] ]]; then
-    overwriteArch  # Call the overwriteArch function
-  elif [ "$idx" == "" ] || [ -z "$idx" ]; then
-    if [ $release == "latest" ]; then
-      tag=$(curl -sL ${auth} "https://api.github.com/repos/$owner/revanced-patches/releases/latest" | jq -r '.tag_name')
-    else
-      tag=$(curl -sL ${auth} "https://api.github.com/repos/$owner/revanced-patches/releases" | jq -r '.[].tag_name | select(contains("dev"))' | head -n 1)
-    fi
-    curl -sL ${auth} "https://api.github.com/repos/$owner/revanced-patches/releases/tags/$tag" | jq -r .body | glow  # Display the release notes
-  else
-    echo -e "$info \"$idx\" is not a valid index! Please select index [0-${max}]." >&2
+  [ $selected_button -eq 0 ] && { printf '\033[2J\033[3J\033[H'; selected=$selected_option;}
+  if [ $selected_button -eq $((${#menu_buttons[@]} - 1)) ]; then
+    [ "${menu_buttons[$((${#menu_buttons[@]} - 1))]}" == "<Back>" ] && { printf '\033[2J\033[3J\033[H'; return 1; } || { [ $isOverwriteTermuxProp -eq 1 ] && sed -i '/allow-external-apps/s/^/# /' "$HOME/.termux/termux.properties"; printf '\033[2J\033[3J\033[H'; echo "Script exited !!"; exit 0; }
   fi
+}
+
+while true; do
+  buttons=("<Select>" "<Back>"); if menu "apps" "buttons"; then selected="${apps[$selected]}"; else break; fi
 
   # main conditional control flow
-  case "${apps[$idx]}" in
+  case "$selected" in
+    CHANGELOG)
+      [ $release == "latest" ] && tag=$(curl -sL ${auth} "https://api.github.com/repos/$owner/revanced-patches/releases/latest" | jq -r '.tag_name') || tag=$(curl -sL ${auth} "https://api.github.com/repos/$owner/revanced-patches/releases" | jq -r '.[].tag_name | select(contains("dev"))' | head -n 1)
+      curl -sL ${auth} "https://api.github.com/repos/$owner/revanced-patches/releases/tags/$tag" | jq -r .body | glow  # Display release notes
+      ;;
+    Spoof\ Device\ Arch)
+      if jq -e '.DeviceArch != null' "$simplifyJson" >/dev/null 2>&1; then
+        cpuAbi=$(jq -r '.DeviceArch' "$simplifyJson" 2>/dev/null)  # Get Device Architecture from json
+        echo -e "$info Device architecture spoofed to $cpuAbi!"
+      else
+        echo -e "$info Device architecture not spoofed yet!"
+      fi
+      options=(Disabled\ Arch\ spoofing arm64-v8a armeabi-v7a x86_64 x86); buttons=("<Select>" "<Back>"); if menu "options" "buttons"; then arch="${options[$selected]}"; fi
+      if [ -n "$arch" ]; then
+        case "$arch" in
+          Disabled\ Arch\ spoofing)
+            echo -e "$running Disabling device architecture spoofing.."
+            jq -e 'del(.DeviceArch)' "$simplifyJson" > temp.json && mv temp.json "$simplifyJson"  # Delete DeviceArch key from simplify.json
+            echo -e "$good ${Green}Device architecture spoofing disabled successfully!${Reset}"
+            ;;
+          arm64-v8a)
+            echo -e "$running Spoofing device architecture to arm64-v8a.."
+            jq ".DeviceArch = \"arm64-v8a\"" "$simplifyJson" > temp.json && mv temp.json "$simplifyJson"
+            echo -e "$good ${Green}Device architecture spoofed to arm64-v8a successfully!${Reset}"
+            ;;
+          armeabi-v7a)
+            echo -e "$running Spoofing device architecture to armeabi-v7a.."
+            jq ".DeviceArch = \"armeabi-v7a\"" "$simplifyJson" > temp.json && mv temp.json "$simplifyJson"
+            echo -e "$good ${Green}Device architecture spoofed to armeabi-v7a successfully!${Reset}"
+            ;;
+          x86_64)
+            echo -e "$running Spoofing device architecture to x86_64.."
+            jq ".DeviceArch = \"x86_64\"" "$simplifyJson" > temp.json && mv temp.json "$simplifyJson"
+            echo -e "$good ${Green}Device architecture spoofed to x86_64 successfully!${Reset}"
+            ;;
+          x86)
+            echo -e "$running Spoofing device architecture to x86.."
+            jq ".DeviceArch = \"x86\"" "$simplifyJson" > temp.json && mv temp.json "$simplifyJson"
+            echo -e "$good ${Green}Device architecture spoofed to x86 successfully!${Reset}"
+            ;;
+        esac
+        # update cpuAbi value
+        jq -e '.DeviceArch != null' "$simplifyJson" >/dev/null 2>&1 && cpuAbi=$(jq -r '.DeviceArch' "$simplifyJson" 2>/dev/null)  # Get Device Architecture from json
+      fi
+      ;;
+    List\ of\ Patches)
+      buttons=("<Select>" "<Back>"); if menu "apps" "buttons"; then selected="${apps[$selected]}"; fi
+      if [ -n "$selected" ]; then
+        case "$selected" in
+          YouTube)
+            pkgName="com.google.android.youtube"
+            getListOfPatches "$pkgName"
+            ;;
+          YT\ Music)
+            pkgName="com.google.android.apps.youtube.music"
+            getListOfPatches "$pkgName"
+            ;;
+          Spotify)
+            pkgName="com.spotify.music"
+            getListOfPatches "$pkgName"
+            ;;
+          Reddit)
+            pkgName="com.reddit.frontpage"
+            getListOfPatches "$pkgName"
+            ;;
+          NetWall)
+            pkgName="com.ysy.app.firewall"
+            getListOfPatches "$pkgName"
+            ;;
+        esac
+        sleep 10  # wait 10 seconds
+      fi
+      ;;
     YouTube)
       pkgName="com.google.android.youtube"
       Arch="universal"
@@ -798,6 +853,7 @@ while true; do
       activityPatched="com.ysy.app.firewall/b.B"
       build_app "$pkgName" "$pkgVersion" "$Type" "$Arch" "APKPure" "stock_apk_path" "netwall_patches_args" "$outputAPK" "$log" "appName" "$BugReportUrl" "$pkgName" "$activityPatched"
       ;;
-  esac  
+  esac
+  sleep 5  # wait 5 seconds
 done
 ######################################################################################################################################################################################
