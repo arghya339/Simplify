@@ -15,6 +15,7 @@ Red="\033[91m"
 Blue="\033[94m"
 Cyan="\033[96m"
 White="\033[37m"
+whiteBG="\e[47m\e[30m"
 Yellow="\033[93m"
 Reset="\033[0m"
 
@@ -192,44 +193,97 @@ fi
 # --- Arrays of apps list that required specific android version ---
 if [ $Android -ge 8 ]; then
   apps=(
-    Quit
     ${novaLauncher}
     Tasker
   )
 elif [ $Android -eq 7 ] || [ $Android -eq 6 ] || [ $Android -eq 5 ]; then
   apps=(
-    Quit
     Tasker
   )
 fi
 
-while true; do
-  # Display the apps list
-  echo -e "$info Available apps:"
-  echo -e "↵. CHANGELOG"
-  for i in "${!apps[@]}"; do
-    if [ -n "${apps[$i]}" ] && [ "${apps[$i]}" != "null" ]; then
-      printf "%d. %s\n" "$i" "${apps[$i]}"
-    fi
+menu() {
+  local -n menu_options=$1
+  local -n menu_buttons=$2
+  
+  selected_option=0
+  selected_button=0
+  
+  show_menu() {
+    printf '\033[2J\033[3J\033[H'
+    echo "Navigate with [↑] [↓] [←] [→]"
+    echo -e "Select with [↵]\n"
+    for ((i=0; i<=$((${#menu_options[@]} - 1)); i++)); do
+      if [ $i -eq $selected_option ]; then
+        echo -e "${whiteBG}➤ ${menu_options[$i]} $Reset"
+      else
+        [ $(($i + 1)) -le 9 ] && echo " $(($i + 1)). ${menu_options[$i]}" || echo "$(($i + 1)). ${menu_options[$i]}"
+      fi
+    done
+    echo
+    for ((i=0; i<=$((${#menu_buttons[@]} - 1)); i++)); do
+      if [ $i -eq $selected_button ]; then
+        [ $i -eq 0 ] && echo -ne "${whiteBG}➤ ${menu_buttons[$i]} $Reset" || echo -ne "  ${whiteBG}➤ ${menu_buttons[$i]} $Reset"
+      else
+        [ $i -eq 0 ] && echo -n "  ${menu_buttons[$i]}" || echo -n "   ${menu_buttons[$i]}"
+      fi
+    done
+    echo
+  }
+
+  printf '\033[?25l'
+  while true; do
+    show_menu
+    read -rsn1 key
+    case $key in
+      $'\E')  # ESC
+        # /bin/bash -c 'read -r -p "Type any ESC key: " input && printf "You Entered: %q\n" "$input"'  # q=safelyQuoted
+        read -rsn2 -t 0.1 key2
+        case "$key2" in
+          '[A')  # Up arrow
+            selected_option=$((selected_option - 1))
+            [ $selected_option -lt 0 ] && selected_option=$((${#menu_options[@]} - 1))
+            ;;
+          '[B')  # Down arrow
+            selected_option=$((selected_option + 1))
+            [ $selected_option -ge ${#menu_options[@]} ] && selected_option=0
+            ;;
+          '[C')  # Right arrow
+            [ $selected_button -lt $((${#menu_buttons[@]} - 1)) ] && selected_button=$((selected_button + 1))
+            ;;
+          '[D')  # Left arrow
+            [ $selected_button -gt 0 ] && selected_button=$((selected_button - 1))
+            ;;
+        esac
+        ;;
+      '')  # Enter key
+        break
+        ;;
+      [0-9])
+        if [ $key -eq 0 ]; then
+          selected_option=$((${#menu_options[@]} - 1))
+        elif [ $key -gt ${#menu_options[@]} ]; then
+          selected_option=0
+        else
+          selected_option=$((key - 1))
+        fi
+        show_menu; sleep 0.5; break
+       ;;
+    esac
   done
+  printf '\033[?25h'
 
-  # Ask for an index, showing the valid range
-  max=$(( ${#apps[@]} - 1 ))  # highest legal index
-  read -rp "Enter the index [0-${max}] of the apps you want to patch: " idx
-
-  # Validate and respond
-  if [ "$idx" == 0 ]; then
-    break  # break the while loop
-  elif [ "$idx" == "" ] || [ -z "$idx" ]; then
-    curl -sL ${auth} "https://api.github.com/repos/indrastorms/Dropped-Patches/releases/latest" | jq -r .body | glow  # Display the release notes
-  elif [[ $idx =~ ^[0-9]+$ ]] && (( idx >= 0 && idx <= max )); then
-    echo -e "$notice Selected: ${apps[$idx]}"
-  else
-    echo -e "$info \"$idx\" is not a valid index! Please select index [0-${max}]." >&2
+  [ $selected_button -eq 0 ] && { printf '\033[2J\033[3J\033[H'; selected=$selected_option;}
+  if [ $selected_button -eq $((${#menu_buttons[@]} - 1)) ]; then
+    [ "${menu_buttons[$((${#menu_buttons[@]} - 1))]}" == "<Back>" ] && { printf '\033[2J\033[3J\033[H'; return 1; } || { [ $isOverwriteTermuxProp -eq 1 ] && sed -i '/allow-external-apps/s/^/# /' "$HOME/.termux/termux.properties"; printf '\033[2J\033[3J\033[H'; echo "Script exited !!"; exit 0; }
   fi
+}
+
+while true; do
+  buttons=("<Select>" "<Back>"); if menu "apps" "buttons"; then selected="${apps[$selected]}"; else break; fi
   
   # main conditional control flow
-  case ${apps[$idx]} in
+  case "$selected" in
     NovaLauncher)
       pkgName="com.teslacoilsw.launcher"
       appName=("Nova Launcher")
