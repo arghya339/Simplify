@@ -718,7 +718,7 @@ menu() {
 }
 
 while true; do
-  buttons=("<Select>" "<Back>"); if menu "options" "buttons" "22"; then selected="${options[$selected]}"; else break; fi
+  buttons=("<Select>" "<Back>"); if menu "apps" "buttons" "22"; then selected="${apps[$selected]}"; else break; fi
   
   release=latest
   # main conditional control flow
