@@ -1189,7 +1189,7 @@ while true; do
       apps_list=(universal-patches)
       apps_list+=("${apps[@]}")
       
-      buttons=("<Select>" "<Back>"); if menu "apps_list" "buttons"; then selected="${apps_list[$selected]}"; fi
+      buttons=("<Select>" "<Back>"); if menu "apps_list" "buttons" "20"; then selected="${apps_list[$selected]}"; fi
       if [ -n "$selected" ]; then
         case "$selected" in
           universal-patches)
