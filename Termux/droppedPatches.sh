@@ -143,17 +143,7 @@ confirmPrompt() {
     show_prompt() {
       echo -ne "\r\033[K"  # n=noNewLine r=returnCursorToStartOfLine \033[K=clearLine
       echo -ne "$last_line "
-      if [ ${#prompt_buttons[@]} -eq 2 ]; then
-        [ $Selected -eq 0 ] && echo -ne "${whiteBG}➤ ${prompt_buttons[0]} $Reset   ${prompt_buttons[1]}" || echo -ne "  ${prompt_buttons[0]}  ${whiteBG}➤ ${prompt_buttons[1]} $Reset"  # highlight selected bt with white bg
-      elif [ ${#prompt_buttons[@]} -eq 3 ]; then
-        if [ $Selected -eq 0 ]; then
-          echo -ne "${whiteBG}➤ ${prompt_buttons[0]} $Reset   ${prompt_buttons[1]}    ${prompt_buttons[2]}"
-        elif [ $Selected -eq 1 ]; then
-          echo -ne "  ${prompt_buttons[0]}  ${whiteBG}➤ ${prompt_buttons[1]} $Reset   ${prompt_buttons[2]}"
-        elif [ $Selected -eq 2 ]; then
-          echo -ne "  ${prompt_buttons[0]}    ${prompt_buttons[1]}  ${whiteBG}➤ ${prompt_buttons[2]} $Reset"
-        fi
-      fi
+      [ $Selected -eq 0 ] && echo -ne "${whiteBG}➤ ${prompt_buttons[0]} $Reset   ${prompt_buttons[1]}" || echo -ne "  ${prompt_buttons[0]}  ${whiteBG}➤ ${prompt_buttons[1]} $Reset"  # highlight selected bt with white bg
     }; show_prompt
 
     read -rsn1 key
@@ -162,19 +152,12 @@ confirmPrompt() {
       # /bin/bash -c 'read -r -p "Type any ESC key: " input && printf "You Entered: %q\n" "$input"'  # q=safelyQuoted
         read -rsn2 -t 0.1 key2  # -r=readRawInput -s=silent(noOutput) -t=timeout -n2=readTwoChar | waits upto 0.1s=100ms to read key 
         case $key2 in 
-          '[C')  # right arrow key
-            Selected=$((Selected + 1))
-            [ $Selected -gt ${#prompt_buttons[@]} ] && Selected=$((${#prompt_buttons[@]} - 1))
-            ;;
-          '[D')  # left arrow key
-            Selected=$((Selected - 1))
-            [ $Selected -lt 0 ] && Selected=0
-            ;;
+          '[C') Selected=1 ;;  # right arrow key
+          '[D') Selected=0 ;;  # left arrow key
         esac
         ;;
-      [Yy]*|[Ii]*) Selected=0; show_prompt; break ;;
-      [Nn]*|[Mm]*) Selected=1; show_prompt; break ;;
-      [Cc]*) Selected=2; show_prompt; break ;;
+      [Yy]*) Selected=0; show_prompt; break ;;
+      [Nn]*) Selected=1; show_prompt; break ;;
       "") break ;;  # Enter key
     esac
   done
