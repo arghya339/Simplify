@@ -860,7 +860,7 @@ if [ $Android -ge 12 ]; then
     YouTube
     $Spotify
     TikTok
-    "Google\ Photos"
+    "Google Photos"
     $googleRecorder
     $Instagram
     $Facebook
@@ -876,7 +876,7 @@ if [ $Android -ge 12 ]; then
     $Threads
     Strava
     SoundCloud
-    "Proton\ Mail"
+    "Proton Mail"
     MyFitnessPal
     Crunchyroll
     Cricbuzz
@@ -886,7 +886,7 @@ elif [ $Android -eq 11 ]; then
     YouTube
     $Spotify
     TikTok
-    "Google\ Photos"
+    "Google Photos"
     $googleRecorder
     $Instagram
     $Facebook
@@ -902,7 +902,7 @@ elif [ $Android -eq 11 ]; then
     $Threads
     Strava
     SoundCloud
-    "Proton\ Mail"
+    "Proton Mail"
     Crunchyroll
     Cricbuzz
   )
@@ -911,7 +911,7 @@ elif [ $Android -eq 10 ]; then
     YouTube
     $Spotify
     TikTok
-    "Google\ Photos"
+    "Google Photos"
     $googleRecorder
     $Instagram
     $Facebook
@@ -927,7 +927,7 @@ elif [ $Android -eq 10 ]; then
     $Threads
     Strava
     SoundCloud
-    "Proton\ Mail"
+    "Proton Mail"
     Crunchyroll
     Cricbuzz
   )
@@ -936,7 +936,7 @@ elif [ $Android -eq 9 ]; then
     YouTube
     $Spotify
     TikTok
-    "Google\ Photos"
+    "Google Photos"
     $Instagram
     $Facebook
     ${fbMessenger}
@@ -950,7 +950,7 @@ elif [ $Android -eq 9 ]; then
     $Threads
     Strava
     SoundCloud
-    "Proton\ Mail"
+    "Proton Mail"
     Crunchyroll
     Cricbuzz
   )
@@ -959,7 +959,7 @@ elif [ $Android -eq 8 ]; then
     YouTube
     $Spotify
     TikTok
-    "Google\ Photos"
+    "Google Photos"
     $Instagram
     $Facebook
     ${fbMessenger}
@@ -980,7 +980,7 @@ elif [ $Android -eq 7 ]; then
   apps=(
     $Spotify
     TikTok
-    "Google\ Photos"
+    "Google Photos"
     $Instagram
     ${fbMessenger}
     Viber
@@ -994,7 +994,7 @@ elif [ $Android -eq 7 ]; then
 elif [ $Android -eq 6 ]; then
   apps=(
     TikTok
-    "Google\ Photos"
+    "Google Photos"
     ${fbMessenger}
     Viber
     Photomath
@@ -1006,7 +1006,7 @@ elif [ $Android -eq 6 ]; then
 elif [ $Android -eq 5 ]; then
   apps=(
     TikTok
-    "Google\ Photos"
+    "Google Photos"
     ${fbMessenger}
     Viber
     Photomath
