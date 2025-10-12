@@ -741,6 +741,7 @@ while true; do
     CHANGELOG)
       [ $release == "latest" ] && tag=$(curl -sL ${auth} "https://api.github.com/repos/$owner/revanced-patches/releases/latest" | jq -r '.tag_name') || tag=$(curl -sL ${auth} "https://api.github.com/repos/$owner/revanced-patches/releases" | jq -r '.[].tag_name | select(contains("dev"))' | head -n 1)
       curl -sL ${auth} "https://api.github.com/repos/$owner/revanced-patches/releases/tags/$tag" | jq -r .body | glow  # Display release notes
+      echo; read -p "Press Enter to continue..."
       ;;
     Spoof\ Device\ Arch)
       if jq -e '.DeviceArch != null' "$simplifyJson" >/dev/null 2>&1; then
@@ -809,7 +810,7 @@ while true; do
             getListOfPatches "$pkgName"
             ;;
         esac
-        sleep 10  # wait 10 seconds
+        echo; read -p "Press Enter to continue..."
       fi
       ;;
     YouTube)

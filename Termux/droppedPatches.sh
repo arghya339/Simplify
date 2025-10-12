@@ -331,7 +331,7 @@ while true; do
   
   # main conditional control flow
   case "$selected" in
-    CHANGELOG) curl -sL ${auth} "https://api.github.com/repos/indrastorms/Dropped-Patches/releases/latest" | jq -r .body | glow ;;  # Display release notes
+    CHANGELOG) curl -sL ${auth} "https://api.github.com/repos/indrastorms/Dropped-Patches/releases/latest" | jq -r .body | glow; echo; read -p "Press Enter to continue..." ;;  # Display release notes
     NovaLauncher)
       pkgName="com.teslacoilsw.launcher"
       appName=("Nova Launcher")
