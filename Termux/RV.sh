@@ -715,7 +715,7 @@ build_app() {
         
         if [ "$pkgName" == "com.google.android.youtube" ]; then
           buttons=("<Install>" "<Mount>" "<Cancel>")
-          confirmPrompt "Select ${appNameRef[0]} RV installation operation" "buttons"
+          confirmPrompt "Select ${appNameRef[0]} RV installation operation" "buttons" "1"
           exit_status=$?
           if [ $exit_status -eq 0 ]; then opt=Install; elif [ $exit_status -eq 1 ]; then opt=Mount; elif [ $exit_status -eq 2 ]; then opt=Cancel; fi
           case $opt in
