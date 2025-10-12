@@ -1208,7 +1208,7 @@ while true; do
             pkgName="com.zhiliaoapp.musically"
             getListOfPatches "$pkgName"
             ;;
-          Google\ Photos)
+          GooglePhotos)
             pkgName="com.google.android.apps.photos"
             getListOfPatches "$pkgName"
             ;;
@@ -1272,7 +1272,7 @@ while true; do
             pkgName="com.soundcloud.android"
             getListOfPatches "$pkgName"
             ;;
-          Proton\ Mail)
+          ProtonMail)
             pkgName="ch.protonmail.android"
             getListOfPatches "$pkgName"
             ;;
@@ -1345,7 +1345,7 @@ while true; do
       activityPatched="com.zhiliaoapp.musically/com.ss.android.ugc.aweme.splash.SplashActivity"
       build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "$web" "tiktok_patches_args" "$pkgName" "$activityPatched" "" "" ""
       ;;
-    Google\ Photos)
+    GooglePhotos)
       pkgName="com.google.android.apps.photos"
       appName=("Google Photos")
       if [ $Android -ge 6 ]; then
@@ -1655,7 +1655,7 @@ while true; do
       activityPatched="com.soundcloud.android/.launcher.LauncherActivity"
       build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "$web" "soundcloud_patches_args" "$pkgName" "$activityPatched" "" "" ""
       ;;
-    Proton\ Mail)
+    ProtonMail)
       pkgName="ch.protonmail.android"
       appName=("ProtonMail")
       pkgVersion="4.15.0"
