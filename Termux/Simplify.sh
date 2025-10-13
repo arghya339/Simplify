@@ -97,7 +97,125 @@ EOF
 )
 comment
 
-Android=$(getprop ro.build.version.release | cut -d. -f1)  # Get major Android version
+# --- Global Variables ---
+Simplify="$HOME/Simplify"  # /data/data/com.termux/files/home/Simplify dir
+SimplUsr="/sdcard/Simplify"  # /storage/emulated/0/Simplify dir
+Download="/sdcard/Download"  # Download dir
+RV="$Simplify/RV"
+RVX="$Simplify/RVX"
+pikoTwitter="$Simplify/pikoTwitter"
+Dropped="$Simplify/Dropped"
+LSPatch="$Simplify/LSPatch"
+POST_INSTALL="$Simplify/POST_INSTALL"
+mkdir -p "$Simplify" "$SimplUsr" "$RV" "$RVX" "$pikoTwitter" "$Dropped" "$LSPatch" "$POST_INSTALL"  # Create $Simplify, $SimplUsr, $RV, $RVX, $pikoTwitter, $Dropped, $LSPatch and $POST_INSTALL dir if it does't exist
+simplifyJson="$Simplify/simplify.json"  # Configuration file to store simplify settings
+
+isPreRelease=0  # Default value (false/off/0) for isPreRelease, it's enabled latest release for Patches source
+isRipLocale=1  # Default value (true/on/1) for RipLocale, it's delete locale from patched apk file except device specific locale by default
+isRipDpi=1  # Default value (true/on/1) for RipDpi, it's delete dpi from patched apk file except device specific dpi by default
+isRipLib=1  # Default value (true/on/1) for RipLib, it's delete lib dir from patched apk file except device specific arch lib by default
+isChangeRVXSource=0  # Default value (false/off/0) for ChangeRVXSource, means patches source remain unchange ie. official source (inotia00) for RVX Patches
+isReadPatchesFile=0  # Default value (false/off/0) for ReadPatchesFile, means recommended PatchesOptions loading from script.
+branding="google_family"
+isCheckTermuxUpdate=1
+isJdkVersion=21
+isU=0  # Install Package for 0 (default-user), possible 1 (all-users)
+isK=0  # Allow Downgrade with keeps App data 0 (false) because it's required reboot after pkg install, possible 1 (true)
+isG=0  # Grant All Runtime Permissions 0 (false) due to Security Risk, possible 1
+isT=0  # Installed as test-only app 0, possible 1
+isL=1  # Bypass Low Target SDK Bolck 1 (true) it's allow Android 14+ to install apps that target below API level 23 (Android 6 and below), possible value 0
+isV=1  # Disable Play Protect Package Verification 1 (true), possible 0
+isI="com.android.vending"  # default: PlayStore | possible Installer: com.android.packageinstaller (PackageInstaller), com.android.shell (Shell), adb
+isR=1  # Reinstall Existing Installed Package 1 (true) because without this app can't be installed if installed and to-be-installed version are same, possible 0
+isB=0  # Enable Version Roolback 0, possible 1
+
+# Config creation function
+config() {
+  local key="$1"
+  local value="$2"
+  
+  [ ! -f "$simplifyJson" ] && jq -n "{}" > "$simplifyJson"
+  jq --arg key "$key" --arg value "$value" '.[$key] = $value' "$simplifyJson" > temp.json && mv temp.json "$simplifyJson"
+}
+
+# Create Simplify config
+all_key=("FetchPreRelease" "RipLocale" "RipDpi" "RipLib" "ChangeRVXSource" "ReadPatchesFile" "Branding" "CheckTermuxUpdate" "openjdk")
+all_key+=("InstallPackageFor" "KeepsData" "GrantAllRuntimePermissions" "InstalledAsTestOnly" "BypassLowTargetSdkBolck" "DisablePlayProtect" "Installer" "Reinstall" "EnableRoolback")
+all_value=("$isPreRelease" "$isRipLocale" "$isRipDpi" "$isRipLib" "$isChangeRVXSource" "$isReadPatchesFile" "$branding" "$isCheckTermuxUpdate" "$isJdkVersion")
+all_value+=("$isU" "$isK" "$isG" "$isT" "$isL" "$isV" "$isI" "$isR" "$isB")
+# Loop through all keys and set values if they don't exist
+for i in "${!all_key[@]}"; do
+  ! jq -e --arg key "${all_key[i]}" 'has($key)' "$simplifyJson" >/dev/null && config "${all_key[i]}" "${all_value[i]}"
+done
+
+# Get Android version from json
+jq -e '.AndroidVersion != null' "$simplifyJson" >/dev/null 2>&1 && Android=$(jq -r '.AndroidVersion' "$simplifyJson" 2>/dev/null) || Android=$(getprop ro.build.version.release | cut -d. -f1)
+# Get Device Architecture from json
+jq -e '.DeviceArch != null' "$simplifyJson" >/dev/null 2>&1 && cpuAbi=$(jq -r '.DeviceArch' "$simplifyJson" 2>/dev/null) || cpuAbi=$(getprop ro.product.cpu.abi)
+# Get openjdk verison from json
+jq -e '.openjdk != null' "$simplifyJson" >/dev/null 2>&1 && jdkVersion=$(jq -r '.openjdk' "$simplifyJson" 2>/dev/null) || jdkVersion="21"
+# Get RipLocale value from json
+jq -e '.RipLocale != null' "$simplifyJson" >/dev/null 2>&1 && RipLocale="$(jq -r '.RipLocale' "$simplifyJson" 2>/dev/null)" || RipLocale=1
+# Get RipDpi value from json
+jq -e '.RipDpi != null' "$simplifyJson" >/dev/null 2>&1 && RipDpi="$(jq -r '.RipDpi' "$simplifyJson" 2>/dev/null)" || RipDpi=1
+# Get RipLib value from json
+jq -e '.RipLib != null' "$simplifyJson" >/dev/null 2>&1 && RipLib="$(jq -r '.RipLib' "$simplifyJson" 2>/dev/null)" || RipLib=1
+# Get FetchPreRelease value from json
+jq -e '.FetchPreRelease != null' "$simplifyJson" >/dev/null 2>&1 && FetchPreRelease=$(jq -r '.FetchPreRelease' "$simplifyJson" 2>/dev/null) || FetchPreRelease=0
+# Get CheckTermuxUpdate value from json
+jq -e '.CheckTermuxUpdate != null' "$simplifyJson" >/dev/null 2>&1 && CheckTermuxUpdate=$(jq -r '.CheckTermuxUpdate' "$simplifyJson" 2>/dev/null) || CheckTermuxUpdate=1
+
+# Build locale
+if [ $RipLocale -eq 1 ]; then
+  locale=$(getprop persist.sys.locale | cut -d'-' -f1)  # Get System Languages
+  [ -z $locale ] && locale=$(getprop ro.product.locale | cut -d'-' -f1)  # Get Languages
+elif [ $RipLocale -eq 0 ]; then
+  locale="[a-z][a-z]"
+fi
+
+# Build lcd_dpi
+if [ $RipDpi -eq 1 ]; then
+  density=$(getprop ro.sf.lcd_density)  # Get the device screen density
+  # Check and categorize the density
+  if [ "$density" -le 120 ]; then
+    lcd_dpi="ldpi"  # Low Density
+  elif [ "$density" -le 160 ]; then
+    lcd_dpi="mdpi"  # Medium Density
+  elif [ "$density" -le 240 ]; then
+    lcd_dpi="hdpi"  # High Density
+  elif [ "$density" -le 320 ]; then
+    lcd_dpi="xhdpi"  # Extra High Density
+  elif [ "$density" -le 480 ]; then
+    lcd_dpi="xxhdpi"  # Extra Extra High Density
+  elif [ "$density" -gt 480 ] || [ "$density" -ge 640 ]; then
+    lcd_dpi="xxxhdpi"  # Extra Extra Extra High Density
+  else
+    lcd_dpi="*dpi"
+  fi
+elif [ $RipDpi -eq 0 ]; then
+  lcd_dpi="*dpi"
+fi
+
+if [ -f "$HOME/.config/gh/hosts.yml" ] && gh auth status > /dev/null 2>&1; then
+  # oauth_token: gho_************************************
+  token=$(grep -A2 "users:" ~/.config/gh/hosts.yml | grep -v "users:" | grep -A1 "oauth_token:" | awk '/oauth_token:/ {getline; print $2}')
+  auth="-H \"Authorization: Bearer $token\""
+elif [ -f "$simplifyJson" ] && jq -e '.PAT' "$simplifyJson" >/dev/null 2>&1; then
+  # PAT: ghp_************************************
+  token=$(jq -r '.PAT' "$simplifyJson" 2>/dev/null)
+  auth="-H \"Authorization: Bearer $token\""
+else
+  auth=""
+fi
+
+su -c "id" >/dev/null 2>&1 && su=1 || su=0
+[ $su -eq 1 ] && Serial=$(su -c 'getprop ro.serialno')  # Get Serial Number required root
+Model=$(getprop ro.product.model)  # Get Device Model
+
+pkg update > /dev/null 2>&1 || apt update >/dev/null 2>&1  # It downloads latest package list with versions from Termux remote repository, then compares them to local (installed) pkg versions, and shows a list of what can be upgraded if they are different.
+outdatedPKG=$(apt list --upgradable 2>/dev/null)  # list of outdated pkg
+echo "$outdatedPKG" | grep -q "dpkg was interrupted" 2>/dev/null && { yes "N" | dpkg --configure -a; outdatedPKG=$(apt list --upgradable 2>/dev/null); }
+installedPKG=$(pkg list-installed 2>/dev/null)  # list of installed pkg
 
 # --- Storage Permission Check Logic ---
 if ! ls /sdcard/ 2>/dev/null | grep -E -q "^(Android|Download)"; then
@@ -145,47 +263,6 @@ if [ "$Android" -ge 6 ]; then
     fi
   fi
 fi
-
-# --- Global Variables ---
-cpuAbi=$(getprop ro.product.cpu.abi)  # Get Android arch
-serial=$(su -c 'getprop ro.serialno')  # Get Serial Number required root
-model=$(getprop ro.product.model)  # Get Device Model
-pkg update > /dev/null 2>&1 || apt update >/dev/null 2>&1  # It downloads latest package list with versions from Termux remote repository, then compares them to local (installed) pkg versions, and shows a list of what can be upgraded if they are different.
-outdatedPKG=$(apt list --upgradable 2>/dev/null)  # list of outdated pkg
-echo "$outdatedPKG" | grep -q "dpkg was interrupted" 2>/dev/null && { yes "N" | dpkg --configure -a; outdatedPKG=$(apt list --upgradable 2>/dev/null); }
-installedPKG=$(pkg list-installed 2>/dev/null)  # list of installed pkg
-jdkVersion="21"
-SimplUsr="/sdcard/Simplify"
-Simplify="$HOME/Simplify"
-RV="$Simplify/RV"
-RVX="$Simplify/RVX"
-pikoTwitter="$Simplify/pikoTwitter"
-Dropped="$Simplify/Dropped"
-LSPatch="$Simplify/LSPatch"
-POST_INSTALL="$Simplify/POST_INSTALL"
-mkdir -p "$Simplify" "$RV" "$RVX" "$pikoTwitter" "$Dropped" "$LSPatch" "$SimplUsr" "$POST_INSTALL"
-Download="/sdcard/Download"
-simplifyJson="$Simplify/simplify.json"  # Configuration file to store simplify settings
-isPreRelease=0  # Default value (false/off/0) for isPreRelease, it's enabled latest release for Patches source
-isRipLocale=1  # Default value (true/on/1) for RipLocale, it's delete locale from patched apk file except device specific locale by default
-isRipDpi=1  # Default value (true/on/1) for RipDpi, it's delete dpi from patched apk file except device specific dpi by default
-isRipLib=1  # Default value (true/on/1) for RipLib, it's delete lib dir from patched apk file except device specific arch lib by default
-isChangeRVXSource=0  # Default value (false/off/0) for ChangeRVXSource, means patches source remain unchange ie. official source (inotia00) for RVX Patches
-isReadPatchesFile=0  # Default value (false/off/0) for ReadPatchesFile, means recommended PatchesOptions loading from script.
-branding="google_family"
-isCheckTermuxUpdate=1
-CheckTermuxUpdate=$(jq -r '.CheckTermuxUpdate' "$simplifyJson" 2>/dev/null)  # Get CheckTermuxUpdate value from json
-isJdkVersion=21
-jdkVersion=$(jq -r '.openjdk' "$simplifyJson" 2>/dev/null)
-isU=0  # Install Package for 0 (default-user), possible 1 (all-users)
-isK=0  # Allow Downgrade with keeps App data 0 (false) because it's required reboot after pkg install, possible 1 (true)
-isG=0  # Grant All Runtime Permissions 0 (false) due to Security Risk, possible 1
-isT=0  # Installed as test-only app 0, possible 1
-isL=1  # Bypass Low Target SDK Bolck 1 (true) it's allow Android 14+ to install apps that target below API level 23 (Android 6 and below), possible value 0
-isV=1  # Disable Play Protect Package Verification 1 (true), possible 0
-isI="com.android.vending"  # default: PlayStore | possible Installer: com.android.packageinstaller (PackageInstaller), com.android.shell (Shell), adb
-isR=1  # Reinstall Existing Installed Package 1 (true) because without this app can't be installed if installed and to-be-installed version are same, possible 0
-isB=0  # Enable Version Roolback 0, possible 1
 
 # --- pkg uninstall function ---
 pkgUninstall() {
@@ -362,27 +439,6 @@ if [ ! -f "$Simplify/ks.keystore" ]; then
   $PREFIX/lib/jvm/java-$jdkVersion-openjdk/bin/keytool -genkey -v -storetype pkcs12 -keystore $Simplify/ks.keystore -alias ReVancedKey -keyalg RSA -keysize 2048 -validity 36050 -dname "CN=arghya339, OU=Android Development Team, O=ReVanced, L=Kolkata, S=West Bengal, C=In" -storepass 123456 -keypass 123456
   $PREFIX/lib/jvm/java-$jdkVersion-openjdk/bin/keytool -list -v -keystore $Simplify/ks.keystore -storepass 123456 | grep -oP '(?<=Owner:).*' | xargs
 fi
-
-config() {
-  local key="$1"
-  local value="$2"
-  
-  if [ ! -f "$simplifyJson" ]; then
-    jq -n "{}" > "$simplifyJson"
-  fi
-  
-  jq --arg key "$key" --arg value "$value" '.[$key] = $value' "$simplifyJson" > temp.json && mv temp.json "$simplifyJson"
-}
-all_key=("FetchPreRelease" "RipLocale" "RipDpi" "RipLib" "ChangeRVXSource" "ReadPatchesFile" "Branding" "CheckTermuxUpdate" "openjdk")
-all_key+=("InstallPackageFor" "KeepsData" "GrantAllRuntimePermissions" "InstalledAsTestOnly" "BypassLowTargetSdkBolck" "DisablePlayProtect" "Installer" "Reinstall" "EnableRoolback")
-all_value=("$isPreRelease" "$isRipLocale" "$isRipDpi" "$isRipLib" "$isChangeRVXSource" "$isReadPatchesFile" "$branding" "$isCheckTermuxUpdate" "$isJdkVersion")
-all_value+=("$isU" "$isK" "$isG" "$isT" "$isL" "$isV" "$isI" "$isR" "$isB")
-# Loop through all keys and set values if they don't exist
-for i in "${!all_key[@]}"; do
-  if ! jq -e --arg key "${all_key[i]}" 'has($key)' "$simplifyJson" >/dev/null; then
-    config "${all_key[i]}" "${all_value[i]}"
-  fi
-done
 
 confirmPrompt() {
   Prompt=${1}
@@ -1035,6 +1091,30 @@ Unmount() {
       break
     fi
   done
+}
+
+# --- Check if CorePatch Installed ---
+checkCoreLSPosed() {
+  if [ "$(su -c 'getenforce 2>/dev/null')" = "Enforcing" ]; then
+    su -c "setenforce 0"  # set SELinux to Permissive mode to unblock unauthorized operations
+    LSPosedPkg=$(su -c "pm list packages | grep org.lsposed.manager" 2>/dev/null)  # LSPosed packages list
+    CorePatchPkg=$(su -c "pm list packages | grep com.coderstory.toolkit" 2>/dev/null)  # CorePatch packages list
+    su -c "setenforce 1"  # set SELinux to Enforcing mode to block unauthorized operations
+  else
+    LSPosedPkg=$(su -c "pm list packages | grep 'org.lsposed.manager'" 2>/dev/null)  # LSPosed packages list
+    CorePatchPkg=$(su -c "pm list packages | grep 'com.coderstory.toolkit'" 2>/dev/null)  # CorePatch packages list
+  fi
+
+  if [ -z $LSPosedPkg ]; then
+    echo -e "$info Please install LSPosed Manager by flashing LSPosed Zyzisk Module from Magisk. Then try again!"
+    termux-open-url "https://github.com/JingMatrix/LSPosed/releases"
+    return 1
+  fi
+  if [ -z $CorePatchPkg ]; then
+    echo -e "$info Please install and Enable CorePatch LSPosed Module in System Framework. Then try again!"
+    termux-open-url "https://github.com/LSPosed/CorePatch/releases"
+    return 1
+  fi
 }
 
 # --- Feature request prompt ---
