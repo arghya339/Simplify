@@ -1,5 +1,30 @@
 #!/usr/bin/bash
 
+# Colored log indicators
+good="\033[92;1m[✔]\033[0m"
+bad="\033[91;1m[✘]\033[0m"
+info="\033[94;1m[i]\033[0m"
+running="\033[37;1m[~]\033[0m"
+notice="\033[93;1m[!]\033[0m"
+question="\033[93;1m[?]\033[0m"
+
+# ANSI color code
+Green="\033[92m"
+BoldGreen="\033[92;1m"
+Red="\033[91m"
+Blue="\033[94m"
+Cyan="\033[96m"
+White="\033[37m"
+whiteBG="\e[47m\e[30m"
+Yellow="\033[93m"
+Reset="\033[0m"
+
+# --- Checking Internet Connection ---
+if ! ping -c 1 -W 2 8.8.8.8 >/dev/null 2>&1 ; then
+  echo -e "${bad} ${Red}Oops! No Internet Connection available.\nConnect to the Internet and try again later."
+  exit 1
+fi
+
 # --- Downloading latest Simplify.sh file from GitHub ---
 curl -fsSL -o "$HOME/.Simplify.sh" "https://raw.githubusercontent.com/arghya339/Simplify/refs/heads/main/Termux/Simplify.sh"
 
@@ -8,14 +33,6 @@ if [ ! -f "$PREFIX/bin/simplify" ]; then
   ln -s "$HOME/.Simplify.sh" "$PREFIX/bin/simplify"  # symlink (shortcut of Simplify.sh)
 fi
 chmod +x "$HOME/.Simplify.sh"  # give execute permission to the Simplify.sh
-
-# Colored log indicators
-good="\033[92;1m[✔]\033[0m"
-bad="\033[91;1m[✘]\033[0m"
-info="\033[94;1m[i]\033[0m"
-running="\033[37;1m[~]\033[0m"
-notice="\033[93;1m[!]\033[0m"
-question="\033[93;1m[?]\033[0m"
 
 <<comment
 # --- dash supports ANSI escape codes for terminal text formatting ---
@@ -60,16 +77,6 @@ echo -e "\e[47mThis is a white background\e[0m"
 echo -e "\e[32;47mThis is green text on white background\e[0m"
 echo -e "\e[1;32;47mThis is bold green text on white background\e[0m"
 comment
-
-# ANSI color code
-Green="\033[92m"
-BoldGreen="\033[92;1m"
-Red="\033[91m"
-Blue="\033[94m"
-White="\033[37m"
-whiteBG="\e[47m\e[30m"
-Yellow="\033[93m"
-Reset="\033[0m"
 
 # Construct the simplify shape using string concatenation
 print_simplify=$(cat <<'EOF'
@@ -137,12 +144,6 @@ if [ "$Android" -ge 6 ]; then
       termux-reload-settings  # reload (restart) Termux settings required for Android 6 after enabled allow-external-apps, also required for Android 7 due to 'Package installer has stopped' err
     fi
   fi
-fi
-
-# --- Checking Internet Connection ---
-if ! ping -c 1 -W 2 8.8.8.8 >/dev/null 2>&1 ; then
-  echo -e "${bad} ${Red}Oops! No Internet Connection available.\nConnect to the Internet and try again later."
-  exit 1
 fi
 
 # --- Global Variables ---
@@ -1113,7 +1114,7 @@ while true; do
       ;;
     LSPatch)
       curl -sL -o "$LSPatch/LSPatch.sh" "https://raw.githubusercontent.com/arghya339/Simplify/refs/heads/main/Termux/LSPatch.sh"
-      bash "$LSPatch/LSPatch.sh"
+      source "$LSPatch/LSPatch.sh"  # source = run in same shell environment (both scripts can share variables both ways)
       sleep 3
       ;;
     Configuration)
