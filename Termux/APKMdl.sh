@@ -94,7 +94,7 @@ APKMdl() {
   local FileName
   
   cf_chl_error() {
-    echo -e "$bad ${Red}Cloudflare security challenge detected!${Reset} ${Yellow}This webpage is protected by Cloudflare's anti-bot system.${Reset}\n ${Blue}Solutions${Reset}:\n   1. ${Yellow}Please try again after some time.${Reset}\n   2. ${Yellow}Disable your VPN if you are connected to one.${Reset}\n   3. ${Yellow}Connect to a Cloudflare WARP proxy and try again.${Reset}"
+    echo -e "$bad ${Red}Cloudflare security challenge detected!${Reset}\n$notice ${Yellow}This webpage is protected by Cloudflare's anti-bot system.${Reset}\n ${Blue}Solutions${Reset}:\n   1. ${Yellow}Please try again after some time.${Reset}\n   2. ${Yellow}Disable your VPN if you are connected to one.${Reset}\n   3. ${Yellow}Connect to a Cloudflare WARP proxy and try again.${Reset}"
     sleep 12
     am start -n com.cloudflare.onedotonedotonedotone/com.cloudflare.app.presentation.main.SplashActivity &> /dev/null || termux-open-url "https://play.google.com/store/apps/details?id=com.cloudflare.onedotonedotonedotone"
     exit 1
