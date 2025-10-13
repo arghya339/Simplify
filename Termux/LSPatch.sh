@@ -293,9 +293,7 @@ comment
 if [ "$cpuAbi" == "arm64-v8a" ] || [ "$cpuAbi" == "armeabi-v7a" ]; then
   Snapchat="Snapchat"
   LINE="LINE"
-  if su -c "id" >/dev/null 2>&1; then
-    googleDialer="PhoneByGoogle"
-  fi
+  [ $su -eq 1 ] && googleDialer="PhoneByGoogle"
 fi
 
 # --- Arrays of apps list that required specific android version ---

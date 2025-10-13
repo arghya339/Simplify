@@ -353,7 +353,7 @@ pkgInstall "findutils"  # find utils update
 pkgInstall "glow"  # glow install/update
 
 # --- Shizuku Setup first time ---
-if ! su -c "id" >/dev/null 2>&1 && { [ ! -f "$HOME/rish" ] || [ ! -f "$HOME/rish_shizuku.dex" ]; }; then
+if [ $su -eq 0 ] && { [ ! -f "$HOME/rish" ] || [ ! -f "$HOME/rish_shizuku.dex" ]; }; then
   #echo -e "$info Please manually install Shizuku from Google Play Store." && sleep 1
   #termux-open-url "https://play.google.com/store/apps/details?id=moe.shizuku.privileged.api"
   echo -e "$info Please manually install Shizuku from GitHub." && sleep 1
@@ -384,7 +384,7 @@ if [ "$(getprop ro.product.manufacturer)" == "Genymobile" ] && [ ! -f "$HOME/adb
   curl -sL -o "$HOME/adb" "https://raw.githubusercontent.com/rendiix/termux-adb-fastboot/refs/heads/master/binary/${cpuAbi}/bin/adb" && chmod +x ~/adb
 fi
 
-if su -c "id" >/dev/null 2>&1 || "$HOME/rish" -c "id" >/dev/null 2>&1 || "$HOME/adb" -s $(~/adb devices 2>/dev/null | head -2 | tail -1 | cut -f1) shell "id" >/dev/null 2>&1; then
+if [ $su -eq 1 ] || "$HOME/rish" -c "id" >/dev/null 2>&1 || "$HOME/adb" -s $(~/adb devices 2>/dev/null | head -2 | tail -1 | cut -f1) shell "id" >/dev/null 2>&1; then
   if [ -n "$(find $POST_INSTALL -mindepth 1 -type f -o -type d -o -type l 2>/dev/null)" ]; then
     file_path=$(find $POST_INSTALL -maxdepth 1 -type f -print -quit)
     bash $Simplify/apkInstall.sh "$file_path" "" && rm -f "$file_path"
@@ -407,9 +407,7 @@ curl -sL -o $Simplify/dlAPKPure.sh "https://raw.githubusercontent.com/arghya339/
 
 curl -sL "https://raw.githubusercontent.com/arghya339/Simplify/refs/heads/main/Termux/apkInstall.sh" --progress-bar -o $Simplify/apkInstall.sh
 
-if su -c "id" >/dev/null 2>&1; then
-  curl -sL -o "$Simplify/apkMount.sh" "https://raw.githubusercontent.com/arghya339/Simplify/refs/heads/main/Termux/apkMount.sh"
-fi
+[ $su -eq 1 ] && curl -sL -o "$Simplify/apkMount.sh" "https://raw.githubusercontent.com/arghya339/Simplify/refs/heads/main/Termux/apkMount.sh"
 
 # --- Create simplify shortcut on Laucher Home ---
 if [ ! -f "$HOME/.shortcuts/simplify" ] || [ ! -f "$HOME/.termux/widget/dynamic_shortcuts/simplify" ]; then
@@ -425,7 +423,7 @@ if [ ! -f "$HOME/.shortcuts/simplify" ] || [ ! -f "$HOME/.termux/widget/dynamic_
     bash $Simplify/apkInstall.sh "$Widget" ""  # Install Termux:Widget app using apkInstall.sh
     [ -f "$Widget" ] && rm -f "$Widget"  # if Termux:Widget app package exist then remove it 
   fi
-  if su -c "id" >/dev/null 2>&1; then
+  if [ $su -eq 1 ]; then
     if [ "$(su -c 'getenforce 2>/dev/null')" = "Enforcing" ]; then
       su -c "setenforce 0"  # set SELinux to Permissive mode to unblock unauthorized operations
       su -c "cmd appops set com.termux SYSTEM_ALERT_WINDOW allow"
@@ -674,7 +672,7 @@ if [ $CheckTermuxUpdate -eq 1 ]; then
       #bash $Simplify/dlGitHub.sh "termux" "termux-app" "latest" ".apk" "$SimplUsr" "termux-app_v.*+github-debug_$cpuAbi.apk"
       echo -e "$notice Please rerun this script again after Termux app update!"
       echo -e "$running Installing app update and restarting Termux app.." && sleep 3
-      if su -c "id" >/dev/null 2>&1; then
+      if [ $su -eq 1 ]; then
         su -c "cp '$SimplUsr/termux-app_v${latestReleases}+github-debug_$cpuAbi.apk' '/data/local/tmp/termux-app_v${latestReleases}+github-debug_$cpuAbi.apk'"
         # Temporary Disable SELinux Enforcing during installation if it not in Permissive
         if [ "$(su -c 'getenforce 2>/dev/null')" = "Enforcing" ]; then
@@ -703,7 +701,7 @@ if [ $CheckTermuxUpdate -eq 1 ]; then
       fi
     else
       if [ -f "$SimplUsr/termux-app_v${latestReleases}+github-debug_$cpuAbi.apk" ]; then
-        if su -c "id" >/dev/null 2>&1; then
+        if [ $su -eq 1 ]; then
           if [ "$(su -c 'getenforce 2>/dev/null')" = "Permissive" ] && [ -f "$Simplify/setenforce0" ]; then
             su -c "setenforce 1"  # set SELinux to Enforcing mode to block unauthorized operations
             rm -f "$Simplify/setenforce0"
@@ -726,7 +724,7 @@ if [ $CheckTermuxUpdate -eq 1 ]; then
       echo -e "$bad Termux app is outdated!"
       echo -e "$running Downloading Termux app update.."
       while true; do
-        su -c "$PREFIX/bin/curl -L --progress-bar -C - -o '/data/local/tmp/termux-app_v${lastReleases}+apt-android-$variant-github-debug_$cpuAbi.apk' 'https://github.com/termux/termux-app/releases/download/v$lastReleases/termux-app_v${lastReleases}+apt-android-$variant-github-debug_$cpuAbi.apk'"
+        $PREFIX/bin/curl -L --progress-bar -C - -o $SimplUsr/termux-app_v${lastReleases}+apt-android-$variant-github-debug_$cpuAbi.apk https://github.com/termux/termux-app/releases/download/v$lastReleases/termux-app_v${lastReleases}+apt-android-$variant-github-debug_$cpuAbi.apk
         if [ $? -eq 0 ]; then
           break  # break the resuming download loop
         fi
@@ -735,7 +733,7 @@ if [ $CheckTermuxUpdate -eq 1 ]; then
       #bash $Simplify/dlGitHub.sh "termux" "termux-app" "pre" ".apk" "$SimplUsr" "termux-app_v.*+apt-android-$variant-github-debug_$cpuAbi.apk"
       echo -e "$notice Please rerun this script again after Termux app update!"
       echo -e "$running Installing app update and restarting Termux app.." && sleep 3
-      if su -c "id" >/dev/null 2>&1; then
+      if [ $su -eq 1 ]; then
         su -c "cp '$SimplUsr/termux-app_v${lastReleases}+apt-android-$variant-github-debug_$cpuAbi.apk' '/data/local/tmp/termux-app_v${lastReleases}+apt-android-$variant-github-debug_$cpuAbi.apk'"
         # Temporary Disable SELinux Enforcing during installation if it not in Permissive
         if [ "$(su -c 'getenforce 2>/dev/null')" = "Enforcing" ]; then
@@ -765,7 +763,7 @@ if [ $CheckTermuxUpdate -eq 1 ]; then
       fi
     else
       if [ -f "$SimplUsr/termux-app_v${lastReleases}+apt-android-$variant-github-debug_$cpuAbi.apk" ]; then
-        if su -c "id" >/dev/null 2>&1; then
+        if [ $su -eq 1 ]; then
           if [ "$(su -c 'getenforce 2>/dev/null')" = "Permissive" ] && [ -f "$Simplify/setenforce0" ]; then
             su -c "setenforce 1"  # set SELinux to Enforcing mode to block unauthorized operations
             rm -f "$Simplify/setenforce0"
@@ -1056,7 +1054,7 @@ UninstallPatchedApp() {
     
     # Process selection
     if [ -n "$selected" ] && [[ "$selected" == [0-9] ]]; then
-      if su -c "id" >/dev/null 2>&1; then
+      if [ $su -eq 1 ]; then
         echo "$running Uninstalling ${nameArr[$selected]}.."
         if [ "$(su -c 'getenforce 2>/dev/null')" = "Enforcing" ]; then
           su -c "setenforce 0"  # set SELinux to Permissive mode to unblock unauthorized operations
@@ -1204,7 +1202,7 @@ while true; do
       sleep 3
       ;;
     ReVanced)
-      if su -c "id" >/dev/null 2>&1; then
+      if [ $su -eq 1 ]; then
         pkgInstall "python"  # python install/update
         if ! pip list 2>/dev/null | grep -q "apksigcopier"; then
           pip install apksigcopier > /dev/null 2>&1  # install apksigcopier using pip
@@ -1215,7 +1213,7 @@ while true; do
       sleep 3
       ;;
     ReVanced\ Extended)
-      if su -c "id" >/dev/null 2>&1; then
+      if [ $su -eq 1 ]; then
         pkgInstall "python"  # python install/update
         if ! pip list 2>/dev/null | grep -q "apksigcopier"; then
           pip install apksigcopier > /dev/null 2>&1  # install apksigcopier using pip
@@ -1468,7 +1466,7 @@ while true; do
     Miscellaneous)
       while true; do
         options=(Spoof\ Android\ Version Spoof\ Device\ Architecture Delete\ patched\ apk\ file Delete\ Patch\ Log Delete\ list-patches\ file Delete\ PatchesOption\ file Uninstall\ Patched\ Apps Uninstall\ Simplify)
-        su -c "id" >/dev/null 2>&1 && options+=(Unmount\ Patched\ Apps)
+        [ $su -eq 1 ] && options+=(Unmount\ Patched\ Apps)
         buttons=("<Select>" "<Back>"); if menu "options" "buttons"; then selected="${options[$selected]}"; else break; fi
         case "$selected" in
           Spoof\ Android\ Version) overwriteVersion ;;
@@ -1537,7 +1535,7 @@ while true; do
                     pkgUninstall "bsdtar"  # bsdtar uninstall
                     pkgUninstall "pv"  # pv uninstall
                     pkgUninstall "glow"  # glow uninstall
-                    if su -c "id" >/dev/null 2>&1; then
+                    if [ $su -eq 1 ]; then
                       if ! pip list 2>/dev/null | grep -q "apksigcopier"; then
                         pip uninstall apksigcopier > /dev/null 2>&1  # uninstall apksigcopier using pip
                       fi

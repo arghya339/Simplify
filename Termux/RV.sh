@@ -18,7 +18,7 @@ PatchesRvp=$(find "$RV" -type f -name "patches-*.rvp" -print -quit)
 echo -e "$info ${Blue}PatchesRvp:${Reset} $PatchesRvp"
 
 # --- Download Vanced MicroG ---
-if ! su -c "id" >/dev/null 2>&1; then
+if [ $su -eq 0 ]; then
   if [ "$Android" -ge "6" ]; then
     bash $Simplify/dlGitHub.sh "inotia00" "VancedMicroG" "latest" ".apk" "$SimplUsr"
     VancedMicroG=$(find "$SimplUsr" -type f -name "microg-*.apk" -print -quit)
@@ -124,7 +124,7 @@ yt_patches_args=(
   -d "Announcements"
 )
 
-if su -c "id" >/dev/null 2>&1; then
+if [ $su -eq 1 ]; then
   yt_patches_args+=(
     -d "GmsCore support"
     -e "Custom branding" -O appName=YouTube -O iconPath="$SimplUsr/.branding/youtube/launcher/$Branding"
@@ -136,7 +136,7 @@ else
   )
 fi
 
-if su -c "id" >/dev/null 2>&1; then
+if [ $su -eq 1 ]; then
   spotify_patches_args=(
     -e "Change lyrics provider"
     -e "Custom theme"
@@ -158,7 +158,7 @@ tiktok_patches_args=(
 
 photos_patches_args=()
 
-if su -c "id" >/dev/null 2>&1; then
+if [ $su -eq 1 ]; then
   photos_patches_args+=(-d "GmsCore support")
 else
   photos_patches_args+=(-e "GmsCore support" -O gmsCoreVendorGroupId="com.mgoogle")
@@ -274,7 +274,7 @@ if [ "$ReadPatchesFile" -eq 1 ]; then
       #touch "$SimplUsr/${arraynames[$i]}.txt"
       printf "%s\n" "${default_content[i]}" > "$SimplUsr/${arraynames[$i]}.txt"
       if [ "${arraynames[$i]}" == "yt_patches_args" ] || [ "${arraynames[$i]}" == "photos_patches_args" ]; then
-        if su -c "id" >/dev/null 2>&1; then
+        if [ $su -eq 1 ]; then
           echo "-d \"GmsCore support\"" >> "$SimplUsr/${arraynames[$i]}.txt"
           if [ "${arraynames[$i]}" == "yt_patches_args" ]; then
             echo "-e \"Custom branding\" -O appName=YouTube -O iconPath=\"/sdcard/Simplify/.branding/youtube/launcher/google_family\"" >> "$SimplUsr/${arraynames[$i]}.txt"
@@ -286,7 +286,7 @@ if [ "$ReadPatchesFile" -eq 1 ]; then
           fi
         fi
       fi
-      if su -c "id" >/dev/null 2>&1 && [ "${arraynames[$i]}" == "spotify_patches_args" ]; then
+      if [ $su -eq 1 ] && [ "${arraynames[$i]}" == "spotify_patches_args" ]; then
         echo "-d \"Spoof client\"" >> "$SimplUsr/${arraynames[$i]}.txt"
       fi
     fi
@@ -537,7 +537,7 @@ build_app() {
   
   if [ -f "$outputAPK" ]; then
     if [ "$pkgName" == "com.google.android.youtube" ] || [ "$pkgName" == "com.google.android.apps.photos" ] || [ "$pkgName" == "com.google.android.apps.recorder" ] || [ "$pkgName" == "com.spotify.music" ]; then
-      if su -c "id" >/dev/null 2>&1; then
+      if [ $su -eq 1 ]; then
         
         if [ "$pkgName" == "com.google.android.youtube" ]; then
           buttons=("<Install>" "<Mount>" "<Cancel>")
@@ -649,7 +649,7 @@ getListOfPatches() {
 comment
 
 # --- Decisions block for app that required specific arch & android version ---
-if su -c "id" >/dev/null 2>&1 && [ "$cpuAbi" == "arm64-v8a" ]; then
+if [ $su -eq 1 ] && [ "$cpuAbi" == "arm64-v8a" ]; then
   googleRecorder="GoogleRecorder"
 fi
 if  [[ $Android -ge 9  &&  ( "$cpuAbi" == "arm64-v8a" || "$cpuAbi" == "x86_64" ) ]]; then
@@ -674,9 +674,7 @@ fi
 if  [[ $Android -ge 11  &&  ( "$cpuAbi" == "arm64-v8a" || "$cpuAbi" == "armeabi-v7a" ) ]]; then
   Facebook="Facebook"
 fi
-if su -c "id" >/dev/null 2>&1; then
-  Spotify="Spotify"
-fi
+[ $su -eq 1 ] && Spotify="Spotify"
 
 options=(CHANGELOG Spoof\ Device\ Arch List\ of\ Patches)
 
@@ -1012,11 +1010,7 @@ while true; do
         getVersion "$pkgName"
         pkgVersion="$pkgVersion"
       fi
-      if su -c "id" >/dev/null 2>&1; then
-        Type="APK"
-      else
-        Type="BUNDLE"
-      fi
+      [ $su -eq 1 ] && Type="APK" || Type="BUNDLE"
       Arch=("universal")
       pkgPatched="app.revanced.android.youtube"
       activityPatched="com.google.android.youtube/.app.honeycomb.Shell\$HomeActivity"
