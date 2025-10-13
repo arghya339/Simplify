@@ -61,7 +61,7 @@ build_app() {
     langUrl="https://tracker.vendetta.rocks/tracker/download/$pkgVersion/config.en"  # Size >= 58 KB
     # src: https://github.com/revenge-mod/revenge-manager/blob/85fdd3c2d25e509960bdb99e0e9882b16f5d541f/app/src/main/java/app/revenge/manager/installer/step/download/DownloadResourcesStep.kt#L20
     resourcesUrl="https://tracker.vendetta.rocks/tracker/download/$pkgVersion/config.xxhdpi"  # Size >= 13 MB
-    if [ "$cpuAbi" == "arm64-v8a" ]; then cpuAbi="arm64_v8a"; elif [ "$cpuAbi" == "armeabi-v7a" ]; then cpuAbi="armeabi_v7a"; fi
+    if [ "$cpuAbi" == "arm64-v8a" ]; then arch="arm64_v8a"; elif [ "$cpuAbi" == "armeabi-v7a" ]; then arch="armeabi_v7a"; fi
     # src: https://github.com/revenge-mod/revenge-manager/blob/85fdd3c2d25e509960bdb99e0e9882b16f5d541f/app/src/main/java/app/revenge/manager/installer/step/download/DownloadLibsStep.kt#L26
     libsUrl="https://tracker.vendetta.rocks/tracker/download/$pkgVersion/config.$cpuAbi"  # Size >= 60 MB
     dlDIR="$Download/Discord_v$pkgVersion"
@@ -89,7 +89,7 @@ build_app() {
       dl "aria2" "$baseUrl" "base.apk"
       dl "curl" "$langUrl" "config.en.apk"
       dl "curl" "$resourcesUrl" "config.xxhdpi.apk"
-      dl "aria2" "$libsUrl" "config.$cpuAbi.apk"
+      if [ "$cpuAbi" == "arm64-v8a" ] || [ "$cpuAbi" == "armeabi-v7a" ]; then dl "aria2" "$libsUrl" "config.$arch.apk"; else dl "aria2" "$libsUrl" "config.$cpuAbi.apk"; fi
     
       bash $Simplify/dlGitHub.sh "REAndroid" "APKEditor" "latest" ".jar" "$Simplify"
       APKEditor=$(find "$Simplify" -type f -name "APKEditor-*.jar" -print -quit)
