@@ -1211,7 +1211,7 @@ while true; do
         fi
       fi
       curl -sL -o "$RV/RV.sh" "https://raw.githubusercontent.com/arghya339/Simplify/refs/heads/main/Termux/RV.sh"
-      bash "$RV/RV.sh"
+      source "$RV/RV.sh"
       sleep 3
       ;;
     ReVanced\ Extended)
