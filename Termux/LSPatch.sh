@@ -676,12 +676,8 @@ while true; do
       fi
       Type="APK"
       Arch=("$cpuAbi")
-      ghApiResponseJson=$(curl -s ${auth} "https://api.github.com/repos/Xposed-Modules-Repo/io.github.vvb2060.callrecording/releases/latest")
-      releasesTagName=$(jq -r '.tag_name' <<< "$ghApiResponseJson")  # 2-1.1
-      releasesName=$(jq -r '.name' <<< "$ghApiResponseJson")  # 1.1
-      dlUrl="https://github.com/Xposed-Modules-Repo/io.github.vvb2060.callrecording/releases/download/${releasesTagName}/app-release.apk"
-      curl -L --progress-bar -C - -o "$LSPatch/callrecording-${releasesName}.apk" "$dlUrl"
-      module_apk_path=$(find "$LSPatch" -type f -name "callrecording-*.apk")
+      bash $Simplify/dlGitHub.sh "Xposed-Modules-Repo" "io.github.vvb2060.callrecording" "latest" ".apk" "$LSPatch"
+      module_apk_path=$(find "$LSPatch" -type f -name "io.github.vvb2060.callrecording-*.apk")
       echo -e "$info module_apk_path: $module_apk_path"
       activityPatched="com.google.android.dialer/.extensions.GoogleDialtactsActivity"
       BugReport="https://github.com/vvb2060/CallRecording/issues/new"
