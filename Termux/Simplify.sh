@@ -3,7 +3,7 @@
 # Constants Colored log indicators
 readonly good="\033[92;1m[✔]\033[0m"
 readonly bad="\033[91;1m[✘]\033[0m"
-readonly nfo="\033[94;1m[i]\033[0m"
+readonly info="\033[94;1m[i]\033[0m"
 readonly running="\033[37;1m[~]\033[0m"
 readonly notice="\033[93;1m[!]\033[0m"
 readonly question="\033[93;1m[?]\033[0m"
