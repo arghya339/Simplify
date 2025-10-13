@@ -1524,7 +1524,8 @@ while true; do
                     pkgUninstall "jq"  # jq uninstall
                     pkgUninstall "pup"  # pup uninstall
                     pkgUninstall "openjdk-$jdkVersion"  # java uninstall
-                    pkgUninstall "apksigner"  # apksigner uninstall
+                    pip list | grep "apksigcopier" >/dev/null 2>&1 && pip uninstall apksigcopier -y > /dev/null 2>&1  # Uninstall apksigcopier using pip
+                    pkgUninstall "python"  # python uninstall
                     pkgUninstall "bsdtar"  # bsdtar uninstall
                     pkgUninstall "pv"  # pv uninstall
                     pkgUninstall "glow"  # glow uninstall
