@@ -641,12 +641,8 @@ while true; do
         pkgVersion=$(curl -sL https://tracker.vendetta.rocks/tracker/index | jq -r '.[].beta')
       fi
       Arch=()
-      ghApiResponseJson=$(curl -s ${auth} "https://api.github.com/repos/revenge-mod/revenge-xposed/releases/latest")
-      releasesTagName=$(jq -r '.tag_name' <<< "$ghApiResponseJson")  # 1202
-      releasesName=$(jq -r '.name' <<< "$ghApiResponseJson")  # 1.2.2
-      dlLink="https://github.com/revenge-mod/revenge-xposed/releases/download/$releasesTagName/app-release.apk"
-      module_apk_path="$LSPatch/revenge-xposed-${releasesName}.apk"
-      curl -L --progress-bar -C - -o "$module_apk_path" "$dlLink"
+      bash $Simplify/dlGitHub.sh "revenge-mod" "revenge-xposed" "latest" ".apk" "$LSPatch"
+      module_apk_path=$(find "$LSPatch" -type f -name "revenge-xposed-*.apk" -print -quit)
       echo -e "$info module_apk_path: $module_apk_path"
       activityPatched="com.discord/.main.MainDefault"
       BugReport="https://github.com/revenge-mod/revenge-xposed/issues/new"
