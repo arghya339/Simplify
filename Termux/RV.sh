@@ -546,6 +546,10 @@ build_app() {
           if [ $exit_status -eq 0 ]; then opt=Install; elif [ $exit_status -eq 1 ]; then opt=Mount; elif [ $exit_status -eq 2 ]; then opt=Cancel; fi
           case $opt in
             I*|i*|"")
+              if [ $su -eq 1 ]; then
+                pkgInstall "python"  # python install/update
+                ! pip list 2>/dev/null | grep -q "apksigcopier" && pip install apksigcopier > /dev/null 2>&1  # install apksigcopier using pip
+              fi
               checkCoreLSPosed  # Call the check core patch functions
               echo -e "$running Copy signature from ${appNameRef[0]}.."
               termux-wake-lock

@@ -103,11 +103,14 @@ SimplUsr="/sdcard/Simplify"  # /storage/emulated/0/Simplify dir
 Download="/sdcard/Download"  # Download dir
 RV="$Simplify/RV"
 RVX="$Simplify/RVX"
+RV4="$RVX/RV4"
+RVX6_7="$Simplify/RVX6-7"  # RVX for Android 6 and 7
 pikoTwitter="$Simplify/pikoTwitter"
 Dropped="$Simplify/Dropped"
 LSPatch="$Simplify/LSPatch"
 POST_INSTALL="$Simplify/POST_INSTALL"
-mkdir -p "$Simplify" "$SimplUsr" "$RV" "$RVX" "$pikoTwitter" "$Dropped" "$LSPatch" "$POST_INSTALL"  # Create $Simplify, $SimplUsr, $RV, $RVX, $pikoTwitter, $Dropped, $LSPatch and $POST_INSTALL dir if it does't exist
+mkdir -p "$Simplify" "$SimplUsr" "$RV" "$RVX" "$RV4" "$pikoTwitter" "$Dropped" "$LSPatch" "$POST_INSTALL"  # Create $Simplify, $SimplUsr, $RV, $RVX, $RV4, $pikoTwitter, $Dropped, $LSPatch and $POST_INSTALL dir if it does't exist
+[[ $Android -eq 7 || $Android -eq 6 ]] && mkdir -p "$RVX6_7"  # Create $RVX6_7 dir if Android version is 6 or 7
 simplifyJson="$Simplify/simplify.json"  # Configuration file to store simplify settings
 
 isPreRelease=0  # Default value (false/off/0) for isPreRelease, it's enabled latest release for Patches source
@@ -168,6 +171,8 @@ jq -e '.CheckTermuxUpdate != null' "$simplifyJson" >/dev/null 2>&1 && CheckTermu
 jq -e '.ReadPatchesFile != null' "$simplifyJson" >/dev/null 2>&1 && ReadPatchesFile="$(jq -r '.ReadPatchesFile' "$simplifyJson" 2>/dev/null)" || ReadPatchesFile=0
 # Get Branding value from json
 jq -e '.Branding != null' "$simplifyJson" >/dev/null 2>&1 && Branding=$(jq -r '.Branding' "$simplifyJson" 2>/dev/null) || Branding="google_family"
+# Get ChangeRVXSource value from json
+jq -e '.ChangeRVXSource != null' "$simplifyJson" >/dev/null 2>&1 && ChangeRVXSource="$(jq -r '.ChangeRVXSource' "$simplifyJson" 2>/dev/null)" || ChangeRVXSource=0
 
 # Build locale
 if [ $RipLocale -eq 1 ]; then
@@ -1202,25 +1207,13 @@ while true; do
       sleep 3
       ;;
     ReVanced)
-      if [ $su -eq 1 ]; then
-        pkgInstall "python"  # python install/update
-        if ! pip list 2>/dev/null | grep -q "apksigcopier"; then
-          pip install apksigcopier > /dev/null 2>&1  # install apksigcopier using pip
-        fi
-      fi
       curl -sL -o "$RV/RV.sh" "https://raw.githubusercontent.com/arghya339/Simplify/refs/heads/main/Termux/RV.sh"
-      source "$RV/RV.sh"
+      source "$RV/RV.sh"  # source = run in same shell environment (both scripts can share variables/functions both ways)
       sleep 3
       ;;
     ReVanced\ Extended)
-      if [ $su -eq 1 ]; then
-        pkgInstall "python"  # python install/update
-        if ! pip list 2>/dev/null | grep -q "apksigcopier"; then
-          pip install apksigcopier > /dev/null 2>&1  # install apksigcopier using pip
-        fi
-      fi
       curl -sL -o "$RVX/RVX.sh" "https://raw.githubusercontent.com/arghya339/Simplify/refs/heads/main/Termux/RVX.sh"
-      bash "$RVX/RVX.sh"
+      source "$RVX/RVX.sh"  # source = run in same shell environment (both scripts can share variables/functions both ways)
       sleep 3
       ;;
     Piko\ Twitter)
@@ -1235,7 +1228,7 @@ while true; do
       ;;
     LSPatch)
       curl -sL -o "$LSPatch/LSPatch.sh" "https://raw.githubusercontent.com/arghya339/Simplify/refs/heads/main/Termux/LSPatch.sh"
-      source "$LSPatch/LSPatch.sh"  # source = run in same shell environment (both scripts can share variables both ways)
+      source "$LSPatch/LSPatch.sh"  # source = run in same shell environment (both scripts can share variables/functions both ways)
       sleep 3
       ;;
     Configuration)
