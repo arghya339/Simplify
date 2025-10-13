@@ -483,7 +483,7 @@ elif [ $Android -eq 5 ]; then
 fi
 
 while true; do
-  buttons=("<Select>" "<Back>"); if menu "apps" "buttons"; then selected="${apps[$selected]}"; else break; fi
+  buttons=("<Select>" "<Back>"); if menu "apps" "buttons" "8"; then selected="${apps[$selected]}"; else break; fi
 
   # main conditional control flow
   case "$selected" in
