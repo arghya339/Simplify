@@ -207,7 +207,7 @@ elif [ $RipDpi -eq 0 ]; then
 fi
 
 # --- Generate ripLib arg ---
-if [ "$RipLib" -eq 1 ]; then
+if [ $RipLib -eq 1 ]; then
   all_arch="arm64-v8a armeabi-v7a x86_64 x86"  # all ABIs
   # Generate ripLib arguments for all ABIs EXCEPT the device ABI
   ripLib=""
@@ -220,12 +220,6 @@ if [ "$RipLib" -eq 1 ]; then
       fi
     fi
   done
-  # Display the final ripLib arguments
-  echo -e "$info ${Blue}cpuAbi:${Reset} $cpuAbi"
-  echo -e "$info ${Blue}ripLib:${Reset} $ripLib"
-else
-  ripLib=""  # If RipLib is not enabled, set ripLib to an empty string
-  echo -e "$notice RipLib Disabled!"
 fi
 
 if [ -f "$HOME/.config/gh/hosts.yml" ] && gh auth status > /dev/null 2>&1; then

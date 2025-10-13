@@ -22,13 +22,20 @@ if [ $su -eq 0 ]; then
   if [ "$Android" -ge "6" ]; then
     bash $Simplify/dlGitHub.sh "inotia00" "VancedMicroG" "latest" ".apk" "$SimplUsr"
     VancedMicroG=$(find "$SimplUsr" -type f -name "microg-*.apk" -print -quit)
-    echo -e "$info ${Blue}VancedMicroG:${Reset} $VancedMicroG"
   elif [ $Android -eq 5 ]; then
     VancedMicroG="$SimplUsr/microg-0.2.22.212658.apk"
-    if [ ! -f "$VancedMicroG" ]; then
-      curl -sL "https://github.com/TeamVanced/VancedMicroG/releases/download/v0.2.22.212658-212658001/microg.apk" --progress-bar -C - -o "$VancedMicroG"
-    fi
+    [ ! -f "$VancedMicroG" ] && curl -sL "https://github.com/TeamVanced/VancedMicroG/releases/download/v0.2.22.212658-212658001/microg.apk" --progress-bar -C - -o "$VancedMicroG"
   fi
+  echo -e "$info ${Blue}VancedMicroG:${Reset} $VancedMicroG"
+fi
+
+if [ $RipLib -eq 1 ]; then
+  # Display the final ripLib arguments
+  echo -e "$info ${Blue}cpuAbi:${Reset} $cpuAbi"
+  echo -e "$info ${Blue}ripLib:${Reset} $ripLib"
+else
+  ripLib=""  # If RipLib is not enabled, set ripLib to an empty string
+  echo -e "$notice RipLib Disabled!"
 fi
 
 # Get compatiblePackages version from patches

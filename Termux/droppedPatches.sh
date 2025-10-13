@@ -10,6 +10,15 @@ bash $Simplify/dlGitHub.sh "indrastorms" "Dropped-Patches" "latest" ".rvp" "$Dro
 PatchesRvp=$(find "$Dropped" -type f -name "patches-*.rvp" -print -quit)
 echo -e "$info ${Blue}PatchesRvp:${Reset} $PatchesRvp"
 
+if [ $RipLib -eq 1 ]; then
+  # Display the final ripLib arguments
+  echo -e "$info ${Blue}cpuAbi:${Reset} $cpuAbi"
+  echo -e "$info ${Blue}ripLib:${Reset} $ripLib"
+else
+  ripLib=""  # If RipLib is not enabled, set ripLib to an empty string
+  echo -e "$notice RipLib Disabled!"
+fi
+
 # Get compatiblePackages version from patches
 getVersion() {
   local pkgName="$1"
