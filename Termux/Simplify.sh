@@ -1299,28 +1299,30 @@ while true; do
           "Change YouTube & YT Music AppIcon & Header")
             echo "changeYouTubeYTMusicAppIconHeader == $Branding"
             options=(google_family pink vanced_light revancify_blue); buttons=("<Select>" "<Back>"); if menu "options" "buttons" "4"; then selected="${options[$selected]}"; fi
-            case "$selected" in
-              [Gg]*)
-                branding="google_family"
-                config "Branding" "$branding"
-                echo -e "$good ${Green}appIconHeader successfully set to google_family!${Reset}"
-                ;;
-              [Pp]*)
-                branding=pink
-                config "Branding" "$branding"
-                echo -e "$good ${Green}appIconHeader successfully set to pink!${Reset}"
-                ;;
-              [Vv]*)
-                branding="vanced_light"
-                config "Branding" "$branding"
-                echo -e "$good ${Green}appIconHeader successfully set to vanced_light!${Reset}"
-                ;;
-              [Rr]*)
-                branding="revancify_blue"
-                config "Branding" "$branding"
-                echo -e "$good ${Green}appIconHeader successfully set to revancify_blue!${Reset}"
-                ;;
-            esac
+            if [ -n "$selected" ]; then
+              case "$selected" in
+                [Gg]*)
+                  branding="google_family"
+                  config "Branding" "$branding"
+                  echo -e "$good ${Green}appIconHeader successfully set to google_family!${Reset}"
+                  ;;
+                [Pp]*)
+                  branding=pink
+                  config "Branding" "$branding"
+                  echo -e "$good ${Green}appIconHeader successfully set to pink!${Reset}"
+                  ;;
+                [Vv]*)
+                  branding="vanced_light"
+                  config "Branding" "$branding"
+                  echo -e "$good ${Green}appIconHeader successfully set to vanced_light!${Reset}"
+                  ;;
+                [Rr]*)
+                  branding="revancify_blue"
+                  config "Branding" "$branding"
+                  echo -e "$good ${Green}appIconHeader successfully set to revancify_blue!${Reset}"
+                  ;;
+              esac
+            fi
             ;;
           Check\ Termux\ update\ on\ startup) if [ $CheckTermuxUpdate -eq 1 ]; then echo "CheckTermuxUpdate == true"; else echo "CheckTermuxUpdate == false"; fi
             key="CheckTermuxUpdate" && value="$isCheckTermuxUpdate"
