@@ -866,7 +866,7 @@ while true; do
       else
         echo -e "$info Device architecture not spoofed yet!"
       fi
-      options=(Disabled\ Arch\ spoofing arm64-v8a armeabi-v7a x86_64 x86); buttons=("<Select>" "<Back>"); if menu "options" "buttons"; then arch="${options[$selected]}"; fi
+      options=(Disabled\ Arch\ spoofing arm64-v8a armeabi-v7a x86_64 x86); buttons=("<Select>" "<Back>"); if menu "options" "buttons" "5"; then arch="${options[$selected]}"; fi
       if [ -n "$arch" ]; then
         case "$arch" in
           Disabled\ Arch\ spoofing)

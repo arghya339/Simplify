@@ -1105,7 +1105,7 @@ Unmount() {
 
     # Get Selection
     buttons=("<Select>" "<Back>")
-    if menu "nameList" "buttons"; then 
+    if menu "nameList" "buttons" "${#nameArr[@]}"; then 
       selected="${nameList[$selected]}"
             
       # Process selection
@@ -1298,7 +1298,7 @@ while true; do
             ;;
           "Change YouTube & YT Music AppIcon & Header")
             echo "changeYouTubeYTMusicAppIconHeader == $Branding"
-            options=(google_family pink vanced_light revancify_blue); buttons=("<Select>" "<Back>"); if menu "options" "buttons"; then selected="${options[$selected]}"; else break; fi
+            options=(google_family pink vanced_light revancify_blue); buttons=("<Select>" "<Back>"); if menu "options" "buttons" "4"; then selected="${options[$selected]}"; else break; fi
             case "$selected" in
               [Gg]*)
                 branding="google_family"
@@ -1361,7 +1361,7 @@ while true; do
               Reinstall=$(jq -r '.Reinstall' "$simplifyJson" 2>/dev/null)
               EnableRoolback=$(jq -r '.EnableRoolback' "$simplifyJson" 2>/dev/null)
               options=("Install Package for *user" "Allow Downgrade with keeps App data (reboot required)" "Grant All Runtime/ Requested Permissions" Installed\ as\ test-only\ app Bypass\ Low\ Target\ SDK\ Bolck Disable\ Play\ Protect\ Package\ Verification Installer "Reinstall (Replace/ Upgrade) Existing Installed Package" Enable\ Version\ Roolback)
-              buttons=("<Select>" "<Back>"); if menu "options" "buttons"; then selected="${options[$selected]}"; else break; fi
+              buttons=("<Select>" "<Back>"); if menu "options" "buttons" "10"; then selected="${options[$selected]}"; else break; fi
               case "$selected" in
                 "Install Package for *user")
                   if [ "$InstallPackageFor" -eq 0 ]; then echo "InstallPackageFor == 0 (default-user)"; else echo "InstallPackageFor == 1 (all-users)"; fi
@@ -1418,7 +1418,7 @@ while true; do
                   esac
                   key="Installer"
                   options=(Play\ Store Package\ Installer Shell ADB)
-                  buttons=("<Select>" "<Back>"); if menu "options" "buttons"; then selected="${options[$selected]}"; else break; fi
+                  buttons=("<Select>" "<Back>"); if menu "options" "buttons" "4"; then selected="${options[$selected]}"; else break; fi
                   case "$selected" in
                     Play\ Store) value="com.android.vending"; config "$key" "$value" && echo -e "${Green}Successfully set Installer as 'com.android.vending' (PlayStore)${Reset}" ;;
                     Package\ Installer) value="com.android.packageinstaller"; config "$key" "$value" && echo -e "${Green}Successfully set Installer as 'com.android.packageinstaller' (PackageInstaller)${Reset}" ;;
@@ -1471,7 +1471,7 @@ while true; do
             else
               echo -e "$info Device architecture not spoofed yet!"
             fi
-            options=(Disabled\ Arch\ spoofing arm64-v8a armeabi-v7a x86_64 x86); buttons=("<Select>" "<Back>"); if menu "options" "buttons"; then arch="${options[$selected]}"; fi
+            options=(Disabled\ Arch\ spoofing arm64-v8a armeabi-v7a x86_64 x86); buttons=("<Select>" "<Back>"); if menu "options" "buttons" "5"; then arch="${options[$selected]}"; fi
             if [ -n "$arch" ]; then
               case "$arch" in
                 Disabled\ Arch\ spoofing)

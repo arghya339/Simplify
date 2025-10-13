@@ -499,7 +499,7 @@ while true; do
       else
         echo -e "$info Device architecture not spoofed yet!"
       fi
-      options=(Disabled\ Arch\ spoofing arm64-v8a armeabi-v7a x86_64 x86); buttons=("<Select>" "<Back>"); if menu "options" "buttons"; then arch="${options[$selected]}"; fi
+      options=(Disabled\ Arch\ spoofing arm64-v8a armeabi-v7a x86_64 x86); buttons=("<Select>" "<Back>"); if menu "options" "buttons" "5"; then arch="${options[$selected]}"; fi
       if [ -n "$arch" ]; then
         case "$arch" in
           Disabled\ Arch\ spoofing)
@@ -535,7 +535,7 @@ while true; do
     List\ of\ Patches)
       apps_list=("${apps[@]}")
       unset apps_list[0] apps_list[1] apps_list[2]; apps_list=("${apps_list[@]}")  # Remove element at index 0,1,2 and reindex
-      buttons=("<Select>" "<Back>"); if menu "apps_list" "buttons"; then selected="${apps_list[$selected]}"; fi
+      buttons=("<Select>" "<Back>"); if menu "apps_list" "buttons" "5"; then selected="${apps_list[$selected]}"; fi
       if [ -n "$selected" ]; then
         case "$selected" in
           YouTube)
