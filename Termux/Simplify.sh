@@ -110,7 +110,6 @@ Dropped="$Simplify/Dropped"
 LSPatch="$Simplify/LSPatch"
 POST_INSTALL="$Simplify/POST_INSTALL"
 mkdir -p "$Simplify" "$SimplUsr" "$RV" "$RVX" "$RV4" "$pikoTwitter" "$Dropped" "$LSPatch" "$POST_INSTALL"  # Create $Simplify, $SimplUsr, $RV, $RVX, $RV4, $pikoTwitter, $Dropped, $LSPatch and $POST_INSTALL dir if it does't exist
-[[ $Android -eq 7 || $Android -eq 6 ]] && mkdir -p "$RVX6_7"  # Create $RVX6_7 dir if Android version is 6 or 7
 simplifyJson="$Simplify/simplify.json"  # Configuration file to store simplify settings
 
 isPreRelease=0  # Default value (false/off/0) for isPreRelease, it's enabled latest release for Patches source
@@ -173,6 +172,8 @@ jq -e '.ReadPatchesFile != null' "$simplifyJson" >/dev/null 2>&1 && ReadPatchesF
 jq -e '.Branding != null' "$simplifyJson" >/dev/null 2>&1 && Branding=$(jq -r '.Branding' "$simplifyJson" 2>/dev/null) || Branding="google_family"
 # Get ChangeRVXSource value from json
 jq -e '.ChangeRVXSource != null' "$simplifyJson" >/dev/null 2>&1 && ChangeRVXSource="$(jq -r '.ChangeRVXSource' "$simplifyJson" 2>/dev/null)" || ChangeRVXSource=0
+
+[[ $Android -eq 7 || $Android -eq 6 ]] && mkdir -p "$RVX6_7"  # Create $RVX6_7 dir if Android version is 6 or 7
 
 # Build locale
 if [ $RipLocale -eq 1 ]; then
