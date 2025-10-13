@@ -1204,7 +1204,7 @@ while true; do
   case "$selected" in
     Download\ Patched\ App)
       curl -sL -o "$Simplify/dlPatchedApp.sh" "https://raw.githubusercontent.com/arghya339/Simplify/refs/heads/main/Termux/dlPatchedApp.sh"
-      bash "$Simplify/dlPatchedApp.sh"
+      source "$Simplify/dlPatchedApp.sh"  # source = run in same shell environment (both scripts can share variables/functions both ways)
       sleep 3
       ;;
     ReVanced)

@@ -1,32 +1,10 @@
 #!/usr/bin/bash
 
-# Colored log indicators
-good="\033[92;1m[✔]\033[0m"
-bad="\033[91;1m[✘]\033[0m"
-info="\033[94;1m[i]\033[0m"
-running="\033[37;1m[~]\033[0m"
-notice="\033[93;1m[!]\033[0m"
-question="\033[93;1m[?]\033[0m"
+echo -e "$info ${Blue}Target device:${Reset} $Model"
 
-# ANSI color code
-Green="\033[92m"
-BoldGreen="\033[92;1m"
-Red="\033[91m"
-Blue="\033[94m"
-Cyan="\033[96m"
-White="\033[37m"
-whiteBG="\e[47m\e[30m"
-Yellow="\033[93m"
-Reset="\033[0m"
-
-# --- Global Variables ---
-Android=$(getprop ro.build.version.release | cut -d. -f1)  # Get major Android version
 cpuAbi=$(getprop ro.product.cpu.abi)  # Get Android arch
-Model=$(getprop ro.product.model)  # Get Device Model
 locale=$(getprop persist.sys.locale | cut -d'-' -f1)  # Get System Languages
-if [ -z $locale ]; then
-  locale=$(getprop ro.product.locale | cut -d'-' -f1)  # Get Languages
-fi
+[ -z $locale ] && locale=$(getprop ro.product.locale | cut -d'-' -f1)  # Get Languages
 density=$(getprop ro.sf.lcd_density)  # Get the device screen density
   # Check and categorize the density
   if [ "$density" -le 120 ]; then
@@ -44,40 +22,10 @@ density=$(getprop ro.sf.lcd_density)  # Get the device screen density
   else
     lcd_dpi="*dpi"
   fi
-Simplify="$HOME/Simplify"  # /data/data/com.termux/files/home/Simplify dir
-SimplUsr="/sdcard/Simplify"  # /storage/emulated/0/Simplify dir
-mkdir -p "$Simplify" "$SimplUsr"  # Create $Simplify and $SimplUsr dir if it does't exist
 dataJson="$Simplify/data.json"  # Data file to store simplify dlPatchedApp data
   # Create empty json file if it doesn't exist
-  if [ ! -f "$dataJson" ]; then
-    jq -n '[]' > "$dataJson"
-  fi
-simplifyJson="$Simplify/simplify.json"  # Configuration file to store simplify settings
-if jq -e '.openjdk != null' "$simplifyJson" >/dev/null 2>&1; then
-  jdkVersion=$(jq -r '.openjdk' "$simplifyJson" 2>/dev/null)  # Get openjdk value (verison) from json
-else
-  jdkVersion="21"
-fi
-ChangeRVXSource="$(jq -r '.ChangeRVXSource' "$simplifyJson" 2>/dev/null)"
-FetchPreRelease=$(jq -r '.FetchPreRelease' "$simplifyJson" 2>/dev/null)
-if [ -f "$HOME/.config/gh/hosts.yml" ] && gh auth status > /dev/null 2>&1; then
-  # oauth_token: gho_************************************
-  token=$(grep -A2 "users:" ~/.config/gh/hosts.yml | grep -v "users:" | grep -A1 "oauth_token:" | awk '/oauth_token:/ {getline; print $2}')
-  auth="-H \"Authorization: Bearer $token\""
-elif [ -f "$simplifyJson" ] && jq -e '.PAT' "$simplifyJson" >/dev/null 2>&1; then
-  # PAT: ghp_************************************
-  token=$(jq -r '.PAT' "$simplifyJson" 2>/dev/null)
-  auth="-H \"Authorization: Bearer $token\""
-else
-  auth=""
-fi
-if [ $FetchPreRelease -eq 1 ]; then
-  release="pre"
-else
-  release="latest"
-fi
-
-echo -e "$info ${Blue}Target device:${Reset} $Model"
+  [ ! -f "$dataJson" ] && jq -n '[]' > "$dataJson"
+[ $FetchPreRelease -eq 1 ] && release="pre" || release="latest"
 
 # --- function to store app metadata to data.json file ---
 data() {
@@ -87,9 +35,7 @@ data() {
   
   
   # Create empty json file if it doesn't exist
-  if [ ! -f "$dataJson" ]; then
-    jq -n '[]' > "$dataJson"
-  fi
+  [ ! -f "$dataJson" ] && jq -n '[]' > "$dataJson"
   
   # Check if asset exists in array
   if jq --arg assets "$assets" 'any(.[]; .assets == $assets)' "$dataJson" | grep -q true; then
@@ -99,53 +45,6 @@ data() {
     # Add new entry
     jq --arg assets "$assets" --arg updated_at "$updated_at" --arg version "$version" '. += [{"assets": $assets, "updated_at": $updated_at, "version": $version}]' "$dataJson" > temp.json && mv temp.json "$dataJson"
   fi
-}
-
-confirmPrompt() {
-  Prompt=${1}
-  local -n prompt_buttons=$2
-  Selected=${3:-0}  # :- set value as 0 if unset
-  maxLen=50
-  
-  # breaks long prompts into multiple lines (50 characters per line)
-  lines=()  # empty array
-  while [ -n "$Prompt" ]; do
-    lines+=("${Prompt:0:$maxLen}")  # take first 50 characters from $Prompt starting at index 0
-    Prompt="${Prompt:$maxLen}"  # removes first 50 characters from $Prompt by starting at 50 to 0
-  done
-  
-  # print all-lines except last-line
-  last_line_index=$(( ${#lines[@]} - 1 ))  # ${#lines[@]} = number of elements in lines array
-  for (( i=0; i<last_line_index; i++ )); do
-    echo -e "${lines[i]}"
-  done
-  last_line="${lines[$last_line_index]}"
-  
-  echo -ne '\033[?25l'  # Hide cursor
-  while true; do
-    show_prompt() {
-      echo -ne "\r\033[K"  # n=noNewLine r=returnCursorToStartOfLine \033[K=clearLine
-      echo -ne "$last_line "
-      [ $Selected -eq 0 ] && echo -ne "${whiteBG}➤ ${prompt_buttons[0]} $Reset   ${prompt_buttons[1]}" || echo -ne "  ${prompt_buttons[0]}  ${whiteBG}➤ ${prompt_buttons[1]} $Reset"  # highlight selected bt with white bg
-    }; show_prompt
-
-    read -rsn1 key
-    case $key in
-      $'\E')
-      # /bin/bash -c 'read -r -p "Type any ESC key: " input && printf "You Entered: %q\n" "$input"'  # q=safelyQuoted
-        read -rsn2 -t 0.1 key2  # -r=readRawInput -s=silent(noOutput) -t=timeout -n2=readTwoChar | waits upto 0.1s=100ms to read key 
-        case $key2 in 
-          '[C') Selected=1 ;;  # right arrow key
-          '[D') Selected=0 ;;  # left arrow key
-        esac
-        ;;
-      [Yy]*) Selected=0; show_prompt; break ;;
-      [Nn]*) Selected=1; show_prompt; break ;;
-      "") break ;;  # Enter key
-    esac
-  done
-  echo -e '\033[?25h' # Show cursor
-  return $Selected  # return Selected int index from this fun
 }
 
 # --- function to install app ---
@@ -373,9 +272,7 @@ if [ $cpuAbi == "arm64-v8a" ] || [ $cpuAbi == "armeabi-v7a" ]; then
   amazonPrimeVideo="AmazonPrimeVideo"
 fi
 
-if  [[ $Android -ge 11  &&  ( "$cpuAbi" == "arm64-v8a" || "$cpuAbi" == "armeabi-v7a" ) ]]; then
-  Facebook="Facebook"
-fi
+[[ $Android -ge 11  &&  ( "$cpuAbi" == "arm64-v8a" || "$cpuAbi" == "armeabi-v7a" ) ]] && Facebook="Facebook"
 
 # --- Arrays of apps list that required specific android version ---
 if [ $Android -ge 10 ]; then
@@ -602,121 +499,6 @@ elif [ $Android -eq 4 ]; then
   )
 fi
 
-menu() {
-  local -n menu_options=$1
-  local -n menu_buttons=$2
-  items_per_page=${3:-12}  # Default to 12 if items/page not provided
-  
-  selected_option=0
-  selected_button=0
-  
-  current_page=0
-  total_pages=$(( (${#menu_options[@]} + items_per_page - 1) / items_per_page ))  # Convert to integer from floating point page number
-
-  show_menu() {
-    printf '\033[2J\033[3J\033[H'
-    # Display guide
-    echo -n "Navigate with [↑] [↓] [←] [→]"
-    [ $total_pages -gt 1 ] && echo -n " [PGUP] [PGDN]"
-    echo -e "\nSelect with [↵]\n"
-    
-    # Calculate start and end indices for current page
-    start_index=$(( current_page * items_per_page ))
-    end_index=$(( start_index + (items_per_page - 1) ))
-    [ $end_index -ge ${#menu_options[@]} ] && end_index=$((${#menu_options[@]} - 1))
-    
-    # Display menu options for current page
-    for ((i=start_index; i<=end_index; i++)); do
-      if [ $i -eq $selected_option ]; then
-        echo -e "${whiteBG}➤ ${menu_options[$i]} $Reset"
-      else
-        [ $(($i + 1)) -le 9 ] && echo " $(($i + 1)). ${menu_options[$i]}" || echo "$(($i + 1)). ${menu_options[$i]}"
-      fi
-    done
-    
-    for ((i=end_index+1; i < start_index + items_per_page; i++)); do echo; done  # Fill remaining lines if current page has fewer than items/page options
-    
-    [ $total_pages -gt 1 ] && echo -e "\nPage: $((current_page + 1))/$total_pages\n" || echo  # Display page info if multiple pages exist
-    
-    # Display buttons
-    for ((i=0; i<=$((${#menu_buttons[@]} - 1)); i++)); do
-      if [ $i -eq $selected_button ]; then
-        [ $i -eq 0 ] && echo -ne "${whiteBG}➤ ${menu_buttons[$i]} $Reset" || echo -ne "  ${whiteBG}➤ ${menu_buttons[$i]} $Reset"
-      else
-        [ $i -eq 0 ] && echo -n "  ${menu_buttons[$i]}" || echo -n "   ${menu_buttons[$i]}"
-      fi
-    done
-  }
-
-  printf '\033[?25l'
-  while true; do
-    show_menu
-    read -rsn1 key
-    case $key in
-      $'\E')  # ESC
-        # /bin/bash -c 'read -r -p "Type any ESC key: " input && printf "You Entered: %q\n" "$input"'  # q=safelyQuoted
-        read -rsn2 -t 0.1 key2
-        case "$key2" in
-          '[A')  # Up arrow
-            selected_option=$((selected_option - 1))
-            [ $selected_option -lt 0 ] && selected_option=$((${#menu_options[@]} - 1))
-            current_page=$((selected_option / items_per_page))  # Auto switch page
-            ;;
-          '[B')  # Down arrow
-            selected_option=$((selected_option + 1))
-            [ $selected_option -ge ${#menu_options[@]} ] && selected_option=0
-            current_page=$((selected_option / items_per_page))  # Auto switch page
-            ;;
-          '[C')  # Right arrow
-            [ $selected_button -lt $((${#menu_buttons[@]} - 1)) ] && selected_button=$((selected_button + 1))
-            ;;
-          '[D')  # Left arrow
-            [ $selected_button -gt 0 ] && selected_button=$((selected_button - 1))
-            ;;
-          '[5') # Page Up
-            read -rsn1 -t 0.1 key3
-            if [ "$key3" == "~" ]; then
-              current_page=$((current_page - 1))
-              [ $current_page -lt 0 ] && current_page=$((total_pages - 1))
-              selected_option=$((current_page * items_per_page))  # Update selected option to start indices on new page
-            fi
-            ;;
-          '[6') # Page Down
-            read -rsn1 -t 0.1 key3
-            if [ "$key3" == "~" ]; then
-              current_page=$((current_page + 1))
-              [ $current_page -ge $total_pages ] && current_page=0
-              selected_option=$((current_page * items_per_page))  # Update selected option to start indices on new page
-            fi
-            ;;
-        esac
-        ;;
-      '')  # Enter key
-        break
-        ;;
-      [0-9])
-        read -rsn2 -t0.5 key2
-        [[ "$key2" == [0-9] ]] && { key="${key}${key2}"; key=$((10#$key)); }  # Convert to integer (decimal) from strings
-        if [ $key -eq 0 ]; then
-          selected_option=$((${#menu_options[@]} - 1))
-        elif [ $key -gt ${#menu_options[@]} ]; then
-          selected_option=0
-        else
-          selected_option=$(($key - 1))
-        fi
-        current_page=$((selected_option / items_per_page))  # Auto switch page
-        show_menu; sleep 0.5; break
-       ;;
-    esac
-  done
-  printf '\033[?25h'
-
-  [ $selected_button -eq 0 ] && { printf '\033[2J\033[3J\033[H'; selected=$selected_option; }
-  if [ $selected_button -eq $((${#menu_buttons[@]} - 1)) ]; then
-    [ "${menu_buttons[$((${#menu_buttons[@]} - 1))]}" == "<Back>" ] && { printf '\033[2J\033[3J\033[H'; return 1; } || { [ $isOverwriteTermuxProp -eq 1 ] && sed -i '/allow-external-apps/s/^/# /' "$HOME/.termux/termux.properties"; printf '\033[2J\033[3J\033[H'; echo "Script exited !!"; exit 0; }
-  fi
-}
-
 while true; do
   buttons=("<Select>" "<Back>"); if menu "apps" "buttons" "22"; then selected="${apps[$selected]}"; else break; fi
   
@@ -755,7 +537,7 @@ while true; do
       appName="YouTube RV"
       owner="arghya339"
       repo="ReVancedApp-Actions"
-      if [ "$FetchPreRelease" -eq 0 ]; then
+      if [ $FetchPreRelease -eq 0 ]; then
         assets="youtube-$cpuAbi-revanced.apk"  # Use Stable release
       else
         assets="youtube-beta-$cpuAbi-revanced.apk"  # Use Beta release
@@ -770,13 +552,13 @@ while true; do
       repo="ReVancedApp-Actions"
       if [ $Android -ge 8 ]; then
         if [ "$ChangeRVXSource" -eq 0 ]; then
-          if [ "$FetchPreRelease" -eq 0 ]; then
+          if [ $FetchPreRelease -eq 0 ]; then
             assets="youtube-$cpuAbi-revanced-extended.apk"  # Use Stable release
           else
             assets="youtube-beta-$cpuAbi-revanced-extended.apk"  # Use Beta release
           fi
         else
-          if [ "$FetchPreRelease" -eq 0 ]; then
+          if [ $FetchPreRelease -eq 0 ]; then
             assets="youtube-stable-$cpuAbi-anddea.apk"  # Use Stable release
           else
             assets="youtube-beta-$cpuAbi-anddea.apk"  # Use Beta release
@@ -877,7 +659,7 @@ while true; do
       appName="Seal"
       owner="JunkFood02"
       repo="Seal"
-      if [ "$FetchPreRelease" -eq 0 ]; then
+      if [ $FetchPreRelease -eq 0 ]; then
         regex="Seal-.*-$cpuAbi-release.apk"
         file_pattern="Seal-*-$cpuAbi-release.apk"
         tag=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases/latest" | jq -r '.tag_name | sub("^v"; "")' 2>/dev/null)  # 1.13.1
@@ -899,7 +681,7 @@ while true; do
       appName="ytdlnis"
       owner="deniscerri"
       repo="ytdlnis"
-      if [ "$FetchPreRelease" -eq 0 ]; then
+      if [ $FetchPreRelease -eq 0 ]; then
         regex="YTDLnis-.*-$cpuAbi-release.apk"
         file_pattern="YTDLnis-*-$cpuAbi-release.apk"
         tag=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases/latest" | jq -r '.tag_name | sub("^v"; "")' 2>/dev/null)  # 1.13.1
@@ -919,7 +701,7 @@ while true; do
       appName="Spotify"
       owner="FiorenMas"
       repo="Revanced-And-Revanced-Extended-Non-Root"
-      if [ "$FetchPreRelease" -eq 0 ]; then
+      if [ $FetchPreRelease -eq 0 ]; then
         assets="spotjfy-$cpuAbi-revanced.apk"  # Use Stable release
       else
         assets="spotjfy-beta-$cpuAbi-revanced.apk"  # Use Beta release
@@ -933,7 +715,7 @@ while true; do
       owner="KRTirtho"
       repo="spotube"
       assets="Spotube-playstore-all-arch.aab"
-      if [ "$FetchPreRelease" -eq 0 ]; then
+      if [ $FetchPreRelease -eq 0 ]; then
         regex="Spotube-playstore-all-arch.aab"
         file_pattern="Spotube-playstore-all-arch.apk"
         tag=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases/latest" | jq -r '.tag_name | sub("^v"; "")' 2>/dev/null)  # 5.0.0
@@ -950,7 +732,7 @@ while true; do
       appName="TikTok"
       owner="FiorenMas"
       repo="Revanced-And-Revanced-Extended-Non-Root"
-      if [ "$FetchPreRelease" -eq 0 ]; then
+      if [ $FetchPreRelease -eq 0 ]; then
         assets="tiktok-revanced.apk"  # Use Stable release
       else
         assets="tiktok-beta-revanced.apk"  # Use Beta release
@@ -963,7 +745,7 @@ while true; do
       appName="Google Photos"
       owner="FiorenMas"
       repo="Revanced-And-Revanced-Extended-Non-Root"
-      if [ "$FetchPreRelease" -eq 0 ]; then
+      if [ $FetchPreRelease -eq 0 ]; then
         assets="gg-photos-$cpuAbi-revanced.apk"  # Use Stable release
       else
         assets="gg-photos-$cpuAbi-beta-revanced.apk"  # Use Beta release
@@ -976,7 +758,7 @@ while true; do
       appName="Instagram"
       owner="FiorenMas"
       repo="Revanced-And-Revanced-Extended-Non-Root"
-      if [ "$FetchPreRelease" -eq 0 ]; then
+      if [ $FetchPreRelease -eq 0 ]; then
         assets="instagram-$cpuAbi-revanced.apk"  # Use Stable release
       else
         assets="instagram-$cpuAbi-beta-revanced.apk"  # Use Beta release
@@ -989,7 +771,7 @@ while true; do
       appName="Facebook"
       owner="FiorenMas"
       repo="Revanced-And-Revanced-Extended-Non-Root"
-      if [ "$FetchPreRelease" -eq 0 ]; then
+      if [ $FetchPreRelease -eq 0 ]; then
         assets="facebook-$cpuAbi-revanced.apk"  # Use Stable release
       else
         assets="facebook-$cpuAbi-beta-revanced.apk"  # Use Beta release
@@ -1013,7 +795,7 @@ while true; do
       appName="Facebook Messenger"
       owner="FiorenMas"
       repo="Revanced-And-Revanced-Extended-Non-Root"
-      if [ "$FetchPreRelease" -eq 0 ]; then
+      if [ $FetchPreRelease -eq 0 ]; then
         assets="messenger-$cpuAbi-revanced.apk"  # Use Stable release
       else
         assets="messenger-$cpuAbi-beta-revanced.apk"  # Use Beta release
@@ -1062,7 +844,7 @@ while true; do
       appName="Twitter"
       owner="FiorenMas"
       repo="Revanced-And-Revanced-Extended-Non-Root"
-      if [ "$FetchPreRelease" -eq 0 ]; then
+      if [ $FetchPreRelease -eq 0 ]; then
         assets="twitter-$cpuAbi-stable-piko.apk"  # Use Stable release
       else
         assets="twitter-$cpuAbi-beta-piko.apk"  # Use Beta release
@@ -1087,7 +869,7 @@ while true; do
       appName="Reddit"
       owner="FiorenMas"
       repo="Revanced-And-Revanced-Extended-Non-Root"
-      if [ "$FetchPreRelease" -eq 0 ]; then
+      if [ $FetchPreRelease -eq 0 ]; then
         assets="reddit-$cpuAbi-revanced-extended.apk"  # Use Stable release
       else
         assets="reddit-$cpuAbi-beta-revanced-extended.apk"  # Use Beta release
@@ -1100,7 +882,7 @@ while true; do
       appName="Adobe Lightroom"
       owner="FiorenMas"
       repo="Revanced-And-Revanced-Extended-Non-Root"
-      if [ "$FetchPreRelease" -eq 0 ]; then
+      if [ $FetchPreRelease -eq 0 ]; then
         assets="lightroom-revanced.apk"  # Use Stable release
       else
         assets="lightroom-beta-revanced.apk"  # Use Beta release
@@ -1113,7 +895,7 @@ while true; do
       appName="Photomath"
       owner="FiorenMas"
       repo="Revanced-And-Revanced-Extended-Non-Root"
-      if [ "$FetchPreRelease" -eq 0 ]; then
+      if [ $FetchPreRelease -eq 0 ]; then
         assets="photomath-revanced.apk"  # Use Stable release
       else
         assets="photomath-beta-revanced.apk"  # Use Beta release
@@ -1126,7 +908,7 @@ while true; do
       appName="Duolingo"
       owner="FiorenMas"
       repo="Revanced-And-Revanced-Extended-Non-Root"
-      if [ "$FetchPreRelease" -eq 0 ]; then
+      if [ $FetchPreRelease -eq 0 ]; then
         assets="duolingo-revanced.apk"  # Use Stable release
       else
         assets="duolingo-beta-revanced.apk"  # Use Beta release
@@ -1139,7 +921,7 @@ while true; do
       appName="RAR"
       owner="FiorenMas"
       repo="Revanced-And-Revanced-Extended-Non-Root"
-      if [ "$FetchPreRelease" -eq 0 ]; then
+      if [ $FetchPreRelease -eq 0 ]; then
         assets="rar-revanced.apk"  # Use Stable release
       else
         assets="rar-beta-revanced.apk"  # Use Beta release
@@ -1152,7 +934,7 @@ while true; do
       appName="Amazon Prime Video"
       owner="FiorenMas"
       repo="Revanced-And-Revanced-Extended-Non-Root"
-      [ "$FetchPreRelease" -eq 0 ] && assets="prime-video-$cpuAbi-revanced.apk" || assets="prime-video-beta-$cpuAbi-revanced.apk"
+      [ $FetchPreRelease -eq 0 ] && assets="prime-video-$cpuAbi-revanced.apk" || assets="prime-video-beta-$cpuAbi-revanced.apk"
       pkgPatched="com.amazon.avod.thirdpartyclient"
       activityPatched="com.amazon.avod.thirdpartyclient/.LauncherActivity"
       dlPatchedApp "${appName}" "$owner" "$repo" "$assets" "$pkgPatched" "$activityPatched"
@@ -1161,7 +943,7 @@ while true; do
       appName="CloudStream"
       owner="recloudstream"
       repo="cloudstream"
-      if [ "$FetchPreRelease" -eq 0 ]; then
+      if [ $FetchPreRelease -eq 0 ]; then
         file_pattern="cloudstream-*.apk"
         tag=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases/latest" | jq -r '.tag_name')
         assets=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases/latest" | jq -r '.assets[] | .name')
@@ -1213,7 +995,7 @@ while true; do
       appName="Twitch"
       owner="FiorenMas"
       repo="Revanced-And-Revanced-Extended-Non-Root"
-      if [ "$FetchPreRelease" -eq 0 ]; then
+      if [ $FetchPreRelease -eq 0 ]; then
         assets="twitch-revanced.apk"  # Use Stable release
       else
         assets="twitch-beta-revanced.apk"  # Use Beta release
@@ -1226,7 +1008,7 @@ while true; do
       appName="Tumblr"
       owner="FiorenMas"
       repo="Revanced-And-Revanced-Extended-Non-Root"
-      if [ "$FetchPreRelease" -eq 0 ]; then
+      if [ $FetchPreRelease -eq 0 ]; then
         assets="tumblr-$cpuAbi-revanced.apk"  # Use Stable release
       else
         assets="tumblr-$cpuAbi-beta-revanced.apk"  # Use Beta release
@@ -1239,7 +1021,7 @@ while true; do
       appName="Strava"
       owner="FiorenMas"
       repo="Revanced-And-Revanced-Extended-Non-Root"
-      if [ "$FetchPreRelease" -eq 0 ]; then
+      if [ $FetchPreRelease -eq 0 ]; then
         assets="strava-$cpuAbi-revanced.apk"  # Use Stable release
       else
         assets="strava-beta-$cpuAbi-revanced.apk"  # Use Beta release
@@ -1252,7 +1034,7 @@ while true; do
       appName="SoundCloud"
       owner="FiorenMas"
       repo="Revanced-And-Revanced-Extended-Non-Root"
-      if [ "$FetchPreRelease" -eq 0 ]; then
+      if [ $FetchPreRelease -eq 0 ]; then
         assets="soundcloud-$cpuAbi-revanced.apk"  # Use Stable release
       else
         assets="soundcloud-$cpuAbi-beta-revanced.apk"  # Use Beta release
@@ -1292,7 +1074,7 @@ while true; do
       
       appName="Lawnicons"
       repo="lawnicons"
-      if [ "$FetchPreRelease" -eq 0 ]; then
+      if [ $FetchPreRelease -eq 0 ]; then
         file_pattern="Lawnicons.*.apk"
         tag=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases/latest" | jq -r '.tag_name')
         assets=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases/latest" | jq -r '.assets[] | .name')
