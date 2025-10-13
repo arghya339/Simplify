@@ -164,6 +164,10 @@ jq -e '.RipLib != null' "$simplifyJson" >/dev/null 2>&1 && RipLib="$(jq -r '.Rip
 jq -e '.FetchPreRelease != null' "$simplifyJson" >/dev/null 2>&1 && FetchPreRelease=$(jq -r '.FetchPreRelease' "$simplifyJson" 2>/dev/null) || FetchPreRelease=0
 # Get CheckTermuxUpdate value from json
 jq -e '.CheckTermuxUpdate != null' "$simplifyJson" >/dev/null 2>&1 && CheckTermuxUpdate=$(jq -r '.CheckTermuxUpdate' "$simplifyJson" 2>/dev/null) || CheckTermuxUpdate=1
+# Get ReadPatchesFile value from json
+jq -e '.ReadPatchesFile != null' "$simplifyJson" >/dev/null 2>&1 && ReadPatchesFile="$(jq -r '.ReadPatchesFile' "$simplifyJson" 2>/dev/null)" || ReadPatchesFile=0
+# Get Branding value from json
+jq -e '.Branding != null' "$simplifyJson" >/dev/null 2>&1 && Branding=$(jq -r '.Branding' "$simplifyJson" 2>/dev/null) || Branding="google_family"
 
 # Build locale
 if [ $RipLocale -eq 1 ]; then
@@ -194,6 +198,28 @@ if [ $RipDpi -eq 1 ]; then
   fi
 elif [ $RipDpi -eq 0 ]; then
   lcd_dpi="*dpi"
+fi
+
+# --- Generate ripLib arg ---
+if [ "$RipLib" -eq 1 ]; then
+  all_arch="arm64-v8a armeabi-v7a x86_64 x86"  # all ABIs
+  # Generate ripLib arguments for all ABIs EXCEPT the device ABI
+  ripLib=""
+  for current_arch in $all_arch; do
+    if [ "$current_arch" != "$cpuAbi" ]; then
+      if [ -z "$ripLib" ]; then
+        ripLib="--rip-lib=$current_arch"  # No leading space for first item
+      else
+        ripLib="$ripLib --rip-lib=$current_arch"  # Add space for subsequent items
+      fi
+    fi
+  done
+  # Display the final ripLib arguments
+  echo -e "$info ${Blue}cpuAbi:${Reset} $cpuAbi"
+  echo -e "$info ${Blue}ripLib:${Reset} $ripLib"
+else
+  ripLib=""  # If RipLib is not enabled, set ripLib to an empty string
+  echo -e "$notice RipLib Disabled!"
 fi
 
 if [ -f "$HOME/.config/gh/hosts.yml" ] && gh auth status > /dev/null 2>&1; then
