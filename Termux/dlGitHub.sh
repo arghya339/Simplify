@@ -72,11 +72,11 @@ dlGitHub() {
   }
 
   if [ "$releases" == "latest" ]; then
-    
+    # Get Latest Releases JSON Response from GH API
     if [ "$repo" != "ReVancedApp-Actions" ] || [ "$repo" != "Revanced-And-Revanced-Extended-Non-Root" ]; then
       ghApiResponseJson=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases/latest")
     fi
-
+    # Extract latest releases tag_name from GH API response json
     if [ "$repo" == "APKEditor" ]; then
       latestReleases=$(jq -r '.tag_name | sub("^V"; "")' <<< "$ghApiResponseJson")  # 1.4.3
       echo -e "$info latestReleases: V$latestReleases"
@@ -91,7 +91,8 @@ dlGitHub() {
         echo -e "$info latestReleases: v$latestReleases"
       fi
     fi
-
+    
+    # Extract assets from GH API response json & built assets name pattern for find downloaded assets
     if [ "$repo" == "VancedMicroG" ] || [ "$repo" == "LSPatch" ] || [ "$repo" == "YTPro" ] || [ "$repo" == "cloudstream" ] || [ "$repo" == "revenge-xposed" ]; then
       assetsName=$(jq -r --arg regex "$regex" '.assets[] | select(.name | test($regex)) | .name' <<< "$ghApiResponseJson")
       if [ "$repo" == "cloudstream" ] || [ "$repo" == "revenge-xposed" ]; then
@@ -115,7 +116,7 @@ dlGitHub() {
         assetsNamePattern=$(echo "$assetsName" | sed "s/$latestReleases/*/g")
       fi
     fi
-    
+    # find downloaded assets from download dir
     if [ "$repo" == "ReVancedApp-Actions" ] || [ "$repo" == "Revanced-And-Revanced-Extended-Non-Root" ]; then
       findFile="$dir/$assetsName"; fileBaseName="$assetsName"
     else
@@ -123,6 +124,7 @@ dlGitHub() {
       fileBaseName=$(basename $findFile 2>/dev/null)
     fi
     
+    # Download assets from GitHub
     if [ "$repo" == "VancedMicroG" ] || [ "$repo" == "LSPatch" ] || [ "$repo" == "YTPro" ] || [ "$repo" == "cloudstream" ] || [ "$repo" == "revenge-xposed" ]; then
       if [ "$fileName" != "$fileBaseName" ]; then
         [ -n "$fileBaseName" ] && echo -e "$notice diffs: $fileName ~ $fileBaseName"
