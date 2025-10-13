@@ -1224,7 +1224,7 @@ while true; do
       ;;
     Dropped\ Patches)
       curl -sL -o "$Dropped/droppedPatches.sh" "https://raw.githubusercontent.com/arghya339/Simplify/refs/heads/main/Termux/droppedPatches.sh"
-      bash "$Dropped/droppedPatches.sh"
+      source "$Dropped/droppedPatches.sh"  # source = run in same shell environment (both scripts can share variables/functions both ways)
       sleep 3
       ;;
     LSPatch)
