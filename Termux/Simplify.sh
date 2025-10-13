@@ -1298,7 +1298,7 @@ while true; do
             ;;
           "Change YouTube & YT Music AppIcon & Header")
             echo "changeYouTubeYTMusicAppIconHeader == $Branding"
-            options=(google_family pink vanced_light revancify_blue); buttons=("<Select>" "<Back>"); if menu "options" "buttons" "4"; then selected="${options[$selected]}"; else break; fi
+            options=(google_family pink vanced_light revancify_blue); buttons=("<Select>" "<Back>"); if menu "options" "buttons" "4"; then selected="${options[$selected]}"; fi
             case "$selected" in
               [Gg]*)
                 branding="google_family"
