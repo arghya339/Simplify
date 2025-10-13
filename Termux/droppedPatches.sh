@@ -15,7 +15,6 @@ if [ $RipLib -eq 1 ]; then
   echo -e "$info ${Blue}cpuAbi:${Reset} $cpuAbi"
   echo -e "$info ${Blue}ripLib:${Reset} $ripLib"
 else
-  ripLib=""  # If RipLib is not enabled, set ripLib to an empty string
   echo -e "$notice RipLib Disabled!"
 fi
 

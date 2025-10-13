@@ -206,21 +206,25 @@ elif [ $RipDpi -eq 0 ]; then
   lcd_dpi="*dpi"
 fi
 
-# --- Generate ripLib arg ---
-if [ $RipLib -eq 1 ]; then
-  all_arch="arm64-v8a armeabi-v7a x86_64 x86"  # all ABIs
-  # Generate ripLib arguments for all ABIs EXCEPT the device ABI
-  ripLib=""
-  for current_arch in $all_arch; do
-    if [ "$current_arch" != "$cpuAbi" ]; then
-      if [ -z "$ripLib" ]; then
-        ripLib="--rip-lib=$current_arch"  # No leading space for first item
-      else
-        ripLib="$ripLib --rip-lib=$current_arch"  # Add space for subsequent items
+# --- Method to Generate ripLib arg ---
+ripLibGen() {
+  if [ $RipLib -eq 1 ]; then
+    all_arch="arm64-v8a armeabi-v7a x86_64 x86"  # all ABIs
+    # Generate ripLib arguments for all ABIs EXCEPT the device ABI
+    ripLib=""
+    for current_arch in $all_arch; do
+      if [ "$current_arch" != "$cpuAbi" ]; then
+        if [ -z "$ripLib" ]; then
+          ripLib="--rip-lib=$current_arch"  # No leading space for first item
+        else
+          ripLib="$ripLib --rip-lib=$current_arch"  # Add space for subsequent items
+        fi
       fi
-    fi
-  done
-fi
+    done
+  else
+    ripLib=""  # If RipLib is not enabled, set ripLib to an empty string
+  fi
+}; ripLibGen  # Call ripLibGen function to generate ripLib args
 
 if [ -f "$HOME/.config/gh/hosts.yml" ] && gh auth status > /dev/null 2>&1; then
   # oauth_token: gho_************************************
@@ -1267,6 +1271,7 @@ while true; do
             m1="Device specific arch lib will be kept in patched apk file"
             m2="All lib dir will be kept in patched apk file"
             tfConfig "$key" "$value" "$m1" "$m2"
+            ripLibGen  # Call ripLibGen function
             ;;
           Change\ RVX\ Source) if [ "$ChangeRVXSource" == 0 ]; then echo "ChangeRVXSource == false"; else echo "ChangeRVXSource == true"; fi
             key="ChangeRVXSource" && value="$isChangeRVXSource"
