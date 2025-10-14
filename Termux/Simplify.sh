@@ -561,6 +561,7 @@ tfConfig() {
         echo -e "$good ${Green}$key is False! $m2.${Reset}"
         ;;
     esac
+    sleep 2
 }
 
 token() {
