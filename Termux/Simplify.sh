@@ -1378,13 +1378,13 @@ while true; do
                 "Install Package for *user")
                   if [ "$InstallPackageFor" -eq 0 ]; then echo "InstallPackageFor == 0 (default-user)"; else echo "InstallPackageFor == 1 (all-users)"; fi
                   key="InstallPackageFor"
-                  echo -e "D. default-user\nA. all-users\n"
-                  read -r -p "Install Package for " u
-                  case "$u" in
-                    [Dd]*) value="0"; config "$key" "$value" && echo -e "${Green}Install Package for default-user set successfully!${Reset}" ;;
-                    [Aa]*) value="1"; config "$key" "$value" && echo -e "${Green}Install Package for all-user set successfully!${Reset}" ;;
-                    *) value="$isU"; config "$key" "$value" && echo -e "${Green}Install Package for default-user set successfully!${Reset}" ;;
-                  esac
+                  buttons=("<default-user>" "<all-users>"); confirmPrompt "$key" "buttons" "$isU" && u=default-user || u=all-users
+                  if [ -n "$u" ]; then
+                    case "$u" in
+                      [Dd]*) value="0"; config "$key" "$value" && echo -e "${Green}Install Package for default-user set successfully!${Reset}" ;;
+                      [Aa]*) value="1"; config "$key" "$value" && echo -e "${Green}Install Package for all-user set successfully!${Reset}" ;;
+                    esac
+                  fi
                   ;;
                 "Allow Downgrade with keeps App data (reboot required)")
                   if [ "$KeepsData" -eq 0 ]; then echo "KeepsData == false"; else echo "KeepsData == true"; fi
