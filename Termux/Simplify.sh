@@ -1249,6 +1249,7 @@ while true; do
         ChangeRVXSource="$(jq -r '.ChangeRVXSource' "$simplifyJson" 2>/dev/null)"
         ReadPatchesFile="$(jq -r '.ReadPatchesFile' "$simplifyJson" 2>/dev/null)"
         Branding=$(jq -r '.Branding' "$simplifyJson" 2>/dev/null)
+        CheckTermuxUpdate=$(jq -r '.CheckTermuxUpdate' "$simplifyJson" 2>/dev/null)
         jdkVersion=$(jq -r '.openjdk' "$simplifyJson" 2>/dev/null)
         options=(FetchPreRelease RipLocale RipDpi RipLib Change\ RVX\ Source "Add gh PAT (increases gh api rate limit)" Import\ Custom\ PatchesOptions\ from\ file "Change YouTube & YT Music AppIcon & Header" Check\ Termux\ update\ on\ startup Change\ Java\ version "SU/ SUI/ ADB Installation Options")
         if [ "$(getprop ro.product.manufacturer)" == "Genymobile" ] && ! "$HOME/adb" -s $(~/adb devices 2>/dev/null | head -2 | tail -1 | awk '{print $1}') shell "id" >/dev/null 2>&1; then
