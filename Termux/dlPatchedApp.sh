@@ -338,6 +338,7 @@ fi
 # --- Arrays of apps list that required specific android version ---
 if [ $Android -ge 10 ]; then
   apps=(
+    deGoogle
     Vanced\ MicroG
     ReVanced\ GmsCore
     YouTube\ RV
@@ -385,6 +386,7 @@ if [ $Android -ge 10 ]; then
   )
 elif [ $Android -eq 9 ]; then
   apps=(
+    deGoogle
     Vanced\ MicroG
     ReVanced\ GmsCore
     YouTube\ RV
@@ -431,6 +433,7 @@ elif [ $Android -eq 9 ]; then
   )
 elif [ $Android -eq 8 ]; then
   apps=(
+    deGoogle
     Vanced\ MicroG
     ReVanced\ GmsCore
     YouTube\ RV
@@ -475,6 +478,7 @@ elif [ $Android -eq 8 ]; then
   )
 elif [ $Android -eq 7 ]; then
   apps=(
+    deGoogle
     Vanced\ MicroG
     ReVanced\ GmsCore
     YouTube
@@ -507,6 +511,7 @@ elif [ $Android -eq 7 ]; then
   )
 elif [ $Android -eq 6 ]; then
   apps=(
+    deGoogle
     Vanced\ MicroG
     ReVanced\ GmsCore
     YouTube
@@ -531,6 +536,7 @@ elif [ $Android -eq 6 ]; then
   )
 elif [ $Android -eq 5 ]; then
   apps=(
+    deGoogle
     YTPro
     Tubular
     Vanced\ MicroG
@@ -554,6 +560,7 @@ elif [ $Android -eq 5 ]; then
   )
 elif [ $Android -eq 4 ]; then
   apps=(
+    deGoogle
     ReVanced\ GmsCore
     RAR
     Solid\ Explorer
@@ -566,6 +573,79 @@ while true; do
   release=latest
   # main conditional control flow
   case "$selected" in
+    deGoogle)
+      apps_list=(
+        Play\ Store\ →\ AuroraStore
+        Play\ Store\ →\ Droid-ify
+        Google\ →\ DuckDuckGo
+        Gemini\ →\ RikkaHub
+        Google\ Photos\ →\ Ente\ Photos
+        Snapseed\ →\ Image\ Toolbox
+        YouTube\ →\ FreeTube
+        Google\ Meet\ →\ Jitsi\ Meet
+        Google\ Home\ →\ Home\ Assistant
+        Google\ Gallery\ →\ Gallery
+        Chrome\ →\ Chromium
+        Chrome\ →\ Firefox
+        Google\ Authenticator\ →\ Ente\ Auth
+        Google\ Calculator\ →\ Multi-Calculator
+        Google\ Drive\ →\ Nextcloud
+        Google\ Drive\ →\ Proton\ Drive
+        Google\ Keep\ →\ Notesnook
+        Google\ Maps\ →\ OsmAnd
+        Gboard\ →\ FlorisBoard
+        Google\ Chat\ →\ Telegram
+        Google\ Password\ Manager\ →\ Bitwarden
+        Google\ Tasks\ →\ Microsoft\ To\ Do
+        Google\ News\ →\ Feeder
+        Google\ Wallpapers\ →\ Starth\ Bing\ Wallpaper
+        Gmail\ →\ Proton\ Mail
+        YouTube\ Music\ →\ Metrolist
+        Pixel\ Screenshots\ →\ Shots\ Studio
+      )
+      while true; do
+        buttons=("<Select>" "<Back>"); if menu "apps_list" "buttons" "22"; then selected="${apps_list[$selected]}"; else break; fi
+        case "$selected" in
+          Play\ Store\ →\ AuroraStore) termux-open-url "https://gitlab.com/AuroraOSS/AuroraStore/-/releases" ;;  # Implement later
+          Play\ Store\ →\ Droid-ify) termux-open-url "https://github.com/Droid-ify/client/releases" ;;  # Implement later
+          Google\ →\ DuckDuckGo) termux-open-url "https://play.google.com/store/apps/details?id=com.duckduckgo.mobile.android" ;;
+          Gemini\ →\ RikkaHub) termux-open-url "https://play.google.com/store/apps/details?id=me.rerere.rikkahub" ;;
+          Google\ Photos\ →\ Ente\ Photos) termux-open-url "https://play.google.com/store/apps/details?id=io.ente.photos" ;;
+          Snapseed\ →\ Image\ Toolbox) termux-open-url "https://play.google.com/store/apps/details?id=ru.tech.imageresizershrinker" ;;
+          YouTube\ →\ FreeTube)
+            appName="FreeTubeAndroid"
+            owner="MarmadileManteater"
+            repo="FreeTubeAndroid"
+            file_pattern="freetube-*-Android.apk"
+            tag=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases/latest" | jq -r '.tag_name')
+            assets="freetube-$tag-Android.apk"
+            pkgApp="io.freetubeapp.freetube"
+            activityApp="io.freetubeapp.freetube/.MainActivity"
+            dlApp "${appName}" "$owner" "$repo" "$release" "" "$file_pattern" "$tag" "$assets" "$pkgApp" "$activityApp"
+            ;;
+          Google\ Meet\ →\ Jitsi\ Meet) termux-open-url "https://play.google.com/store/apps/details?id=org.jitsi.meet" ;;
+          Google\ Home\ →\ Home\ Assistant) termux-open-url "https://play.google.com/store/apps/details?id=io.homeassistant.companion.android" ;;
+          Gallery) termux-open-url "https://github.com/IacobIonut01/Gallery/releases" ;;  # Implement later
+          Chrome\ →\ Chromium) termux-open-url "https://github.com/arghya339/crdl" ;;
+          Chrome\ →\ Firefox) termux-open-url "https://play.google.com/store/apps/details?id=org.mozilla.firefox" ;;
+          Google\ Authenticator\ →\ Ente\ Auth) termux-open-url "https://play.google.com/store/apps/details?id=io.ente.auth" ;;
+          Google\ Calculator\ →\ Multi-Calculator) termux-open-url "https://play.google.com/store/apps/details?id=com.yangdai.calc" ;;
+          Google\ Drive\ →\ Nextcloud) termux-open-url "https://play.google.com/store/apps/details?id=com.nextcloud.client" ;;
+          Google\ Drive\ →\ Proton\ Drive) termux-open-url "https://play.google.com/store/apps/details?id=me.proton.android.drive" ;;
+          Google\ Keep\ →\ Notesnook) termux-open-url "https://play.google.com/store/apps/details?id=com.streetwriters.notesnook" ;;
+          Google\ Maps\ →\ OsmAnd) termux-open-url "https://play.google.com/store/apps/details?id=net.osmand" ;;
+          Gboard\ →\ FlorisBoard) termux-open-url "https://github.com/florisboard/florisboard/releases" ;;  # Implement later
+          Google\ Chat\ →\ Telegram) termux-open-url "https://play.google.com/store/apps/details?id=org.telegram.messenger" ;;
+          Google\ Password\ Manager\ →\ Bitwarden) termux-open-url "https://play.google.com/store/apps/details?id=com.x8bit.bitwarden" ;;
+          Google\ Tasks\ →\ Microsoft\ To\ Do) termux-open-url "https://play.google.com/store/apps/details?id=com.microsoft.todos" ;;
+          Google\ News\ →\ Feeder) termux-open-url "https://play.google.com/store/apps/details?id=com.nononsenseapps.feeder.play" ;;
+          Google\ Wallpapers\ →\ Starth\ Bing\ Wallpaper) termux-open-url "https://play.google.com/store/apps/details?id=me.liaoheng.wallpaper" ;;
+          Gmail\ →\ Proton\ Mail) termux-open-url "https://play.google.com/store/apps/details?id=ch.protonmail.android" ;;
+          YouTube\ Music\ →\ Metrolist) termux-open-url "https://github.com/mostafaalagamy/Metrolist/releases" ;;  # Implement later
+          Pixel\ Screenshots\ →\ Shots\ Studio) termux-open-url "https://github.com/AnsahMohammad/shots-studio/releases" ;;  # Implement later
+        esac
+      done
+      ;;
     Vanced\ MicroG)
       appName="Vanced MicroG"
       repo="VancedMicroG"
