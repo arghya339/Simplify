@@ -152,7 +152,7 @@ dlGitLab() {
   fi
   
   [ "$repo" == "AuroraStore" ] && dl "curl" "$assets_url" "$dir/$assets_name"
-}; dlGitLab "AuroraOSS" "AuroraStore" ".apk" "$SimplUsr" "AuroraStore-[\d\.]+"
+} #; dlGitLab "AuroraOSS" "AuroraStore" ".apk" "$SimplUsr" "AuroraStore-[\d\.]+"
 
 # --- function to download app ---
 dlApp() {
