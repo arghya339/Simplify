@@ -1463,7 +1463,7 @@ while true; do
         [ $su -eq 1 ] && options+=(Unmount\ Patched\ Apps)
         buttons=("<Select>" "<Back>"); if menu "options" "buttons" "10"; then selected="${options[$selected]}"; else break; fi
         case "$selected" in
-          Spoof\ Android\ Version) overwriteVersion ;;
+          Spoof\ Android\ Version) overwriteVersion; sleep 2 ;;
           Spoof\ Device\ Architecture)
             if jq -e '.DeviceArch != null' "$simplifyJson" >/dev/null 2>&1; then
               cpuAbi=$(jq -r '.DeviceArch' "$simplifyJson" 2>/dev/null)  # Get Device Architecture from json
@@ -1500,6 +1500,7 @@ while true; do
                   echo -e "$good ${Green}Device architecture spoofed to x86 successfully!${Reset}"
                   ;;
               esac
+              sleep 2
             fi
             ;;
           Delete\ patched\ apk\ file) DeletePatchedApk ;;
