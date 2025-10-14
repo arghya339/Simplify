@@ -552,11 +552,11 @@ tfConfig() {
     case "$opt" in
       [Tt]*)
         config "$tfKey" "1"
-        echo -e "$good ${Green}$key is True! $m1.${Reset}"
+        echo -e "$good ${Green}$tfKey is True! $m1.${Reset}"
         ;;
       [Ff]*)
         config "$tfKey" "0"
-        echo -e "$good ${Green}$key is False! $m2.${Reset}"
+        echo -e "$good ${Green}$tfKey is False! $m2.${Reset}"
         ;;
     esac
     sleep 2
