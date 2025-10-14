@@ -93,6 +93,67 @@ appInstall() {
     esac
 }
 
+dlGitLab() {
+  local owner=$1
+  local repo=$2
+  local ext=$3
+  local dir=$4
+  local regex=$5
+
+  if [ -n "$regex" ]; then
+    assets="$regex"
+  elif [ -n "$ext" ] && [ -z "$assets" ]; then
+    assets=".*${ext}$"  # Simplified assets pattern
+  fi
+  
+  dl() {
+    local dlUtility=$1
+    local url=$2
+    local output=$3
+    
+    assets_name=$(basename "$output")
+    echo -e "$running Downloading $assets_name.."
+    
+    while true; do
+      if [ "$dlUtility" == "curl" ]; then
+        curl -L -C - --progress-bar -o "$output" "$url"
+        exit_status=$?
+      elif [ "$dlUtility" == "aria2" ]; then
+        aria2c -x 16 -s 16 --console-log-level=error --summary-interval=0 --download-result=hide -c -o "$(basename "$output")" -d "$(dirname "$output")" "$url"
+        exit_status=$?
+        echo  # White Space
+      fi
+      if [ $exit_status -eq 0 ]; then
+        break  # Exit loop on success
+      else
+        echo -e "${bad} ${Red}Download failed! retrying in 5 seconds..${Reset}"
+        sleep 5  # Wait 5 seconds
+      fi
+    done
+  }
+  
+  glApiResponseJson=$(curl -sL "https://gitlab.com/api/v4/projects/${owner}%2F${repo}/releases")
+  release_title=$(jq -r '.[0].name' <<< "$glApiResponseJson"); echo -e "$info release_title: $release_title"
+  tag=$(jq -r '.[0].tag_name' <<< "$glApiResponseJson"); echo -e "$info tag: $tag"
+  #assets_name=$(jq -r '.[0].assets.links[].name' <<< "$glApiResponseJson"); echo "assets_name: $assets_name"
+  #assets_url=$(jq -r '.[0].assets.links[].url' <<< "$glApiResponseJson"); echo "assets_url: $assets_url"
+  
+  assets_name=$(jq -r --arg assets "$assets" '.[]?.assets.links[]?.name | select(test($assets))' <<< "$glApiResponseJson" | head -1)
+  assets_url=$(jq -r --arg assets "$assets" '.[]?.assets.links[]?.url | select(test($assets))' <<< "$glApiResponseJson" | head -1)
+  assets_url_basename=$(basename "$assets_url" 2>/dev/null)
+  [ "$assets_name" != "$assets_url_basename" ] && assets_name="$assets_url_basename"
+  echo -e "assets_name: $assets_name\n$info assets_url: $assets_url"
+  
+  assets_name_pattern=$(echo "$assets_name" | sed "s/$tag/*/g"); echo -e "$info assets_name_pattern: $assets_name_pattern"
+  findFile=$(find "$dir" -type f -name "$assets_name_pattern" -print -quit)
+  [ -f "$findFile" ] && file_basename=$(basename "$findFile" 2>/dev/null)
+  if [ -n "$file_basename" ]; then
+    [ "$assets_name" != "$file_basename" ] && { echo -e "$notice diffs: $assets_name ~ $file_basename"; rm -f "$findFile"; }
+  fi
+  
+  [ "$repo" == "AuroraStore" ] && dl "curl" "$assets_url" "$dir/$assets_name"
+}; dlGitLab "AuroraOSS" "AuroraStore" ".apk" "$SimplUsr" "AuroraStore-[\d\.]+"
+
 # --- function to download app ---
 dlApp() {
   local appName="${1}"
