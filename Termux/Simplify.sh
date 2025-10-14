@@ -551,12 +551,10 @@ tfConfig() {
     buttons=("<True>" "<False>"); confirmPrompt "$tfKey" "buttons" "$defaultValue" && opt=True || opt=False
     case "$opt" in
       [Tt]*)
-        echo "tfKey: $tfKey"
         config "$tfKey" "1"
         echo -e "$good ${Green}$key is True! $m1.${Reset}"
         ;;
       [Ff]*)
-        echo "tfKey: $tfKey"
         config "$tfKey" "0"
         echo -e "$good ${Green}$key is False! $m2.${Reset}"
         ;;
