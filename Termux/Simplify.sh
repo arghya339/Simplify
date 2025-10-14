@@ -1425,6 +1425,7 @@ while true; do
                       Shell) value="com.android.shell"; config "$key" "$value" && echo -e "${Green}Successfully set Installer as 'com.android.shell' (Shell)${Reset}" ;;
                       ADB) value="adb"; config "$key" "$value" && echo -e "${Green}Successfully set Installer as 'adb'${Reset}" ;;
                     esac
+                    sleep 2
                   fi
                   ;;
                 "Reinstall (Replace/ Upgrade) Existing Installed Package")
