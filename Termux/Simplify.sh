@@ -552,11 +552,13 @@ tfConfig() {
     case "$opt" in
       [Tt]*)
         value=1  # value  == true
+        echo "key: $key, value: $value"
         config "$key" "$value"
         echo -e "$good ${Green}$key is True! $m1.${Reset}"
         ;;
       [Ff]*)
         value=0  # value  == false
+        echo "key: $key, value: $value"
         config "$key" "$value"
         echo -e "$good ${Green}$key is False! $m2.${Reset}"
         ;;
