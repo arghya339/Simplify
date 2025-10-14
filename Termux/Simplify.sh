@@ -1369,13 +1369,13 @@ while true; do
               case "$selected" in
                 "Install Package for *user")
                   if [ "$InstallPackageFor" -eq 0 ]; then echo "InstallPackageFor == 0 (default-user)"; else echo "InstallPackageFor == 1 (all-users)"; fi
-                  key="InstallPackageFor"
-                  buttons=("<default-user>" "<all-users>"); confirmPrompt "$key" "buttons" "$isU" && u=default-user || u=all-users
+                  buttons=("<default-user>" "<all-users>"); confirmPrompt "InstallPackageFor" "buttons" "$isU" && u=default-user || u=all-users
                   if [ -n "$u" ]; then
                     case "$u" in
-                      [Dd]*) value="0"; config "$key" "$value" && echo -e "${Green}Install Package for default-user set successfully!${Reset}" ;;
-                      [Aa]*) value="1"; config "$key" "$value" && echo -e "${Green}Install Package for all-user set successfully!${Reset}" ;;
+                      [Dd]*) config "InstallPackageFor" "0" && echo -e "${Green}Install Package for default-user set successfully!${Reset}" ;;
+                      [Aa]*) config "InstallPackageFor" "1" && echo -e "${Green}Install Package for all-user set successfully!${Reset}" ;;
                     esac
+                    sleep 2
                   fi
                   ;;
                 "Allow Downgrade with keeps App data (reboot required)")
