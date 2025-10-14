@@ -542,7 +542,7 @@ confirmPrompt() {
 }
 
 tfConfig() {
-  local key=$1
+  local key=${1}
   local defaultValue=$2
   local m1=${3}
   local m2=${4}
