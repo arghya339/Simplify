@@ -276,11 +276,18 @@ fi
 
 # --- enabled allow-external-apps ---
 isOverwriteTermuxProp=0
-if [ "$Android" -eq 6 ] && [ ! -f "$HOME/.termux/termux.properties" ]; then
+if [ $Android -eq 6 ] && [ ! -f "$HOME/.termux/termux.properties" ]; then
   mkdir -p "$HOME/.termux" && echo "allow-external-apps = true" > "$HOME/.termux/termux.properties"
   isOverwriteTermuxProp=1
   echo -e "$notice 'termux.properties' file has been created successfully & 'allow-external-apps = true' line has been add (enabled) in Termux \$HOME/.termux/termux.properties."
   termux-reload-settings
+elif [ $Android -eq 6 ] && [ -f "$HOME/.termux/termux.properties" ]; then
+  if grep -q "^# allow-external-apps" "$HOME/.termux/termux.properties"; then
+    sed -i '/allow-external-apps/s/# //' "$HOME/.termux/termux.properties"  # uncomment 'allow-external-apps = true' line
+    isOverwriteTermuxProp=1
+    echo -e "$notice 'allow-external-apps = true' line has been uncommented (enabled) in Termux \$HOME/.termux/termux.properties."
+    termux-reload-settings
+  fi
 fi
 if [ "$Android" -ge 6 ]; then
   if grep -q "^# allow-external-apps" "$HOME/.termux/termux.properties"; then
@@ -290,9 +297,9 @@ if [ "$Android" -ge 6 ]; then
     sed -i '/allow-external-apps/s/# //' "$HOME/.termux/termux.properties"  # uncomment 'allow-external-apps = true' line
     isOverwriteTermuxProp=1
     echo -e "$notice 'allow-external-apps = true' line has been uncommented (enabled) in Termux \$HOME/.termux/termux.properties."
-    if [ "$Android" -eq 7 ] || [ "$Android" -eq 6 ]; then
+    #if [ "$Android" -eq 7 ] || [ "$Android" -eq 6 ]; then
       termux-reload-settings  # reload (restart) Termux settings required for Android 6 after enabled allow-external-apps, also required for Android 7 due to 'Package installer has stopped' err
-    fi
+    #fi
   fi
 fi
 
