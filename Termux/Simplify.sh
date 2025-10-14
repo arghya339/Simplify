@@ -549,7 +549,7 @@ tfConfig() {
   [ $defaultValue -eq 0 ] && defaultValue=1 || defaultValue=0  # if defaultValue=0 then Select button1 (False) else Select button0 (True) 
 
     buttons=("<True>" "<False>"); confirmPrompt "$key" "buttons" "$defaultValue" && opt=True || opt=False
-      case "$opt" in
+    case "$opt" in
       [Tt]*)
         value=1  # value  == true
         config "$key" "$value"
