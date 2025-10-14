@@ -543,11 +543,11 @@ confirmPrompt() {
 
 tfConfig() {
   local key=$1
-  local value=$2
+  local defaultValue=$2
   local m1=${3}
   local m2=${4}
 
-    buttons=("<True>" "<False>"); confirmPrompt "$key" "buttons" && opt=True || opt=False
+    buttons=("<True>" "<False>"); confirmPrompt "$key" "buttons" "$defaultValue" && opt=True || opt=False
       case "$opt" in
       [Tt]*)
         value=1  # value  == true
@@ -1256,35 +1256,35 @@ while true; do
         buttons=("<Select>" "<Back>"); if menu "options" "buttons"; then selected="${options[$selected]}"; else break; fi
         case "$selected" in
           FetchPreRelease) if [ "$FetchPreRelease" == 0 ]; then echo "FetchPreRelease == false"; else echo "FetchPreRelease == true"; fi
-            key="FetchPreRelease" && value="$isPreRelease"
+            key="FetchPreRelease"
             m1="Last Pre Release Patches will be fetched"
             m2="Latest Release Patches will be fetched"
-            tfConfig "$key" "$value" "$m1" "$m2"
+            tfConfig "$key" "$isPreRelease" "$m1" "$m2"
             ;;
           RipLocale) if [ "$RipLocale" == 1 ]; then echo "RipLocale == true"; else echo "RipLocale == false"; fi
-            key="RipLocale" && value="$isRipLocale"
+            key="RipLocale"
             m1="Device specific locale will be kept in patched apk file"
             m2="All locale will be kept in patched apk file"
-            tfConfig "$key" "$value" "$m1" "$m2"
+            tfConfig "$key" "$isRipLocale" "$m1" "$m2"
             ;;
           RipDpi) if [ "$RipDpi" == 1 ]; then echo "RipDpi == true"; else echo "RipDpi == false"; fi
-            key="RipDpi" && value="$isRipDpi"
+            key="RipDpi"
             m1="Device specific dpi will be kept in patched apk file"
             m2="All dpi will be kept in patched apk file"
-            tfConfig "$key" "$value" "$m1" "$m2"
+            tfConfig "$key" "$isRipDpi" "$m1" "$m2"
             ;;
           RipLib) if [ "$RipLib" == 1 ]; then echo "RipLib == true"; else echo "RipLib == false"; fi
-            key="RipLib" && value="$isRipLib"
+            key="RipLib"
             m1="Device specific arch lib will be kept in patched apk file"
             m2="All lib dir will be kept in patched apk file"
-            tfConfig "$key" "$value" "$m1" "$m2"
+            tfConfig "$key" "$isRipLib" "$m1" "$m2"
             ripLibGen  # Call ripLibGen function
             ;;
           Change\ RVX\ Source) if [ "$ChangeRVXSource" == 0 ]; then echo "ChangeRVXSource == false"; else echo "ChangeRVXSource == true"; fi
-            key="ChangeRVXSource" && value="$isChangeRVXSource"
+            key="ChangeRVXSource"
             m1="RVX Patches source will be changed to forked (@anddea)"
             m2="RVX Patches source will remain official (@inotia00)"
-            tfConfig "$key" "$value" "$m1" "$m2"
+            tfConfig "$key" "$isChangeRVXSource" "$m1" "$m2"
             ;;
           "Add gh PAT (increases gh api rate limit)") 
             if { [ -f "$simplifyJson" ] && jq -e '.PAT' "$simplifyJson" >/dev/null 2>&1; } || { gh auth status > /dev/null 2>&1 && [ -f "$HOME/.config/gh/hosts.yml" ]; }; then
@@ -1299,10 +1299,10 @@ while true; do
             pat  # Call the pat function to create & add GitHub token
             ;;
           Import\ Custom\ PatchesOptions\ from\ file) if [ "$ReadPatchesFile" == 0 ]; then echo "ReadPatchesFile == false"; else echo "ReadPatchesFile == true"; fi
-            key="ReadPatchesFile" && value="$isReadPatchesFile"
+            key="ReadPatchesFile"
             m1="Custom PatchesOptions Loading from File"
             m2="Recommended PatchesOptions Loading from Script"
-            tfConfig "$key" "$value" "$m1" "$m2"
+            tfConfig "$key" "$isReadPatchesFile" "$m1" "$m2"
             ;;
           "Change YouTube & YT Music AppIcon & Header")
             echo "changeYouTubeYTMusicAppIconHeader == $Branding"
@@ -1333,10 +1333,10 @@ while true; do
             fi
             ;;
           Check\ Termux\ update\ on\ startup) if [ $CheckTermuxUpdate -eq 1 ]; then echo "CheckTermuxUpdate == true"; else echo "CheckTermuxUpdate == false"; fi
-            key="CheckTermuxUpdate" && value="$isCheckTermuxUpdate"
+            key="CheckTermuxUpdate"
             m1="Check for Termux app updates on startup"
             m2="Never check for Termux app updates on startup"
-            tfConfig "$key" "$value" "$m1" "$m2"
+            tfConfig "$key" "$isCheckTermuxUpdate" "$m1" "$m2"
             ;;
           Change\ Java\ version)
             echo "openjdkVersion == $jdkVersion"
@@ -1386,38 +1386,38 @@ while true; do
                   ;;
                 "Allow Downgrade with keeps App data (reboot required)")
                   if [ "$KeepsData" -eq 0 ]; then echo "KeepsData == false"; else echo "KeepsData == true"; fi
-                  key="KeepsData"; value="$isK"
+                  key="KeepsData"
                   m1="Allow Downgrade with keeps App data Enabled"
                   m2="Allow Downgrade with keeps App data Disabled"
-                  tfConfig "$key" "$value" "$m1" "$m2"
+                  tfConfig "$key" "$isK" "$m1" "$m2"
                   ;;
                 "Grant All Runtime/ Requested Permissions")
                   if [ "$GrantAllRuntimePermissions" -eq 0 ]; then echo "GrantAllRuntimePermissions == false"; else echo "GrantAllRuntimePermissions == true"; fi
-                  key="GrantAllRuntimePermissions"; value="$isG"
+                  key="GrantAllRuntimePermissions"
                   m1="Grant All Runtime Permissions Enabled"
                   m2="Grant All Runtime Permissions Disabled"
-                  tfConfig "$key" "$value" "$m1" "$m2"
+                  tfConfig "$key" "$isG" "$m1" "$m2"
                   ;;
                 Installed\ as\ test-only\ app)
                   if [ "$InstalledAsTestOnly" -eq 0 ]; then echo "InstalledAsTestOnly == false"; else echo "InstalledAsTestOnly == true"; fi
-                  key="InstalledAsTestOnly"; value="$isT"
+                  key="InstalledAsTestOnly"
                   m1="Installed as test-only Enabled"
                   m2="Installed as test-only Disabled"
-                  tfConfig "$key" "$value" "$m1" "$m2"
+                  tfConfig "$key" "$isT" "$m1" "$m2"
                   ;;
                 Bypass\ Low\ Target\ SDK\ Bolck)
                   if [ "$BypassLowTargetSdkBolck" -eq 1 ]; then echo "BypassLowTargetSdkBolck == true"; else echo "BypassLowTargetSdkBolck == false"; fi
-                  key="BypassLowTargetSdkBolck"; value="$isL"
+                  key="BypassLowTargetSdkBolck"
                   m1="Bypass Low Target SDK Bolck Enabled"
                   m2="Bypass Low Target SDK Bolck Disabled"
-                  tfConfig "$key" "$value" "$m1" "$m2"
+                  tfConfig "$key" "$isL" "$m1" "$m2"
                   ;;
                 Disable\ Play\ Protect\ Package\ Verification)
                   if [ "$DisablePlayProtect" -eq 1 ]; then echo "DisablePlayProtect == true"; else echo "DisablePlayProtect == false"; fi
-                  key="DisablePlayProtect"; value="$isV"
+                  key="DisablePlayProtect"
                   m1="Play Protect Package Verification Disabled"
                   m2="Play Protect Package Verification Enabled"
-                  tfConfig "$key" "$value" "$m1" "$m2"
+                  tfConfig "$key" "$isV" "$m1" "$m2"
                   ;;
                 Installer)
                   case "$Installer" in
@@ -1440,17 +1440,17 @@ while true; do
                   ;;
                 "Reinstall (Replace/ Upgrade) Existing Installed Package")
                   if [ "$Reinstall" -eq 1 ]; then echo "Reinstall == true"; else echo "Reinstall == false"; fi
-                  key="Reinstall"; value="$isR"
+                  key="Reinstall"
                   m1="Reinstall Existing Installed Package Enabled"
                   m2="Reinstall Existing Installed Package Disabled"
-                  tfConfig "$key" "$value" "$m1" "$m2"
+                  tfConfig "$key" "$isR" "$m1" "$m2"
                   ;;
                 Enable\ Version\ Roolback)
                   if [ "$EnableRoolback" -eq 0 ]; then echo "EnableRoolback == false"; else echo "EnableRoolback == true"; fi
-                  key="EnableRoolback"; value="$isB"
+                  key="EnableRoolback"
                   m1="Version Roolback Enabled"
                   m2="Version Roolback Disabled"
-                  tfConfig "$key" "$value" "$m1" "$m2"
+                  tfConfig "$key" "$isB" "$m1" "$m2"
                   ;;
               esac
             done
