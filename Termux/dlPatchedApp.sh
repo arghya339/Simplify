@@ -625,7 +625,7 @@ while true; do
             ;;
           Google\ Meet\ →\ Jitsi\ Meet) termux-open-url "https://play.google.com/store/apps/details?id=org.jitsi.meet" ;;
           Google\ Home\ →\ Home\ Assistant) termux-open-url "https://play.google.com/store/apps/details?id=io.homeassistant.companion.android" ;;
-          Gallery) termux-open-url "https://github.com/IacobIonut01/Gallery/releases" ;;  # Implement later
+          Google\ Gallery\ →\ Gallery) termux-open-url "https://github.com/IacobIonut01/Gallery/releases" ;;  # Implement later
           Chrome\ →\ Chromium) termux-open-url "https://github.com/arghya339/crdl" ;;
           Chrome\ →\ Firefox) termux-open-url "https://play.google.com/store/apps/details?id=org.mozilla.firefox" ;;
           Google\ Authenticator\ →\ Ente\ Auth) termux-open-url "https://play.google.com/store/apps/details?id=io.ente.auth" ;;
