@@ -1326,6 +1326,7 @@ while true; do
                   echo -e "$good ${Green}appIconHeader successfully set to revancify_blue!${Reset}"
                   ;;
               esac
+              sleep 2
             fi
             ;;
           Check\ Termux\ update\ on\ startup) if [ $CheckTermuxUpdate -eq 1 ]; then echo "CheckTermuxUpdate == true"; else echo "CheckTermuxUpdate == false"; fi
