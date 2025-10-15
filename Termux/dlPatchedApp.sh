@@ -577,9 +577,11 @@ while true; do
       apps_list=(
         Play\ Store\ →\ AuroraStore
         Play\ Store\ →\ Droid-ify
+        Play\ Store\ →\ Obtainium
         Google\ →\ DuckDuckGo
         Gemini\ →\ RikkaHub
         Google\ Photos\ →\ Ente\ Photos
+        Google\ Photos\ →\ VLC
         Snapseed\ →\ Image\ Toolbox
         YouTube\ →\ FreeTube
         Google\ Meet\ →\ Jitsi\ Meet
@@ -596,12 +598,14 @@ while true; do
         Google\ TV\ →\ CloudStream
         Gboard\ →\ FlorisBoard
         Google\ Chat\ →\ Telegram
+        Google\ Chat\ →\ Session
         Google\ Password\ Manager\ →\ Bitwarden
         Google\ Tasks\ →\ Microsoft\ To\ Do
         Google\ News\ →\ Feeder
         Google\ Wallpapers\ →\ Starth\ Bing\ Wallpaper
         Gmail\ →\ Proton\ Mail
         YouTube\ Music\ →\ Metrolist
+        YouTube\ Music\ →\ PixelPlay
         Pixel\ Screenshots\ →\ Shots\ Studio
         Google\ Weather\ →\ Breezy\ Weather
       )
@@ -610,9 +614,11 @@ while true; do
         case "$selected" in
           Play\ Store\ →\ AuroraStore) termux-open-url "https://gitlab.com/AuroraOSS/AuroraStore/-/releases" ;;  # Implement later
           Play\ Store\ →\ Droid-ify) termux-open-url "https://github.com/Droid-ify/client/releases" ;;  # Implement later
+          Play\ Store\ →\ Obtainium) termux-open-url "https://github.com/ImranR98/Obtainium/releases" ;;  # Implement later
           Google\ →\ DuckDuckGo) termux-open-url "https://play.google.com/store/apps/details?id=com.duckduckgo.mobile.android" ;;
           Gemini\ →\ RikkaHub) termux-open-url "https://play.google.com/store/apps/details?id=me.rerere.rikkahub" ;;
           Google\ Photos\ →\ Ente\ Photos) termux-open-url "https://play.google.com/store/apps/details?id=io.ente.photos" ;;
+          Google\ Photos\ →\ VLC) termux-open-url "https://play.google.com/store/apps/details?id=org.videolan.vlc" ;;
           Snapseed\ →\ Image\ Toolbox) termux-open-url "https://play.google.com/store/apps/details?id=ru.tech.imageresizershrinker" ;;
           YouTube\ →\ FreeTube)
             appName="FreeTubeAndroid"
@@ -658,12 +664,14 @@ while true; do
             ;;
           Gboard\ →\ FlorisBoard) termux-open-url "https://github.com/florisboard/florisboard/releases" ;;  # Implement later
           Google\ Chat\ →\ Telegram) termux-open-url "https://play.google.com/store/apps/details?id=org.telegram.messenger" ;;
+          Google\ Chat\ →\ Session) termux-open-url "https://play.google.com/store/apps/details?id=network.loki.messenger" ;;
           Google\ Password\ Manager\ →\ Bitwarden) termux-open-url "https://play.google.com/store/apps/details?id=com.x8bit.bitwarden" ;;
           Google\ Tasks\ →\ Microsoft\ To\ Do) termux-open-url "https://play.google.com/store/apps/details?id=com.microsoft.todos" ;;
           Google\ News\ →\ Feeder) termux-open-url "https://play.google.com/store/apps/details?id=com.nononsenseapps.feeder.play" ;;
           Google\ Wallpapers\ →\ Starth\ Bing\ Wallpaper) termux-open-url "https://play.google.com/store/apps/details?id=me.liaoheng.wallpaper" ;;
           Gmail\ →\ Proton\ Mail) termux-open-url "https://play.google.com/store/apps/details?id=ch.protonmail.android" ;;
           YouTube\ Music\ →\ Metrolist) termux-open-url "https://github.com/mostafaalagamy/Metrolist/releases" ;;  # Implement later
+          YouTube\ Music\ →\ PixelPlay) termux-open-url "https://github.com/theovilardo/PixelPlay/releases" ;;  # Implement later
           Pixel\ Screenshots\ →\ Shots\ Studio) termux-open-url "https://github.com/AnsahMohammad/shots-studio/releases" ;;  # Implement later
           Google\ Weather\ →\ Breezy\ Weather)
             appName="Breezy Weather"
