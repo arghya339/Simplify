@@ -127,6 +127,7 @@ isG=0  # Grant All Runtime Permissions 0 (false) due to Security Risk, possible 
 isT=0  # Installed as test-only app 0, possible 1
 isL=1  # Bypass Low Target SDK Bolck 1 (true) it's allow Android 14+ to install apps that target below API level 23 (Android 6 and below), possible value 0
 isV=1  # Disable Play Protect Package Verification 1 (true), possible 0
+isA=0  # 'Disable Play Protect' is Enabled; this makes Enabling 'Disable Verify ADB installs' unnecessary
 isI="com.android.vending"  # default: PlayStore | possible Installer: com.android.packageinstaller (PackageInstaller), com.android.shell (Shell), adb
 isR=1  # Reinstall Existing Installed Package 1 (true) because without this app can't be installed if installed and to-be-installed version are same, possible 0
 isB=0  # Enable Version Roolback 0, possible 1
@@ -142,9 +143,9 @@ config() {
 
 # Create Simplify config
 all_key=("FetchPreRelease" "RipLocale" "RipDpi" "RipLib" "ChangeRVXSource" "ReadPatchesFile" "Branding" "CheckTermuxUpdate" "openjdk")
-all_key+=("InstallPackageFor" "KeepsData" "GrantAllRuntimePermissions" "InstalledAsTestOnly" "BypassLowTargetSdkBolck" "DisablePlayProtect" "Installer" "Reinstall" "EnableRoolback")
+all_key+=("InstallPackageFor" "KeepsData" "GrantAllRuntimePermissions" "InstalledAsTestOnly" "BypassLowTargetSdkBolck" "DisablePlayProtect" "DisableVerifyAdbInstalls" "Installer" "Reinstall" "EnableRoolback")
 all_value=("$isPreRelease" "$isRipLocale" "$isRipDpi" "$isRipLib" "$isChangeRVXSource" "$isReadPatchesFile" "$branding" "$isCheckTermuxUpdate" "$isJdkVersion")
-all_value+=("$isU" "$isK" "$isG" "$isT" "$isL" "$isV" "$isI" "$isR" "$isB")
+all_value+=("$isU" "$isK" "$isG" "$isT" "$isL" "$isV" "$isA" "$isI" "$isR" "$isB")
 # Loop through all keys and set values if they don't exist
 for i in "${!all_key[@]}"; do
   ! jq -e --arg key "${all_key[i]}" 'has($key)' "$simplifyJson" >/dev/null && config "${all_key[i]}" "${all_value[i]}"
@@ -1363,10 +1364,11 @@ while true; do
               InstalledAsTestOnly=$(jq -r '.InstalledAsTestOnly' "$simplifyJson" 2>/dev/null)
               BypassLowTargetSdkBolck=$(jq -r '.BypassLowTargetSdkBolck' "$simplifyJson" 2>/dev/null)
               DisablePlayProtect=$(jq -r '.DisablePlayProtect' "$simplifyJson" 2>/dev/null)
+              DisableVerifyAdbInstalls=$(jq -r '.DisableVerifyAdbInstalls' "$simplifyJson" 2>/dev/null)
               Installer=$(jq -r '.Installer' "$simplifyJson" 2>/dev/null)
               Reinstall=$(jq -r '.Reinstall' "$simplifyJson" 2>/dev/null)
               EnableRoolback=$(jq -r '.EnableRoolback' "$simplifyJson" 2>/dev/null)
-              options=("Install Package for *user" "Allow Downgrade with keeps App data (reboot required)" "Grant All Runtime/ Requested Permissions" Installed\ as\ test-only\ app Bypass\ Low\ Target\ SDK\ Bolck Disable\ Play\ Protect\ Package\ Verification Installer "Reinstall (Replace/ Upgrade) Existing Installed Package" Enable\ Version\ Roolback)
+              options=("Install Package for *user" "Allow Downgrade with keeps App data (reboot required)" "Grant All Runtime/ Requested Permissions" Installed\ as\ test-only\ app Bypass\ Low\ Target\ SDK\ Bolck Disable\ Play\ Protect\ Package\ Verification Disable\ Verify\ Adb\ Installs Installer "Reinstall (Replace/ Upgrade) Existing Installed Package" Enable\ Version\ Roolback)
               buttons=("<Select>" "<Back>"); if menu "options" "buttons" "10"; then selected="${options[$selected]}"; else break; fi
               case "$selected" in
                 "Install Package for *user")
@@ -1409,6 +1411,10 @@ while true; do
                   m1="Play Protect Package Verification Disabled"
                   m2="Play Protect Package Verification Enabled"
                   tfConfig "DisablePlayProtect" "$isV" "$m1" "$m2"
+                  ;;
+                Disable\ Verify\ Adb\ Installs)
+                  [ $DisableVerifyAdbInstalls -eq 1 ] && echo "DisableVerifyAdbInstalls == true" || echo "DisableVerifyAdbInstalls == false"
+                  m1="Verify Adb Installs Disabled"; m2="Verify Adb Installs Enabled"; tfConfig "DisableVerifyAdbInstalls" "$isA" "$m1" "$m2"
                   ;;
                 Installer)
                   case "$Installer" in
