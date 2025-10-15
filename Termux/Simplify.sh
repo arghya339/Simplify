@@ -1252,7 +1252,10 @@ while true; do
         Branding=$(jq -r '.Branding' "$simplifyJson" 2>/dev/null)
         CheckTermuxUpdate=$(jq -r '.CheckTermuxUpdate' "$simplifyJson" 2>/dev/null)
         jdkVersion=$(jq -r '.openjdk' "$simplifyJson" 2>/dev/null)
-        options=(FetchPreRelease RipLocale RipDpi RipLib Change\ RVX\ Source "Add gh PAT (increases gh api rate limit)" Import\ Custom\ PatchesOptions\ from\ file "Change YouTube & YT Music AppIcon & Header" Check\ Termux\ update\ on\ startup Change\ Java\ version "SU/ SUI/ ADB Installation Options")
+        options=(FetchPreRelease RipLocale RipDpi RipLib Change\ RVX\ Source "Add gh PAT (increases gh api rate limit)" Import\ Custom\ PatchesOptions\ from\ file "Change YouTube & YT Music AppIcon & Header" Check\ Termux\ update\ on\ startup Change\ Java\ version)
+        if [ $su -eq 1 ] || "$HOME/rish" -c "id" >/dev/null 2>&1 || "$HOME/adb" -s $(~/adb devices 2>/dev/null | head -2 | tail -1 | awk '{print $1}') shell "id" >/dev/null 2>&1; then
+          options+=("SU/ SUI/ ADB Installation Options")
+        fi
         if [ "$(getprop ro.product.manufacturer)" == "Genymobile" ] && ! "$HOME/adb" -s $(~/adb devices 2>/dev/null | head -2 | tail -1 | awk '{print $1}') shell "id" >/dev/null 2>&1; then
           options+=(Pair\ ADB)
         fi
