@@ -610,6 +610,9 @@ while true; do
         YouTube\ Music\ →\ PixelPlay
         Pixel\ Screenshots\ →\ Shots\ Studio
         Google\ Weather\ →\ Breezy\ Weather
+        VPN\ by\ Google\ One\ →\ 1.1.1.1\ +\ WARP
+        VPN\ by\ Google\ One\ →\ WireGuard\ +\ WireGuard\ config\ by\ Proton\ VPN
+        VPN\ by\ Google\ One\ →\ Tor\ VPN
       )
       while true; do
         buttons=("<Select>" "<Back>"); if menu "apps_list" "buttons" "22"; then selected="${apps_list[$selected]}"; else break; fi
@@ -697,6 +700,9 @@ while true; do
             activityApp="org.breezyweather/.ui.main.MainActivity"
             dlApp "${appName}" "$owner" "$repo" "$release" "$regex" "$file_pattern" "$tag" "$assets" "$pkgApp" "$activityApp"
             ;;
+          VPN\ by\ Google\ One\ →\ 1.1.1.1\ +\ WARP) termux-open-url "https://play.google.com/store/apps/details?id=com.cloudflare.onedotonedotonedotone" ;;
+          VPN\ by\ Google\ One\ →\ WireGuard\ +\ WireGuard\ config\ by\ Proton\ VPN) termux-open-url "https://play.google.com/store/apps/details?id=com.wireguard.android" && sleep 0.5 && termux-open-url "https://account.protonvpn.com/downloads" ;;
+          VPN\ by\ Google\ One\ →\ Tor\ VPN) termux-open-url "https://play.google.com/store/apps/details?id=org.torproject.vpn" ;;
         esac
       done
       ;;
