@@ -605,6 +605,7 @@ while true; do
         Google\ News\ →\ Feeder
         Google\ Wallpapers\ →\ Starth\ Bing\ Wallpaper
         Gmail\ →\ Proton\ Mail
+        Gmail\ →\ Thunderbird
         YouTube\ Music\ →\ Metrolist
         YouTube\ Music\ →\ PixelPlay
         Pixel\ Screenshots\ →\ Shots\ Studio
@@ -672,6 +673,7 @@ while true; do
           Google\ News\ →\ Feeder) termux-open-url "https://play.google.com/store/apps/details?id=com.nononsenseapps.feeder.play" ;;
           Google\ Wallpapers\ →\ Starth\ Bing\ Wallpaper) termux-open-url "https://play.google.com/store/apps/details?id=me.liaoheng.wallpaper" ;;
           Gmail\ →\ Proton\ Mail) termux-open-url "https://play.google.com/store/apps/details?id=ch.protonmail.android" ;;
+          Gmail\ →\ Thunderbird) termux-open-url "https://play.google.com/store/apps/details?id=net.thunderbird.android" ;;
           YouTube\ Music\ →\ Metrolist) termux-open-url "https://github.com/mostafaalagamy/Metrolist/releases" ;;  # Implement later
           YouTube\ Music\ →\ PixelPlay) termux-open-url "https://github.com/theovilardo/PixelPlay/releases" ;;  # Implement later
           Pixel\ Screenshots\ →\ Shots\ Studio) termux-open-url "https://github.com/AnsahMohammad/shots-studio/releases" ;;  # Implement later
