@@ -592,6 +592,7 @@ while true; do
         Google\ Authenticator\ →\ Ente\ Auth
         Google\ Calculator\ →\ Multi-Calculator
         Google\ Drive\ →\ Nextcloud
+        Google\ Drive\ →\ Microsoft\ OneDrive
         Google\ Drive\ →\ Proton\ Drive
         Google\ Keep\ →\ Notesnook
         Google\ Maps\ →\ OsmAnd
@@ -639,6 +640,7 @@ while true; do
           Google\ Authenticator\ →\ Ente\ Auth) termux-open-url "https://play.google.com/store/apps/details?id=io.ente.auth" ;;
           Google\ Calculator\ →\ Multi-Calculator) termux-open-url "https://play.google.com/store/apps/details?id=com.yangdai.calc" ;;
           Google\ Drive\ →\ Nextcloud) termux-open-url "https://play.google.com/store/apps/details?id=com.nextcloud.client" ;;
+          Google\ Drive\ →\ Microsoft\ OneDrive) termux-open-url "https://play.google.com/store/apps/details?id=com.microsoft.skydrive" ;;
           Google\ Drive\ →\ Proton\ Drive) termux-open-url "https://play.google.com/store/apps/details?id=me.proton.android.drive" ;;
           Google\ Keep\ →\ Notesnook) termux-open-url "https://play.google.com/store/apps/details?id=com.streetwriters.notesnook" ;;
           Google\ Maps\ →\ OsmAnd) termux-open-url "https://play.google.com/store/apps/details?id=net.osmand" ;;
