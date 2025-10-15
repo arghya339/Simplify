@@ -593,6 +593,7 @@ while true; do
         Google\ Drive\ →\ Proton\ Drive
         Google\ Keep\ →\ Notesnook
         Google\ Maps\ →\ OsmAnd
+        Google\ TV\ →\ CloudStream
         Gboard\ →\ FlorisBoard
         Google\ Chat\ →\ Telegram
         Google\ Password\ Manager\ →\ Bitwarden
@@ -602,6 +603,7 @@ while true; do
         Gmail\ →\ Proton\ Mail
         YouTube\ Music\ →\ Metrolist
         Pixel\ Screenshots\ →\ Shots\ Studio
+        Google\ Weather\ →\ Breezy\ Weather
       )
       while true; do
         buttons=("<Select>" "<Back>"); if menu "apps_list" "buttons" "22"; then selected="${apps_list[$selected]}"; else break; fi
@@ -634,6 +636,26 @@ while true; do
           Google\ Drive\ →\ Proton\ Drive) termux-open-url "https://play.google.com/store/apps/details?id=me.proton.android.drive" ;;
           Google\ Keep\ →\ Notesnook) termux-open-url "https://play.google.com/store/apps/details?id=com.streetwriters.notesnook" ;;
           Google\ Maps\ →\ OsmAnd) termux-open-url "https://play.google.com/store/apps/details?id=net.osmand" ;;
+          Google\ TV\ →\ CloudStream)
+            appName="CloudStream"
+            owner="recloudstream"
+            repo="cloudstream"
+            if [ $FetchPreRelease -eq 0 ]; then
+              file_pattern="cloudstream-*.apk"
+              tag=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases/latest" | jq -r '.tag_name')
+              assets=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases/latest" | jq -r '.assets[] | .name')
+              pkgApp="com.lagradost.cloudstream3"
+              activityApp="com.lagradost.cloudstream3/.ui.account.AccountSelectActivity"
+            else
+              release="pre-release"
+              file_pattern="app-prerelease-release.apk"
+              tag="$release"
+              assets="$file_pattern"
+              pkgApp="com.lagradost.cloudstream3.prerelease"
+              activityApp="com.lagradost.cloudstream3.prerelease/com.lagradost.cloudstream3.ui.account.AccountSelectActivity"
+            fi
+            dlApp "${appName}" "$owner" "$repo" "$release" "" "$file_pattern" "$tag" "$assets" "$pkgApp" "$activityApp"
+            ;;
           Gboard\ →\ FlorisBoard) termux-open-url "https://github.com/florisboard/florisboard/releases" ;;  # Implement later
           Google\ Chat\ →\ Telegram) termux-open-url "https://play.google.com/store/apps/details?id=org.telegram.messenger" ;;
           Google\ Password\ Manager\ →\ Bitwarden) termux-open-url "https://play.google.com/store/apps/details?id=com.x8bit.bitwarden" ;;
@@ -643,6 +665,26 @@ while true; do
           Gmail\ →\ Proton\ Mail) termux-open-url "https://play.google.com/store/apps/details?id=ch.protonmail.android" ;;
           YouTube\ Music\ →\ Metrolist) termux-open-url "https://github.com/mostafaalagamy/Metrolist/releases" ;;  # Implement later
           Pixel\ Screenshots\ →\ Shots\ Studio) termux-open-url "https://github.com/AnsahMohammad/shots-studio/releases" ;;  # Implement later
+          Google\ Weather\ →\ Breezy\ Weather)
+            appName="Breezy Weather"
+            owner="breezy-weather"
+            repo="$owner"
+            if [ "$FetchPreRelease" -eq 0 ]; then
+              tag=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases/latest" | jq -r '.tag_name')
+              regex="breezy-weather-$cpuAbi-${tag}_standard.apk"
+              file_pattern="$regex"
+              assets="$regex"
+            else
+              release=alpha
+              tag=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases" | jq -r --arg release "$release" '.[].tag_name | select(contains($release))' | head -n 1)
+              regex="breezy-weather-$cpuAbi-${tag}_standard.apk"
+              file_pattern="$regex"
+              assets="$regex"
+            fi
+            pkgApp="org.breezyweather"
+            activityApp="org.breezyweather/.ui.main.MainActivity"
+            dlApp "${appName}" "$owner" "$repo" "$release" "$regex" "$file_pattern" "$tag" "$assets" "$pkgApp" "$activityApp"
+            ;;
         esac
       done
       ;;
