@@ -1374,8 +1374,8 @@ while true; do
                   buttons=("<default-user>" "<all-users>"); confirmPrompt "InstallPackageFor" "buttons" "$isU" && u=default-user || u=all-users
                   if [ -n "$u" ]; then
                     case "$u" in
-                      [Dd]*) config "InstallPackageFor" "0" && echo -e "${Green}Install Package for default-user set successfully!${Reset}" ;;
-                      [Aa]*) config "InstallPackageFor" "1" && echo -e "${Green}Install Package for all-user set successfully!${Reset}" ;;
+                      [Dd]*) config "InstallPackageFor" "0" && echo -e "$good ${Green}Install Package for default-user set successfully!${Reset}" ;;
+                      [Aa]*) config "InstallPackageFor" "1" && echo -e "$good ${Green}Install Package for all-user set successfully!${Reset}" ;;
                     esac
                     sleep 2
                   fi
