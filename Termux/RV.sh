@@ -1079,7 +1079,7 @@ while true; do
       pkgName="com.google.android.apps.photos"
       appName=("Google Photos")
       if [ $Android -ge 6 ]; then
-        pkgVersion="6.95.0.663027175"
+        pkgVersion="7.50.0.818774663"
         #pkgVersion=""
         if [ -z "$pkgVersion" ]; then
           getVersion "$pkgName"
