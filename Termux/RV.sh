@@ -10,11 +10,24 @@ echo -e "$info ${Blue}ReVancedCLIJar:${Reset} $ReVancedCLIJar"
 # --- Download ReVanced Patches ---
 if [ "$FetchPreRelease" -eq 0 ]; then
   release="latest"  # Use latest release
+  requestUrl="https://api.revanced.app/v4/patches"
 else
   release="pre"  # Use pre-release
+  requestUrl="https://api.revanced.app/v4/patches?prerelease=true"
 fi
-bash $Simplify/dlGitHub.sh "ReVanced" "revanced-patches" "$release" ".rvp" "$RV"
-PatchesRvp=$(find "$RV" -type f -name "patches-*.rvp" -print -quit)
+rvApiResponseJson=$(curl -sX 'GET' "$requestUrl" -H 'accept: application/json')
+downloadUrl=$(jq -r '.download_url' <<< "$rvApiResponseJson")
+PatchesRvp="$RV/$(basename "$downloadUrl")"
+findPatchesRvp=$(find "$RV" -type f -name "patches-*.rvp" -print -quit)
+if [ -f "$findPatchesRvp" ]; then
+  [ "$(basename "$findPatchesRvp" 2>/dev/null)" != "$(basename "$downloadUrl")" ] && { echo -e "$notice diffs: $(basename $downloadUrl) ~ $(basename $findPatchesRvp)"; rm -f "$findPatchesRvp"; }
+fi
+while true; do
+  curl -L -C - --progress-bar -o "$PatchesRvp" "$downloadUrl"
+  [ $? -eq 0 ] && break || { echo -e "${bad} ${Red}Download failed! retrying in 5 seconds..${Reset}"; sleep 5; }
+done
+#bash $Simplify/dlGitHub.sh "ReVanced" "revanced-patches" "$release" ".rvp" "$RV"
+#PatchesRvp=$(find "$RV" -type f -name "patches-*.rvp" -print -quit)
 echo -e "$info ${Blue}PatchesRvp:${Reset} $PatchesRvp"
 
 # --- Download Vanced MicroG ---
@@ -861,8 +874,9 @@ while true; do
   # main conditional control flow
   case "$selected" in
     CHANGELOG)
-      [ $release == "latest" ] && tag=$(curl -sL ${auth} "https://api.github.com/repos/ReVanced/revanced-patches/releases/latest" | jq -r '.tag_name') || tag=$(curl -sL ${auth} "https://api.github.com/repos/ReVanced/revanced-patches/releases" | jq -r '.[].tag_name | select(contains("dev"))' | head -n 1)
-      curl -sL ${auth} "https://api.github.com/repos/ReVanced/revanced-patches/releases/tags/$tag" | jq -r .body | glow  # Display release notes
+      jq -r '.description' <<< "$rvApiResponseJson" | glow
+      #[ $release == "latest" ] && tag=$(curl -sL ${auth} "https://api.github.com/repos/ReVanced/revanced-patches/releases/latest" | jq -r '.tag_name') || tag=$(curl -sL ${auth} "https://api.github.com/repos/ReVanced/revanced-patches/releases" | jq -r '.[].tag_name | select(contains("dev"))' | head -n 1)
+      #curl -sL ${auth} "https://api.github.com/repos/ReVanced/revanced-patches/releases/tags/$tag" | jq -r .body | glow  # Display release notes
       echo; read -p "Press Enter to continue..."
       ;;
     Spoof\ Device\ Arch)
