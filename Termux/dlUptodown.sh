@@ -138,7 +138,7 @@ dlUptodown() {
   # --- SCRAPE DOWNLOAD URL ---
   data_version=$(curl -sL -A "$USER_AGENT" "$versionURL" | grep -oP '<button class="button variants" data-version="\K[^"]+')  # 'ALL VARIANTS' BUTTON ID
   if [ -z "$data_version" ]; then
-    data_url=$(curl -sL -A "$USER_AGENT" "$versionURL" | grep -oP 'data-url="\K[^"]+' | head -n1)
+    data_url=$(curl -sL -A "$USER_AGENT" "$versionURL" | pup '#detail-download-button attr{data-url}')
     echo -e "$info data_url: ${Cyan}$data_url${Reset}"
     
     dlUrl="https://dw.uptodown.com/dwn/${data_url}"
@@ -177,7 +177,7 @@ dlUptodown() {
         if [ "$Arch" == "$arch_clean" ] && [ "$Type" == "$type" ]; then
           data_file_id=$(pup "div.variant:nth-of-type($n) > .v-report attr{data-file-id}" <<<"$files_json")
           location_url="$versionLink/${data_file_id}-x"
-          data_url=$(curl -sL -A "$USER_AGENT" "$location_url" | grep -oP 'data-url="\K[^"]+' | head -n1)
+          data_url=$(curl -sL -A "$USER_AGENT" "$location_url" | pup '#detail-download-button attr{data-url}')
           dlUrl="https://dw.uptodown.com/dwn/${data_url}"
           echo -e "$info Auto Selected: [$n]"
           echo "arch     : $arch"
