@@ -918,6 +918,7 @@ while true; do
         # update cpuAbi value
         jq -e '.DeviceArch != null' "$simplifyJson" >/dev/null 2>&1 && cpuAbi=$(jq -r '.DeviceArch' "$simplifyJson" 2>/dev/null)  # Get Device Architecture from json
       fi
+      continue
       ;;
     List\ of\ Patches)
       apps_list=(universal-patches)
