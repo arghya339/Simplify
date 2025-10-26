@@ -1111,7 +1111,7 @@ while true; do
     Instagram)
       pkgName="com.instagram.android"
       appName=("Instagram")
-      pkgVersion="397.1.0.52.81"
+      pkgVersion="403.0.0.49.74"
       #pkgVersion=""
       if [ -z "$pkgVersion" ]; then
         getVersion "$pkgName"
@@ -1127,9 +1127,9 @@ while true; do
         Arch=("$cpuAbi")
       else
         if [ $cpuAbi == arm64-v8a ]; then
-          Arch=("380306835")
+          Arch=("380906427")
         elif [ $cpuAbi == armeabi-v7a ]; then
-          Arch=("380306859")
+          Arch=("380906426")
         fi
         Type="APK"
       fi
