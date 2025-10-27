@@ -685,9 +685,8 @@ while true; do
             ghApiResponseJson=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases/latest")
             tag=$(jq -r '.tag_name' <<< "$ghApiResponseJson")
             name=$(jq -r '.name' <<< "$ghApiResponseJson" | sed 's/ Release$//')
-            regex="$repo-$name*-$cpuAbi.apk"
+            regex="$repo-$name.*-$cpuAbi.apk"
             assets=$(jq -r --arg regex "$regex" '.assets[] | select(.name | test($regex)) | .name' <<< "$ghApiResponseJson" | head -1)
-            echo -e "$notice DEBUG - assets: $assets" && sleep 30
             pkgApp="com.dot.gallery"
             activityApp="com.dot.gallery/.feature_node.presentation.main.MainActivity"
             dlApp "${appName}" "$owner" "$repo" "$release" "$assets" "$file_pattern" "$tag" "$assets" "$pkgApp" "$activityApp"
