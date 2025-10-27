@@ -385,6 +385,7 @@ if [ $Android -ge 10 ]; then
     SoundCloud
     ${novaLauncher}
     Lawnchair
+    Mi\ Remote\ controller
     Solid\ Explorer
     Proton\ Mail
     Crunchyroll
@@ -432,6 +433,7 @@ elif [ $Android -eq 9 ]; then
     SoundCloud
     ${novaLauncher}
     Lawnchair
+    Mi\ Remote\ controller
     Solid\ Explorer
     Proton\ Mail
     Crunchyroll
@@ -478,6 +480,7 @@ elif [ $Android -eq 8 ]; then
     SoundCloud
     ${novaLauncher}
     Lawnchair
+    Mi\ Remote\ controller
     Solid\ Explorer
     Crunchyroll
     Tasker
@@ -512,6 +515,7 @@ elif [ $Android -eq 7 ]; then
     WeatherMaster
     Twitch
     Tumblr
+    Mi\ Remote\ controller
     Solid\ Explorer
     Tasker
   )
@@ -537,6 +541,7 @@ elif [ $Android -eq 6 ]; then
     CloudStream
     WeatherMaster
     Twitch
+    Mi\ Remote\ controller
     Solid\ Explorer
     Tasker
   )
@@ -561,6 +566,7 @@ elif [ $Android -eq 5 ]; then
     CloudStream
     WeatherMaster
     Twitch
+    Mi\ Remote\ controller
     Solid\ Explorer
     Tasker
   )
@@ -1422,6 +1428,7 @@ while true; do
       activityApp=
       dlApp "${appName}" "$owner" "$repo" "$release" "" "$file_pattern" "$tag" "$assets" "$pkgApp" "$activityApp"
       ;;
+    Mi\ Remote\ controller) termux-open-url "https://play.google.com/store/apps/details?id=com.duokan.phone.remotecontroller" ;;
     Solid\ Explorer)
       appName="Solid Explorer"
       owner="FiorenMas"
