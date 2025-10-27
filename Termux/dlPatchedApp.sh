@@ -720,7 +720,17 @@ while true; do
             fi
             dlApp "${appName}" "$owner" "$repo" "$release" "" "$file_pattern" "$tag" "$assets" "$pkgApp" "$activityApp"
             ;;
-          Gboard\ →\ FlorisBoard) termux-open-url "https://github.com/florisboard/florisboard/releases" ;;  # Implement later
+          Gboard\ →\ FlorisBoard)
+            appName="FlorisBoard"
+            owner="florisboard"
+            repo="$owner"
+            file_pattern="florisboard-*-stable.apk"
+            tag=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases/latest" | jq -r '.tag_name | sub("^v"; "")' 2>/dev/null)
+            assets="florisboard-$tag-stable.apk"
+            pkgApp="dev.patrickgold.florisboard"
+            activityApp="dev.patrickgold.florisboard/.SettingsLauncherAlias"
+            dlApp "${appName}" "$owner" "$repo" "$release" "$assets" "$file_pattern" "v$tag" "$assets" "$pkgApp" "$activityApp"
+            ;;
           Google\ Chat\ →\ Telegram) termux-open-url "https://play.google.com/store/apps/details?id=org.telegram.messenger" ;;
           Google\ Chat\ →\ Session) termux-open-url "https://play.google.com/store/apps/details?id=network.loki.messenger" ;;
           Google\ Password\ Manager\ →\ Bitwarden) termux-open-url "https://play.google.com/store/apps/details?id=com.x8bit.bitwarden" ;;
