@@ -712,6 +712,7 @@ while true; do
             file_pattern="${appName}_v$version-noarch.apk"
             apk_path=$(find "$Download" -type f -name "$file_pattern" -print -quit)
             [ -f "$apk_path" ] && version=$($HOME/aapt2 dump badging "$apk_path" 2>/dev/null | sed -n "s/.*versionName='\([^']*\)'.*/\1/p")
+            activityApp="com.miui.compass/.CompassActivity"
             url="https://www.apkmirror.com/apk/xiaomi-inc/miui-compass/xiaomi-compass-16-0-6-0-release/xiaomi-compass-16-0-6-0-android-apk-download/"
             appInstall
             ;;
