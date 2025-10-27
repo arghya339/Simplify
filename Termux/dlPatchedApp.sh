@@ -165,12 +165,12 @@ dlApp() {
   local tag="$7"
   local assets="$8"
   if [ "$repo" == "spotube" ]; then
-    local url="https://github.com/$owner/$repo/releases/download/v$tag/Spotube-android-all-arch.apk"
+    local url="https://github.com/$owner/$repo/releases/download/$tag/Spotube-android-all-arch.apk"
     assets="$file_pattern"
   elif [ "$repo" == "AuroraStore" ]; then
     url="$assets_url"
   else
-    local url="https://github.com/$owner/$repo/releases/download/v$tag/$assets"
+    local url="https://github.com/$owner/$repo/releases/download/$tag/$assets"
   fi
   local pkgApp="$9"
   local activityApp="$10"
@@ -355,10 +355,10 @@ if [ $Android -ge 10 ]; then
     YouTube\ Music
     InnerTune
     Seal
-    ytdlnis
+    YTDLnis
     RetroMusicPlayer
     #Spotify
-    spotube
+    Spotube
     TikTok
     Google\ Photos
     $Instagram
@@ -403,10 +403,10 @@ elif [ $Android -eq 9 ]; then
     YouTube\ Music
     InnerTune
     Seal
-    ytdlnis
+    YTDLnis
     RetroMusicPlayer
     #Spotify
-    spotube
+    Spotube
     TikTok
     Google\ Photos
     $Instagram
@@ -450,10 +450,10 @@ elif [ $Android -eq 8 ]; then
     YouTube\ Music
     InnerTune
     Seal
-    ytdlnis
+    YTDLnis
     RetroMusicPlayer
     #Spotify
-    spotube
+    Spotube
     TikTok
     Google\ Photos
     $Instagram
@@ -494,10 +494,10 @@ elif [ $Android -eq 7 ]; then
     YouTube\ Music
     InnerTune
     Seal
-    ytdlnis
+    YTDLnis
     RetroMusicPlayer
     #Spotify
-    spotube
+    Spotube
     TikTok
     Google\ Photos
     $Instagram
@@ -905,10 +905,10 @@ while true; do
         pkgApp="com.junkfood.seal.preview"
         activityApp="com.junkfood.seal.preview/.MainActivity"
       fi
-      dlApp "${appName}" "$owner" "$repo" "$release" "$regex" "$file_pattern" "$tag" "$assets" "$pkgApp" "$activityApp"
+      dlApp "${appName}" "$owner" "$repo" "$release" "$regex" "$file_pattern" "v$tag" "$assets" "$pkgApp" "$activityApp"
       ;;
-    ytdlnis)
-      appName="ytdlnis"
+    YTDLnis)
+      appName="YTDLnis"
       owner="deniscerri"
       repo="ytdlnis"
       if [ $FetchPreRelease -eq 0 ]; then
@@ -924,7 +924,7 @@ while true; do
       assets="YTDLnis-$tag-$cpuAbi-release.apk"
       pkgApp="com.deniscerri.ytdl"
       activityApp="com.deniscerri.ytdl/.Default"
-      dlApp "${appName}" "$owner" "$repo" "$release" "$regex" "$file_pattern" "$tag" "$assets" "$pkgApp" "$activityApp"
+      dlApp "${appName}" "$owner" "$repo" "$release" "$regex" "$file_pattern" "v$tag" "$assets" "$pkgApp" "$activityApp"
       ;;
     RetroMusicPlayer) termux-open-url "https://play.google.com/store/apps/details?id=code.name.monkey.retromusic" ;;
     Spotify)
@@ -940,8 +940,8 @@ while true; do
       activityPatched="com.spotify.music/.MainActivity"
       dlPatchedApp "${appName}" "$owner" "$repo" "$assets" "$pkgPatched" "$activityPatched"
       ;;
-    spotube)
-      appName="spotube"
+    Spotube)
+      appName="Spotube"
       owner="KRTirtho"
       repo="spotube"
       assets="Spotube-playstore-all-arch.aab"
@@ -951,7 +951,7 @@ while true; do
         tag=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases/latest" | jq -r '.tag_name | sub("^v"; "")' 2>/dev/null)  # 5.0.0
         pkgApp="oss.krtirtho.spotube"
         activityApp="$pkgApp/com.ryanheise.audioservice.AudioServiceActivity"
-        dlApp "${appName}" "$owner" "$repo" "" "$regex" "$file_pattern" "$tag" "$regex" "$pkgApp" "$activityApp"
+        dlApp "${appName}" "$owner" "$repo" "" "$regex" "$file_pattern" "v$tag" "$regex" "$pkgApp" "$activityApp"
       else
         pkgPatched="oss.krtirtho.spotube.nightly"
         activityPatched="$pkgPatched/com.ryanheise.audioservice.AudioServiceActivity"
