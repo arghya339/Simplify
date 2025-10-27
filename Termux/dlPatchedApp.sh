@@ -71,7 +71,7 @@ appInstall() {
           fi
           data "$appName" "$updated_at" "$tag"
         fi
-        if [ $su -eq 1 ] || "$HOME/rish" -c "id" >/dev/null 2>&1; then
+        if [ $su -eq 1 ] || "$HOME/rish" -c "id" >/dev/null 2>&1 || "$HOME/adb" -s $(~/adb devices | grep "device$" | awk '{print $1}' | tail -1) shell "id" >/dev/null 2>&1; then
           rm -f "$apk_path"
         fi
         ;;
