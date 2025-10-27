@@ -592,6 +592,7 @@ while true; do
         YouTube\ →\ FreeTube
         Google\ Meet\ →\ Jitsi\ Meet
         Google\ Home\ →\ Home\ Assistant
+        Google\ Home\ →\ Sinric\ Pro
         Google\ Gallery\ →\ Gallery
         Files\ by\ Google\ →\ ZArchiver
         Chrome\ →\ Chromium
@@ -681,6 +682,7 @@ while true; do
             ;;
           Google\ Meet\ →\ Jitsi\ Meet) termux-open-url "https://play.google.com/store/apps/details?id=org.jitsi.meet" ;;
           Google\ Home\ →\ Home\ Assistant) termux-open-url "https://play.google.com/store/apps/details?id=io.homeassistant.companion.android" ;;
+          Google\ Home\ →\ Sinric\ Pro) termux-open-url "https://play.google.com/store/apps/details?id=pro.sinric" ;;
           Google\ Gallery\ →\ Gallery)
             appName="Gallery"
             owner="IacobIonut01"
