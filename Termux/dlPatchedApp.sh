@@ -634,6 +634,7 @@ while true; do
         VPN\ by\ Google\ One\ →\ Tor\ VPN
         AOSP\ Missing\ RT\ Network\ Speed\ Indicator\ →\ Data\ Monitor
         ADB\ →\ Shizuku
+        Pixel\ Phone\ Services\ RadioInfo\ Settings\ →\ NetworkSwitch\ QuickSettingsTile
         Private\ DNS\ Settings\ →\ Private\ DNS\ Quick\ Toggle
         Uninstall\ Bloatware\ →\ Package\ Manager
       )
@@ -836,6 +837,16 @@ while true; do
             assets=$(jq -r --arg regex "$regex" '.assets[] | select(.name | test($regex)) | .name' <<< "$ghApiResponseJson" | head -1)
             pkgApp="moe.shizuku.privileged.api"
             activityApp="moe.shizuku.privileged.api/moe.shizuku.manager.MainActivity"
+            dlApp "${appName}" "$owner" "$appName" "$release" "" "$file_pattern" "$tag" "$assets" "$pkgApp" "$activityApp"
+            ;;
+          Pixel\ Phone\ Services\ RadioInfo\ Settings\ →\ NetworkSwitch\ QuickSettingsTile)
+            appName="NetworkSwitch"
+            owner="aunchagaonkar"
+            file_pattern="NetworkSwitch-v*.apk"
+            tag=$(curl -s ${auth} "https://api.github.com/repos/$owner/$appName/releases/latest" | jq -r '.tag_name')
+            assets="NetworkSwitch-$tag.apk"
+            pkgApp="com.supernova.networkswitch"
+            activityApp="com.supernova.networkswitch/.presentation.ui.activity.MainActivity"
             dlApp "${appName}" "$owner" "$appName" "$release" "" "$file_pattern" "$tag" "$assets" "$pkgApp" "$activityApp"
             ;;
           Private\ DNS\ Settings\ →\ Private\ DNS\ Quick\ Toggle)
