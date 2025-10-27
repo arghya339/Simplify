@@ -686,6 +686,7 @@ while true; do
             tag=$(jq -r '.tag_name' <<< "$ghApiResponseJson")
             name=$(jq -r '.name' <<< "$ghApiResponseJson" | sed 's/ Release$//')
             regex="$repo-$name-$cpuAbi.apk"
+            echo -e "$notice DEBUG - regex: $regex" && sleep 30
             pkgApp="com.dot.gallery"
             activityApp="com.dot.gallery/.feature_node.presentation.main.MainActivity"
             dlApp "${appName}" "$owner" "$repo" "$release" "$regex" "$file_pattern" "$tag" "$regex" "$pkgApp" "$activityApp"
