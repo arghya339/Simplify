@@ -593,6 +593,7 @@ while true; do
         Google\ Meet\ →\ Jitsi\ Meet
         Google\ Home\ →\ Home\ Assistant
         Google\ Gallery\ →\ Gallery
+        Files\ by\ Google\ →\ ZArchiver
         Chrome\ →\ Chromium
         Chrome\ →\ Firefox
         Google\ Authenticator\ →\ Ente\ Auth
@@ -693,6 +694,7 @@ while true; do
             activityApp="com.dot.gallery/.feature_node.presentation.main.MainActivity"
             dlApp "${appName}" "$owner" "$repo" "$release" "$assets" "$file_pattern" "$tag" "$assets" "$pkgApp" "$activityApp"
             ;;
+          Files\ by\ Google\ →\ ZArchiver) termux-open-url "https://play.google.com/store/apps/details?id=ru.zdevs.zarchiver" ;;
           Chrome\ →\ Chromium) termux-open-url "https://github.com/arghya339/crdl" ;;
           Chrome\ →\ Firefox) termux-open-url "https://play.google.com/store/apps/details?id=org.mozilla.firefox" ;;
           Google\ Authenticator\ →\ Ente\ Auth) termux-open-url "https://play.google.com/store/apps/details?id=io.ente.auth" ;;
