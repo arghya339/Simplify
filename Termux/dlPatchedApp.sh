@@ -677,7 +677,19 @@ while true; do
             ;;
           Google\ Meet\ →\ Jitsi\ Meet) termux-open-url "https://play.google.com/store/apps/details?id=org.jitsi.meet" ;;
           Google\ Home\ →\ Home\ Assistant) termux-open-url "https://play.google.com/store/apps/details?id=io.homeassistant.companion.android" ;;
-          Google\ Gallery\ →\ Gallery) termux-open-url "https://github.com/IacobIonut01/Gallery/releases" ;;  # Implement later
+          Google\ Gallery\ →\ Gallery)
+            appName="Gallery"
+            owner="IacobIonut01"
+            repo="$appName"
+            file_pattern="Gallery-*-*-arm64-v8a.apk"
+            ghApiResponseJson=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases/latest")
+            tag=$(jq -r '.tag_name' <<< "$ghApiResponseJson")
+            regex="$repo-$tag-.*-$cpuAbi.apk"
+            assets=$(jq -r --arg regex "$regex" '.assets[] | select(.name | test($regex)) | .name' <<< "$ghApiResponseJson" | head -1)
+            pkgApp="com.dot.gallery"
+            activityApp="com.dot.gallery/.feature_node.presentation.main.MainActivity"
+            dlApp "${appName}" "$owner" "$repo" "$release" "$assets" "$file_pattern" "$tag" "$assets" "$pkgApp" "$activityApp"
+            ;;
           Chrome\ →\ Chromium) termux-open-url "https://github.com/arghya339/crdl" ;;
           Chrome\ →\ Firefox) termux-open-url "https://play.google.com/store/apps/details?id=org.mozilla.firefox" ;;
           Google\ Authenticator\ →\ Ente\ Auth) termux-open-url "https://play.google.com/store/apps/details?id=io.ente.auth" ;;
