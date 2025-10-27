@@ -637,7 +637,17 @@ while true; do
             activityApp="com.aurora.store/.MainActivity"
             dlApp "${appName}" "$owner" "$repo" "$release" "$regex" "$file_pattern" "$tag" "$assets" "$pkgApp" "$activityApp"
             ;;
-          Play\ Store\ →\ Droid-ify) termux-open-url "https://github.com/Droid-ify/client/releases" ;;  # Implement later
+          Play\ Store\ →\ Droid-ify)
+            appName="Droid-ify"
+            owner="$appName"
+            repo="client"
+            file_pattern="$owner-*.apk"
+            tag=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases/latest" | jq -r '.tag_name')
+            assets="app-release.apk"
+            pkgApp="com.looker.droidify"
+            activityApp="com.looker.droidify/.MainActivity"
+            dlApp "${appName}" "$owner" "$repo" "$release" "" "$file_pattern" "$tag" "$assets" "$pkgApp" "$activityApp"
+            ;;
           Play\ Store\ →\ Obtainium) termux-open-url "https://github.com/ImranR98/Obtainium/releases" ;;  # Implement later
           Google\ →\ DuckDuckGo) termux-open-url "https://play.google.com/store/apps/details?id=com.duckduckgo.mobile.android" ;;
           Gemini\ →\ RikkaHub) termux-open-url "https://play.google.com/store/apps/details?id=me.rerere.rikkahub" ;;
