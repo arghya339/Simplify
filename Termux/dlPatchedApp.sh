@@ -71,7 +71,7 @@ appInstall() {
           fi
           data "$appName" "$updated_at" "$tag"
         fi
-        if su -c "id" >/dev/null 2>&1 || "$HOME/rish" -c "id" >/dev/null 2>&1; then
+        if [ $su -eq 1 ] || "$HOME/rish" -c "id" >/dev/null 2>&1; then
           rm -f "$apk_path"
         fi
         ;;
@@ -152,7 +152,7 @@ dlGitLab() {
   fi
   
   [ "$repo" == "AuroraStore" ] && dl "curl" "$assets_url" "$dir/$assets_name"
-} #; dlGitLab "AuroraOSS" "AuroraStore" ".apk" "$SimplUsr" "AuroraStore-[\d\.]+"
+}
 
 # --- function to download app ---
 dlApp() {
@@ -167,6 +167,8 @@ dlApp() {
   if [ "$repo" == "spotube" ]; then
     local url="https://github.com/$owner/$repo/releases/download/v$tag/Spotube-android-all-arch.apk"
     assets="$file_pattern"
+  elif [ "$repo" == "AuroraStore" ]; then
+    url="$assets_url"
   else
     local url="https://github.com/$owner/$repo/releases/download/v$tag/$assets"
   fi
@@ -193,6 +195,10 @@ dlApp() {
       termux-wake-lock
       build_apks "$aab_path"  # build apk from aab by calling build_apks function
       termux-wake-unlock
+    elif [ "$repo" == "AuroraStore" ]; then
+      echo -e "$running Downloading $appName from GitLab.."
+      dlGitLab "$owner" "$repo" ".apk" "$SimplUsr" "$regex"
+      apk_path=$(find "$SimplUsr" -type f -name "$file_pattern" -print -quit)
     else
       echo -e "$running Downloading $appName from GitHub.."
       bash $Simplify/dlGitHub.sh "$owner" "$repo" "$release" ".apk" "$SimplUsr" "$regex"
@@ -617,7 +623,20 @@ while true; do
       while true; do
         buttons=("<Select>" "<Back>"); if menu "apps_list" "buttons" "22"; then selected="${apps_list[$selected]}"; else break; fi
         case "$selected" in
-          Play\ Store\ →\ AuroraStore) termux-open-url "https://gitlab.com/AuroraOSS/AuroraStore/-/releases" ;;  # Implement later
+          Play\ Store\ →\ AuroraStore)
+            appName="AuroraStore"
+            owner="AuroraOSS"
+            repo="AuroraStore"
+            regex="AuroraStore-[\d\.]+"
+            file_pattern="AuroraStore-*.apk"
+            glApiResponseJson=$(curl -sL "https://gitlab.com/api/v4/projects/${owner}%2F${repo}/releases")
+            assets_url=$(jq -r --arg regex "$regex" '.[]?.assets.links[]?.url | select(test($regex))' <<< "$glApiResponseJson" | head -1)
+            tag=$(jq -r '.[0].tag_name' <<< "$glApiResponseJson")
+            assets="AuroraStore-$tag.apk"
+            pkgApp="com.aurora.store"
+            activityApp="com.aurora.store/.MainActivity"
+            dlApp "${appName}" "$owner" "$repo" "$release" "$regex" "$file_pattern" "$tag" "$assets" "$pkgApp" "$activityApp"
+            ;;
           Play\ Store\ →\ Droid-ify) termux-open-url "https://github.com/Droid-ify/client/releases" ;;  # Implement later
           Play\ Store\ →\ Obtainium) termux-open-url "https://github.com/ImranR98/Obtainium/releases" ;;  # Implement later
           Google\ →\ DuckDuckGo) termux-open-url "https://play.google.com/store/apps/details?id=com.duckduckgo.mobile.android" ;;
