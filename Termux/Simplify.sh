@@ -1468,10 +1468,10 @@ while true; do
                   buttons=("<Select>" "<Back>"); if menu "options" "buttons" "4"; then selected="${options[$selected]}"; fi
                   if [ -n "$selected" ]; then
                     case "$selected" in
-                      Play\ Store) config "Installer" "com.android.vending" && echo -e "${Green}Successfully set Installer as 'com.android.vending' (PlayStore)${Reset}" ;;
-                      Package\ Installer) config "Installer" "com.android.packageinstaller" && echo -e "${Green}Successfully set Installer as 'com.android.packageinstaller' (PackageInstaller)${Reset}" ;;
-                      Shell) config "Installer" "com.android.shell" && echo -e "${Green}Successfully set Installer as 'com.android.shell' (Shell)${Reset}" ;;
-                      ADB) config "Installer" "adb" && echo -e "${Green}Successfully set Installer as 'adb'${Reset}" ;;
+                      Play\ Store) config "Installer" "com.android.vending" && echo -e "$good ${Green}Successfully set Installer as 'com.android.vending' (PlayStore)${Reset}" ;;
+                      Package\ Installer) config "Installer" "com.android.packageinstaller" && echo -e "$good ${Green}Successfully set Installer as 'com.android.packageinstaller' (PackageInstaller)${Reset}" ;;
+                      Shell) config "Installer" "com.android.shell" && echo -e "$good ${Green}Successfully set Installer as 'com.android.shell' (Shell)${Reset}" ;;
+                      ADB) config "Installer" "adb" && echo -e "$good ${Green}Successfully set Installer as 'adb'${Reset}" ;;
                     esac
                     sleep 2
                   fi
