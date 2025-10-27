@@ -681,7 +681,7 @@ while true; do
             appName="Gallery"
             owner="IacobIonut01"
             repo="$appName"
-            file_pattern="Gallery-*-*-arm64-v8a.apk"
+            file_pattern="Gallery-*-*-$cpuAbi.apk"
             ghApiResponseJson=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases/latest")
             tag=$(jq -r '.tag_name' <<< "$ghApiResponseJson")
             regex="$repo-$tag-.*-$cpuAbi.apk"
