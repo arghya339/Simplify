@@ -94,11 +94,11 @@ dlGitHub() {
     fi
     
     # Extract assets from GH API response json & built assets name pattern for find downloaded assets
-    if [ "$repo" == "VancedMicroG" ] || [ "$repo" == "LSPatch" ] || [ "$repo" == "YTPro" ] || [ "$repo" == "cloudstream" ] || [ "$repo" == "revenge-xposed" ] || [ "$repo" == "io.github.vvb2060.callrecording" ] || [ "$owner" == "Droid-ify" ] || [ "$repo" == "Obtainium" ]; then
+    if [ "$repo" == "VancedMicroG" ] || [ "$repo" == "LSPatch" ] || [ "$repo" == "YTPro" ] || [ "$repo" == "cloudstream" ] || [ "$repo" == "revenge-xposed" ] || [ "$repo" == "io.github.vvb2060.callrecording" ] || [ "$owner" == "Droid-ify" ] || [ "$repo" == "Obtainium" ] || [ "$repo" == "Metrolist" ]; then
       assetsName=$(jq -r --arg regex "$regex" '.assets[] | select(.name | test($regex)) | .name' <<< "$ghApiResponseJson" | head -1)
       if [ "$repo" == "cloudstream" ] || [ "$repo" == "revenge-xposed" ] || [ "$repo" == "io.github.vvb2060.callrecording" ]; then
         fileName="$repo-${latestReleases}$ext"
-      elif [ "$repo" == "Obtainium" ]; then
+      elif [ "$repo" == "Obtainium" ] || [ "$repo" == "Metrolist" ]; then
         fileName="$repo-${latestReleases}-${cpuAbi}$ext"
       elif [ "$owner" == "Droid-ify" ]; then
         fileName="$owner-${latestReleases}$ext"
@@ -133,7 +133,7 @@ dlGitHub() {
     fi
     
     # Download assets from GitHub
-    if [ "$repo" == "VancedMicroG" ] || [ "$repo" == "LSPatch" ] || [ "$repo" == "YTPro" ] || [ "$repo" == "cloudstream" ] || [ "$repo" == "revenge-xposed" ] || [ "$repo" == "io.github.vvb2060.callrecording" ] || [ "$owner" == "Droid-ify" ] || [ "$repo" == "Obtainium" ]; then
+    if [ "$repo" == "VancedMicroG" ] || [ "$repo" == "LSPatch" ] || [ "$repo" == "YTPro" ] || [ "$repo" == "cloudstream" ] || [ "$repo" == "revenge-xposed" ] || [ "$repo" == "io.github.vvb2060.callrecording" ] || [ "$owner" == "Droid-ify" ] || [ "$repo" == "Obtainium" ] || [ "$repo" == "Metrolist" ]; then
       if [ "$fileName" != "$fileBaseName" ]; then
         [ -n "$fileBaseName" ] && echo -e "$notice diffs: $fileName ~ $fileBaseName"
         [ -f "$findFile" ] && rm -f "$findFile"

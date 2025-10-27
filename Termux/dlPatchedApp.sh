@@ -739,7 +739,18 @@ while true; do
           Google\ Wallpapers\ →\ Starth\ Bing\ Wallpaper) termux-open-url "https://play.google.com/store/apps/details?id=me.liaoheng.wallpaper" ;;
           Gmail\ →\ Proton\ Mail) termux-open-url "https://play.google.com/store/apps/details?id=ch.protonmail.android" ;;
           Gmail\ →\ Thunderbird) termux-open-url "https://play.google.com/store/apps/details?id=net.thunderbird.android" ;;
-          YouTube\ Music\ →\ Metrolist) termux-open-url "https://github.com/mostafaalagamy/Metrolist/releases" ;;  # Implement later
+          YouTube\ Music\ →\ Metrolist)
+            appName="Metrolist"
+            owner="mostafaalagamy"
+            repo="$appName"
+            file_pattern="$repo-*-$cpuAbi.apk"
+            tag=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases/latest" | jq -r '.tag_name | sub("^v"; "")' 2>/dev/null)
+            if [ "$cpuAbi" == "arm64-v8a" ]; then arch="arm64"; elif [ "$cpuAbi" == "armeabi_v7a" ]; then arch="armeabi"; else arch="$cpuAbi";fi
+            assets="app-$arch-release.apk"
+            pkgApp="com.metrolist.music"
+            activityApp="com.metrolist.music/.MainActivity"
+            dlApp "${appName}" "$owner" "$repo" "$release" "$assets" "$file_pattern" "v$tag" "$assets" "$pkgApp" "$activityApp"
+            ;;
           YouTube\ Music\ →\ PixelPlay) termux-open-url "https://github.com/theovilardo/PixelPlay/releases" ;;  # Implement later
           Pixel\ Screenshots\ →\ Shots\ Studio) termux-open-url "https://github.com/AnsahMohammad/shots-studio/releases" ;;  # Implement later
           Google\ Weather\ →\ Breezy\ Weather)
