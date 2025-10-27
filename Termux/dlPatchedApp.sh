@@ -711,7 +711,7 @@ while true; do
             appName="Xiaomi Compass"; repo="$appName"; updated_at=
             file_pattern="${appName}_v$tag-noarch.apk"
             apk_path=$(find "$Download" -type f -name "$file_pattern" -print -quit)
-            apkInstall
+            appInstall
             ;;
           Google\ TV\ →\ CloudStream)
             appName="CloudStream"
