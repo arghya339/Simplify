@@ -761,7 +761,17 @@ while true; do
             activityApp="com.theveloper.pixelplay/.MainActivity"
             dlApp "${appName}" "$owner" "$appName" "$release" "" "$file_pattern" "$tag" "$assets" "$pkgApp" "$activityApp"
             ;;
-          Pixel\ Screenshots\ →\ Shots\ Studio) termux-open-url "https://github.com/AnsahMohammad/shots-studio/releases" ;;  # Implement later
+          Pixel\ Screenshots\ →\ Shots\ Studio)
+            appName="Shots Studio"
+            owner="AnsahMohammad"
+            repo="shots-studio"
+            file_pattern="shots_studio-github-release-*.apk"
+            tag=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases/latest" | jq -r '.tag_name | sub("^v"; "")' 2>/dev/null)
+            assets="shots_studio-github-release-$tag.apk"
+            pkgApp="com.ansah.shots_studio"
+            activityApp="com.ansah.shots_studio/.MainActivity"
+            dlApp "${appName}" "$owner" "$repo" "$release" "" "$file_pattern" "v$tag" "$assets" "$pkgApp" "$activityApp"
+            ;;
           Google\ Weather\ →\ Breezy\ Weather)
             appName="Breezy Weather"
             owner="breezy-weather"
