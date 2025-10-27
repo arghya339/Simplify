@@ -620,6 +620,7 @@ while true; do
         VPN\ by\ Google\ One\ →\ WireGuard\ +\ WireGuard\ config\ by\ Proton\ VPN
         VPN\ by\ Google\ One\ →\ Tor\ VPN
         ADB\ →\ Shizuku
+        Uninstall\ Bloatware\ →\ Package\ Manager
       )
       while true; do
         buttons=("<Select>" "<Back>"); if menu "apps_list" "buttons" "22"; then selected="${apps_list[$selected]}"; else break; fi
@@ -808,6 +809,7 @@ while true; do
             activityApp="moe.shizuku.privileged.api/moe.shizuku.manager.MainActivity"
             dlApp "${appName}" "$owner" "$appName" "$release" "" "$file_pattern" "$tag" "$assets" "$pkgApp" "$activityApp"
             ;;
+          Uninstall\ Bloatware\ →\ Package\ Manager) termux-open-url "https://play.google.com/store/apps/details?id=com.smartpack.packagemanager" ;;
         esac
       done
       ;;
