@@ -52,7 +52,7 @@ dlGitHub() {
     local output=$3
     
     assets_name=$(basename "$output")
-    echo -e "$running Downloading $assets_name.."
+    echo -e "$running Downloading $assets_name from ${Blue}$dlUrl${Reset}.."
     
     while true; do
       if [ "$dlUtility" == "curl" ]; then
