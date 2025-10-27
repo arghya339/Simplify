@@ -112,7 +112,7 @@ dlGitHub() {
       assetsName="$assets"
       echo -e "$info assetsName: $assetsName"
     else
-      assetsName=$(jq -r --arg regex "$regex" '.assets[] | select(.name | test($regex)) | .name' <<< "$ghApiResponseJson")
+      assetsName=$(jq -r --arg regex "$regex" '.assets[] | select(.name | test($regex)) | .name' <<< "$ghApiResponseJson" | head -1)
       echo -e "$info assetsName: $assetsName"
       if [ "$repo" == "Nagram" ]; then
         name=$(jq -r '.name' <<< "$ghApiResponseJson")
