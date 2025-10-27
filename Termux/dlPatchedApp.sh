@@ -633,6 +633,7 @@ while true; do
         VPN\ by\ Google\ One\ →\ WireGuard\ +\ WireGuard\ config\ by\ Proton\ VPN
         VPN\ by\ Google\ One\ →\ Tor\ VPN
         ADB\ →\ Shizuku
+        Private\ DNS\ Settings\ →\ Private\ DNS\ Quick\ Toggle
         Uninstall\ Bloatware\ →\ Package\ Manager
       )
       while true; do
@@ -833,6 +834,16 @@ while true; do
             assets=$(jq -r --arg regex "$regex" '.assets[] | select(.name | test($regex)) | .name' <<< "$ghApiResponseJson" | head -1)
             pkgApp="moe.shizuku.privileged.api"
             activityApp="moe.shizuku.privileged.api/moe.shizuku.manager.MainActivity"
+            dlApp "${appName}" "$owner" "$appName" "$release" "" "$file_pattern" "$tag" "$assets" "$pkgApp" "$activityApp"
+            ;;
+          Private\ DNS\ Settings\ →\ Private\ DNS\ Quick\ Toggle)
+            appName="PrivateDNSAndroid"
+            owner="karasevm"
+            file_pattern="$appName-*.apk"
+            tag=$(curl -s ${auth} "https://api.github.com/repos/$owner/$appName/releases/latest" | jq -r '.tag_name')
+            assets="app-release.apk"
+            pkgApp="ru.karasevm.privatednstoggle"
+            activityApp="ru.karasevm.privatednstoggle/.ui.MainActivity"
             dlApp "${appName}" "$owner" "$appName" "$release" "" "$file_pattern" "$tag" "$assets" "$pkgApp" "$activityApp"
             ;;
           Uninstall\ Bloatware\ →\ Package\ Manager) termux-open-url "https://play.google.com/store/apps/details?id=com.smartpack.packagemanager" ;;
