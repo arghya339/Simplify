@@ -634,7 +634,7 @@ while true; do
         VPN\ by\ Google\ One\ →\ Tor\ VPN
         AOSP\ Missing\ RT\ Network\ Speed\ Indicator\ →\ Data\ Monitor
         ADB\ →\ Shizuku
-        Pixel\ Phone\ Services\ RadioInfo\ Settings\ →\ NetworkSwitch\ QuickSettingsTile
+        Pixel\ PhoneServices\ RadioInfoSettings\ →\ NetworkSwitch\ QuickSettingsTile
         Private\ DNS\ Settings\ →\ Private\ DNS\ Quick\ Toggle
         Uninstall\ Bloatware\ →\ Package\ Manager
       )
@@ -839,7 +839,7 @@ while true; do
             activityApp="moe.shizuku.privileged.api/moe.shizuku.manager.MainActivity"
             dlApp "${appName}" "$owner" "$appName" "$release" "" "$file_pattern" "$tag" "$assets" "$pkgApp" "$activityApp"
             ;;
-          Pixel\ Phone\ Services\ RadioInfo\ Settings\ →\ NetworkSwitch\ QuickSettingsTile)
+          Pixel\ PhoneServices\ RadioInfoSettings\ →\ NetworkSwitch\ QuickSettingsTile)
             appName="NetworkSwitch"
             owner="aunchagaonkar"
             file_pattern="NetworkSwitch-v*.apk"
