@@ -648,7 +648,17 @@ while true; do
             activityApp="com.looker.droidify/.MainActivity"
             dlApp "${appName}" "$owner" "$repo" "$release" "" "$file_pattern" "$tag" "$assets" "$pkgApp" "$activityApp"
             ;;
-          Play\ Store\ →\ Obtainium) termux-open-url "https://github.com/ImranR98/Obtainium/releases" ;;  # Implement later
+          Play\ Store\ →\ Obtainium)
+            appName="Obtainium"
+            owner="ImranR98"
+            repo="$appName"
+            regex="app-$cpuAbi-release.apk"
+            file_pattern="$repo-*-$cpuAbi.apk"
+            tag=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases/latest" | jq -r '.tag_name')
+            pkgApp="dev.imranr.obtainium"
+            activityApp="dev.imranr.obtainium/.MainActivity"
+            dlApp "${appName}" "$owner" "$repo" "$release" "$regex" "$file_pattern" "$tag" "$regex" "$pkgApp" "$activityApp"
+            ;;
           Google\ →\ DuckDuckGo) termux-open-url "https://play.google.com/store/apps/details?id=com.duckduckgo.mobile.android" ;;
           Gemini\ →\ RikkaHub) termux-open-url "https://play.google.com/store/apps/details?id=me.rerere.rikkahub" ;;
           Google\ Photos\ →\ Ente\ Photos) termux-open-url "https://play.google.com/store/apps/details?id=io.ente.photos" ;;
