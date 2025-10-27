@@ -634,6 +634,7 @@ while true; do
         VPN\ by\ Google\ One\ →\ Tor\ VPN
         Quick\ Share\ →\ LocalSend
         AOSP\ Missing\ RT\ Network\ Speed\ Indicator\ →\ Data\ Monitor
+        Google\ Public\ DNS\ →\ NextDNS\ Manager
         ADB\ →\ Shizuku
         Pixel\ PhoneServices\ RadioInfoSettings\ →\ NetworkSwitch\ QuickSettingsTile
         Private\ DNS\ Settings\ →\ Private\ DNS\ Quick\ Toggle
@@ -829,6 +830,7 @@ while true; do
           VPN\ by\ Google\ One\ →\ Tor\ VPN) termux-open-url "https://play.google.com/store/apps/details?id=org.torproject.vpn" ;;
           Quick\ Share\ →\ LocalSend) termux-open-url "https://play.google.com/store/apps/details?id=org.localsend.localsend_app" ;;
           AOSP\ Missing\ RT\ Network\ Speed\ Indicator\ →\ Data\ Monitor) termux-open-url "https://play.google.com/store/apps/details?id=com.drnoob.datamonitor" ;;
+          Google\ Public\ DNS\ →\ NextDNS\ Manager) termux-open-url "https://play.google.com/store/apps/details?id=com.doubleangels.nextdnsmanagement" ;;
           ADB\ →\ Shizuku)
             appName="Shizuku"
             owner="RikkaApps"
