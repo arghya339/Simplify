@@ -751,7 +751,16 @@ while true; do
             activityApp="com.metrolist.music/.MainActivity"
             dlApp "${appName}" "$owner" "$repo" "$release" "$assets" "$file_pattern" "v$tag" "$assets" "$pkgApp" "$activityApp"
             ;;
-          YouTube\ Music\ →\ PixelPlay) termux-open-url "https://github.com/theovilardo/PixelPlay/releases" ;;  # Implement later
+          YouTube\ Music\ →\ PixelPlay)
+            appName="PixelPlay"
+            owner="theovilardo"
+            file_pattern="PixelPlay-*-universal.apk"
+            tag=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases/latest" | jq -r '.tag_name')
+            assets="PixelPlay-$tag-universal.apk"
+            pkgApp="com.theveloper.pixelplay"
+            activityApp="com.theveloper.pixelplay/.MainActivity"
+            dlApp "${appName}" "$owner" "$appName" "$release" "$assets" "$file_pattern" "$tag" "$assets" "$pkgApp" "$activityApp"
+            ;;
           Pixel\ Screenshots\ →\ Shots\ Studio) termux-open-url "https://github.com/AnsahMohammad/shots-studio/releases" ;;  # Implement later
           Google\ Weather\ →\ Breezy\ Weather)
             appName="Breezy Weather"
