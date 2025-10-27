@@ -759,7 +759,7 @@ while true; do
             assets="PixelPlay-$tag-universal.apk"
             pkgApp="com.theveloper.pixelplay"
             activityApp="com.theveloper.pixelplay/.MainActivity"
-            dlApp "${appName}" "$owner" "$appName" "$release" "$assets" "$file_pattern" "$tag" "$assets" "$pkgApp" "$activityApp"
+            dlApp "${appName}" "$owner" "$appName" "$release" "" "$file_pattern" "$tag" "$assets" "$pkgApp" "$activityApp"
             ;;
           Pixel\ Screenshots\ →\ Shots\ Studio) termux-open-url "https://github.com/AnsahMohammad/shots-studio/releases" ;;  # Implement later
           Google\ Weather\ →\ Breezy\ Weather)
