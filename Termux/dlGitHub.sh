@@ -120,6 +120,8 @@ dlGitHub() {
       elif [ "$repo" == "Gallery" ]; then
         name=$(jq -r '.name' <<< "$ghApiResponseJson" | sed 's/ Release$//')
         assetsNamePattern=$(echo "$assetsName" | sed "s/$name/*/g")
+      elif [ "$repo" == "Shizuku" ]; then
+        assetsNamePattern=$(echo "$assetsName" | sed "s/$latestReleases/*/g" | sed -E 's/\.r[^.]+/.r*/; s/\.[^-]+-/.*-/')
       else
         assetsNamePattern=$(echo "$assetsName" | sed "s/$latestReleases/*/g")
       fi

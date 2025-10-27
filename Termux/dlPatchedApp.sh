@@ -619,6 +619,7 @@ while true; do
         VPN\ by\ Google\ One\ →\ 1.1.1.1\ +\ WARP
         VPN\ by\ Google\ One\ →\ WireGuard\ +\ WireGuard\ config\ by\ Proton\ VPN
         VPN\ by\ Google\ One\ →\ Tor\ VPN
+        ADB\ →\ Shizuku
       )
       while true; do
         buttons=("<Select>" "<Back>"); if menu "apps_list" "buttons" "22"; then selected="${apps_list[$selected]}"; else break; fi
@@ -795,6 +796,18 @@ while true; do
           VPN\ by\ Google\ One\ →\ 1.1.1.1\ +\ WARP) termux-open-url "https://play.google.com/store/apps/details?id=com.cloudflare.onedotonedotonedotone" ;;
           VPN\ by\ Google\ One\ →\ WireGuard\ +\ WireGuard\ config\ by\ Proton\ VPN) termux-open-url "https://play.google.com/store/apps/details?id=com.wireguard.android" && sleep 0.5 && termux-open-url "https://account.protonvpn.com/downloads" ;;
           VPN\ by\ Google\ One\ →\ Tor\ VPN) termux-open-url "https://play.google.com/store/apps/details?id=org.torproject.vpn" ;;
+          ADB\ →\ Shizuku)
+            appName="Shizuku"
+            owner="RikkaApps"
+            file_pattern="shizuku-v*.r*.*-release.apk"
+            ghApiResponseJson=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases/latest")
+            tag=$(jq -r '.tag_name' <<< "$ghApiResponseJson")
+            regex="shizuku-$tag.r.*..*-release.apk"
+            assets=$(jq -r --arg regex "$regex" '.assets[] | select(.name | test($regex)) | .name' <<< "$ghApiResponseJson" | head -1)
+            pkgApp="moe.shizuku.privileged.api"
+            activityApp="moe.shizuku.privileged.api/moe.shizuku.manager.MainActivity"
+            dlApp "${appName}" "$owner" "$appName" "$release" "" "$file_pattern" "$tag" "$assets" "$pkgApp" "$activityApp"
+            ;;
         esac
       done
       ;;
