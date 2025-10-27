@@ -756,7 +756,7 @@ while true; do
             appName="PixelPlay"
             owner="theovilardo"
             file_pattern="PixelPlay-*-universal.apk"
-            tag=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases/latest" | jq -r '.tag_name')
+            tag=$(curl -s ${auth} "https://api.github.com/repos/$owner/$appName/releases/latest" | jq -r '.tag_name')
             assets="PixelPlay-$tag-universal.apk"
             pkgApp="com.theveloper.pixelplay"
             activityApp="com.theveloper.pixelplay/.MainActivity"
@@ -800,7 +800,7 @@ while true; do
             appName="Shizuku"
             owner="RikkaApps"
             file_pattern="shizuku-v*.r*.*-release.apk"
-            ghApiResponseJson=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases/latest")
+            ghApiResponseJson=$(curl -s ${auth} "https://api.github.com/repos/$owner/$appName/releases/latest")
             tag=$(jq -r '.tag_name' <<< "$ghApiResponseJson")
             regex="shizuku-$tag.r.*..*-release.apk"
             assets=$(jq -r --arg regex "$regex" '.assets[] | select(.name | test($regex)) | .name' <<< "$ghApiResponseJson" | head -1)
