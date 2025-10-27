@@ -632,6 +632,7 @@ while true; do
         VPN\ by\ Google\ One\ →\ 1.1.1.1\ +\ WARP
         VPN\ by\ Google\ One\ →\ WireGuard\ +\ WireGuard\ config\ by\ Proton\ VPN
         VPN\ by\ Google\ One\ →\ Tor\ VPN
+        Quick\ Share\ →\ LocalSend
         AOSP\ Missing\ RT\ Network\ Speed\ Indicator\ →\ Data\ Monitor
         ADB\ →\ Shizuku
         Pixel\ PhoneServices\ RadioInfoSettings\ →\ NetworkSwitch\ QuickSettingsTile
@@ -826,6 +827,7 @@ while true; do
           VPN\ by\ Google\ One\ →\ 1.1.1.1\ +\ WARP) termux-open-url "https://play.google.com/store/apps/details?id=com.cloudflare.onedotonedotonedotone" ;;
           VPN\ by\ Google\ One\ →\ WireGuard\ +\ WireGuard\ config\ by\ Proton\ VPN) termux-open-url "https://play.google.com/store/apps/details?id=com.wireguard.android" && sleep 0.5 && termux-open-url "https://account.protonvpn.com/downloads" ;;
           VPN\ by\ Google\ One\ →\ Tor\ VPN) termux-open-url "https://play.google.com/store/apps/details?id=org.torproject.vpn" ;;
+          Quick\ Share\ →\ LocalSend) termux-open-url "https://play.google.com/store/apps/details?id=org.localsend.localsend_app" ;;
           AOSP\ Missing\ RT\ Network\ Speed\ Indicator\ →\ Data\ Monitor) termux-open-url "https://play.google.com/store/apps/details?id=com.drnoob.datamonitor" ;;
           ADB\ →\ Shizuku)
             appName="Shizuku"
