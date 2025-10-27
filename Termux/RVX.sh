@@ -500,46 +500,7 @@ while true; do
       curl -sL ${auth} "https://api.github.com/repos/$owner/revanced-patches/releases/tags/$tag" | jq -r .body | glow  # Display release notes
       echo; read -p "Press Enter to continue..."
       ;;
-    Spoof\ Device\ Arch)
-      if jq -e '.DeviceArch != null' "$simplifyJson" >/dev/null 2>&1; then
-        cpuAbi=$(jq -r '.DeviceArch' "$simplifyJson" 2>/dev/null)  # Get Device Architecture from json
-        echo -e "$info Device architecture spoofed to $cpuAbi!"
-      else
-        echo -e "$info Device architecture not spoofed yet!"
-      fi
-      options=(Disabled\ Arch\ spoofing arm64-v8a armeabi-v7a x86_64 x86); buttons=("<Select>" "<Back>"); if menu "options" "buttons" "5"; then arch="${options[$selected]}"; fi
-      if [ -n "$arch" ]; then
-        case "$arch" in
-          Disabled\ Arch\ spoofing)
-            echo -e "$running Disabling device architecture spoofing.."
-            jq -e 'del(.DeviceArch)' "$simplifyJson" > temp.json && mv temp.json "$simplifyJson"  # Delete DeviceArch key from simplify.json
-            echo -e "$good ${Green}Device architecture spoofing disabled successfully!${Reset}"
-            ;;
-          arm64-v8a)
-            echo -e "$running Spoofing device architecture to arm64-v8a.."
-            jq ".DeviceArch = \"arm64-v8a\"" "$simplifyJson" > temp.json && mv temp.json "$simplifyJson"
-            echo -e "$good ${Green}Device architecture spoofed to arm64-v8a successfully!${Reset}"
-            ;;
-          armeabi-v7a)
-            echo -e "$running Spoofing device architecture to armeabi-v7a.."
-            jq ".DeviceArch = \"armeabi-v7a\"" "$simplifyJson" > temp.json && mv temp.json "$simplifyJson"
-            echo -e "$good ${Green}Device architecture spoofed to armeabi-v7a successfully!${Reset}"
-            ;;
-          x86_64)
-            echo -e "$running Spoofing device architecture to x86_64.."
-            jq ".DeviceArch = \"x86_64\"" "$simplifyJson" > temp.json && mv temp.json "$simplifyJson"
-            echo -e "$good ${Green}Device architecture spoofed to x86_64 successfully!${Reset}"
-            ;;
-          x86)
-            echo -e "$running Spoofing device architecture to x86.."
-            jq ".DeviceArch = \"x86\"" "$simplifyJson" > temp.json && mv temp.json "$simplifyJson"
-            echo -e "$good ${Green}Device architecture spoofed to x86 successfully!${Reset}"
-            ;;
-        esac
-        # update cpuAbi value
-        jq -e '.DeviceArch != null' "$simplifyJson" >/dev/null 2>&1 && cpuAbi=$(jq -r '.DeviceArch' "$simplifyJson" 2>/dev/null)  # Get Device Architecture from json
-      fi
-      ;;
+    Spoof\ Device\ Arch) overwriteArch ;;
     List\ of\ Patches)
       apps_list=("${apps[@]}")
       unset apps_list[0] apps_list[1] apps_list[2]; apps_list=("${apps_list[@]}")  # Remove element at index 0,1,2 and reindex

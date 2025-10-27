@@ -804,113 +804,22 @@ overwriteVersion() {
     echo -e "${Yellow}Enter the Android version you want to spoof or '0' to disabled spoof: ${Reset}\c" && read spoofVersion
     if [[ $spoofVersion =~ ^[0-9]+$ ]]; then  # Check if the input is a valid version format
       if [ $spoofVersion -eq 0 ]; then
-        echo -e "$running Disabling Android version spoofing.."
         jq -e 'del(.AndroidVersion)' "$simplifyJson" > temp.json && mv temp.json "$simplifyJson"  # Delete AndroidVersion key from simplify.json
         echo -e "$good ${Green}Android version spoofing disabled successfully!${Reset}"
+        Android=$(getprop ro.build.version.release | cut -d. -f1)
         break
       elif [ $spoofVersion -lt 4 ]; then
         echo -e "$notice Android version $spoofVersion is not supported by ReVanced patches! Please enter a valid version that is <= 4."
       elif [ $spoofVersion -ge 4 ]; then
-        echo -e "$running Spoofing Android version to $spoofVersion.."
         config "AndroidVersion" "$spoofVersion"
-        echo -e "$good ${Green}Android version spoofed successfully!${Reset}"
+        echo -e "$good ${Green}Android version spoofed to $spoofVersion successfully!${Reset}"
+        Android=$(jq -r '.AndroidVersion' "$simplifyJson" 2>/dev/null)
         break
       fi
     else
       echo -e "$info Invalid Android version format! Please enter a valid version."
     fi
   done
-}
-
-DeletePatchedApk() {
-  local nameArr=("YouTube" "YT-Music" "Spotify" "TikTok" "Google Photos" "Instagram" "Facebook" "Facebook Messenger" "Reddit" "X" "Adobe Lightroom Mobile" "Photomath" "Duolingo" "RAR" "Amazon Prime Video" "Twitch" "Tumblr" "Threads" "Strava" "SoundCloud" "Proton Mail" "Calorie Counter MyFitnessPal" "NovaLauncher" "Tasker" "Crunchyroll" "Cricbuzz Cricket Scores and News")
-  for app in "${nameArr[@]}"; do
-    find "$SimplUsr" -type f -name "${app}-RV*_v[0-9.]*-${cpuAbi}.apk" \
-      -exec echo "Deleting: {}" \; \
-      -exec rm -f {} \; 2>/dev/null
-  done
-  echo "Cleanup complete!"
-}
-
-DeletePatchLog() {
-  local nameArr=("YouTube" "YT-Music" "Spotify" "TikTok" "Google Photos" "Instagram" "Facebook" "Facebook Messenger" "Reddit" "X" "Adobe Lightroom Mobile" "Photomath" "Duolingo" "RAR" "Amazon Prime Video" "Twitch" "Tumblr" "Threads" "Strava" "SoundCloud" "Proton Mail" "Calorie Counter MyFitnessPal" "NovaLauncher" "Tasker" "Crunchyroll" "Cricbuzz Cricket Scores and News")
-  for app in "${nameArr[@]}"; do
-    find "$SimplUsr" -type f -name "${app}-RV*_patch-log.txt" \
-      -exec echo "Deleting: {}" \; \
-      -exec rm -f {} \; 2>/dev/null
-  done
-  echo "Cleanup complete!"
-}
-
-DeleteListPatches() {
-  local pkgArr=(
-    "app.revanced"
-    "com.google.android.youtube"
-    "com.google.android.apps.youtube.music"
-    "com.spotify.music"
-    "com.zhiliaoapp.musically"
-    "com.google.android.apps.photos"
-    "com.google.android.apps.recorder"
-    "com.instagram.android"
-    "com.facebook.katana"
-    "com.facebook.orca"
-    "com.reddit.frontpage"
-    "com.twitter.android"
-    "com.adobe.lrmobile"
-    "com.microblink.photomath"
-    "com.duolingo"
-    "com.rarlab.rar"
-    "com.amazon.avod.thirdpartyclient"
-    "tv.twitch.android.app"
-    "com.tumblr"
-    "com.instagram.barcelona"
-    "com.strava"
-    "com.soundcloud.android"
-    "ch.protonmail.android"
-    "com.myfitnesspal.android"
-    "com.crunchyroll.crunchyroid"
-    "com.cricbuzz.android"
-  )
-  for pkg in "${pkgArr[@]}"; do
-    find "$SimplUsr" -type f -name "${pkg}_list-patches.txt" \
-      -exec echo "Deleting: {}" \; \
-      -exec rm -f {} \; 2>/dev/null
-  done
-  echo "Cleanup complete!"
-}
-
-DeletePatchesOption() {
-  local patchesArr=(
-    yt_patches_args
-    yt_music_patches_args
-    spotify_patches_args
-    tiktok_patches_args
-    photos_patches_args
-    instagram_patches_args
-    facebook_patches_args
-    fb_messenger_patches_args
-    reddit_patches_args
-    lightroom_patches_args
-    photomath_patches_args
-    duolingo_patches_args
-    rar_patches_args
-    prime_video_patches_args
-    twitch_patches_args
-    tumblr_patches_args
-    threads_patches_args
-    strava_patches_args
-    soundcloud_patches_args
-    protonmail_patches_args
-    myfitnesspal_patches_args
-    crunchyroll_patches_args
-    cricbuzz_patches_args
-  )
-  for patches in "${patchesArr[@]}"; do
-    find "$SimplUsr" -type f -name "${patches}.txt" \
-      -exec echo "Deleting: {}" \; \
-      -exec rm -f {} \; 2>/dev/null
-  done
-  echo "Cleanup complete!"
 }
 
 menu() {
@@ -1027,6 +936,135 @@ menu() {
   if [ $selected_button -eq $((${#menu_buttons[@]} - 1)) ]; then
     [ "${menu_buttons[$((${#menu_buttons[@]} - 1))]}" == "<Back>" ] && { printf '\033[2J\033[3J\033[H'; return 1; } || { [ $isOverwriteTermuxProp -eq 1 ] && sed -i '/allow-external-apps/s/^/# /' "$HOME/.termux/termux.properties"; printf '\033[2J\033[3J\033[H'; echo "Script exited !!"; exit 0; }
   fi
+}
+
+overwriteArch() {
+  if jq -e '.DeviceArch != null' "$simplifyJson" >/dev/null 2>&1; then
+    cpuAbi=$(jq -r '.DeviceArch' "$simplifyJson" 2>/dev/null)  # Get Device Architecture from json
+    echo -e "$info Device architecture spoofed to $cpuAbi!"
+  else
+    echo -e "$info Device architecture not spoofed yet!"
+  fi
+  sleep 1
+  options=(Disabled\ Arch\ spoofing arm64-v8a armeabi-v7a x86_64 x86); buttons=("<Select>" "<Back>"); if menu "options" "buttons" "5"; then arch="${options[$selected]}"; fi
+  if [ -n "$arch" ]; then
+    case "$arch" in
+      Disabled\ Arch\ spoofing)
+        jq -e 'del(.DeviceArch)' "$simplifyJson" > temp.json && mv temp.json "$simplifyJson"  # Delete DeviceArch key from simplify.json
+        echo -e "$good ${Green}Device architecture spoofing disabled successfully!${Reset}"
+        ;;
+      arm64-v8a)
+        config "DeviceArch" "arm64-v8a"
+        echo -e "$good ${Green}Device architecture spoofed to arm64-v8a successfully!${Reset}"
+        ;;
+      armeabi-v7a)
+        config "DeviceArch" "armeabi-v7a"
+        echo -e "$good ${Green}Device architecture spoofed to armeabi-v7a successfully!${Reset}"
+        ;;
+      x86_64)
+        config "DeviceArch" "x86_64"
+        echo -e "$good ${Green}Device architecture spoofed to x86_64 successfully!${Reset}"
+        ;;
+      x86)
+        config "DeviceArch" "x86"
+        echo -e "$good ${Green}Device architecture spoofed to x86 successfully!${Reset}"
+        ;;
+    esac
+    cpuAbi=$(jq -r '.DeviceArch' "$simplifyJson" 2>/dev/null)
+  else
+    cpuAbi=$(getprop ro.product.cpu.abi)
+  fi
+}
+
+DeletePatchedApk() {
+  local nameArr=("YouTube" "YT-Music" "Spotify" "TikTok" "Google Photos" "Instagram" "Facebook" "Facebook Messenger" "Reddit" "X" "Adobe Lightroom Mobile" "Photomath" "Duolingo" "RAR" "Amazon Prime Video" "Twitch" "Tumblr" "Threads" "Strava" "SoundCloud" "Proton Mail" "Calorie Counter MyFitnessPal" "NovaLauncher" "Tasker" "Crunchyroll" "Cricbuzz Cricket Scores and News")
+  for app in "${nameArr[@]}"; do
+    find "$SimplUsr" -type f -name "${app}-RV*_v[0-9.]*-${cpuAbi}.apk" \
+      -exec echo "Deleting: {}" \; \
+      -exec rm -f {} \; 2>/dev/null
+  done
+  echo "Cleanup complete!"
+}
+
+DeletePatchLog() {
+  local nameArr=("YouTube" "YT-Music" "Spotify" "TikTok" "Google Photos" "Instagram" "Facebook" "Facebook Messenger" "Reddit" "X" "Adobe Lightroom Mobile" "Photomath" "Duolingo" "RAR" "Amazon Prime Video" "Twitch" "Tumblr" "Threads" "Strava" "SoundCloud" "Proton Mail" "Calorie Counter MyFitnessPal" "NovaLauncher" "Tasker" "Crunchyroll" "Cricbuzz Cricket Scores and News")
+  for app in "${nameArr[@]}"; do
+    find "$SimplUsr" -type f -name "${app}-RV*_patch-log.txt" \
+      -exec echo "Deleting: {}" \; \
+      -exec rm -f {} \; 2>/dev/null
+  done
+  echo "Cleanup complete!"
+}
+
+DeleteListPatches() {
+  local pkgArr=(
+    "app.revanced"
+    "com.google.android.youtube"
+    "com.google.android.apps.youtube.music"
+    "com.spotify.music"
+    "com.zhiliaoapp.musically"
+    "com.google.android.apps.photos"
+    "com.google.android.apps.recorder"
+    "com.instagram.android"
+    "com.facebook.katana"
+    "com.facebook.orca"
+    "com.reddit.frontpage"
+    "com.twitter.android"
+    "com.adobe.lrmobile"
+    "com.microblink.photomath"
+    "com.duolingo"
+    "com.rarlab.rar"
+    "com.amazon.avod.thirdpartyclient"
+    "tv.twitch.android.app"
+    "com.tumblr"
+    "com.instagram.barcelona"
+    "com.strava"
+    "com.soundcloud.android"
+    "ch.protonmail.android"
+    "com.myfitnesspal.android"
+    "com.crunchyroll.crunchyroid"
+    "com.cricbuzz.android"
+  )
+  for pkg in "${pkgArr[@]}"; do
+    find "$SimplUsr" -type f -name "${pkg}_list-patches.txt" \
+      -exec echo "Deleting: {}" \; \
+      -exec rm -f {} \; 2>/dev/null
+  done
+  echo "Cleanup complete!"
+}
+
+DeletePatchesOption() {
+  local patchesArr=(
+    yt_patches_args
+    yt_music_patches_args
+    spotify_patches_args
+    tiktok_patches_args
+    photos_patches_args
+    instagram_patches_args
+    facebook_patches_args
+    fb_messenger_patches_args
+    reddit_patches_args
+    lightroom_patches_args
+    photomath_patches_args
+    duolingo_patches_args
+    rar_patches_args
+    prime_video_patches_args
+    twitch_patches_args
+    tumblr_patches_args
+    threads_patches_args
+    strava_patches_args
+    soundcloud_patches_args
+    protonmail_patches_args
+    myfitnesspal_patches_args
+    crunchyroll_patches_args
+    cricbuzz_patches_args
+  )
+  for patches in "${patchesArr[@]}"; do
+    find "$SimplUsr" -type f -name "${patches}.txt" \
+      -exec echo "Deleting: {}" \; \
+      -exec rm -f {} \; 2>/dev/null
+  done
+  echo "Cleanup complete!"
 }
 
 UninstallPatchedApp() {
@@ -1475,45 +1513,7 @@ while true; do
         buttons=("<Select>" "<Back>"); if menu "options" "buttons" "10"; then selected="${options[$selected]}"; else break; fi
         case "$selected" in
           Spoof\ Android\ Version) overwriteVersion; sleep 2 ;;
-          Spoof\ Device\ Architecture)
-            if jq -e '.DeviceArch != null' "$simplifyJson" >/dev/null 2>&1; then
-              cpuAbi=$(jq -r '.DeviceArch' "$simplifyJson" 2>/dev/null)  # Get Device Architecture from json
-              echo -e "$info Device architecture spoofed to $cpuAbi!"
-            else
-              echo -e "$info Device architecture not spoofed yet!"
-            fi
-            options=(Disabled\ Arch\ spoofing arm64-v8a armeabi-v7a x86_64 x86); buttons=("<Select>" "<Back>"); if menu "options" "buttons" "5"; then arch="${options[$selected]}"; fi
-            if [ -n "$arch" ]; then
-              case "$arch" in
-                Disabled\ Arch\ spoofing)
-                  echo -e "$running Disabling device architecture spoofing.."
-                  jq -e 'del(.DeviceArch)' "$simplifyJson" > temp.json && mv temp.json "$simplifyJson"  # Delete DeviceArch key from simplify.json
-                  echo -e "$good ${Green}Device architecture spoofing disabled successfully!${Reset}"
-                  ;;
-                arm64-v8a)
-                  echo -e "$running Spoofing device architecture to arm64-v8a.."
-                  config "DeviceArch" "arm64-v8a"
-                  echo -e "$good ${Green}Device architecture spoofed to arm64-v8a successfully!${Reset}"
-                  ;;
-                armeabi-v7a)
-                  echo -e "$running Spoofing device architecture to armeabi-v7a.."
-                  config "DeviceArch" "armeabi-v7a"
-                  echo -e "$good ${Green}Device architecture spoofed to armeabi-v7a successfully!${Reset}"
-                  ;;
-                x86_64)
-                  echo -e "$running Spoofing device architecture to x86_64.."
-                  config "DeviceArch" "x86_64"
-                  echo -e "$good ${Green}Device architecture spoofed to x86_64 successfully!${Reset}"
-                  ;;
-                x86)
-                  echo -e "$running Spoofing device architecture to x86.."
-                  config "DeviceArch" "x86"
-                  echo -e "$good ${Green}Device architecture spoofed to x86 successfully!${Reset}"
-                  ;;
-              esac
-              sleep 2
-            fi
-            ;;
+          Spoof\ Device\ Architecture) overwriteArch ;;
           Delete\ patched\ apk\ file) DeletePatchedApk ;;
           Delete\ Patch\ Log) DeletePatchLog ;;
           Delete\ list-patches\ file) DeleteListPatches ;;
