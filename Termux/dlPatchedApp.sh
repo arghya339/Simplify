@@ -632,6 +632,7 @@ while true; do
         VPN\ by\ Google\ One\ →\ 1.1.1.1\ +\ WARP
         VPN\ by\ Google\ One\ →\ WireGuard\ +\ WireGuard\ config\ by\ Proton\ VPN
         VPN\ by\ Google\ One\ →\ Tor\ VPN
+        AOSP\ Missing\ RT\ Network\ Speed\ Indicator\ →\ Data\ Monitor
         ADB\ →\ Shizuku
         Private\ DNS\ Settings\ →\ Private\ DNS\ Quick\ Toggle
         Uninstall\ Bloatware\ →\ Package\ Manager
@@ -824,6 +825,7 @@ while true; do
           VPN\ by\ Google\ One\ →\ 1.1.1.1\ +\ WARP) termux-open-url "https://play.google.com/store/apps/details?id=com.cloudflare.onedotonedotonedotone" ;;
           VPN\ by\ Google\ One\ →\ WireGuard\ +\ WireGuard\ config\ by\ Proton\ VPN) termux-open-url "https://play.google.com/store/apps/details?id=com.wireguard.android" && sleep 0.5 && termux-open-url "https://account.protonvpn.com/downloads" ;;
           VPN\ by\ Google\ One\ →\ Tor\ VPN) termux-open-url "https://play.google.com/store/apps/details?id=org.torproject.vpn" ;;
+          AOSP\ Missing\ RT\ Network\ Speed\ Indicator\ →\ Data\ Monitor) termux-open-url "https://play.google.com/store/apps/details?id=com.drnoob.datamonitor" ;;
           ADB\ →\ Shizuku)
             appName="Shizuku"
             owner="RikkaApps"
