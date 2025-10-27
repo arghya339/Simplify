@@ -616,6 +616,7 @@ while true; do
         Google\ Maps\ →\ OsmAnd
         Google\ Maps\ Compass\ →\ Xiaomi\ Compass
         Google\ TV\ →\ CloudStream
+        Google\ TV\ →\ mpvKt\ +\ torrends.to\ +\ seedr.cc
         Gboard\ →\ FlorisBoard
         Google\ Chat\ →\ Telegram
         Google\ Chat\ →\ Session
@@ -753,6 +754,7 @@ while true; do
             fi
             dlApp "${appName}" "$owner" "$repo" "$release" "" "$file_pattern" "$tag" "$assets" "$pkgApp" "$activityApp"
             ;;
+          Google\ TV\ →\ mpvKt\ +\ torrends.to\ +\ seedr.cc) termux-open-url "https://play.google.com/store/apps/details?id=live.mehiz.mpvkt" && termux-open-url "https://torrends.to/" && termux-open-url "https://www.seedr.cc/";;
           Gboard\ →\ FlorisBoard)
             appName="FlorisBoard"
             owner="florisboard"
