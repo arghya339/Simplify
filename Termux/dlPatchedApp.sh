@@ -687,6 +687,7 @@ while true; do
             name=$(jq -r '.name' <<< "$ghApiResponseJson" | sed 's/ Release$//')
             regex="$repo-$name*-$cpuAbi.apk"
             assets=$(jq -r --arg regex "$regex" '.assets[] | select(.name | test($regex)) | .name' <<< "$ghApiResponseJson" | head -1)
+            echo -e "$notice DEBUG - assets: $assets" && sleep 30
             pkgApp="com.dot.gallery"
             activityApp="com.dot.gallery/.feature_node.presentation.main.MainActivity"
             dlApp "${appName}" "$owner" "$repo" "$release" "$assets" "$file_pattern" "$tag" "$assets" "$pkgApp" "$activityApp"
