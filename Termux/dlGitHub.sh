@@ -133,13 +133,13 @@ dlGitHub() {
     fi
     
     # Download assets from GitHub
-    if [ "$repo" == "VancedMicroG" ] || [ "$repo" == "LSPatch" ] || [ "$repo" == "YTPro" ] || [ "$repo" == "cloudstream" ] || [ "$repo" == "revenge-xposed" ] || [ "$repo" == "io.github.vvb2060.callrecording" ] || [ "$owner" == "Droid-ify" ] || [ "$repo" == "Obtainium" ] || [ "$repo" == "Metrolist" ] || [ "$repo" == "PixelPlay" ]; then
+    if [ "$repo" == "VancedMicroG" ] || [ "$repo" == "LSPatch" ] || [ "$repo" == "YTPro" ] || [ "$repo" == "cloudstream" ] || [ "$repo" == "revenge-xposed" ] || [ "$repo" == "io.github.vvb2060.callrecording" ] || [ "$owner" == "Droid-ify" ] || [ "$repo" == "Obtainium" ] || [ "$repo" == "Metrolist" ]; then
       if [ "$fileName" != "$fileBaseName" ]; then
         [ -n "$fileBaseName" ] && echo -e "$notice diffs: $fileName ~ $fileBaseName"
         [ -f "$findFile" ] && rm -f "$findFile"
-        [[ ( "$repo" == "revenge-xposed" || "$repo" == "io.github.vvb2060.callrecording" || "$repo" == "PixelPlay" ) ]] && dlUrl="https://github.com/$owner/$repo/releases/download/${latestReleases}/$assetsName" || dlUrl="https://github.com/$owner/$repo/releases/download/v${latestReleases}/$assetsName"
+        [[ ( "$repo" == "revenge-xposed" || "$repo" == "io.github.vvb2060.callrecording" ) ]] && dlUrl="https://github.com/$owner/$repo/releases/download/${latestReleases}/$assetsName" || dlUrl="https://github.com/$owner/$repo/releases/download/v${latestReleases}/$assetsName"
         findFile="$dir/$fileName"
-        if [ "$repo" == "cloudstream" ] || [ "$repo" == "PixelPlay" ]; then
+        if [ "$repo" == "cloudstream" ]; then
           dl "aria2" "$dlUrl" "$findFile"
         else
           dl "curl" "$dlUrl" "$findFile"
@@ -171,6 +171,9 @@ dlGitHub() {
         if [ "$repo" == "APKEditor" ]; then
           dlUrl="https://github.com/$owner/$repo/releases/download/V${latestReleases}/$assetsName"
           dl "curl" "$dlUrl" "$findFile"
+        elif [ "$repo" == "PixelPlay" ]; then
+          dlUrl="https://github.com/$owner/$repo/releases/download/${latestReleases}/$assetsName"
+          dl "aria2" "$dlUrl" "$findFile"
         else
           dlUrl="https://github.com/$owner/$repo/releases/download/v${latestReleases}/$assetsName"
           if [ "$repo" == "revanced-cli" ] || { [ "$repo" == "revanced-patches" ] && { [ "$owner" == "inotia00" ] || [ "$owner" == "anddea" ]; }; } || [ "$repo" == "Nekogram" ] || [ "$repo" == "spotube" ]; then
