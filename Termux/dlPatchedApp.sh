@@ -386,6 +386,7 @@ if [ $Android -ge 10 ]; then
     ${novaLauncher}
     Lawnchair
     Mi\ Remote\ controller
+    Acode
     Solid\ Explorer
     Proton\ Mail
     Crunchyroll
@@ -434,6 +435,7 @@ elif [ $Android -eq 9 ]; then
     ${novaLauncher}
     Lawnchair
     Mi\ Remote\ controller
+    Acode
     Solid\ Explorer
     Proton\ Mail
     Crunchyroll
@@ -481,6 +483,7 @@ elif [ $Android -eq 8 ]; then
     ${novaLauncher}
     Lawnchair
     Mi\ Remote\ controller
+    Acode
     Solid\ Explorer
     Crunchyroll
     Tasker
@@ -516,6 +519,7 @@ elif [ $Android -eq 7 ]; then
     Twitch
     Tumblr
     Mi\ Remote\ controller
+    Acode
     Solid\ Explorer
     Tasker
   )
@@ -1429,6 +1433,16 @@ while true; do
       dlApp "${appName}" "$owner" "$repo" "$release" "" "$file_pattern" "$tag" "$assets" "$pkgApp" "$activityApp"
       ;;
     Mi\ Remote\ controller) termux-open-url "https://play.google.com/store/apps/details?id=com.duokan.phone.remotecontroller" ;;
+    Acode) # termux-open-url "https://play.google.com/store/apps/details?id=com.foxdebug.acodefree"
+      appName="Acode"
+      owner="Acode-Foundation"
+      file_pattern="$appName-*-play.apk"
+      tag=$(curl -s ${auth} "https://api.github.com/repos/$owner/$appName/releases/latest" | jq -r '.tag_name | sub("^v"; "")' 2>/dev/null)
+      assets="app-play-release.apk"
+      pkgApp="com.foxdebug.acode"
+      activityApp="com.foxdebug.acode/.MainActivity"
+      dlApp "${appName}" "$owner" "$appName" "$release" "$assets" "$file_pattern" "v$tag" "$assets" "$pkgApp" "$activityApp"
+      ;;
     Solid\ Explorer)
       appName="Solid Explorer"
       owner="FiorenMas"
