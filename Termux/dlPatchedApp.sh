@@ -706,12 +706,12 @@ while true; do
           Google\ Keep\ →\ Notesnook) termux-open-url "https://play.google.com/store/apps/details?id=com.streetwriters.notesnook" ;;
           Google\ Maps\ →\ OsmAnd) termux-open-url "https://play.google.com/store/apps/details?id=net.osmand" ;;
           Google\ Maps\ Compass\ →\ Xiaomi\ Compass)
-            tag="16.0.6.0"
-            bash $Simplify/APKMdl.sh "com.miui.compass" "$tag" "APK" "noarch" "" "" ""  # Download stock apk from APKMirror
+            version="16.0.6.0"; tag="$version"
+            bash $Simplify/APKMdl.sh "com.miui.compass" "$version" "APK" "noarch" "" "" ""  # Download stock apk from APKMirror
             appName="Xiaomi Compass"; repo="$appName"; updated_at=
-            file_pattern="${appName}_v$tag-noarch.apk"
+            file_pattern="${appName}_v$version-noarch.apk"
             apk_path=$(find "$Download" -type f -name "$file_pattern" -print -quit)
-            version=$($HOME/aapt2 dump badging $apk_path 2>/dev/null | sed -n "s/.*versionName='\([^']*\)'.*/\1/p")
+            [ -f "$apk_path" ] && version=$($HOME/aapt2 dump badging "$apk_path" 2>/dev/null | sed -n "s/.*versionName='\([^']*\)'.*/\1/p")
             url="https://www.apkmirror.com/apk/xiaomi-inc/miui-compass/xiaomi-compass-16-0-6-0-release/xiaomi-compass-16-0-6-0-android-apk-download/"
             appInstall
             ;;
