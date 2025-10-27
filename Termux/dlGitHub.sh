@@ -137,9 +137,9 @@ dlGitHub() {
       if [ "$fileName" != "$fileBaseName" ]; then
         [ -n "$fileBaseName" ] && echo -e "$notice diffs: $fileName ~ $fileBaseName"
         [ -f "$findFile" ] && rm -f "$findFile"
-        [[ ( "$repo" == "revenge-xposed" || "$repo" == "io.github.vvb2060.callrecording" ) ]] && dlUrl="https://github.com/$owner/$repo/releases/download/${latestReleases}/$assetsName" || dlUrl="https://github.com/$owner/$repo/releases/download/v${latestReleases}/$assetsName"
+        [[ ( "$repo" == "revenge-xposed" || "$repo" == "io.github.vvb2060.callrecording" || "$repo" == "PixelPlay" ) ]] && dlUrl="https://github.com/$owner/$repo/releases/download/${latestReleases}/$assetsName" || dlUrl="https://github.com/$owner/$repo/releases/download/v${latestReleases}/$assetsName"
         findFile="$dir/$fileName"
-        if [ "$repo" == "cloudstream" ]; then
+        if [ "$repo" == "cloudstream" ] || [ "$repo" == "PixelPlay" ]; then
           dl "aria2" "$dlUrl" "$findFile"
         else
           dl "curl" "$dlUrl" "$findFile"
