@@ -173,7 +173,7 @@ dlFDroid() {
 }
 
 dlFDroidArchive() {
-  izzysoftHTML=$(curl -XsL POST "https://apt.izzysoft.de/fdroid/index.php?repo=archive" -d "searchterm=$appName" -d "doFilter=Go!")
+  izzysoftHTML=$(curl -sL -X POST "https://apt.izzysoft.de/fdroid/index.php?repo=archive" -d "searchterm=$appName" -d "doFilter=Go!")
   appNames=($(pup 'span.boldname text{}' <<< "$izzysoftHTML"))
   appLinks=($(pup 'a.paddedlink[href*="https://f-droid.org/archive/"] attr{href}' <<< "$izzysoftHTML"))
   appVersions=($(pup 'span.minor-details text{}' <<< "$izzysoftHTML" | awk 'NR % 2 == 1' | sed 's/ \/.*//'))
