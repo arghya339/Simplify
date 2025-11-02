@@ -683,6 +683,7 @@ while true; do
         Google\ TV\ →\ CloudStream
         Google\ TV\ →\ mpvKt\ +\ torrends.to\ +\ seedr.cc
         Gboard\ →\ FlorisBoard
+        Google\ Messages\ →\ Fossify\ Messages
         Google\ Chat\ →\ Telegram
         Google\ Chat\ →\ Session
         Google\ Clock\ →\ Fossify\ Clock
@@ -882,6 +883,7 @@ while true; do
             activityApp="dev.patrickgold.florisboard/.SettingsLauncherAlias"
             dlApp "${appName}" "$owner" "$repo" "$release" "$assets" "$file_pattern" "v$tag" "$assets" "$pkgApp" "$activityApp"
             ;;
+          Google\ Messages\ →\ Fossify\ Messages) termux-open-url "https://play.google.com/store/apps/details?id=org.fossify.messages" ;;
           Google\ Chat\ →\ Telegram) termux-open-url "https://play.google.com/store/apps/details?id=org.telegram.messenger" ;;
           Google\ Chat\ →\ Session) termux-open-url "https://play.google.com/store/apps/details?id=network.loki.messenger" ;;
           Google\ Clock\ →\ Fossify\ Clock) termux-open-url "https://play.google.com/store/apps/details?id=org.fossify.clock" ;;
