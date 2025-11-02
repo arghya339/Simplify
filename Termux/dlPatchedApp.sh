@@ -211,6 +211,8 @@ dlApp() {
     url="$assets_url"
   elif [ "$appName" == "Gadgetbridge" ]; then
     url="https://f-droid.org/repo/$assets"
+  elif [ "$appName" == "Ringdroid" ]; then
+    url="https://f-droid.org/archive/$assets"
   else
     local url="https://github.com/$owner/$repo/releases/download/$tag/$assets"
   fi
@@ -244,6 +246,10 @@ dlApp() {
     elif [ "$appName" == "Gadgetbridge" ]; then
       echo -e "$running Downloading $appName from F-Droid.."
       dlFDroid
+      apk_path=$(find "$SimplUsr" -type f -name "$file_pattern" -print -quit)
+    elif [ "$appName" == "Ringdroid" ]; then
+      echo -e "$running Downloading $appName from F-Droid Archive.."
+      dlFDroidArchive
       apk_path=$(find "$SimplUsr" -type f -name "$file_pattern" -print -quit)
     else
       echo -e "$running Downloading $appName from GitHub.."
@@ -403,6 +409,7 @@ if [ $Android -ge 10 ]; then
     Seal
     YTDLnis
     RetroMusicPlayer
+    Ringdroid
     #Spotify
     Spotube
     TikTok
@@ -453,6 +460,7 @@ elif [ $Android -eq 9 ]; then
     Seal
     YTDLnis
     RetroMusicPlayer
+    Ringdroid
     #Spotify
     Spotube
     TikTok
@@ -502,6 +510,7 @@ elif [ $Android -eq 8 ]; then
     Seal
     YTDLnis
     RetroMusicPlayer
+    Ringdroid
     #Spotify
     Spotube
     TikTok
@@ -548,6 +557,7 @@ elif [ $Android -eq 7 ]; then
     Seal
     YTDLnis
     RetroMusicPlayer
+    Ringdroid
     #Spotify
     Spotube
     TikTok
@@ -579,6 +589,7 @@ elif [ $Android -eq 6 ]; then
     Tubular
     YouTube\ Music
     RetroMusicPlayer
+    Ringdroid
     TikTok
     Google\ Photos
     Nobook
@@ -604,6 +615,7 @@ elif [ $Android -eq 5 ]; then
     ReVanced\ GmsCore
     YouTube\ Music
     RetroMusicPlayer
+    Ringdroid
     TikTok
     Google\ Photos
     Nobook
@@ -624,6 +636,7 @@ elif [ $Android -eq 4 ]; then
   apps=(
     deGoogle
     ReVanced\ GmsCore
+    Ringdroid
     RAR
     Solid\ Explorer
   )
@@ -1149,6 +1162,16 @@ while true; do
         activityPatched="$pkgPatched/com.ryanheise.audioservice.AudioServiceActivity"
         dlPatchedApp "${appName}" "$owner" "$repo" "$assets" "$pkgPatched" "$activityPatched"
       fi
+      ;;
+    Ringdroid)
+      appName="Ringdroid"
+      pkgName="com.ringdroid"
+      file_pattern="${appName}_v*.apk"
+      versionCode="20704"
+      versionName="2.7.4"
+      assets="${pkgName}_${versionCode}.apk"
+      activityClass="com.ringdroid/.RingdroidSelectActivity"
+      dlApp "${appName}" "google" "ringdroid" "$release" "" "$file_pattern" "v$versionName" "$assets" "$pkgName" "$activityClass"
       ;;
     TikTok)
       appName="TikTok"
