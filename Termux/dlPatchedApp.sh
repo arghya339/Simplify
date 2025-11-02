@@ -154,6 +154,22 @@ dlGitLab() {
   [ "$repo" == "AuroraStore" ] && dl "curl" "$assets_url" "$dir/$assets_name"
 }
 
+dlFDroid() {
+  app_name=$(echo "$appName" | sed 's/ /+/g')
+  appUrl=$(curl -sL "https://search.f-droid.org/api/search_apps?q=${app_name}" | jq -r ".apps[].url" | head -1)
+  pkgName=$(basename "$appUrl" 2>/dev/null)
+  packagesResponseJson=$(curl -sL https://f-droid.org/api/v1/packages/${pkgName})
+  suggestedVersionCode=$(jq -r '.suggestedVersionCode' <<< "$packagesResponseJson")
+  suggestedVersionName=$(jq -r '.packages[].versionName' <<< "$packagesResponseJson" | head -1)
+  dlUrl="https://f-droid.org/repo/${pkgName}_${suggestedVersionCode}.apk"
+  fileName="${appName}_v${suggestedVersionName}.apk"
+  filePath="$SimplUsr/$fileName"
+  while true; do
+    curl -L -C - --progress-bar -o "$filePath" "$dlUrl"
+    [ $? -eq 0 ] && break || { echo -e "$bad ${Red}Download failed! retrying in 5 seconds..${Reset}"; sleep 5; }
+  done
+}
+
 # --- function to download app ---
 dlApp() {
   local appName="${1}"
@@ -169,6 +185,8 @@ dlApp() {
     assets="$file_pattern"
   elif [ "$repo" == "AuroraStore" ]; then
     url="$assets_url"
+  elif [ "$appName" == "Gadgetbridge" ]; then
+    url="https://f-droid.org/repo/$assets"
   else
     local url="https://github.com/$owner/$repo/releases/download/$tag/$assets"
   fi
@@ -198,6 +216,10 @@ dlApp() {
     elif [ "$repo" == "AuroraStore" ]; then
       echo -e "$running Downloading $appName from GitLab.."
       dlGitLab "$owner" "$repo" ".apk" "$SimplUsr" "$regex"
+      apk_path=$(find "$SimplUsr" -type f -name "$file_pattern" -print -quit)
+    elif [ "$appName" == "Gadgetbridge" ]; then
+      echo -e "$running Downloading $appName from F-Droid.."
+      dlFDroid
       apk_path=$(find "$SimplUsr" -type f -name "$file_pattern" -print -quit)
     else
       echo -e "$running Downloading $appName from GitHub.."
@@ -612,6 +634,7 @@ while true; do
         Google\ Drive\ →\ Nextcloud
         Google\ Drive\ →\ Microsoft\ OneDrive
         Google\ Drive\ →\ Proton\ Drive
+        Google\ Fit\ →\ Gadgetbridge
         Google\ Keep\ →\ Notesnook
         Google\ Maps\ →\ OsmAnd
         Google\ Maps\ Compass\ →\ Xiaomi\ Compass
@@ -721,6 +744,18 @@ while true; do
           Google\ Drive\ →\ Nextcloud) termux-open-url "https://play.google.com/store/apps/details?id=com.nextcloud.client" ;;
           Google\ Drive\ →\ Microsoft\ OneDrive) termux-open-url "https://play.google.com/store/apps/details?id=com.microsoft.skydrive" ;;
           Google\ Drive\ →\ Proton\ Drive) termux-open-url "https://play.google.com/store/apps/details?id=me.proton.android.drive" ;;
+          Google\ Fit\ →\ Gadgetbridge)
+            appName="Gadgetbridge"
+            pkgName="nodomain.freeyourgadget.gadgetbridge"
+            file_pattern="${appName}_v*.apk"
+            packagesResponseJson=$(curl -sL https://f-droid.org/api/v1/packages/${pkgName})
+            suggestedVersionCode=$(jq -r '.suggestedVersionCode' <<< "$packagesResponseJson")
+            suggestedVersionName=$(jq -r '.packages[].versionName' <<< "$packagesResponseJson" | head -1)
+            assets="${pkgName}_${suggestedVersionCode}.apk"
+            activityClass="nodomain.freeyourgadget.gadgetbridge/.activities.ControlCenterv2"
+            dlApp "${appName}" "Freeyourgadget" "Gadgetbridge" "$release" "" "$file_pattern" "v$suggestedVersionName" "$assets" "$pkgName" "$activityClass"
+            termux-open-url "https://gadgetbridge.org/gadgets/wearables/"
+            ;;
           Google\ Keep\ →\ Notesnook) termux-open-url "https://play.google.com/store/apps/details?id=com.streetwriters.notesnook" ;;
           Google\ Maps\ →\ OsmAnd) termux-open-url "https://play.google.com/store/apps/details?id=net.osmand" ;;
           Google\ Maps\ Compass\ →\ Xiaomi\ Compass)
