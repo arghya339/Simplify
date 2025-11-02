@@ -172,6 +172,28 @@ dlFDroid() {
   done
 }
 
+dlFDroidArchive() {
+  izzysoftHTML=$(curl -XsL POST "https://apt.izzysoft.de/fdroid/index.php?repo=archive" -d "searchterm=$appName" -d "doFilter=Go!")
+  appNames=($(pup 'span.boldname text{}' <<< "$izzysoftHTML"))
+  appLinks=($(pup 'a.paddedlink[href*="https://f-droid.org/archive/"] attr{href}' <<< "$izzysoftHTML"))
+  appVersions=($(pup 'span.minor-details text{}' <<< "$izzysoftHTML" | awk 'NR % 2 == 1' | sed 's/ \/.*//'))
+  for i in "${!appNames[@]}"; do
+    if [[ "${appNames[$i]}" == *"$appName"* ]]; then
+      dlUrl="${appLinks[$i]}"
+      pkgName=$(basename "$dlUrl" | sed 's/_[0-9]*\.apk//')
+      versionCode=$(basename "$dlUrl" | sed 's/.*_//' | sed 's/\.apk//')
+      versionName="${appVersions[$i]}"
+      break
+    fi
+  done
+  fileName="${appName}_v${versionName}.apk"
+  filePath="$SimplUsr/$fileName"
+  while true; do
+    curl -L -C - --progress-bar -o "$filePath" "$dlUrl"
+    [ $? -eq 0 ] && break || { echo -e "$bad ${Red}Download failed! retrying in 5 seconds..${Reset}"; sleep 5; }
+  done
+}
+
 # --- function to download app ---
 dlApp() {
   local appName="${1}"
