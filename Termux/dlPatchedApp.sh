@@ -695,6 +695,7 @@ while true; do
         Pixel\ Screenshots\ →\ Shots\ Studio
         Android\ Switch\ →\ DataBackup
         Google\ Weather\ →\ Breezy\ Weather
+        Google\ Recorder\ →\ RecordYou
         VPN\ by\ Google\ One\ →\ 1.1.1.1\ +\ WARP
         VPN\ by\ Google\ One\ →\ WireGuard\ +\ WireGuard\ config\ by\ Proton\ VPN
         VPN\ by\ Google\ One\ →\ Tor\ VPN
@@ -929,6 +930,16 @@ while true; do
             pkgApp="org.breezyweather"
             activityApp="org.breezyweather/.ui.main.MainActivity"
             dlApp "${appName}" "$owner" "$repo" "$release" "$regex" "$file_pattern" "$tag" "$assets" "$pkgApp" "$activityApp"
+            ;;
+          Google\ Recorder\ →\ RecordYou)
+            appName="RecordYou"
+            owner="you-apps"
+            file_pattern="RecordYou-*.apk"
+            tag=$(curl -s ${auth} "https://api.github.com/repos/$owner/$appName/releases/latest" | jq -r '.tag_name | sub("^v"; "")' 2>/dev/null)
+            assets="app-release.apk"
+            pkgApp="com.bnyro.recorder"
+            activityApp="com.bnyro.recorder/.ui.MainActivity"
+            dlApp "${appName}" "$owner" "$appName" "$release" "" "$file_pattern" "v$tag" "$assets" "$pkgApp" "$activityApp"
             ;;
           VPN\ by\ Google\ One\ →\ 1.1.1.1\ +\ WARP) termux-open-url "https://play.google.com/store/apps/details?id=com.cloudflare.onedotonedotonedotone" ;;
           VPN\ by\ Google\ One\ →\ WireGuard\ +\ WireGuard\ config\ by\ Proton\ VPN) termux-open-url "https://play.google.com/store/apps/details?id=com.wireguard.android" && sleep 0.5 && termux-open-url "https://account.protonvpn.com/downloads" ;;
