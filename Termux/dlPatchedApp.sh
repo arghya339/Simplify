@@ -762,11 +762,12 @@ while true; do
           "YouTube for Android TV → SmartTube")
             appName="SmartTube"
             owner="yuliskov"
-            file_pattern="SmartTube_stable_*_$cpuAbi.apk"
+            [ "$cpuAbi" == "x86_64" ] && arch="x86" || arch="$cpuAbi"
+            file_pattern="SmartTube_stable_*_$arch.apk"
             ghApiResponseJson=$(curl -s ${auth} "https://api.github.com/repos/$owner/$appName/releases/latest")
             tag=$(jq -r '.tag_name' <<< "$ghApiResponseJson")
             name=$(jq -r '.name' <<< "$ghApiResponseJson" | sed 's/ Stable$//')
-            assets="SmartTube_stable_${name}_$cpuAbi.apk"
+            assets="SmartTube_stable_${name}_$arch.apk"
             pkgApp="com.teamsmart.videomanager.tv"
             activityApp="com.teamsmart.videomanager.tv/com.liskovsoft.smartyoutubetv2.tv.ui.main.SplashActivity"
             dlApp "${appName}" "$owner" "$appName" "$release" "$assets" "$file_pattern" "$tag" "$assets" "$pkgApp" "$activityApp"
