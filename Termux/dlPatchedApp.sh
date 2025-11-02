@@ -657,6 +657,7 @@ while true; do
         Gemini\ →\ RikkaHub
         Google\ Photos\ →\ Ente\ Photos
         Google\ Photos\ →\ VLC
+        Google\ Photos\ →\ Next\ Player
         YouTube\ Music\ →\ Metrolist
         YouTube\ Music\ →\ PixelPlay
         "Docs + Slides + Sheets → Microsoft 365"
@@ -758,6 +759,7 @@ while true; do
           Gemini\ →\ RikkaHub) termux-open-url "https://play.google.com/store/apps/details?id=me.rerere.rikkahub" ;;
           Google\ Photos\ →\ Ente\ Photos) termux-open-url "https://play.google.com/store/apps/details?id=io.ente.photos" ;;
           Google\ Photos\ →\ VLC) termux-open-url "https://play.google.com/store/apps/details?id=org.videolan.vlc" ;;
+          Google\ Photos\ →\ Next\ Player) termux-open-url "https://play.google.com/store/apps/details?id=dev.anilbeesetti.nextplayer" ;;
           YouTube\ Music\ →\ Metrolist)
             appName="Metrolist"
             owner="mostafaalagamy"
