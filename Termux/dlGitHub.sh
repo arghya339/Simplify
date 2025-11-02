@@ -81,7 +81,7 @@ dlGitHub() {
     if [ "$repo" == "APKEditor" ]; then
       latestReleases=$(jq -r '.tag_name | sub("^V"; "")' <<< "$ghApiResponseJson")  # 1.4.3
       echo -e "$info latestReleases: V$latestReleases"
-    elif [ "$repo" == "FreeTubeAndroid" ] || [ "$repo" == "bundletool" ] || [ "$repo" == "twitter-apk" ] || [ "$repo" == "lawnchair" ] || [ "$repo" == "Nagram" ] || [ "$repo" == "revenge-xposed" ] || [ "$repo" == "io.github.vvb2060.callrecording" ] || [ "$repo" == "Gallery" ] || [ "$repo" == "PixelPlay" ] || [ "$repo" == "SmartTube" ]; then
+    elif [ "$repo" == "FreeTubeAndroid" ] || [ "$repo" == "bundletool" ] || [ "$repo" == "twitter-apk" ] || [ "$repo" == "lawnchair" ] || [ "$repo" == "Nagram" ] || [ "$repo" == "revenge-xposed" ] || [ "$repo" == "io.github.vvb2060.callrecording" ] || [ "$repo" == "Gallery" ] || [ "$repo" == "PixelPlay" ] || [ "$repo" == "SmartTube" ] || [ "$repo" == "Android-DataBackup" ]; then
       latestReleases=$(jq -r '.tag_name' <<< "$ghApiResponseJson")  # 0.23.5.17
       echo -e "$info latestReleases: $latestReleases"
     else
@@ -178,7 +178,7 @@ dlGitHub() {
         if [ "$repo" == "APKEditor" ]; then
           dlUrl="https://github.com/$owner/$repo/releases/download/V${latestReleases}/$assetsName"
           dl "curl" "$dlUrl" "$findFile"
-        elif [ "$repo" == "PixelPlay" ] || [ "$repo" == "SmartTube" ]; then
+        elif [ "$repo" == "PixelPlay" ] || [ "$repo" == "SmartTube" ] || [ "$repo" == "Android-DataBackup" ]; then
           dlUrl="https://github.com/$owner/$repo/releases/download/${latestReleases}/$assetsName"
           [ "$repo" == "PixelPlay" ] && dl "aria2" "$dlUrl" "$findFile" || dl "curl" "$dlUrl" "$findFile"
         else

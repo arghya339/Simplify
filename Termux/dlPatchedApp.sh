@@ -693,6 +693,7 @@ while true; do
         Gmail\ →\ Thunderbird
         Pixel\ Camera\ →\ GCam\ Hub
         Pixel\ Screenshots\ →\ Shots\ Studio
+        Android\ Switch\ →\ DataBackup
         Google\ Weather\ →\ Breezy\ Weather
         VPN\ by\ Google\ One\ →\ 1.1.1.1\ +\ WARP
         VPN\ by\ Google\ One\ →\ WireGuard\ +\ WireGuard\ config\ by\ Proton\ VPN
@@ -897,6 +898,17 @@ while true; do
             pkgApp="com.ansah.shots_studio"
             activityApp="com.ansah.shots_studio/.MainActivity"
             dlApp "${appName}" "$owner" "$repo" "$release" "" "$file_pattern" "v$tag" "$assets" "$pkgApp" "$activityApp"
+            ;;
+          Android\ Switch\ →\ DataBackup)
+            appName="DataBackup"
+            owner="XayahSuSuSu"
+            repo="Android-DataBackup"
+            file_pattern="DataBackup-*-$cpuAbi-premium-release.apk"
+            tag=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases/latest" | jq -r '.tag_name')
+            assets="DataBackup-$tag-$cpuAbi-premium-release.apk"
+            pkgApp="com.xayah.databackup.premium"
+            activityApp="com.xayah.databackup.premium/com.xayah.databackup.SplashActivity"
+            dlApp "${appName}" "$owner" "$repo" "$release" "$assets" "$file_pattern" "$tag" "$assets" "$pkgApp" "$activityApp"
             ;;
           Google\ Weather\ →\ Breezy\ Weather)
             appName="Breezy Weather"
