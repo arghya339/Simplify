@@ -657,6 +657,8 @@ while true; do
         Gemini\ →\ RikkaHub
         Google\ Photos\ →\ Ente\ Photos
         Google\ Photos\ →\ VLC
+        YouTube\ Music\ →\ Metrolist
+        YouTube\ Music\ →\ PixelPlay
         Snapseed\ →\ Image\ Toolbox
         YouTube\ →\ FreeTube
         "YouTube for Android TV → SmartTube"
@@ -689,8 +691,7 @@ while true; do
         Google\ Wallpapers\ →\ Starth\ Bing\ Wallpaper
         Gmail\ →\ Proton\ Mail
         Gmail\ →\ Thunderbird
-        YouTube\ Music\ →\ Metrolist
-        YouTube\ Music\ →\ PixelPlay
+        Pixel\ Camera\ →\ GCam\ Hub
         Pixel\ Screenshots\ →\ Shots\ Studio
         Google\ Weather\ →\ Breezy\ Weather
         VPN\ by\ Google\ One\ →\ 1.1.1.1\ +\ WARP
@@ -747,6 +748,28 @@ while true; do
           Gemini\ →\ RikkaHub) termux-open-url "https://play.google.com/store/apps/details?id=me.rerere.rikkahub" ;;
           Google\ Photos\ →\ Ente\ Photos) termux-open-url "https://play.google.com/store/apps/details?id=io.ente.photos" ;;
           Google\ Photos\ →\ VLC) termux-open-url "https://play.google.com/store/apps/details?id=org.videolan.vlc" ;;
+          YouTube\ Music\ →\ Metrolist)
+            appName="Metrolist"
+            owner="mostafaalagamy"
+            repo="$appName"
+            file_pattern="$repo-*-$cpuAbi.apk"
+            tag=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases/latest" | jq -r '.tag_name | sub("^v"; "")' 2>/dev/null)
+            if [ "$cpuAbi" == "arm64-v8a" ]; then arch="arm64"; elif [ "$cpuAbi" == "armeabi_v7a" ]; then arch="armeabi"; else arch="$cpuAbi";fi
+            assets="app-$arch-release.apk"
+            pkgApp="com.metrolist.music"
+            activityApp="com.metrolist.music/.MainActivity"
+            dlApp "${appName}" "$owner" "$repo" "$release" "$assets" "$file_pattern" "v$tag" "$assets" "$pkgApp" "$activityApp"
+            ;;
+          YouTube\ Music\ →\ PixelPlay)
+            appName="PixelPlay"
+            owner="theovilardo"
+            file_pattern="PixelPlay-*-universal.apk"
+            tag=$(curl -s ${auth} "https://api.github.com/repos/$owner/$appName/releases/latest" | jq -r '.tag_name')
+            assets="PixelPlay-$tag-universal.apk"
+            pkgApp="com.theveloper.pixelplay"
+            activityApp="com.theveloper.pixelplay/.MainActivity"
+            dlApp "${appName}" "$owner" "$appName" "$release" "" "$file_pattern" "$tag" "$assets" "$pkgApp" "$activityApp"
+            ;;
           Snapseed\ →\ Image\ Toolbox) termux-open-url "https://play.google.com/store/apps/details?id=ru.tech.imageresizershrinker" ;;
           YouTube\ →\ FreeTube)
             appName="FreeTubeAndroid"
@@ -863,28 +886,7 @@ while true; do
           Google\ Wallpapers\ →\ Starth\ Bing\ Wallpaper) termux-open-url "https://play.google.com/store/apps/details?id=me.liaoheng.wallpaper" ;;
           Gmail\ →\ Proton\ Mail) termux-open-url "https://play.google.com/store/apps/details?id=ch.protonmail.android" ;;
           Gmail\ →\ Thunderbird) termux-open-url "https://play.google.com/store/apps/details?id=net.thunderbird.android" ;;
-          YouTube\ Music\ →\ Metrolist)
-            appName="Metrolist"
-            owner="mostafaalagamy"
-            repo="$appName"
-            file_pattern="$repo-*-$cpuAbi.apk"
-            tag=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases/latest" | jq -r '.tag_name | sub("^v"; "")' 2>/dev/null)
-            if [ "$cpuAbi" == "arm64-v8a" ]; then arch="arm64"; elif [ "$cpuAbi" == "armeabi_v7a" ]; then arch="armeabi"; else arch="$cpuAbi";fi
-            assets="app-$arch-release.apk"
-            pkgApp="com.metrolist.music"
-            activityApp="com.metrolist.music/.MainActivity"
-            dlApp "${appName}" "$owner" "$repo" "$release" "$assets" "$file_pattern" "v$tag" "$assets" "$pkgApp" "$activityApp"
-            ;;
-          YouTube\ Music\ →\ PixelPlay)
-            appName="PixelPlay"
-            owner="theovilardo"
-            file_pattern="PixelPlay-*-universal.apk"
-            tag=$(curl -s ${auth} "https://api.github.com/repos/$owner/$appName/releases/latest" | jq -r '.tag_name')
-            assets="PixelPlay-$tag-universal.apk"
-            pkgApp="com.theveloper.pixelplay"
-            activityApp="com.theveloper.pixelplay/.MainActivity"
-            dlApp "${appName}" "$owner" "$appName" "$release" "" "$file_pattern" "$tag" "$assets" "$pkgApp" "$activityApp"
-            ;;
+          Pixel\ Camera\ →\ GCam\ Hub) termux-open-url "https://www.celsoazevedo.com/files/android/google-camera/" ;;
           Pixel\ Screenshots\ →\ Shots\ Studio)
             appName="Shots Studio"
             owner="AnsahMohammad"
