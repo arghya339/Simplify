@@ -668,6 +668,7 @@ while true; do
         Chrome\ →\ Firefox
         Google\ Authenticator\ →\ Ente\ Auth
         Google\ Calculator\ →\ Multi-Calculator
+        Google\ Calculator\ →\ Buckwheat
         Google\ Drive\ →\ Nextcloud
         Google\ Drive\ →\ Microsoft\ OneDrive
         Google\ Drive\ →\ Proton\ Drive
@@ -681,6 +682,7 @@ while true; do
         Google\ Chat\ →\ Telegram
         Google\ Chat\ →\ Session
         Google\ Password\ Manager\ →\ Bitwarden
+        Google\ Password\ Manager\ →\ Proton\ Pass
         Google\ Tasks\ →\ Microsoft\ To\ Do
         Google\ News\ →\ Feeder
         Google\ Wallpapers\ →\ Starth\ Bing\ Wallpaper
@@ -778,6 +780,7 @@ while true; do
           Chrome\ →\ Firefox) termux-open-url "https://play.google.com/store/apps/details?id=org.mozilla.firefox" ;;
           Google\ Authenticator\ →\ Ente\ Auth) termux-open-url "https://play.google.com/store/apps/details?id=io.ente.auth" ;;
           Google\ Calculator\ →\ Multi-Calculator) termux-open-url "https://play.google.com/store/apps/details?id=com.yangdai.calc" ;;
+          Google\ Calculator\ →\ Buckwheat) termux-open-url "https://play.google.com/store/apps/details?id=com.danilkinkin.buckwheat" ;;
           Google\ Drive\ →\ Nextcloud) termux-open-url "https://play.google.com/store/apps/details?id=com.nextcloud.client" ;;
           Google\ Drive\ →\ Microsoft\ OneDrive) termux-open-url "https://play.google.com/store/apps/details?id=com.microsoft.skydrive" ;;
           Google\ Drive\ →\ Proton\ Drive) termux-open-url "https://play.google.com/store/apps/details?id=me.proton.android.drive" ;;
@@ -840,6 +843,7 @@ while true; do
           Google\ Chat\ →\ Telegram) termux-open-url "https://play.google.com/store/apps/details?id=org.telegram.messenger" ;;
           Google\ Chat\ →\ Session) termux-open-url "https://play.google.com/store/apps/details?id=network.loki.messenger" ;;
           Google\ Password\ Manager\ →\ Bitwarden) termux-open-url "https://play.google.com/store/apps/details?id=com.x8bit.bitwarden" ;;
+          Google\ Password\ Manager\ →\ Proton\ Pass) termux-open-url "https://play.google.com/store/apps/details?id=proton.android.pass" ;;
           Google\ Tasks\ →\ Microsoft\ To\ Do) termux-open-url "https://play.google.com/store/apps/details?id=com.microsoft.todos" ;;
           Google\ News\ →\ Feeder) termux-open-url "https://play.google.com/store/apps/details?id=com.nononsenseapps.feeder.play" ;;
           Google\ Wallpapers\ →\ Starth\ Bing\ Wallpaper) termux-open-url "https://play.google.com/store/apps/details?id=me.liaoheng.wallpaper" ;;
