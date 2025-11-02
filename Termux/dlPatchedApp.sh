@@ -699,6 +699,7 @@ while true; do
         Android\ Switch\ →\ DataBackup
         Google\ Weather\ →\ Breezy\ Weather
         Google\ Recorder\ →\ RecordYou
+        Pixel\ Launcher\ →\ Lawnchair
         VPN\ by\ Google\ One\ →\ 1.1.1.1\ +\ WARP
         VPN\ by\ Google\ One\ →\ WireGuard\ +\ WireGuard\ config\ by\ Proton\ VPN
         VPN\ by\ Google\ One\ →\ Tor\ VPN
@@ -946,6 +947,52 @@ while true; do
             pkgApp="com.bnyro.recorder"
             activityApp="com.bnyro.recorder/.ui.MainActivity"
             dlApp "${appName}" "$owner" "$appName" "$release" "" "$file_pattern" "v$tag" "$assets" "$pkgApp" "$activityApp"
+            ;;
+          Pixel\ Launcher\ →\ Lawnchair)
+            owner="LawnchairLauncher"
+            appName="Lawnchair"
+            repo="lawnchair"
+            if [ "$FetchPreRelease" -eq 0 ]; then
+              file_pattern="Lawnchair-*.apk"
+              tag=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases/latest" | jq -r '.tag_name')
+              assets="Lawnchair-$tag.apk"
+              pkgApp="ch.deletescape.lawnchair"
+              activityApp="ch.deletescape.lawnchair/.Launcher"
+            else
+              release=nightly
+              file_pattern="Lawnchair.Debug.*-dev.Nightly-CI_*.apk"
+              tag="nightly"
+              assets=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases" | jq -r --arg tag "$tag" '.[] | select(.tag_name == $tag) | .assets[] | .name')
+              pkgApp="app.lawnchair.nightly"
+              activityApp="app.lawnchair.nightly/app.lawnchair.LawnchairLauncher"
+            fi
+            dlApp "${appName}" "$owner" "$repo" "$release" "" "$file_pattern" "$tag" "$assets" "$pkgApp" "$activityApp"
+      
+            appName="Lawnicons"
+            repo="lawnicons"
+            if [ $FetchPreRelease -eq 0 ]; then
+              file_pattern="Lawnicons.*.apk"
+              tag=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases/latest" | jq -r '.tag_name')
+              assets=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases/latest" | jq -r '.assets[] | .name')
+            else
+              release=nightly
+              file_pattern="Lawnicons.Nightly.*.apk"
+              tag="nightly"
+              assets=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases" | jq -r --arg tag "$tag" '.[] | select(.tag_name == $tag) | .assets[] | .name')
+            fi
+            pkgApp="app.lawnchair.lawnicons"
+            activityApp="app.lawnchair.lawnicons/.MainActivity"
+            dlApp "${appName}" "$owner" "$repo" "$release" "" "$file_pattern" "$tag" "$assets" "$pkgApp" "$activityApp"
+      
+            appName="Lawnfeed"
+            repo="lawnfeed"
+            release=latest
+            file_pattern="Lawnfeed.*.apk"
+            tag=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases/latest" | jq -r '.tag_name')
+            assets=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases/latest" | jq -r '.assets[] | .name')
+            pkgApp="app.lawnchair.lawnfeed"
+            activityApp=
+            dlApp "${appName}" "$owner" "$repo" "$release" "" "$file_pattern" "$tag" "$assets" "$pkgApp" "$activityApp"
             ;;
           VPN\ by\ Google\ One\ →\ 1.1.1.1\ +\ WARP) termux-open-url "https://play.google.com/store/apps/details?id=com.cloudflare.onedotonedotonedotone" ;;
           VPN\ by\ Google\ One\ →\ WireGuard\ +\ WireGuard\ config\ by\ Proton\ VPN) termux-open-url "https://play.google.com/store/apps/details?id=com.wireguard.android" && sleep 0.5 && termux-open-url "https://account.protonvpn.com/downloads" ;;
