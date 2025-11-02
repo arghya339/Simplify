@@ -204,27 +204,22 @@ sign_app() {
   
   if [ "$web" == "APKMirror" ]; then
     bash $Simplify/APKMdl.sh "$pkgName" "$pkgVersion" "$Type" "${ArchRef[0]}"  # Download stock apk from APKMirror
-    if [ "$Type" == "BUNDLE" ]; then
-      if [ -n "$pkgVersion" ] && [ "$pkgVersion" != "null" ]; then
-        local stock_apk_path=("$Download/${appNameRef[0]}_v${pkgVersion}-$cpuAbi.apk")
-      elif [ -z "$pkgVersion" ] || [ "$pkgVersion" == "null" ]; then
-        local stock_apk=$(find "$Download" -type f -name "${appNameRef[0]}_v*-$cpuAbi.apk" -print -quit)
-        local stock_apk_path=("$stock_apk")  # -quit= find stops after first match
-      fi
-    elif [ "$Type" == "APK" ]; then
-      if [ -n "$pkgVersion" ] && [ "$pkgVersion" != "null" ]; then
-        local stock_apk_path=("$Download/${appNameRef[0]}_v${pkgVersion}-${ArchRef[0]}.apk")
-      elif [ -z "$pkgVersion" ] || [ "$pkgVersion" == "null" ]; then
-        local stock_apk=$(find "$Download" -type f -name "${appNameRef[0]}_v*-${ArchRef[0]}.apk" -print -quit)
-        local stock_apk_path=("$stock_apk")
-      fi
-    fi
   else
     bash $Simplify/dlUptodown.sh "${appNameRef[0]}" "$pkgVersion" "$Type" "${ArchRef[0]}"  # Download stock apk from Uptodown
-    if [ "$Type" == "xapk" ]; then
+  fi
+  if [ "$Type" == "BUNDLE" ] || [ "$Type" == "xapk" ]; then
+    if [ -n "$pkgVersion" ]; then
       local stock_apk_path=("$Download/${appNameRef[0]}_v${pkgVersion}-$cpuAbi.apk")
-    elif [ "$Type" == "apk" ]; then
+    else
+      local stock_apk=$(find "$Download" -type f -name "${appNameRef[0]}_v*-$cpuAbi.apk" -print -quit)
+      local stock_apk_path=("$stock_apk")  # -quit= find stops after first match
+    fi
+  elif [ "$Type" == "APK" ] || [ "$Type" == "apk" ]; then
+    if [ -n "$pkgVersion" ]; then
       local stock_apk_path=("$Download/${appNameRef[0]}_v${pkgVersion}-${ArchRef[0]}.apk")
+    else
+      local stock_apk=$(find "$Download" -type f -name "${appNameRef[0]}_v*-${ArchRef[0]}.apk" -print -quit)
+      local stock_apk_path=("$stock_apk")
     fi
   fi
   sleep 0.5  # Wait 500 milliseconds
