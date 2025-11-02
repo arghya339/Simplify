@@ -684,6 +684,7 @@ while true; do
         Gboard\ →\ FlorisBoard
         Google\ Chat\ →\ Telegram
         Google\ Chat\ →\ Session
+        Google\ Clock\ →\ Fossify\ Clock
         Google\ Password\ Manager\ →\ Bitwarden
         Google\ Password\ Manager\ →\ Proton\ Pass
         Google\ Tasks\ →\ Microsoft\ To\ Do
@@ -881,6 +882,7 @@ while true; do
             ;;
           Google\ Chat\ →\ Telegram) termux-open-url "https://play.google.com/store/apps/details?id=org.telegram.messenger" ;;
           Google\ Chat\ →\ Session) termux-open-url "https://play.google.com/store/apps/details?id=network.loki.messenger" ;;
+          Google\ Clock\ →\ Fossify\ Clock) termux-open-url "https://play.google.com/store/apps/details?id=org.fossify.clock" ;;
           Google\ Password\ Manager\ →\ Bitwarden) termux-open-url "https://play.google.com/store/apps/details?id=com.x8bit.bitwarden" ;;
           Google\ Password\ Manager\ →\ Proton\ Pass) termux-open-url "https://play.google.com/store/apps/details?id=proton.android.pass" ;;
           Google\ Tasks\ →\ Microsoft\ To\ Do) termux-open-url "https://play.google.com/store/apps/details?id=com.microsoft.todos" ;;
