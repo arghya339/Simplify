@@ -659,6 +659,7 @@ while true; do
         Google\ Photos\ →\ VLC
         YouTube\ Music\ →\ Metrolist
         YouTube\ Music\ →\ PixelPlay
+        "Docs + Slides + Sheets → Microsoft 365"
         Snapseed\ →\ Image\ Toolbox
         YouTube\ →\ FreeTube
         "YouTube for Android TV → SmartTube"
@@ -776,6 +777,7 @@ while true; do
             activityApp="com.theveloper.pixelplay/.MainActivity"
             dlApp "${appName}" "$owner" "$appName" "$release" "" "$file_pattern" "$tag" "$assets" "$pkgApp" "$activityApp"
             ;;
+          "Docs + Slides + Sheets → Microsoft 365") termux-open-url "https://play.google.com/store/apps/details?id=com.microsoft.office.officehubrow" ;;
           Snapseed\ →\ Image\ Toolbox) termux-open-url "https://play.google.com/store/apps/details?id=ru.tech.imageresizershrinker" ;;
           YouTube\ →\ FreeTube)
             appName="FreeTubeAndroid"
