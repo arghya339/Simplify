@@ -68,6 +68,8 @@ appInstall() {
             fi
           elif [ "$appName" == "YTPro" ] || [ "$appName" == "Nobook" ]; then
             termux-open-url "https://play.google.com/store/apps/details?id=com.google.android.webview"
+          elif [ "$appName" == "Gadgetbridge" ]; then
+            termux-open-url "https://gadgetbridge.org/gadgets/wearables/"
           fi
           data "$appName" "$updated_at" "$tag"
         fi
@@ -754,7 +756,6 @@ while true; do
             assets="${pkgName}_${suggestedVersionCode}.apk"
             activityClass="nodomain.freeyourgadget.gadgetbridge/.activities.ControlCenterv2"
             dlApp "${appName}" "Freeyourgadget" "Gadgetbridge" "$release" "" "$file_pattern" "v$suggestedVersionName" "$assets" "$pkgName" "$activityClass"
-            termux-open-url "https://gadgetbridge.org/gadgets/wearables/"
             ;;
           Google\ Keep\ →\ Notesnook) termux-open-url "https://play.google.com/store/apps/details?id=com.streetwriters.notesnook" ;;
           Google\ Maps\ →\ OsmAnd) termux-open-url "https://play.google.com/store/apps/details?id=net.osmand" ;;
