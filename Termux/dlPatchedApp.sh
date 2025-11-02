@@ -707,6 +707,7 @@ while true; do
         Quick\ Share\ →\ LocalSend
         AOSP\ Missing\ RT\ Network\ Speed\ Indicator\ →\ Data\ Monitor
         AOSP\ Missing\ ScreenTimeout\ Always-on\ opt\ →\ Keep\ Screen\ On
+        "Android 6.0+ restricted ClearAllAppCachesAtOnce → Cache Cleaner"
         Google\ Public\ DNS\ →\ NextDNS\ Manager
         ADB\ →\ Shizuku
         Pixel\ PhoneServices\ RadioInfoSettings\ →\ NetworkSwitch\ QuickSettingsTile
@@ -1003,6 +1004,17 @@ while true; do
           Quick\ Share\ →\ LocalSend) termux-open-url "https://play.google.com/store/apps/details?id=org.localsend.localsend_app" ;;
           AOSP\ Missing\ RT\ Network\ Speed\ Indicator\ →\ Data\ Monitor) termux-open-url "https://play.google.com/store/apps/details?id=com.drnoob.datamonitor" ;;
           AOSP\ Missing\ ScreenTimeout\ Always-on\ opt\ →\ Keep\ Screen\ On) termux-open-url "https://play.google.com/store/apps/details?id=eu.davidweis.keepscreenon" ;;
+          "Android 6.0+ restricted ClearAllAppCachesAtOnce → Cache Cleaner")
+            appName="Cache Cleaner"
+            owner="bmx666"
+            repo="android-appcachecleaner"
+            file_pattern="$repo-*.apk"
+            tag=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases/latest" | jq -r '.tag_name')
+            assets="app-release.apk"
+            pkgApp="com.github.bmx666.appcachecleaner"
+            activityApp=""
+            dlApp "${appName}" "$owner" "$repo" "$release" "$assets" "$file_pattern" "$tag" "$assets" "$pkgApp" "$activityApp"
+            ;;
           Google\ Public\ DNS\ →\ NextDNS\ Manager) termux-open-url "https://play.google.com/store/apps/details?id=com.doubleangels.nextdnsmanagement" ;;
           ADB\ →\ Shizuku)
             appName="Shizuku"
