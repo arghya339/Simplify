@@ -675,6 +675,7 @@ while true; do
         Google\ Drive\ →\ Nextcloud
         Google\ Drive\ →\ Microsoft\ OneDrive
         Google\ Drive\ →\ Proton\ Drive
+        Phone\ by\ Google\ →\ Fossify\ Phone
         Google\ Fit\ →\ Gadgetbridge
         Google\ Keep\ →\ Notesnook
         Google\ Maps\ →\ OsmAnd
@@ -824,6 +825,7 @@ while true; do
           Google\ Drive\ →\ Nextcloud) termux-open-url "https://play.google.com/store/apps/details?id=com.nextcloud.client" ;;
           Google\ Drive\ →\ Microsoft\ OneDrive) termux-open-url "https://play.google.com/store/apps/details?id=com.microsoft.skydrive" ;;
           Google\ Drive\ →\ Proton\ Drive) termux-open-url "https://play.google.com/store/apps/details?id=me.proton.android.drive" ;;
+          Phone\ by\ Google\ →\ Fossify\ Phone) termux-open-url "https://play.google.com/store/apps/details?id=org.fossify.phone" ;;
           Google\ Fit\ →\ Gadgetbridge)
             appName="Gadgetbridge"
             pkgName="nodomain.freeyourgadget.gadgetbridge"
