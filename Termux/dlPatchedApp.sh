@@ -701,6 +701,7 @@ while true; do
         Google\ Weather\ →\ Breezy\ Weather
         Google\ Recorder\ →\ RecordYou
         Pixel\ Launcher\ →\ Lawnchair
+        Private\ Space\ →\ Amarok-Hider
         VPN\ by\ Google\ One\ →\ 1.1.1.1\ +\ WARP
         VPN\ by\ Google\ One\ →\ WireGuard\ +\ WireGuard\ config\ by\ Proton\ VPN
         VPN\ by\ Google\ One\ →\ Tor\ VPN
@@ -997,6 +998,17 @@ while true; do
             pkgApp="app.lawnchair.lawnfeed"
             activityApp=
             dlApp "${appName}" "$owner" "$repo" "$release" "" "$file_pattern" "$tag" "$assets" "$pkgApp" "$activityApp"
+            ;;
+          Private\ Space\ →\ Amarok-Hider)
+            appName="Amarok"
+            owner="deltazefiro"
+            repo="Amarok-Hider"
+            file_pattern="$appName-v*.apk"
+            tag=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases/latest" | jq -r '.tag_name')
+            assets="$appName-$tag.apk"
+            pkgApp="deltazero.amarok"
+            activityApp="deltazero.amarok/.launcher.default"
+            dlApp "${appName}" "$owner" "$repo" "$release" "$assets" "$file_pattern" "$tag" "$assets" "$pkgApp" "$activityApp"
             ;;
           VPN\ by\ Google\ One\ →\ 1.1.1.1\ +\ WARP) termux-open-url "https://play.google.com/store/apps/details?id=com.cloudflare.onedotonedotonedotone" ;;
           VPN\ by\ Google\ One\ →\ WireGuard\ +\ WireGuard\ config\ by\ Proton\ VPN) termux-open-url "https://play.google.com/store/apps/details?id=com.wireguard.android" && sleep 0.5 && termux-open-url "https://account.protonvpn.com/downloads" ;;
