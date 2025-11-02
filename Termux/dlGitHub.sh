@@ -81,7 +81,7 @@ dlGitHub() {
     if [ "$repo" == "APKEditor" ]; then
       latestReleases=$(jq -r '.tag_name | sub("^V"; "")' <<< "$ghApiResponseJson")  # 1.4.3
       echo -e "$info latestReleases: V$latestReleases"
-    elif [ "$repo" == "FreeTubeAndroid" ] || [ "$repo" == "bundletool" ] || [ "$repo" == "twitter-apk" ] || [ "$repo" == "lawnchair" ] || [ "$repo" == "Nagram" ] || [ "$repo" == "revenge-xposed" ] || [ "$repo" == "io.github.vvb2060.callrecording" ] || [ "$repo" == "Gallery" ] || [ "$repo" == "PixelPlay" ]; then
+    elif [ "$repo" == "FreeTubeAndroid" ] || [ "$repo" == "bundletool" ] || [ "$repo" == "twitter-apk" ] || [ "$repo" == "lawnchair" ] || [ "$repo" == "Nagram" ] || [ "$repo" == "revenge-xposed" ] || [ "$repo" == "io.github.vvb2060.callrecording" ] || [ "$repo" == "Gallery" ] || [ "$repo" == "PixelPlay" ] || [ "$repo" == "SmartTube" ]; then
       latestReleases=$(jq -r '.tag_name' <<< "$ghApiResponseJson")  # 0.23.5.17
       echo -e "$info latestReleases: $latestReleases"
     else
@@ -121,6 +121,9 @@ dlGitHub() {
         assetsNamePattern=$(echo "$assetsName" | sed "s/$name/*/g")
       elif [ "$repo" == "Gallery" ]; then
         name=$(jq -r '.name' <<< "$ghApiResponseJson" | sed 's/ Release$//')
+        assetsNamePattern=$(echo "$assetsName" | sed "s/$name/*/g")
+      elif [ "$repo" == "SmartTube" ]; then
+        name=$(jq -r '.name' <<< "$ghApiResponseJson" | sed 's/ Stable$//')
         assetsNamePattern=$(echo "$assetsName" | sed "s/$name/*/g")
       elif [ "$repo" == "Shizuku" ]; then
         assetsNamePattern=$(echo "$assetsName" | sed "s/$latestReleases/*/g" | sed -E 's/\.r[^.]+/.r*/; s/\.[^-]+-/.*-/')
@@ -175,9 +178,9 @@ dlGitHub() {
         if [ "$repo" == "APKEditor" ]; then
           dlUrl="https://github.com/$owner/$repo/releases/download/V${latestReleases}/$assetsName"
           dl "curl" "$dlUrl" "$findFile"
-        elif [ "$repo" == "PixelPlay" ]; then
+        elif [ "$repo" == "PixelPlay" ] || [ "$repo" == "SmartTube" ]; then
           dlUrl="https://github.com/$owner/$repo/releases/download/${latestReleases}/$assetsName"
-          dl "aria2" "$dlUrl" "$findFile"
+          [ "$repo" == "PixelPlay" ] && dl "aria2" "$dlUrl" "$findFile" || dl "curl" "$dlUrl" "$findFile"
         else
           dlUrl="https://github.com/$owner/$repo/releases/download/v${latestReleases}/$assetsName"
           if [ "$repo" == "revanced-cli" ] || { [ "$repo" == "revanced-patches" ] && { [ "$owner" == "inotia00" ] || [ "$owner" == "anddea" ]; }; } || [ "$repo" == "Nekogram" ] || [ "$repo" == "spotube" ] || [ "$repo" == "shots-studio" ]; then

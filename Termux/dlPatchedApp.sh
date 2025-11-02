@@ -659,6 +659,7 @@ while true; do
         Google\ Photos\ →\ VLC
         Snapseed\ →\ Image\ Toolbox
         YouTube\ →\ FreeTube
+        "YouTube for Android TV → SmartTube"
         Google\ Meet\ →\ Jitsi\ Meet
         Google\ Home\ →\ Home\ Assistant
         Google\ Home\ →\ Sinric\ Pro
@@ -757,6 +758,18 @@ while true; do
             pkgApp="io.freetubeapp.freetube"
             activityApp="io.freetubeapp.freetube/.MainActivity"
             dlApp "${appName}" "$owner" "$repo" "$release" "" "$file_pattern" "$tag" "$assets" "$pkgApp" "$activityApp"
+            ;;
+          "YouTube for Android TV → SmartTube")
+            appName="SmartTube"
+            owner="yuliskov"
+            file_pattern="SmartTube_stable_*_$cpuAbi.apk"
+            ghApiResponseJson=$(curl -s ${auth} "https://api.github.com/repos/$owner/$appName/releases/latest")
+            tag=$(jq -r '.tag_name' <<< "$ghApiResponseJson")
+            name=$(jq -r '.name' <<< "$ghApiResponseJson" | sed 's/ Stable$//')
+            assets="SmartTube_stable_${name}_$cpuAbi.apk"
+            pkgApp="com.teamsmart.videomanager.tv"
+            activityApp="com.teamsmart.videomanager.tv/com.liskovsoft.smartyoutubetv2.tv.ui.main.SplashActivity"
+            dlApp "${appName}" "$owner" "$appName" "$release" "$assets" "$file_pattern" "$tag" "$assets" "$pkgApp" "$activityApp"
             ;;
           Google\ Meet\ →\ Jitsi\ Meet) termux-open-url "https://play.google.com/store/apps/details?id=org.jitsi.meet" ;;
           Google\ Home\ →\ Home\ Assistant) termux-open-url "https://play.google.com/store/apps/details?id=io.homeassistant.companion.android" ;;
