@@ -295,6 +295,7 @@ fi
 if [ $Android -ge 10 ]; then
   apps=(
     ${Snapchat}
+    Reddit
     Discord
     ${LINE}
     ${googleDialer}
@@ -303,6 +304,7 @@ if [ $Android -ge 10 ]; then
 elif [ $Android -eq 9 ]; then
   apps=(
     ${Snapchat}
+    Reddit
     Discord
     ${googleDialer}
     "1.1.1.1 + WARP"
@@ -365,6 +367,18 @@ while true; do
       activityPatched="com.snapchat.android/.LandingPageActivity"
       BugReport="https://github.com/rhunk/SnapEnhance/issues/new?template=bug_report.yml"
       build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "APKMirror" "$module_apk_path" "$BugReport" "$pkgName" "$activityPatched"
+      ;;
+    Reddit)
+      appName=("Reddit")
+      pkgName="com.reddit.frontpage"
+      pkgVersion="2025.43.0"
+      Type="BUNDLE"
+      Arch=("universal")
+      bash $Simplify/dlGitHub.sh "Xposed-Modules-Repo" "com.wizpizz.reddidnt" "latest" ".apk" "$LSPatch"
+      module_apk_path=$(find "$LSPatch" -type f -name "com.wizpizz.reddidnt-v*.apk" -print -quit)
+      echo -e "$info module_apk_path: $module_apk_path"
+      activityPatched="com.reddit.frontpage/launcher.default"
+      build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "APKMirror" "$module_apk_path" "" "$pkgName" "$activityPatched"
       ;;
     Discord)
       appName=("Discord")
