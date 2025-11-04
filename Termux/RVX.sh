@@ -125,6 +125,7 @@ patch_app() {
       -i "materialyou" -i "spoof-streaming-data" -e "hide-autoplay-button" -e "hide-cast-button"  -e "hide-create-button" -e "hide-endscreen-overlay" -e "hide-next-prev-button" \
       -e "hide-player-captions-button" -e "hide-player-overlay-filter" -e "hide-shorts-button" -e "switch-create-notification" \
       --custom-aapt2-binary="$HOME/aapt2" --purge | tee "$log"  # --options $SimplUsr/options.json $ripLib 
+      [ -f $HOME/options.json ] && rm -f ~/options.json
   elif [ $Android -eq 5 ] && [ "$appName" == "YouTube" ]; then
     $PREFIX/lib/jvm/java-$jdkVersion-openjdk/bin/java -jar $ReVancedCLIv4 patch $stock_apk_path -o $outputAPK -m $IntegrationsApk --options $SimplUsr/options.json -b $PatchesJar \
       -i patch-options -i custom-branding-icon-afn-blue -i custom-branding-icon-revancify -i materialyou -i spoof-app-version \
