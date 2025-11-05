@@ -33,7 +33,7 @@ Installer=$(jq -r '.Installer' "$simplifyJson" 2>/dev/null)
 Reinstall=$(jq -r '.Reinstall' "$simplifyJson" 2>/dev/null)
 EnableRoolback=$(jq -r '.EnableRoolback' "$simplifyJson" 2>/dev/null)
 
-[ $InstallPackageFor -eq 0 ] && cmd="--user $(am get-current-user)" || cmd="--all-users"
+[ $InstallPackageFor -eq 0 ] && cmd="--user $(am get-current-user)" || cmd="--user all"
 [ $GrantAllRuntimePermissions -eq 1 ] && cmd+=" -g"
 [ $InstalledAsTestOnly -eq 1 ] && cmd+=" -t"
 [ $BypassLowTargetSdkBolck -eq 1 ] && cmd+=" --bypass-low-target-sdk-block"
