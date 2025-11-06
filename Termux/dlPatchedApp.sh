@@ -670,6 +670,7 @@ while true; do
         Google\ Gallery\ →\ Gallery
         Files\ by\ Google\ →\ ZArchiver
         Chrome\ →\ Chromium
+        Chrome\ →\ Cromite
         Chrome\ →\ Firefox
         Google\ Authenticator\ →\ Ente\ Auth
         Google\ Calculator\ →\ Multi-Calculator
@@ -827,6 +828,18 @@ while true; do
             ;;
           Files\ by\ Google\ →\ ZArchiver) termux-open-url "https://play.google.com/store/apps/details?id=ru.zdevs.zarchiver" ;;
           Chrome\ →\ Chromium) termux-open-url "https://github.com/arghya339/crdl" ;;
+          Chrome\ →\ Cromite)
+            appName="Cromite"
+            owner="uazo"
+            repo="cromite"
+            file_pattern="$repo-*-$cpuAbi.apk"
+            tag=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases" | jq -r '.[] | select(.tag_name | contains("extension")) | .tag_name')
+            #dlUrl=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases" | jq -r '.[].assets[] | select(.browser_download_url | contains("extension")) | .browser_download_url')
+            assets="ChromePublic_arm64.apk"
+            pkgApp="org.cromite.cromite"
+            activityApp="org.cromite.cromite/com.google.android.apps.chrome.Main"
+            dlApp "${appName}" "$owner" "$repo" "$release" "" "$file_pattern" "$tag" "$assets" "$pkgApp" "$activityApp"
+            ;;
           Chrome\ →\ Firefox) termux-open-url "https://play.google.com/store/apps/details?id=org.mozilla.firefox" ;;
           Google\ Authenticator\ →\ Ente\ Auth) termux-open-url "https://play.google.com/store/apps/details?id=io.ente.auth" ;;
           Google\ Calculator\ →\ Multi-Calculator) termux-open-url "https://play.google.com/store/apps/details?id=com.yangdai.calc" ;;
