@@ -74,10 +74,10 @@ dlGitHub() {
 
   if [ "$releases" == "latest" ]; then
     # Get Latest Releases JSON Response from GH API
-    if [ "$repo" != "ReVancedApp-Actions" ] || [ "$repo" != "Revanced-And-Revanced-Extended-Non-Root" ]; then
-      ghApiResponseJson=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases/latest")
-    elif [ "$repo" == "cromite" ]; then
+    if [ "$repo" == "cromite" ]; then
       ghApiResponseJson=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases")
+    elif [ "$repo" != "ReVancedApp-Actions" ] || [ "$repo" != "Revanced-And-Revanced-Extended-Non-Root" ]; then
+      ghApiResponseJson=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases/latest")
     fi
     # Extract latest releases tag_name from GH API response json
     if [ "$repo" == "APKEditor" ]; then
