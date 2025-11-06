@@ -1291,8 +1291,12 @@ while true; do
         CheckTermuxUpdate=$(jq -r '.CheckTermuxUpdate' "$simplifyJson" 2>/dev/null)
         jdkVersion=$(jq -r '.openjdk' "$simplifyJson" 2>/dev/null)
         options=(FetchPreRelease RipLocale RipDpi RipLib Change\ RVX\ Source "Add gh PAT (increases gh api rate limit)" Import\ Custom\ PatchesOptions\ from\ file "Change YouTube & YT Music AppIcon & Header" Check\ Termux\ update\ on\ startup Change\ Java\ version)
-        if [ $su -eq 1 ] || "$HOME/rish" -c "id" >/dev/null 2>&1 || "$HOME/adb" -s $(~/adb devices 2>/dev/null | head -2 | tail -1 | awk '{print $1}') shell "id" >/dev/null 2>&1; then
-          options+=("SU/ SUI/ ADB Installation Options")
+        if [ $su -eq 1 ]; then
+          options+=("SU Installation Options")
+        elif "$HOME/rish" -c "id" >/dev/null 2>&1; then
+          options+=("SUI Installation Options")
+        elif "$HOME/adb" -s $(~/adb devices | grep "device$" | awk '{print $1}' | tail -1) shell "id" >/dev/null 2>&1; then
+          options+=("ADB Installation Options")
         fi
         if [ "$(getprop ro.product.manufacturer)" == "Genymobile" ] && ! "$HOME/adb" -s $(~/adb devices 2>/dev/null | head -2 | tail -1 | awk '{print $1}') shell "id" >/dev/null 2>&1; then
           options+=(Pair\ ADB)
@@ -1397,7 +1401,7 @@ while true; do
               echo -e "$good ${Green}Java version change successfully!${Reset}"
             fi
             ;;
-          "SU/ SUI/ ADB Installation Options")
+          "SU Installation Options"|"SUI Installation Options"|"ADB Installation Options")
             while true; do
               InstallPackageFor=$(jq -r '.InstallPackageFor' "$simplifyJson" 2>/dev/null)
               KeepsData=$(jq -r '.KeepsData' "$simplifyJson" 2>/dev/null)
