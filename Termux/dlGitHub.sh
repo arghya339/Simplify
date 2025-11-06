@@ -88,7 +88,7 @@ dlGitHub() {
       if [ "$repo" == "ReVancedApp-Actions" ] || [ "$repo" == "Revanced-And-Revanced-Extended-Non-Root" ]; then
         latestReleases="all"; echo -e "$info latestReleases: $latestReleases"
       else
-        latestReleases=$(jq -r '.tag_name | sub("^v"; "")' <<< "$ghApiResponseJson")
+        [ "$repo" == "cromite" ] && latestReleases=$(jq -r '.[] | select(.tag_name | contains("extension")) | .tag_name | sub("^v"; "")' <<< "$ghApiResponseJson") || latestReleases=$(jq -r '.tag_name | sub("^v"; "")' <<< "$ghApiResponseJson")
         echo -e "$info latestReleases: v$latestReleases"
       fi
     fi
