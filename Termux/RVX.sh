@@ -119,7 +119,7 @@ patch_app() {
     curl -sL -C - -o $SimplUsr/options.json https://raw.githubusercontent.com/arghya339/ReVancedApp-Actions/refs/heads/main/src/options/revanced-extended-android-5.json
   fi
   if [ $ChangeRVXSource -eq 0 ] && [ "$appName" == "Reddit" ] && [ "$ARSCLib" == "true" ]; then
-    ARSCLib="RVX/ARSCLib"; mkdir -p "$ARSCLib"
+    ARSCLib="$RVX/ARSCLib"; mkdir -p "$ARSCLib"
     bash $Simplify/dlGitHub.sh "inotia00" "revanced-cli-arsclib" "latest" ".jar" "$ARSCLib"
     rvCli=$(find "$ARSCLib" -type f -name "revanced-cli-*-all.jar" -print -quit)
     bash $Simplify/dlGitHub.sh "$owner" "revanced-patches-arsclib" "latest" ".jar" "$ARSCLib"
