@@ -118,6 +118,15 @@ patch_app() {
     echo -e "$info ${Blue}IntegrationsApk:${Reset} $IntegrationsApk"
     curl -sL -C - -o $SimplUsr/options.json https://raw.githubusercontent.com/arghya339/ReVancedApp-Actions/refs/heads/main/src/options/revanced-extended-android-5.json
   fi
+  if [ $ChangeRVXSource -eq 0 ] && [ "$appName" == "Reddit" ] && [ "$ARSCLib" == "true" ]; then
+    ARSCLib="RVX/ARSCLib"; mkdir -p "$ARSCLib"
+    bash $Simplify/dlGitHub.sh "inotia00" "revanced-cli-arsclib" "latest" ".jar" "$ARSCLib"
+    rvCli=$(find "$ARSCLib" -type f -name "revanced-cli-*-all.jar" -print -quit)
+    bash $Simplify/dlGitHub.sh "$owner" "revanced-patches-arsclib" "latest" ".jar" "$ARSCLib"
+    rvPatches=$(find "$ARSCLib" -type f -name "revanced-patches-*.jar" -print -quit)
+    bash $Simplify/dlGitHub.sh "$owner" "revanced-integrations" "latest" ".apk" "$ARSCLib"
+    rvIntegrations=$(find "$ARSCLib" -type f -name "revanced-integrations-*.apk" -print -quit)
+  fi
   
   echo -e "$running Patching ${appName} RVX.."
   if [[ ( $Android -eq 7 || $Android -eq 6 ) && ( "$appName" == "YouTube" ) && ( $ChangeRVXSource -eq 1 ) ]]; then
@@ -131,6 +140,12 @@ patch_app() {
       -i patch-options -i custom-branding-icon-afn-blue -i custom-branding-icon-revancify -i materialyou -i spoof-app-version \
       -e custom-branding-icon-afn-red -e hide-autoplay-button -e hide-cast-buttom -e hide-create-button -e hide-endscreen-overlay -e hide-next-prev-button -e hide-player-captions-button -e hide-player-overlay-filter -e hide-shorts-button -e hide-snackbar -e switch-create-notification \
       --custom-aapt2-binary="$HOME/aapt2" --purge $ripLib | tee "$log"
+  elif [ $ChangeRVXSource -eq 0 ] && [ "$appName" == "Reddit" ] && [ "$ARSCLib" == "true" ]; then
+    $PREFIX/lib/jvm/java-$jdkVersion-openjdk/bin/java -jar $rvCli options -b $rvPatches  # Genarate patches options.json
+    jq '(.[] | select(.patchName == "Change version code").options[] | select(.key == "ChangeVersionCode").value) |= true' options.json > temp.json && mv temp.json options.json  # modifiy ChangeVersionCode key value = true
+    $PREFIX/lib/jvm/java-$jdkVersion-openjdk/bin/java -jar "$rvCli" -a "$stock_apk_path" -o "$SimplUsr" -m "$rvIntegrations" --options options.json -b "$rvPatches" -i "Change version code" -e "Custom branding name for Reddit" -c  # Patch
+    rm -f options.json; rm -f $SimplUsr/revanced.keystore  # remove files
+    mv "$SimplUsr/base.apk" "$outputAPK"  # rename output patched apk using mv
   else
     $PREFIX/lib/jvm/java-$jdkVersion-openjdk/bin/java -jar $ReVancedCLIJar patch -p $PatchesRvp \
       -o "$outputAPK" "$stock_apk_path" \
@@ -610,11 +625,12 @@ while true; do
       ;;
     Reddit)
       pkgName="com.reddit.frontpage"
-      #pkgVersion="2025.12.1"
-      pkgVersion=""
+      pkgVersion="2025.44.0"; ARSCLib="true"
+      #pkgVersion=""
       if [ -z "$pkgVersion" ]; then
         getVersion "$pkgName"
         pkgVersion="$pkgVersion"
+        ARSCLib="false"
       fi
       Type="BUNDLE"
       Arch="universal"
