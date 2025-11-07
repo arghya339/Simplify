@@ -833,9 +833,17 @@ while true; do
             owner="uazo"
             repo="cromite"
             file_pattern="$repo-*-$cpuAbi.apk"
-            tag=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases" | jq -r '.[] | select(.tag_name | contains("extension")) | .tag_name')
+            tag=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases/latest" | jq -r '.tag_name | sub("^v"; "")' 2>/dev/null)
+            #tag=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases" | jq -r '.[] | select(.tag_name | contains("extension")) | .tag_name')
             #dlUrl=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases" | jq -r '.[].assets[] | select(.browser_download_url | contains("extension")) | .browser_download_url')
-            assets="ChromePublic_arm64.apk"
+            #assets="ChromePublic_arm64.apk"
+            if [ "$cpuAbi" == "armeabi-v7a" ]; then
+              assets="arm_ChromePublic.apk"
+            elif [ "$cpuAbi" == "arm64-v8a" ]; then
+              assets="arm64_ChromePublic.apk"
+            else
+              assets="x64_ChromePublic.apk"
+            fi
             pkgApp="org.cromite.cromite"
             activityApp="org.cromite.cromite/com.google.android.apps.chrome.Main"
             dlApp "${appName}" "$owner" "$repo" "$release" "$assets" "$file_pattern" "$tag" "$assets" "$pkgApp" "$activityApp"

@@ -74,9 +74,7 @@ dlGitHub() {
 
   if [ "$releases" == "latest" ]; then
     # Get Latest Releases JSON Response from GH API
-    if [ "$repo" == "cromite" ]; then
-      ghApiResponseJson=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases")
-    elif [ "$repo" != "ReVancedApp-Actions" ] || [ "$repo" != "Revanced-And-Revanced-Extended-Non-Root" ]; then
+    if [ "$repo" != "ReVancedApp-Actions" ] || [ "$repo" != "Revanced-And-Revanced-Extended-Non-Root" ]; then
       ghApiResponseJson=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases/latest")
     fi
     # Extract latest releases tag_name from GH API response json
@@ -90,14 +88,14 @@ dlGitHub() {
       if [ "$repo" == "ReVancedApp-Actions" ] || [ "$repo" == "Revanced-And-Revanced-Extended-Non-Root" ]; then
         latestReleases="all"; echo -e "$info latestReleases: $latestReleases"
       else
-        [ "$repo" == "cromite" ] && latestReleases=$(jq -r '.[] | select(.tag_name | contains("extension")) | .tag_name | sub("^v"; "")' <<< "$ghApiResponseJson") || latestReleases=$(jq -r '.tag_name | sub("^v"; "")' <<< "$ghApiResponseJson")
+        latestReleases=$(jq -r '.tag_name | sub("^v"; "")' <<< "$ghApiResponseJson")
         echo -e "$info latestReleases: v$latestReleases"
       fi
     fi
     
     # Extract assets from GH API response json & built assets name pattern for find downloaded assets
     if [ "$repo" == "VancedMicroG" ] || [ "$repo" == "LSPatch" ] || [ "$repo" == "YTPro" ] || [ "$repo" == "cloudstream" ] || [ "$repo" == "revenge-xposed" ] || [ "$repo" == "io.github.vvb2060.callrecording" ] || [ "$owner" == "Droid-ify" ] || [ "$repo" == "Obtainium" ] || [ "$repo" == "Metrolist" ] || [ "$repo" == "Acode" ] || [ "$repo" == "PrivateDNSAndroid" ] || [ "$repo" == "RecordYou" ] || [ "$repo" == "android-appcachecleaner" ] || [ "$repo" == "com.wizpizz.reddidnt" ] || [ "$repo" == "cromite" ]; then
-      [ "$repo" == "cromite" ] && assetsName=$(jq -r '.[].assets[] | select(.browser_download_url | contains("extension")) | .name' <<< "$ghApiResponseJson") || assetsName=$(jq -r --arg regex "$regex" '.assets[] | select(.name | test($regex)) | .name' <<< "$ghApiResponseJson" | head -1)
+      assetsName=$(jq -r --arg regex "$regex" '.assets[] | select(.name | test($regex)) | .name' <<< "$ghApiResponseJson" | head -1)
       if [ "$repo" == "cloudstream" ] || [ "$repo" == "revenge-xposed" ] || [ "$repo" == "io.github.vvb2060.callrecording" ] || [ "$repo" == "PrivateDNSAndroid" ] || [ "$repo" == "RecordYou" ] || [ "$repo" == "android-appcachecleaner" ]; then
         fileName="$repo-${latestReleases}$ext"
       elif [ "$repo" == "com.wizpizz.reddidnt" ]; then
