@@ -833,7 +833,7 @@ while true; do
             owner="uazo"
             repo="cromite"
             file_pattern="$repo-*-$cpuAbi.apk"
-            tag=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases/latest" | jq -r '.tag_name | sub("^v"; "")' 2>/dev/null)
+            tag=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases/latest" | jq -r '.tag_name')
             #tag=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases" | jq -r '.[] | select(.tag_name | contains("extension")) | .tag_name')
             #dlUrl=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases" | jq -r '.[].assets[] | select(.browser_download_url | contains("extension")) | .browser_download_url')
             #assets="ChromePublic_arm64.apk"
