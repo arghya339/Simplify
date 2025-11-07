@@ -1203,7 +1203,7 @@ while true; do
     Duolingo)
       pkgName="com.duolingo"
       appName=("Duolingo")
-      pkgVersion="6.52.4"
+      pkgVersion="6.54.5"
       #pkgVersion=""
       if [ -z "$pkgVersion" ]; then
         getVersion "$pkgName"
