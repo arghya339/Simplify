@@ -119,13 +119,13 @@ patch_app() {
     curl -sL -C - -o $SimplUsr/options.json https://raw.githubusercontent.com/arghya339/ReVancedApp-Actions/refs/heads/main/src/options/revanced-extended-android-5.json
   fi
   if [ $ChangeRVXSource -eq 0 ] && [ "$appName" == "Reddit" ] && [ "$ARSCLib" == "true" ]; then
-    ARSCLib="$RVX/ARSCLib"; mkdir -p "$ARSCLib"
-    bash $Simplify/dlGitHub.sh "inotia00" "revanced-cli-arsclib" "latest" ".jar" "$ARSCLib"
-    rvCli=$(find "$ARSCLib" -type f -name "revanced-cli-*-all.jar" -print -quit)
-    bash $Simplify/dlGitHub.sh "$owner" "revanced-patches-arsclib" "latest" ".jar" "$ARSCLib"
-    rvPatches=$(find "$ARSCLib" -type f -name "revanced-patches-*.jar" -print -quit)
-    bash $Simplify/dlGitHub.sh "$owner" "revanced-integrations" "latest" ".apk" "$ARSCLib"
-    rvIntegrations=$(find "$ARSCLib" -type f -name "revanced-integrations-*.apk" -print -quit)
+    mkdir -p "$RVX/ARSCLib"
+    bash $Simplify/dlGitHub.sh "inotia00" "revanced-cli-arsclib" "latest" ".jar" "$RVX/ARSCLib"
+    rvCli=$(find "$RVX/ARSCLib" -type f -name "revanced-cli-*-all.jar" -print -quit)
+    bash $Simplify/dlGitHub.sh "$owner" "revanced-patches-arsclib" "latest" ".jar" "$RVX/ARSCLib"
+    rvPatches=$(find "$RVX/ARSCLib" -type f -name "revanced-patches-*.jar" -print -quit)
+    bash $Simplify/dlGitHub.sh "$owner" "revanced-integrations" "latest" ".apk" "$RVX/ARSCLib"
+    rvIntegrations=$(find "$RVX/ARSCLib" -type f -name "revanced-integrations-*.apk" -print -quit)
   fi
   
   echo -e "$running Patching ${appName} RVX.."
