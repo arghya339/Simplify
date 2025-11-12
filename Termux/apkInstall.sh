@@ -64,8 +64,8 @@ apkInstall() {
     fi
   elif "$HOME/rish" -c "id" >/dev/null 2>&1; then
     local activityClass=$($HOME/rish -c "pm resolve-activity --brief $pkgName" | tail -n 1)
-  elif "$HOME/adb" -s $(~/adb devices 2>/dev/null | head -2 | tail -1 | cut -f1) shell "id" >/dev/null 2>&1; then
-    local activityClass=$($HOME/adb -s $(~/adb devices 2>/dev/null | head -2 | tail -1 | cut -f1) shell "pm resolve-activity --brief $pkgName" | tail -n 1)
+  elif "$HOME/adb" -s $(~/adb devices | grep "device$" | awk '{print $1}' | tail -1) shell "id" >/dev/null 2>&1; then
+    local activityClass=$(~/adb -s $("$HOME/adb" devices 2>/dev/null | grep "device$" | awk '{print $1}' | tail -1) shell "pm resolve-activity --brief $pkgName" | tail -n 1)
   else
     local activityClass="$activity"
   fi
@@ -138,27 +138,27 @@ apkInstall() {
       ~/rish -c "monkey -p $pkgName -c android.intent.category.LAUNCHER 1" > /dev/null 2>&1
     fi
     $HOME/rish -c "rm -f '/data/local/tmp/$outputFileName'"  # Cleanup tmp APK
-  elif "$HOME/adb" -s $(~/adb devices 2>/dev/null | head -2 | tail -1 | awk '{print $1}') shell "id" >/dev/null 2>&1; then
-    [ $DisablePlayProtect -eq 1 ] && "$HOME/adb" -s $(~/adb devices 2>/dev/null | head -2 | tail -1 | awk '{print $1}') shell "settings put global package_verifier_user_consent -1"  # Disabled Play Protect
+  elif "$HOME/adb" -s $(~/adb devices | grep "device$" | awk '{print $1}' | tail -1) shell "id" >/dev/null 2>&1; then
+    [ $DisablePlayProtect -eq 1 ] && ~/adb -s $("$HOME/adb" devices 2>/dev/null | grep "device$" | awk '{print $1}' | tail -1) shell "settings put global package_verifier_user_consent -1"  # Disabled Play Protect
     if [ $DisableVerifyAdbInstalls -eq 1 ]; then
-      [ $Android -le 10 ] && ~/adb -s $("$HOME/adb" devices 2>/dev/null | head -2 | tail -1 | awk '{print $1}') shell "settings put global package_verifier_enable 0" || ~/adb -s $("$HOME/adb" devices 2>/dev/null | head -2 | tail -1 | awk '{print $1}') shell "settings put global verifier_verify_adb_installs 0"  # Disable Verify Adb Installs
+      [ $Android -le 10 ] && ~/adb -s $("$HOME/adb" devices 2>/dev/null | grep "device$" | awk '{print $1}' | tail -1) shell "settings put global package_verifier_enable 0" || ~/adb -s $("$HOME/adb" devices 2>/dev/null | grep "device$" | awk '{print $1}' | tail -1) shell "settings put global verifier_verify_adb_installs 0"  # Disable Verify Adb Installs
     fi
-    output=$(~/adb -s $(~/adb devices 2>/dev/null | head -2 | tail -1 | cut -f1) shell pm install ${cmd} "$outputAPK" 2>&1)
-    #$HOME/adb -s $(~/adb devices 2>/dev/null | head -2 | tail -1 | awk '{print $1}') install ${cmd} "$outputAPK" 2>&1
-    #~/adb -s $(~/adb devices 2>/dev/null | head -2 | tail -1 | awk '{print $1}') shell cmd package install ${cmd} "$outputAPK" > /dev/null 2>&1
-    [ $DisablePlayProtect -eq 1 ] && ~/adb -s $(~/adb devices 2>/dev/null | head -2 | tail -1 | awk '{print $1}') shell "settings put global package_verifier_user_consent 1"  # Enabled Play Protect
+    output=$(~/adb -s $("$HOME/adb" devices 2>/dev/null | grep "device$" | awk '{print $1}' | tail -1) shell pm install ${cmd} "$outputAPK" 2>&1)
+    #~/adb -s $("$HOME/adb" devices 2>/dev/null | grep "device$" | awk '{print $1}' | tail -1) install ${cmd} "$outputAPK" 2>&1
+    #~/adb -s $("$HOME/adb" devices 2>/dev/null | grep "device$" | awk '{print $1}' | tail -1) shell cmd package install ${cmd} "$outputAPK" > /dev/null 2>&1
+    [ $DisablePlayProtect -eq 1 ] && ~/adb -s $("$HOME/adb" devices 2>/dev/null | grep "device$" | awk '{print $1}' | tail -1) shell "settings put global package_verifier_user_consent 1"  # Enabled Play Protect
     if [ $DisableVerifyAdbInstalls -eq 1 ]; then
-      [ $Android -le 10 ] && ~/adb -s $(~/adb devices 2>/dev/null | head -2 | tail -1 | awk '{print $1}') shell "settings put global package_verifier_enable 1" || ~/adb -s $(~/adb devices 2>/dev/null | head -2 | tail -1 | awk '{print $1}') shell "settings put global verifier_verify_adb_installs 1"  # Enabled Verify Adb Installs
+      [ $Android -le 10 ] && ~/adb -s $("$HOME/adb" devices 2>/dev/null | grep "device$" | awk '{print $1}' | tail -1) shell "settings put global package_verifier_enable 1" || ~/adb -s $("$HOME/adb" devices 2>/dev/null | grep "device$" | awk '{print $1}' | tail -1) shell "settings put global verifier_verify_adb_installs 1"  # Enabled Verify Adb Installs
     fi
     if [[ $output == *"Downgrade detected"* ]] && [ $KeepsData -eq 1 ]; then
       echo -e "${Green}$appName uninstall successfully with keeps app data.${Reset}\n${Yellow}Don't forget to restart Simplify after reboot!${Reset}"
-      ~/adb -s $(~/adb devices 2>/dev/null | head -2 | tail -1 | cut -f1) shell "cmd package uninstall -k $pkgName"
+      ~/adb -s $("$HOME/adb" devices 2>/dev/null | grep "device$" | awk '{print $1}' | tail -1) shell "cmd package uninstall -k $pkgName"
       cp "$outputAPK" "$POST_INSTALL"
       sleep 12
-      "$HOME/adb" -s $(~/adb devices 2>/dev/null | head -2 | tail -1 | awk '{print $1}') "reboot"
+      ~/adb -s $("$HOME/adb" devices 2>/dev/null | grep "device$" | awk '{print $1}' | tail -1) "reboot"
     fi
     am start -n "$activityClass" &> /dev/null  # launch app after update
-    [ $? != 0 ] && ~/adb -s $(~/adb devices 2>/dev/null | head -2 | tail -1 | awk '{print $1}') shell "monkey -p $pkgName -c android.intent.category.LAUNCHER 1" > /dev/null 2>&1
+    [ $? != 0 ] && ~/adb -s $("$HOME/adb" devices 2>/dev/null | grep "device$" | awk '{print $1}' | tail -1) shell "monkey -p $pkgName -c android.intent.category.LAUNCHER 1" > /dev/null 2>&1
   elif [ "$Android" -le "6" ]; then
     am start -a android.intent.action.VIEW -t application/vnd.android.package-archive -d "file://$outputAPK" > /dev/null 2>&1  # Activity Manager
     sleep 15 && am start -n "$activityClass" &> /dev/null  # launch app after update
@@ -167,7 +167,7 @@ apkInstall() {
     sleep 15 && am start -n "$activityClass" &> /dev/null  # launch app after update
   fi
   
-  if [ $su -eq 1 ] || "$HOME/rish" -c "id" >/dev/null 2>&1 || "$HOME/adb" -s $(~/adb devices 2>/dev/null | head -2 | tail -1 | cut -f1) shell "id" >/dev/null 2>&1; then
+  if [ $su -eq 1 ] || "$HOME/rish" -c "id" >/dev/null 2>&1 || "$HOME/adb" -s $(~/adb devices | grep "device$" | awk '{print $1}' | tail -1) shell "id" >/dev/null 2>&1; then
     if [ $EnableRoolback -eq 1 ]; then
       read -r -p "Is the $appName app working correctly? [Y/n]: " response
       if [[ "$response" == [Yy]* ]]; then
@@ -184,8 +184,8 @@ apkInstall() {
           fi
         elif "$HOME/rish" -c "id" >/dev/null 2>&1; then
           $HOME/rish -c "pm rollback-app $pkgName"
-        elif "$HOME/adb" -s $(~/adb devices 2>/dev/null | head -2 | tail -1 | cut -f1) shell "id" >/dev/null 2>&1; then
-          $HOME/adb -s $(~/adb devices 2>/dev/null | head -2 | tail -1 | awk '{print $1}') shell "pm rollback-app $pkgName"
+        elif "$HOME/adb" -s $(~/adb devices | grep "device$" | awk '{print $1}' | tail -1) shell "id" >/dev/null 2>&1; then
+          ~/adb -s $("$HOME/adb" devices 2>/dev/null | grep "device$" | awk '{print $1}' | tail -1) shell "pm rollback-app $pkgName"
         fi
       fi
     fi
