@@ -678,8 +678,14 @@ if [ $CheckTermuxUpdate -eq 1 ]; then
     fileName="termux-app_v${latestReleases}+github-debug_$cpuAbi.apk"
     filePath="$SimplUsr/$fileName"
   else
-    latestReleases=$(curl -s https://api.github.com/repos/termux/termux-app/tags | jq -r '.[0].name | sub("^v"; "")')  # 0.119.0-beta.2
-    [ $Android -eq 7 ] && variant=7 || variant=5
+    if [ $Android -eq 7 ]; then
+      latestReleases=$(curl -s https://api.github.com/repos/termux/termux-app/tags | jq -r '.[0].name | sub("^v"; "")')  # 0.119.0-beta.2
+      variant=7
+    else
+      #oniguruma library (that provides sub related functions) unavailable in precompiled jq binary
+      latestReleases=$(curl -s https://api.github.com/repos/termux/termux-app/tags | jq -r '.[0].name' | sed 's/^v//')  # 0.119.0-beta.2
+      variant=5
+    fi
     dlUrl="https://github.com/termux/termux-app/releases/download/v$latestReleases/termux-app_v${latestReleases}+apt-android-$variant-github-debug_$cpuAbi.apk"
     fileName="termux-app_v${latestReleases}+apt-android-$variant-github-debug_$cpuAbi.apk"
     filePath="$SimplUsr/$fileName"
