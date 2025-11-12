@@ -674,121 +674,63 @@ pat() {
 if [ $CheckTermuxUpdate -eq 1 ]; then
   if [ $Android -ge 8 ]; then
     latestReleases=$(curl -s https://api.github.com/repos/termux/termux-app/releases/latest | jq -r '.tag_name | sub("^v"; "")')  # 0.118.0
-    if [ "$TERMUX_VERSION" != "$latestReleases" ]; then
-      echo -e "$bad Termux app is outdated!"
-      echo -e "$running Downloading Termux app update.."
-      while true; do
-        curl -L --progress-bar -C - -o "$SimplUsr/termux-app_v${latestReleases}+github-debug_$cpuAbi.apk" "https://github.com/termux/termux-app/releases/download/v$latestReleases/termux-app_v${latestReleases}+github-debug_$cpuAbi.apk"
-        if [ $? -eq 0 ]; then
-          break  # break the resuming download loop
-        fi
-        echo -e "$notice Retrying in 5 seconds.." && sleep 5  # wait 5 seconds
-      done
-      #bash $Simplify/dlGitHub.sh "termux" "termux-app" "latest" ".apk" "$SimplUsr" "termux-app_v.*+github-debug_$cpuAbi.apk"
-      echo -e "$notice Please rerun this script again after Termux app update!"
-      echo -e "$running Installing app update and restarting Termux app.." && sleep 3
-      if [ $su -eq 1 ]; then
-        su -c "cp '$SimplUsr/termux-app_v${latestReleases}+github-debug_$cpuAbi.apk' '/data/local/tmp/termux-app_v${latestReleases}+github-debug_$cpuAbi.apk'"
-        # Temporary Disable SELinux Enforcing during installation if it not in Permissive
-        if [ "$(su -c 'getenforce 2>/dev/null')" = "Enforcing" ]; then
-          su -c "setenforce 0"  # set SELinux to Permissive mode to unblock unauthorized operations
-          su -c 'pm grant com.termux android.permission.POST_NOTIFICATIONS'
-          su -c "cmd deviceidle whitelist +com.termux"
-          touch "$Simplify/setenforce0"
-          su -c "pm install -i com.android.vending '/data/local/tmp/termux-app_v${latestReleases}+github-debug_$cpuAbi.apk'"
-        else
-          su -c 'pm grant com.termux android.permission.POST_NOTIFICATIONS'
-          su -c "cmd deviceidle whitelist +com.termux"
-          su -c "pm install -i com.android.vending '/data/local/tmp/termux-app_v${latestReleases}+github-debug_$cpuAbi.apk'"
-        fi
+    dlUrl="https://github.com/termux/termux-app/releases/download/v$latestReleases/termux-app_v${latestReleases}+github-debug_$cpuAbi.apk"
+    fileName="termux-app_v${latestReleases}+github-debug_$cpuAbi.apk"
+    filePath="$SimplUsr/$fileName"
+  else
+    latestReleases=$(curl -s https://api.github.com/repos/termux/termux-app/tags | jq -r '.[0].name | sub("^v"; "")')  # 0.119.0-beta.2
+    [ $Android -eq 7 ] && variant=7 || variant=5
+    dlUrl="https://github.com/termux/termux-app/releases/download/v$latestReleases/termux-app_v${latestReleases}+apt-android-$variant-github-debug_$cpuAbi.apk"
+    fileName="termux-app_v${latestReleases}+apt-android-$variant-github-debug_$cpuAbi.apk"
+    filePath="$SimplUsr/$fileName"
+  fi
+  if [ "$TERMUX_VERSION" != "$latestReleases" ]; then
+    echo -e "$bad Termux app is outdated!"
+    echo -e "$running Downloading Termux app update.."
+    while true; do
+      curl -L --progress-bar -C - -o "$filePath" "$dlUrl"
+      [ $? -eq 0 ] && break || { echo -e "$notice Retrying in 5 seconds.."; sleep 5; }
+    done
+    echo -e "$notice Please rerun this script again after Termux app update!"
+    echo -e "$running Installing app update and restarting Termux app.." && sleep 3
+    if [ $su -eq 1 ]; then
+      su -c "cp '$filePath' '/data/local/tmp/$fileName'"
+      if [ "$(su -c 'getenforce 2>/dev/null')" = "Enforcing" ]; then
+        su -c "setenforce 0"  # set SELinux to Permissive mode to unblock unauthorized operations
+        su -c 'pm grant com.termux android.permission.POST_NOTIFICATIONS'
+        su -c "cmd deviceidle whitelist +com.termux"
+        touch "$Simplify/setenforce0"
+        su -c "pm install -i com.android.vending '/data/local/tmp/$fileName'"
       else
-        if "$HOME/rish" -c "id" >/dev/null 2>&1; then
-          $HOME/rish -c 'pm grant com.termux android.permission.POST_NOTIFICATIONS'
-          $HOME/rish -c "cmd deviceidle whitelist +com.termux"
-          $HOME/rish -c "cmd appops set com.termux REQUEST_INSTALL_PACKAGES allow"
-        else
-          echo -e "$info Please Disabled: ${Green}Battery optimization → Not optimized → All apps → Termux → Don't optiomize → DONE${Reset}" && sleep 6
-          am start -n com.android.settings/.Settings\$HighPowerApplicationsActivity &> /dev/null
-          echo -e "$info Please Allow: ${Green}Install unknown apps → Termux → Allow from this source${Reset}" && sleep 6
-          am start -n com.android.settings/.Settings\$ManageExternalSourcesActivity &> /dev/null
-        fi
-        bash $Simplify/apkInstall.sh "$SimplUsr/termux-app_v${latestReleases}+github-debug_$cpuAbi.apk" "com.termux/.app.TermuxActivity"
+        su -c 'pm grant com.termux android.permission.POST_NOTIFICATIONS'
+        su -c "cmd deviceidle whitelist +com.termux"
+        su -c "pm install -i com.android.vending '/data/local/tmp/$fileName'"
       fi
     else
-      if [ -f "$SimplUsr/termux-app_v${latestReleases}+github-debug_$cpuAbi.apk" ]; then
-        if [ $su -eq 1 ]; then
-          if [ "$(su -c 'getenforce 2>/dev/null')" = "Permissive" ] && [ -f "$Simplify/setenforce0" ]; then
-            su -c "setenforce 1"  # set SELinux to Enforcing mode to block unauthorized operations
-            rm -f "$Simplify/setenforce0"
-          fi
-          su -c "rm -f '/data/local/tmp/termux-app_v${latestReleases}+github-debug_$cpuAbi.apk'"
-        elif "$HOME/rish" -c "id" >/dev/null 2>&1; then
-          ~/rish -c "rm -f '/data/local/tmp/termux-app_v${latestReleases}+github-debug_$cpuAbi.apk'"
-        fi
-        rm -f "$SimplUsr/termux-app_v${latestReleases}+github-debug_$cpuAbi.apk"
+      if "$HOME/rish" -c "id" >/dev/null 2>&1; then
+        $HOME/rish -c 'pm grant com.termux android.permission.POST_NOTIFICATIONS'
+        $HOME/rish -c "cmd deviceidle whitelist +com.termux"
+        $HOME/rish -c "cmd appops set com.termux REQUEST_INSTALL_PACKAGES allow"
+      else
+        echo -e "$info Please Disabled: ${Green}Battery optimization → Not optimized → All apps → Termux → Don't optiomize → DONE${Reset}" && sleep 6
+        am start -n com.android.settings/.Settings\$HighPowerApplicationsActivity &> /dev/null
+        echo -e "$info Please Allow: ${Green}Install unknown apps → Termux → Allow from this source${Reset}" && sleep 6
+        am start -n com.android.settings/.Settings\$ManageExternalSourcesActivity &> /dev/null
       fi
+      bash $Simplify/apkInstall.sh "$filePath" "com.termux/.app.TermuxActivity"
     fi
   else
-    if [ $Android -eq 7 ]; then
-      variant=7
-    else
-      variant=5
-    fi
-    lastReleases=$(curl -s https://api.github.com/repos/termux/termux-app/tags | jq -r '.[0].name | sub("^v"; "")')  # 0.119.0-beta.2
-    if [ "$TERMUX_VERSION" != "$lastReleases" ]; then
-      echo -e "$bad Termux app is outdated!"
-      echo -e "$running Downloading Termux app update.."
-      while true; do
-        $PREFIX/bin/curl -L --progress-bar -C - -o $SimplUsr/termux-app_v${lastReleases}+apt-android-$variant-github-debug_$cpuAbi.apk https://github.com/termux/termux-app/releases/download/v$lastReleases/termux-app_v${lastReleases}+apt-android-$variant-github-debug_$cpuAbi.apk
-        if [ $? -eq 0 ]; then
-          break  # break the resuming download loop
-        fi
-        echo -e "$notice Retrying in 5 seconds.." && sleep 5  # wait 5 seconds
-      done
-      #bash $Simplify/dlGitHub.sh "termux" "termux-app" "pre" ".apk" "$SimplUsr" "termux-app_v.*+apt-android-$variant-github-debug_$cpuAbi.apk"
-      echo -e "$notice Please rerun this script again after Termux app update!"
-      echo -e "$running Installing app update and restarting Termux app.." && sleep 3
+    if [ -f "$filePath" ]; then
       if [ $su -eq 1 ]; then
-        su -c "cp '$SimplUsr/termux-app_v${lastReleases}+apt-android-$variant-github-debug_$cpuAbi.apk' '/data/local/tmp/termux-app_v${lastReleases}+apt-android-$variant-github-debug_$cpuAbi.apk'"
-        # Temporary Disable SELinux Enforcing during installation if it not in Permissive
-        if [ "$(su -c 'getenforce 2>/dev/null')" = "Enforcing" ]; then
-          su -c "setenforce 0"  # set SELinux to Permissive mode to unblock unauthorized operations
-          su -c 'pm grant com.termux android.permission.POST_NOTIFICATIONS'
-          su -c "cmd deviceidle whitelist +com.termux"
-          touch "$Simplify/setenforce0"
-          su -c "pm install -i com.android.vending '/data/local/tmp/termux-app_v${lastReleases}+apt-android-$variant-github-debug_$cpuAbi.apk'"
-        else
-          su -c 'pm grant com.termux android.permission.POST_NOTIFICATIONS'
-          su -c "cmd deviceidle whitelist +com.termux"
-          su -c "pm install -i com.android.vending '/data/local/tmp/termux-app_v${lastReleases}+apt-android-$variant-github-debug_$cpuAbi.apk'"
+        if [ "$(su -c 'getenforce 2>/dev/null')" = "Permissive" ] && [ -f "$Simplify/setenforce0" ]; then
+          su -c "setenforce 1"  # set SELinux to Enforcing mode to block unauthorized operations
+          rm -f "$Simplify/setenforce0"
         fi
-      else
-        if "$HOME/rish" -c "id" >/dev/null 2>&1; then
-          $HOME/rish -c 'pm grant com.termux android.permission.POST_NOTIFICATIONS'
-          $HOME/rish -c "cmd deviceidle whitelist +com.termux"
-          $HOME/rish -c "cmd appops set com.termux REQUEST_INSTALL_PACKAGES allow"
-          $HOME/rish -c "cmd appops set com.termux.widget REQUEST_INSTALL_PACKAGES allow"
-        else
-          echo -e "$info Please Disabled: ${Green}Battery optimization → Not optimized → All apps → Termux → Don't optiomize → DONE${Reset}" && sleep 6
-          am start -n com.android.settings/.Settings\$HighPowerApplicationsActivity &> /dev/null
-          echo -e "$info Please Allow: ${Green}Install unknown apps → Termux → Allow from this source${Reset}" && sleep 6
-          am start -n com.android.settings/.Settings\$ManageExternalSourcesActivity &> /dev/null
-        fi
-        bash $Simplify/apkInstall.sh "$SimplUsr/termux-app_v${latestReleases}+apt-android-$variant-github-debug_$cpuAbi.apk" "com.termux/.app.TermuxActivity"
+        su -c "rm -f '/data/local/tmp/$fileName'"
+      elif "$HOME/rish" -c "id" >/dev/null 2>&1; then
+        ~/rish -c "rm -f '/data/local/tmp/$fileName'"
       fi
-    else
-      if [ -f "$SimplUsr/termux-app_v${lastReleases}+apt-android-$variant-github-debug_$cpuAbi.apk" ]; then
-        if [ $su -eq 1 ]; then
-          if [ "$(su -c 'getenforce 2>/dev/null')" = "Permissive" ] && [ -f "$Simplify/setenforce0" ]; then
-            su -c "setenforce 1"  # set SELinux to Enforcing mode to block unauthorized operations
-            rm -f "$Simplify/setenforce0"
-          fi
-          su -c "rm -f '/data/local/tmp/termux-app_v${latestReleases}+apt-android-$variant-github-debug_$cpuAbi.apk'"
-        elif "$HOME/rish" -c "id" >/dev/null 2>&1; then
-          ~/rish -c "rm -f '/data/local/tmp/termux-app_v${latestReleases}+apt-android-$variant-github-debug_$cpuAbi.apk'"
-        fi
-        rm -f "$SimplUsr/termux-app_v${latestReleases}+apt-android-$variant-github-debug_$cpuAbi.apk"
-      fi
+      rm -f "$filePath"
     fi
   fi
 fi
