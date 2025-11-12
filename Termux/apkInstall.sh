@@ -79,7 +79,7 @@ apkInstall() {
       if [ $DisableVerifyAdbInstalls -eq 1 ]; then
         [ $Android -le 10 ] && su -c "settings put global package_verifier_enable 0" || su -c "settings put global verifier_verify_adb_installs 0"  # Disable Verify Adb Installs
       fi
-      output=$(su -c "pm install ${cmd} '/data/local/tmp/$outputFileName'" 2>&1)
+      output=$(su -c "pm install ${cmd} '/data/local/tmp/$outputFileName'" 2>&1); echo "$output"
       [ $DisablePlayProtect -eq 1 ] && su -c "settings put global package_verifier_user_consent 1"  # Enabled Play Protect
       if [ $DisableVerifyAdbInstalls -eq 1 ]; then
         [ $Android -le 10 ] && su -c "settings put global package_verifier_enable 1" || su -c "settings put global verifier_verify_adb_installs 1"  # Enabled Verify Adb Installs
@@ -97,7 +97,7 @@ apkInstall() {
       if [ $DisableVerifyAdbInstalls -eq 1 ]; then
         [ $Android -le 10 ] && su -c "settings put global package_verifier_enable 0" || su -c "settings put global verifier_verify_adb_installs 0"  # Disable Verify Adb Installs
       fi
-      output=$(su -c "pm install ${cmd} '/data/local/tmp/$outputFileName'" 2>&1)
+      output=$(su -c "pm install ${cmd} '/data/local/tmp/$outputFileName'" 2>&1); echo "$output"
       [ $DisablePlayProtect -eq 1 ] && su -c "settings put global package_verifier_user_consent 1"  # Enabled Play Protect
       if [ $DisableVerifyAdbInstalls -eq 1 ]; then
         [ $Android -le 10 ] && su -c "settings put global package_verifier_enable 1" || su -c "settings put global verifier_verify_adb_installs 1"  # Enabled Verify Adb Installs
@@ -121,7 +121,7 @@ apkInstall() {
     if [ $DisableVerifyAdbInstalls -eq 1 ]; then
       [ $Android -le 10 ] && $HOME/rish -c "settings put global package_verifier_enable 0" || $HOME/rish -c "settings put global verifier_verify_adb_installs 0"  # Disable Verify Adb Installs
     fi
-    output=$(~/rish -c "pm install ${cmd} '/data/local/tmp/$outputFileName'" 2>&1)  # -r=reinstall
+    output=$(~/rish -c "pm install ${cmd} '/data/local/tmp/$outputFileName'" 2>&1); echo "$output"
     [ $DisablePlayProtect -eq 1 ] && ~/rish -c "settings put global package_verifier_user_consent 1"  # Enabled Play Protect
     if [ $DisableVerifyAdbInstalls -eq 1 ]; then
       [ $Android -le 10 ] && ~/rish -c "settings put global package_verifier_enable 1" || ~/rish -c "settings put global verifier_verify_adb_installs 1"  # Enabled Verify Adb Installs
@@ -143,7 +143,7 @@ apkInstall() {
     if [ $DisableVerifyAdbInstalls -eq 1 ]; then
       [ $Android -le 10 ] && ~/adb -s $("$HOME/adb" devices 2>/dev/null | grep "device$" | awk '{print $1}' | tail -1) shell "settings put global package_verifier_enable 0" || ~/adb -s $("$HOME/adb" devices 2>/dev/null | grep "device$" | awk '{print $1}' | tail -1) shell "settings put global verifier_verify_adb_installs 0"  # Disable Verify Adb Installs
     fi
-    output=$(~/adb -s $("$HOME/adb" devices 2>/dev/null | grep "device$" | awk '{print $1}' | tail -1) shell pm install ${cmd} "$outputAPK" 2>&1)
+    output=$(~/adb -s $("$HOME/adb" devices 2>/dev/null | grep "device$" | awk '{print $1}' | tail -1) shell pm install ${cmd} "$outputAPK" 2>&1); echo "$output"
     #~/adb -s $("$HOME/adb" devices 2>/dev/null | grep "device$" | awk '{print $1}' | tail -1) install ${cmd} "$outputAPK" 2>&1
     #~/adb -s $("$HOME/adb" devices 2>/dev/null | grep "device$" | awk '{print $1}' | tail -1) shell cmd package install ${cmd} "$outputAPK" > /dev/null 2>&1
     [ $DisablePlayProtect -eq 1 ] && ~/adb -s $("$HOME/adb" devices 2>/dev/null | grep "device$" | awk '{print $1}' | tail -1) shell "settings put global package_verifier_user_consent 1"  # Enabled Play Protect
