@@ -120,7 +120,7 @@ isChangeRVXSource=0  # Default value (false/off/0) for ChangeRVXSource, means pa
 isReadPatchesFile=0  # Default value (false/off/0) for ReadPatchesFile, means recommended PatchesOptions loading from script.
 branding="google_family"
 isCheckTermuxUpdate=1
-isJdkVersion=21
+isJdkVersion="25"
 isU=0  # Install Package for 0 (default-user), possible 1 (all-users)
 isK=0  # Allow Downgrade with keeps App data 0 (false) because it's required reboot after pkg install, possible 1 (true)
 isG=0  # Grant All Runtime Permissions 0 (false) due to Security Risk, possible 1
@@ -156,7 +156,7 @@ jq -e '.AndroidVersion != null' "$simplifyJson" >/dev/null 2>&1 && Android=$(jq 
 # Get Device Architecture from json
 jq -e '.DeviceArch != null' "$simplifyJson" >/dev/null 2>&1 && cpuAbi=$(jq -r '.DeviceArch' "$simplifyJson" 2>/dev/null) || cpuAbi=$(getprop ro.product.cpu.abi)
 # Get openjdk verison from json
-jq -e '.openjdk != null' "$simplifyJson" >/dev/null 2>&1 && jdkVersion=$(jq -r '.openjdk' "$simplifyJson" 2>/dev/null) || jdkVersion="21"
+jq -e '.openjdk != null' "$simplifyJson" >/dev/null 2>&1 && jdkVersion=$(jq -r '.openjdk' "$simplifyJson" 2>/dev/null) || jdkVersion="$isJdkVersion"
 # Get RipLocale value from json
 jq -e '.RipLocale != null' "$simplifyJson" >/dev/null 2>&1 && RipLocale="$(jq -r '.RipLocale' "$simplifyJson" 2>/dev/null)" || RipLocale=1
 # Get RipDpi value from json
