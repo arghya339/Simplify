@@ -711,6 +711,10 @@ if [ $CheckTermuxUpdate -eq 1 ]; then
         $HOME/rish -c 'pm grant com.termux android.permission.POST_NOTIFICATIONS'
         $HOME/rish -c "cmd deviceidle whitelist +com.termux"
         $HOME/rish -c "cmd appops set com.termux REQUEST_INSTALL_PACKAGES allow"
+      elif "$HOME/adb" -s $(~/adb devices | grep "device$" | awk '{print $1}' | tail -1) shell "id" >/dev/null 2>&1; then
+        ~/adb -s $("$HOME/adb" devices 2>/dev/null | grep "device$" | awk '{print $1}' | tail -1) shell "pm grant com.termux android.permission.POST_NOTIFICATIONS"
+        ~/adb -s $("$HOME/adb" devices 2>/dev/null | grep "device$" | awk '{print $1}' | tail -1) shell "cmd deviceidle whitelist +com.termux"
+        ~/adb -s $("$HOME/adb" devices 2>/dev/null | grep "device$" | awk '{print $1}' | tail -1) shell "cmd appops set com.termux REQUEST_INSTALL_PACKAGES allow"
       else
         echo -e "$info Please Disabled: ${Green}Battery optimization → Not optimized → All apps → Termux → Don't optiomize → DONE${Reset}" && sleep 6
         am start -n com.android.settings/.Settings\$HighPowerApplicationsActivity &> /dev/null
@@ -729,6 +733,8 @@ if [ $CheckTermuxUpdate -eq 1 ]; then
         su -c "rm -f '/data/local/tmp/$fileName'"
       elif "$HOME/rish" -c "id" >/dev/null 2>&1; then
         ~/rish -c "rm -f '/data/local/tmp/$fileName'"
+      elif "$HOME/adb" -s $(~/adb devices | grep "device$" | awk '{print $1}' | tail -1) shell "id" >/dev/null 2>&1; then
+        ~/adb -s $("$HOME/adb" devices 2>/dev/null | grep "device$" | awk '{print $1}' | tail -1) shell "rm -f '/data/local/tmp/$fileName'"
       fi
       rm -f "$filePath"
     fi
