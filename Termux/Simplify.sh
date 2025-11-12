@@ -704,22 +704,22 @@ if [ $CheckTermuxUpdate -eq 1 ]; then
       if [ "$(su -c 'getenforce 2>/dev/null')" = "Enforcing" ]; then
         su -c "setenforce 0"  # set SELinux to Permissive mode to unblock unauthorized operations
         su -c 'pm grant com.termux android.permission.POST_NOTIFICATIONS'
-        su -c "cmd deviceidle whitelist +com.termux"
+        su -c "cmd deviceidle whitelist +com.termux" >/dev/null 2>&1
         touch "$Simplify/setenforce0"
         su -c "pm install -i com.android.vending '/data/local/tmp/$fileName'"
       else
         su -c 'pm grant com.termux android.permission.POST_NOTIFICATIONS'
-        su -c "cmd deviceidle whitelist +com.termux"
+        su -c "cmd deviceidle whitelist +com.termux" >/dev/null 2>&1
         su -c "pm install -i com.android.vending '/data/local/tmp/$fileName'"
       fi
     else
       if "$HOME/rish" -c "id" >/dev/null 2>&1; then
         $HOME/rish -c 'pm grant com.termux android.permission.POST_NOTIFICATIONS'
-        $HOME/rish -c "cmd deviceidle whitelist +com.termux"
+        $HOME/rish -c "cmd deviceidle whitelist +com.termux" >/dev/null 2>&1
         $HOME/rish -c "cmd appops set com.termux REQUEST_INSTALL_PACKAGES allow"
       elif "$HOME/adb" -s $(~/adb devices | grep "device$" | awk '{print $1}' | tail -1) shell "id" >/dev/null 2>&1; then
         ~/adb -s $("$HOME/adb" devices 2>/dev/null | grep "device$" | awk '{print $1}' | tail -1) shell "pm grant com.termux android.permission.POST_NOTIFICATIONS"
-        ~/adb -s $("$HOME/adb" devices 2>/dev/null | grep "device$" | awk '{print $1}' | tail -1) shell "cmd deviceidle whitelist +com.termux"
+        ~/adb -s $("$HOME/adb" devices 2>/dev/null | grep "device$" | awk '{print $1}' | tail -1) shell "cmd deviceidle whitelist +com.termux" >/dev/null 2>&1
         ~/adb -s $("$HOME/adb" devices 2>/dev/null | grep "device$" | awk '{print $1}' | tail -1) shell "cmd appops set com.termux REQUEST_INSTALL_PACKAGES allow"
       else
         echo -e "$info Please Disabled: ${Green}Battery optimization → Not optimized → All apps → Termux → Don't optiomize → DONE${Reset}" && sleep 6
