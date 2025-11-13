@@ -228,16 +228,11 @@ ripLibGen() {
 }; ripLibGen  # Call ripLibGen function to generate ripLib args
 
 if [ -f "$HOME/.config/gh/hosts.yml" ] && gh auth status > /dev/null 2>&1; then
-  # oauth_token: gho_************************************
-  token=$(grep -A2 "users:" ~/.config/gh/hosts.yml | grep -v "users:" | grep -A1 "oauth_token:" | awk '/oauth_token:/ {getline; print $2}')
-  auth="-H \"Authorization: Bearer $token\""
+  token="$(gh auth token)"  # oauth_token: gho_************************************
 elif [ -f "$simplifyJson" ] && jq -e '.PAT' "$simplifyJson" >/dev/null 2>&1; then
-  # PAT: ghp_************************************
-  token=$(jq -r '.PAT' "$simplifyJson" 2>/dev/null)
-  auth="-H \"Authorization: Bearer $token\""
-else
-  auth=""
+  token="$(jq -r '.PAT' "$simplifyJson" 2>/dev/null)"  # PAT: ghp_************************************
 fi
+[ -n "$token" ] && auth="-H \"Authorization: Bearer $token\"" || auth=""
 
 su -c "id" >/dev/null 2>&1 && su=1 || su=0
 [ $su -eq 1 ] && Serial=$(su -c 'getprop ro.serialno')  # Get Serial Number required root
@@ -574,8 +569,8 @@ token() {
     if [[ "$char" == $'\0' || "$char" == $'\n' || "$char" == $'\r' ]]; then
       # Only break if input is not empty, input not start with space, input doesn't contain space & pat is valid
       if [[ -n "$input" && ! "$input" =~ ^[[:space:]] && ! "$input" =~ [[:space:]] ]]; then
-        tag=$(curl -sL -H "Authorization: Bearer $input" "https://api.github.com/repos/ReVanced/revanced-patches/releases/latest" | jq -r '.tag_name')
-        if [[ $tag == v* ]] && [ $tag != "null" ]; then
+        curl -sL -f -H "Authorization: Bearer ${input}" "https://api.github.com/repos/ReVanced/revanced-patches/releases/latest" | jq -r '.tag_name'
+        if [ ${PIPESTATUS[0]} -eq 0 ]; then
           echo -e "\n$good ${Green}Successfully added your GitHub PAT!${Reset}"
           echo -e "$notice ${Yellow}Your GitHub API rate limit has been increased.${Reset}"
           break
@@ -649,8 +644,8 @@ pat() {
               pkgInstall "gh"  # gh install/update
               echo -e "${running} Creating GitHub access token using GitHub CLI.."
               gh auth login  # Authenticate gh cli with GitHub account
-              gh_api_response=$(owner="ReVanced" && repo="revanced-patches" && gh api "repos/$owner/$repo/releases/latest" | jq -r '.tag_name')
-              if [[ $gh_api_response == v* ]] && [ $gh_api_response != "null" ]; then
+              gh api "repos/ReVanced/revanced-patches/releases/latest" | cat | jq -r '.tag_name'
+              if [ ${PIPESTATUS[0]} -eq 0 ]; then
                 echo -e "$good ${Green}Successfully authenticated with GitHub CLI!${Reset}"
                 echo -e "$notice ${Yellow}Your GitHub API rate limit has been increased.${Reset}"
                 break

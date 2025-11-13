@@ -46,16 +46,11 @@ Download="/sdcard/Download"  # Download dir
 FetchPreRelease=$(jq -r '.FetchPreRelease' "$simplifyJson" 2>/dev/null)
 RipLib="$(jq -r '.RipLib' "$simplifyJson" 2>/dev/null)"
 if [ -f "$HOME/.config/gh/hosts.yml" ] && gh auth status > /dev/null 2>&1; then
-  # oauth_token: gho_************************************
-  token=$(grep -A2 "users:" ~/.config/gh/hosts.yml | grep -v "users:" | grep -A1 "oauth_token:" | awk '/oauth_token:/ {getline; print $2}')
-  auth="-H \"Authorization: Bearer $token\""
+  token="$(gh auth token)"  # oauth_token: gho_************************************
 elif [ -f "$simplifyJson" ] && jq -e '.PAT' "$simplifyJson" >/dev/null 2>&1; then
-  # PAT: ghp_************************************
-  token=$(jq -r '.PAT' "$simplifyJson" 2>/dev/null)
-  auth="-H \"Authorization: Bearer $token\""
-else
-  auth=""
+  token="$(jq -r '.PAT' "$simplifyJson" 2>/dev/null)"  # PAT: ghp_************************************
 fi
+[ -n "$token" ] && auth="-H \"Authorization: Bearer $token\"" || auth=""
 
 # --- Checking Android Version ---
 if [ $Android -le 7 ]; then
