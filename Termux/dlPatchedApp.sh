@@ -411,7 +411,7 @@ if [ $Android -ge 10 ]; then
     RetroMusicPlayer
     Ringdroid
     #Spotify
-    Spotube
+    #Spotube
     TikTok
     Google\ Photos
     $Instagram
@@ -462,7 +462,7 @@ elif [ $Android -eq 9 ]; then
     RetroMusicPlayer
     Ringdroid
     #Spotify
-    Spotube
+    #Spotube
     TikTok
     Google\ Photos
     $Instagram
@@ -512,7 +512,7 @@ elif [ $Android -eq 8 ]; then
     RetroMusicPlayer
     Ringdroid
     #Spotify
-    Spotube
+    #Spotube
     TikTok
     Google\ Photos
     $Instagram
@@ -559,7 +559,7 @@ elif [ $Android -eq 7 ]; then
     RetroMusicPlayer
     Ringdroid
     #Spotify
-    Spotube
+    #Spotube
     TikTok
     Google\ Photos
     $Instagram
