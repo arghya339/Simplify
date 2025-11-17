@@ -1050,7 +1050,17 @@ while true; do
             activityApp="com.github.bmx666.appcachecleaner/.ui.activity.AppCacheCleanerActivity"
             dlApp "${appName}" "$owner" "$repo" "$release" "$assets" "$file_pattern" "$tag" "$assets" "$pkgApp" "$activityApp"
             ;;
-          Google\ Public\ DNS\ →\ NextDNS\ Manager) termux-open-url "https://play.google.com/store/apps/details?id=com.doubleangels.nextdnsmanagement" ;;
+          Google\ Public\ DNS\ →\ NextDNS\ Manager) #termux-open-url "https://play.google.com/store/apps/details?id=com.doubleangels.nextdnsmanagement"
+            appName="NextDNS Manager"
+            owner="doubleangels"
+            repo="nextdnsmanager"
+            file_pattern="$repo-*.apk"
+            tag=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases/latest" | jq -r '.tag_name')
+            assets="app-release.apk"
+            pkgApp="com.doubleangels.nextdnsmanagement"
+            activityApp="com.doubleangels.nextdnsmanagement/.MainActivity"
+            dlApp "${appName}" "$owner" "$repo" "$release" "$assets" "$file_pattern" "$tag" "$assets" "$pkgApp" "$activityApp"
+            ;;
           ADB\ →\ Shizuku)
             appName="Shizuku"
             owner="RikkaApps"
