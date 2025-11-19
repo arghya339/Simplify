@@ -70,6 +70,8 @@ appInstall() {
             termux-open-url "https://play.google.com/store/apps/details?id=com.google.android.webview"
           elif [ "$appName" == "Gadgetbridge" ]; then
             termux-open-url "https://gadgetbridge.org/gadgets/wearables/"
+          elif [ "$appName" == "mpvExtended" ]; then
+            termux-open-url "https://torrends.to/" && termux-open-url "https://www.seedr.cc/"
           fi
           data "$appName" "$updated_at" "$tag"
         fi
@@ -684,7 +686,7 @@ while true; do
         Google\ Maps\ →\ OsmAnd
         Google\ Maps\ Compass\ →\ Xiaomi\ Compass
         Google\ TV\ →\ CloudStream
-        Google\ TV\ →\ mpvKt\ +\ torrends.to\ +\ seedr.cc
+        Google\ TV\ →\ mpvExtended\ +\ torrends.to\ +\ seedr.cc
         Gboard\ →\ FlorisBoard
         Google\ Messages\ →\ Fossify\ Messages
         Google\ Chat\ →\ Telegram
@@ -900,7 +902,17 @@ while true; do
             fi
             dlApp "${appName}" "$owner" "$repo" "$release" "" "$file_pattern" "$tag" "$assets" "$pkgApp" "$activityApp"
             ;;
-          Google\ TV\ →\ mpvKt\ +\ torrends.to\ +\ seedr.cc) termux-open-url "https://play.google.com/store/apps/details?id=live.mehiz.mpvkt" && termux-open-url "https://torrends.to/" && termux-open-url "https://www.seedr.cc/";;
+          Google\ TV\ →\ mpvExtended\ +\ torrends.to\ +\ seedr.cc) #termux-open-url "https://play.google.com/store/apps/details?id=live.mehiz.mpvkt" && termux-open-url "https://torrends.to/" && termux-open-url "https://www.seedr.cc/"
+            appName="mpvExtended"
+            owner="marlboro-advance"
+            repo="mpvEx"
+            file_pattern="mpvEx-$cpuAbi-v*.apk"
+            tag=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases/latest" | jq -r '.tag_name')
+            assets="mpvEx-$cpuAbi-$tag.apk"
+            pkgApp="app.marlboroadvance.mpvex"
+            activityApp="app.marlboroadvance.mpvex/.MainActivity"
+            dlApp "${appName}" "$owner" "$repo" "$release" "$assets" "$file_pattern" "$tag" "$assets" "$pkgApp" "$activityApp"
+            ;;
           Gboard\ →\ FlorisBoard)
             appName="FlorisBoard"
             owner="florisboard"
