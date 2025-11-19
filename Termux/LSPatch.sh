@@ -371,7 +371,7 @@ while true; do
     Reddit)
       appName=("Reddit")
       pkgName="com.reddit.frontpage"
-      pkgVersion="2025.43.0"
+      pkgVersion="2025.46.0"
       Type="BUNDLE"
       Arch=("universal")
       bash $Simplify/dlGitHub.sh "Xposed-Modules-Repo" "com.wizpizz.reddidnt" "latest" ".apk" "$LSPatch"
