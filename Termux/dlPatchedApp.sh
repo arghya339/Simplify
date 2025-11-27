@@ -7,17 +7,19 @@ locale=$(getprop persist.sys.locale | cut -d'-' -f1)  # Get System Languages
 [ -z $locale ] && locale=$(getprop ro.product.locale | cut -d'-' -f1)  # Get Languages
 density=$(getprop ro.sf.lcd_density)  # Get the device screen density
   # Check and categorize the density
-  if [ "$density" -le 120 ]; then
+  if [ "$density" -le "120" ]; then
     lcd_dpi="ldpi"  # Low Density
-  elif [ "$density" -le 160 ]; then
+  elif [ "$density" -le "160" ]; then
     lcd_dpi="mdpi"  # Medium Density
-  elif [ "$density" -le 240 ]; then
+  elif [ "$density" -le "213" ]; then
+    lcd_dpi="tvdpi"  # TV Density
+  elif [ "$density" -le "240" ]; then
     lcd_dpi="hdpi"  # High Density
-  elif [ "$density" -le 320 ]; then
+  elif [ "$density" -le "320" ]; then
     lcd_dpi="xhdpi"  # Extra High Density
-  elif [ "$density" -le 480 ]; then
+  elif [ "$density" -le "480" ]; then
     lcd_dpi="xxhdpi"  # Extra Extra High Density
-  elif [ "$density" -gt 480 ] || [ "$density" -ge 640 ]; then
+  elif [ "$density" -gt "480" ] || [ "$density" -ge "640" ]; then
     lcd_dpi="xxxhdpi"  # Extra Extra Extra High Density
   else
     lcd_dpi="*dpi"
