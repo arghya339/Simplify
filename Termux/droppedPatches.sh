@@ -83,7 +83,7 @@ build_app() {
       y*|Y*|"")
         echo -e "$notice ${Yellow}Warning! Disable auto updates for the patched app to avoid unexpected issues.${Reset}"
         echo -e "$running Please Wait !! Installing Patched ${appNameRef[0]} Dropped apk.."
-        bash $Simplify/apkInstall.sh "$outputAPK" "$activityPatched"
+        apkInstall "$outputAPK" "$activityPatched"
         ;;
       n*|N*) echo -e "$notice ${appNameRef[0]} Dropped Installaion skipped!" ;;
     esac

@@ -394,13 +394,6 @@ if [ "$(getprop ro.product.manufacturer)" == "Genymobile" ] && [ ! -f "$HOME/adb
   curl -sL -o "$HOME/adb" "https://raw.githubusercontent.com/rendiix/termux-adb-fastboot/refs/heads/master/binary/${cpuAbi}/bin/adb" && chmod +x ~/adb
 fi
 
-if [ $su -eq 1 ] || "$HOME/rish" -c "id" >/dev/null 2>&1 || "$HOME/adb" -s $(~/adb devices 2>/dev/null | head -2 | tail -1 | cut -f1) shell "id" >/dev/null 2>&1; then
-  if [ -n "$(find $POST_INSTALL -mindepth 1 -type f -o -type d -o -type l 2>/dev/null)" ]; then
-    file_path=$(find $POST_INSTALL -maxdepth 1 -type f -print -quit)
-    bash $Simplify/apkInstall.sh "$file_path" "" && rm -f "$file_path"
-  fi
-fi
-
 # --- Download and give execute (--x) permission to AAPT2 Binary ---
 if [ ! -f "$HOME/aapt2" ]; then
   echo -e "$running Downloading aapt2 binary from GitHub.."
@@ -416,8 +409,16 @@ curl -sL "https://raw.githubusercontent.com/arghya339/Simplify/refs/heads/main/T
 curl -sL -o $Simplify/dlAPKPure.sh "https://raw.githubusercontent.com/arghya339/Simplify/refs/heads/main/Termux/dlAPKPure.sh"
 
 curl -sL "https://raw.githubusercontent.com/arghya339/Simplify/refs/heads/main/Termux/apkInstall.sh" --progress-bar -o $Simplify/apkInstall.sh
+source $Simplify/apkInstall.sh
 
 [ $su -eq 1 ] && curl -sL -o "$Simplify/apkMount.sh" "https://raw.githubusercontent.com/arghya339/Simplify/refs/heads/main/Termux/apkMount.sh"
+
+if [ $su -eq 1 ] || "$HOME/rish" -c "id" >/dev/null 2>&1 || "$HOME/adb" -s $(~/adb devices 2>/dev/null | head -2 | tail -1 | cut -f1) shell "id" >/dev/null 2>&1; then
+  if [ -n "$(find $POST_INSTALL -mindepth 1 -type f -o -type d -o -type l 2>/dev/null)" ]; then
+    file_path=$(find $POST_INSTALL -maxdepth 1 -type f -print -quit)
+    apkInstall "$file_path" "" && rm -f "$file_path"
+  fi
+fi
 
 # --- Create simplify shortcut on Laucher Home ---
 if [ ! -f "$HOME/.shortcuts/simplify" ] || [ ! -f "$HOME/.termux/widget/dynamic_shortcuts/simplify" ]; then
@@ -430,7 +431,7 @@ if [ ! -f "$HOME/.shortcuts/simplify" ] || [ ! -f "$HOME/.termux/widget/dynamic_
   if ! am start -n com.termux.widget/com.termux.widget.TermuxLaunchShortcutActivity > /dev/null 2>&1; then
     bash $Simplify/dlGitHub.sh "termux" "termux-widget" "latest" ".apk" "$SimplUsr"  # Download Termux:Widget app from GitHub using dlGitHub.sh
     Widget=$(find "$SimplUsr" -type f -name "termux-widget-app_v*+github.debug.apk" -print -quit)  # find downloaded Termux:Widget app package
-    bash $Simplify/apkInstall.sh "$Widget" ""  # Install Termux:Widget app using apkInstall.sh
+    apkInstall "$Widget" ""  # Install Termux:Widget app using apkInstall.sh
     [ -f "$Widget" ] && rm -f "$Widget"  # if Termux:Widget app package exist then remove it 
   fi
   if [ $su -eq 1 ]; then
@@ -722,7 +723,7 @@ if [ $CheckTermuxUpdate -eq 1 ]; then
         echo -e "$info Please Allow: ${Green}Install unknown apps → Termux → Allow from this source${Reset}" && sleep 6
         am start -n com.android.settings/.Settings\$ManageExternalSourcesActivity &> /dev/null
       fi
-      bash $Simplify/apkInstall.sh "$filePath" "com.termux/.app.TermuxActivity"
+      apkInstall "$filePath" "com.termux/.app.TermuxActivity"
     fi
   else
     if [ -f "$filePath" ]; then

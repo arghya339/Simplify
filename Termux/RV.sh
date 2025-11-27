@@ -476,7 +476,7 @@ commonPrompt() {
           echo -e "$notice ${Yellow}Warning! Disable auto updates for the patched app to avoid unexpected issues.${Reset}"
         fi
         echo -e "$running Please Wait !! Installing Patched ${appNameRef[0]} RV apk.."
-        bash $Simplify/apkInstall.sh "$outputAPK" "$activityPatched"
+        apkInstall "$outputAPK" "$activityPatched"
         ;;
       n*|N*) echo -e "$notice ${appNameRef[0]} RV Installaion skipped!" ;;
     esac
@@ -575,7 +575,7 @@ build_app() {
               cs "${stock_apk_path[0]}" "$outputAPK" "$SimplUsr/${appNameRef[0]}-RV-CS_v${pkgVersion}-${archRef[0]}.apk"
               termux-wake-unlock
               echo -e "$running Please Wait !! Installing Patched ${appNameRef[0]} RV CS apk.."
-              bash $Simplify/apkInstall.sh "$SimplUsr/${appNameRef[0]}-RV-CS_v${pkgVersion}-${archRef[0]}.apk" ""
+              apkInstall "$SimplUsr/${appNameRef[0]}-RV-CS_v${pkgVersion}-${archRef[0]}.apk" ""
               ;;
             M*|m*)
               echo -e "$running Please Wait !! Mounting Patched ${appNameRef[0]} RV apk.."
@@ -605,7 +605,7 @@ build_app() {
         case $opt in
           y*|Y*|"")
             echo -e "$running Please Wait !! Installing VancedMicroG apk.."
-            bash $Simplify/apkInstall.sh "$VancedMicroG" "com.mgoogle.android.gms/org.microg.gms.ui.SettingsActivity"
+            apkInstall "$VancedMicroG" "com.mgoogle.android.gms/org.microg.gms.ui.SettingsActivity"
             ;;
           n*|N*) echo -e "$notice VancedMicroG Installaion skipped!" ;;
         esac

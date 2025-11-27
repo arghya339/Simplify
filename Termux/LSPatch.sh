@@ -149,7 +149,7 @@ build_app() {
         Install)
           checkCoreLSPosed  # Call the check core patch functions
           echo -e "$running Please Wait !! Installing Patched ${appNameRef[0]} LSPatch apk.."
-          bash $Simplify/apkInstall.sh "${output_apk_path}" ""
+          apkInstall "${output_apk_path}" ""
           ;;
         Mount)
           echo -e "$running Please Wait !! Mounting Patched ${appNameRef[0]} LSPatch apk.."
@@ -166,7 +166,7 @@ build_app() {
       case $opt in
         y*|Y*|"")
           echo -e "$running Please Wait !! Installing Patched ${appNameRef[0]} LSPatch apk.."
-          bash $Simplify/apkInstall.sh "${output_apk_path}" "$activityPatched"
+          apkInstall "${output_apk_path}" "$activityPatched"
           ;;
         n*|N*) echo -e "$notice ${appNameRef[0]} LSPatch Installaion skipped!" ;;
       esac
@@ -252,7 +252,7 @@ sign_app() {
     case $opt in
       y*|Y*|"")
         echo -e "$running Please Wait !! Installing Signed ${appNameRef[0]} apk.."
-        bash $Simplify/apkInstall.sh "${output_apk_path}" "$activityPatched"
+        apkInstall "${output_apk_path}" "$activityPatched"
         ;;
       n*|N*) echo -e "$notice ${appNameRef[0]} Signed Installaion skipped!" ;;
     esac
