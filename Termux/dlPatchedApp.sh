@@ -672,6 +672,7 @@ while true; do
         Google\ Home\ →\ Home\ Assistant
         Google\ Home\ →\ Sinric\ Pro
         Google\ Gallery\ →\ Gallery
+        Files\ by\ Google\ →\ Amaze\ File\ Manager
         Files\ by\ Google\ →\ ZArchiver
         Chrome\ →\ Chromium
         Chrome\ →\ Cromite
@@ -829,6 +830,17 @@ while true; do
             pkgApp="com.dot.gallery"
             activityApp="com.dot.gallery/.feature_node.presentation.main.MainActivity"
             dlApp "${appName}" "$owner" "$repo" "$release" "$assets" "$file_pattern" "$tag" "$assets" "$pkgApp" "$activityApp"
+            ;;
+          Files\ by\ Google\ →\ Amaze\ File\ Manager)
+            appName="Amaze"
+            owner="TeamAmaze"
+            repo="AmazeFileManager"
+            file_pattern="$repo-*-play.apk"
+            tag=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases/latest" | jq -r '.tag_name')
+            assets="app-play-release.apk"
+            pkgApp="com.amaze.filemanager"
+            activityApp="com.amaze.filemanager/.activities.MainActivity"
+            dlApp "${appName}" "$owner" "$repo" "$release" "" "$file_pattern" "$tag" "$assets" "$pkgApp" "$activityApp"
             ;;
           Files\ by\ Google\ →\ ZArchiver) termux-open-url "https://play.google.com/store/apps/details?id=ru.zdevs.zarchiver" ;;
           Chrome\ →\ Chromium) termux-open-url "https://github.com/arghya339/crdl" ;;

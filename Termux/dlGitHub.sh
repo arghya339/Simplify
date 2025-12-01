@@ -89,7 +89,7 @@ dlGitHub() {
     fi
     
     # Extract assets from GH API response json & built assets name pattern for find downloaded assets
-    if [ "$repo" == "VancedMicroG" ] || [ "$repo" == "LSPatch" ] || [ "$repo" == "YTPro" ] || [ "$repo" == "cloudstream" ] || [ "$repo" == "revenge-xposed" ] || [ "$repo" == "io.github.vvb2060.callrecording" ] || [ "$owner" == "Droid-ify" ] || [ "$repo" == "Obtainium" ] || [ "$repo" == "Metrolist" ] || [ "$repo" == "Acode" ] || [ "$repo" == "PrivateDNSAndroid" ] || [ "$repo" == "RecordYou" ] || [ "$repo" == "android-appcachecleaner" ] || [ "$repo" == "com.wizpizz.reddidnt" ] || [ "$repo" == "cromite" ] || [ "$repo" == "nextdnsmanager" ]; then
+    if [ "$repo" == "VancedMicroG" ] || [ "$repo" == "LSPatch" ] || [ "$repo" == "YTPro" ] || [ "$repo" == "cloudstream" ] || [ "$repo" == "revenge-xposed" ] || [ "$repo" == "io.github.vvb2060.callrecording" ] || [ "$owner" == "Droid-ify" ] || [ "$repo" == "Obtainium" ] || [ "$repo" == "Metrolist" ] || [ "$repo" == "Acode" ] || [ "$repo" == "PrivateDNSAndroid" ] || [ "$repo" == "RecordYou" ] || [ "$repo" == "android-appcachecleaner" ] || [ "$repo" == "com.wizpizz.reddidnt" ] || [ "$repo" == "cromite" ] || [ "$repo" == "nextdnsmanager" ] || [ "$repo" == "AmazeFileManager" ]; then
       assetsName=$(jq -r --arg regex "$regex" '.assets[] | select(.name | test($regex)) | .name' <<< "$ghApiResponseJson" | head -1)
       if [ "$repo" == "cloudstream" ] || [ "$repo" == "revenge-xposed" ] || [ "$repo" == "io.github.vvb2060.callrecording" ] || [ "$repo" == "PrivateDNSAndroid" ] || [ "$repo" == "RecordYou" ] || [ "$repo" == "android-appcachecleaner" ] || [ "$repo" == "nextdnsmanager" ]; then
         fileName="$repo-${latestReleases}$ext"
@@ -98,7 +98,7 @@ dlGitHub() {
         fileName="$repo-${name}$ext"
       elif [ "$repo" == "Obtainium" ] || [ "$repo" == "Metrolist" ] || [ "$repo" == "cromite" ]; then
         fileName="$repo-${latestReleases}-${cpuAbi}$ext"
-      elif [ "$repo" == "Acode" ]; then
+      elif [ "$repo" == "Acode" ] || [ "$repo" == "AmazeFileManager" ]; then
         fileName="$repo-${latestReleases}-play$ext"
       elif [ "$owner" == "Droid-ify" ]; then
         fileName="$owner-${latestReleases}$ext"
@@ -138,7 +138,7 @@ dlGitHub() {
     fi
     
     # Download assets from GitHub
-    if [ "$repo" == "VancedMicroG" ] || [ "$repo" == "LSPatch" ] || [ "$repo" == "YTPro" ] || [ "$repo" == "cloudstream" ] || [ "$repo" == "revenge-xposed" ] || [ "$repo" == "io.github.vvb2060.callrecording" ] || [ "$owner" == "Droid-ify" ] || [ "$repo" == "Obtainium" ] || [ "$repo" == "Metrolist" ] || [ "$repo" == "Acode" ] || [ "$repo" == "PrivateDNSAndroid" ] || [ "$repo" == "RecordYou" ] || [ "$repo" == "android-appcachecleaner" ] || [ "$repo" == "com.wizpizz.reddidnt" ] || [ "$repo" == "cromite" ] || [ "$repo" == "nextdnsmanager" ]; then
+    if [ "$repo" == "VancedMicroG" ] || [ "$repo" == "LSPatch" ] || [ "$repo" == "YTPro" ] || [ "$repo" == "cloudstream" ] || [ "$repo" == "revenge-xposed" ] || [ "$repo" == "io.github.vvb2060.callrecording" ] || [ "$owner" == "Droid-ify" ] || [ "$repo" == "Obtainium" ] || [ "$repo" == "Metrolist" ] || [ "$repo" == "Acode" ] || [ "$repo" == "PrivateDNSAndroid" ] || [ "$repo" == "RecordYou" ] || [ "$repo" == "android-appcachecleaner" ] || [ "$repo" == "com.wizpizz.reddidnt" ] || [ "$repo" == "cromite" ] || [ "$repo" == "nextdnsmanager" ] || [ "$repo" == "AmazeFileManager" ]; then
       if [ "$fileName" != "$fileBaseName" ]; then
         [ -n "$fileBaseName" ] && echo -e "$notice diffs: $fileName ~ $fileBaseName"
         [ -f "$findFile" ] && rm -f "$findFile"
