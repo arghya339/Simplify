@@ -422,6 +422,7 @@ if [ $Android -ge 10 ]; then
     $Facebook
     Nobook
     ${fbMessenger}
+    Viber
     Threads
     Nagram
     Nekogram
@@ -473,6 +474,7 @@ elif [ $Android -eq 9 ]; then
     $Facebook
     Nobook
     ${fbMessenger}
+    Viber
     Threads
     Nagram
     Nekogram
@@ -523,6 +525,7 @@ elif [ $Android -eq 8 ]; then
     $Facebook
     Nobook
     ${fbMessenger}
+    Viber
     Threads
     Nagram
     Nekogram
@@ -569,6 +572,7 @@ elif [ $Android -eq 7 ]; then
     $Instagram
     Nobook
     ${fbMessenger}
+    Viber
     Nagram
     Nekogram
     Photomath
@@ -598,6 +602,7 @@ elif [ $Android -eq 6 ]; then
     Google\ Photos
     Nobook
     ${fbMessenger}
+    Viber
     Nagram
     Nekogram
     Photomath
@@ -624,6 +629,7 @@ elif [ $Android -eq 5 ]; then
     Google\ Photos
     Nobook
     ${fbMessenger}
+    Viber
     Nagram
     Nekogram
     Photomath
@@ -1430,6 +1436,15 @@ while true; do
       fi
       pkgPatched="com.facebook.orca"
       activityPatched="com.facebook.orca/.auth.StartScreenActivity"
+      dlPatchedApp "${appName}" "$owner" "$repo" "$assets" "$pkgPatched" "$activityPatched"
+      ;;
+    Viber)
+      appName="Viber"
+      owner="FiorenMas"
+      repo="Revanced-And-Revanced-Extended-Non-Root"
+      [ "$FetchPreRelease" -eq 0 ] && assets="viber-revanced.apk" || assets="viber-beta-revanced.apk"
+      pkgPatched="com.viber.voip"
+      activityPatched="com.viber.voip/.WelcomeActivity"
       dlPatchedApp "${appName}" "$owner" "$repo" "$assets" "$pkgPatched" "$activityPatched"
       ;;
     Threads)
