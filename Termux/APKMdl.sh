@@ -344,6 +344,7 @@ APKMdl() {
       echo -e "$bad Error: Could not find the final download URL in the content of ${Blue}$final_apk_link${Reset} using pup!" >&2
       return 1
     else
+      final_app_url="$(curl -sL -I --doh-url "$cloudflareDOH" -A "$USER_AGENT" -H "Referer: $Link" "$final_app_url" | grep -i "location:" | head -1 | sed 's/location: //i' | tr -d '\r')"
       echo -e "$good Found final download URL: ${Blue}$final_app_url${Reset}"
     fi
   else
