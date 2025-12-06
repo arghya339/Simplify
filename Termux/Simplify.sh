@@ -177,37 +177,41 @@ jq -e '.ChangeRVXSource != null' "$simplifyJson" >/dev/null 2>&1 && ChangeRVXSou
 [[ $Android -eq 7 || $Android -eq 6 ]] && mkdir -p "$RVX6_7"  # Create $RVX6_7 dir if Android version is 6 or 7
 
 # Build locale
-if [ $RipLocale -eq 1 ]; then
-  locale=$(getprop persist.sys.locale | cut -d'-' -f1)  # Get System Languages
-  [ -z $locale ] && locale=$(getprop ro.product.locale | cut -d'-' -f1)  # Get Languages
-elif [ $RipLocale -eq 0 ]; then
-  locale="[a-z][a-z]"
-fi
+ripLocaleGen() {
+  if [ $RipLocale -eq 1 ]; then
+    locale=$(getprop persist.sys.locale | cut -d'-' -f1)  # Get System Languages
+    [ -z $locale ] && locale=$(getprop ro.product.locale | cut -d'-' -f1)  # Get Languages
+  elif [ $RipLocale -eq 0 ]; then
+    locale="[a-z][a-z]"
+  fi
+}; ripLocaleGen
 
 # Build lcd_dpi
-if [ $RipDpi -eq 1 ]; then
-  density=$(getprop ro.sf.lcd_density)  # Get the device screen density
-  # Check and categorize the density
-  if [ "$density" -le "120" ]; then
-    lcd_dpi="ldpi"  # Low Density
-  elif [ "$density" -le "160" ]; then
-    lcd_dpi="mdpi"  # Medium Density
-  elif [ "$density" -le "213" ]; then
-    lcd_dpi="tvdpi"  # TV Density
-  elif [ "$density" -le "240" ]; then
-    lcd_dpi="hdpi"  # High Density
-  elif [ "$density" -le "320" ]; then
-    lcd_dpi="xhdpi"  # Extra High Density
-  elif [ "$density" -le "480" ]; then
-    lcd_dpi="xxhdpi"  # Extra Extra High Density
-  elif [ "$density" -gt "480" ] || [ "$density" -ge "640" ]; then
-    lcd_dpi="xxxhdpi"  # Extra Extra Extra High Density
-  else
+ripDpiGen() {
+  if [ $RipDpi -eq 1 ]; then
+    density=$(getprop ro.sf.lcd_density)  # Get the device screen density
+    # Check and categorize the density
+    if [ "$density" -le "120" ]; then
+      lcd_dpi="ldpi"  # Low Density
+    elif [ "$density" -le "160" ]; then
+      lcd_dpi="mdpi"  # Medium Density
+    elif [ "$density" -le "213" ]; then
+      lcd_dpi="tvdpi"  # TV Density
+    elif [ "$density" -le "240" ]; then
+      lcd_dpi="hdpi"  # High Density
+    elif [ "$density" -le "320" ]; then
+      lcd_dpi="xhdpi"  # Extra High Density
+    elif [ "$density" -le "480" ]; then
+      lcd_dpi="xxhdpi"  # Extra Extra High Density
+    elif [ "$density" -gt "480" ] || [ "$density" -ge "640" ]; then
+      lcd_dpi="xxxhdpi"  # Extra Extra Extra High Density
+    else
+      lcd_dpi="*dpi"
+    fi
+  elif [ $RipDpi -eq 0 ]; then
     lcd_dpi="*dpi"
   fi
-elif [ $RipDpi -eq 0 ]; then
-  lcd_dpi="*dpi"
-fi
+}; ripDpiGen
 
 # --- Method to Generate ripLib arg ---
 ripLibGen() {
@@ -1264,11 +1268,13 @@ while true; do
             m1="Device specific locale will be kept in patched apk file"
             m2="All locale will be kept in patched apk file"
             tfConfig "RipLocale" "$isRipLocale" "$m1" "$m2"
+            ripLocaleGen
             ;;
           RipDpi) if [ "$RipDpi" == 1 ]; then echo "RipDpi == true"; else echo "RipDpi == false"; fi
             m1="Device specific dpi will be kept in patched apk file"
             m2="All dpi will be kept in patched apk file"
             tfConfig "RipDpi" "$isRipDpi" "$m1" "$m2"
+            ripDpiGen
             ;;
           RipLib) if [ "$RipLib" == 1 ]; then echo "RipLib == true"; else echo "RipLib == false"; fi
             m1="Device specific arch lib will be kept in patched apk file"
