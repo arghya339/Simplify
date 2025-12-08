@@ -1389,10 +1389,10 @@ while true; do
         getVersion "$pkgName"
         pkgVersion="$pkgVersion"
       fi
-      Type="BUNDLE"
-      Arch=("universal")
+      Type="xapk"
+      Arch=("arm64-v8a, armeabi-v7a, x86_64")
       activityPatched="ch.protonvpn.android/.RoutingActivity"
-      build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "APKMirror" "protonvpn_patches_args" "$pkgName" "$activityPatched" "" "" ""
+      build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "Uptodown" "protonvpn_patches_args" "$pkgName" "$activityPatched" "" "" ""
       ;;
     MyFitnessPal)
       pkgName="com.myfitnesspal.android"
