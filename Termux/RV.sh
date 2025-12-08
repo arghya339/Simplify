@@ -219,6 +219,8 @@ soundcloud_patches_args=()
 
 protonmail_patches_args=()
 
+protonvpn_patches_args=()
+
 myfitnesspal_patches_args=()
 
 crunchyroll_patches_args=()
@@ -257,8 +259,8 @@ if [ "$ReadPatchesFile" -eq 1 ]; then
     # [14] Tumblr
     '-e "Fix old versions"'
     
-    # [15] Threads, [16] Strava, [17] SoundCloud, [18] ProtonMail, [19] MyFitnessPal, [20] Crunchyroll, [21] Cricbuzz | No default patches
-    '' '' '' '' '' '' ''
+    # [15] Threads, [16] Strava, [17] SoundCloud, [18] ProtonMail, [19] ProtonVPN, [20] MyFitnessPal, [21] Crunchyroll, [22] Cricbuzz | No default patches
+    '' '' '' '' '' '' '' ''
   )
   
   # Array to stores arrays-names
@@ -282,6 +284,7 @@ if [ "$ReadPatchesFile" -eq 1 ]; then
     strava_patches_args
     soundcloud_patches_args
     protonmail_patches_args
+    protonvpn_patches_args
     myfitnesspal_patches_args
     crunchyroll_patches_args
     cricbuzz_patches_args
@@ -666,6 +669,7 @@ getListOfPatches() {
   Strava 8.0+
   SoundCloud 8.0+
   Proton Mail 9.0+
+  ProtonVPN 8.0+
   MyFitnessPal 12+
   Crunchyroll 8.0+
   Cricbuzz 5.0+
@@ -724,6 +728,7 @@ if [ $Android -ge 12 ]; then
     Strava
     SoundCloud
     ProtonMail
+    ProtonVPN
     MyFitnessPal
     Crunchyroll
     Cricbuzz
@@ -750,6 +755,7 @@ elif [ $Android -eq 11 ]; then
     Strava
     SoundCloud
     ProtonMail
+    ProtonVPN
     Crunchyroll
     Cricbuzz
   )
@@ -775,6 +781,7 @@ elif [ $Android -eq 10 ]; then
     Strava
     SoundCloud
     ProtonMail
+    ProtonVPN
     Crunchyroll
     Cricbuzz
   )
@@ -798,6 +805,7 @@ elif [ $Android -eq 9 ]; then
     Strava
     SoundCloud
     ProtonMail
+    ProtonVPN
     Crunchyroll
     Cricbuzz
   )
@@ -820,6 +828,7 @@ elif [ $Android -eq 8 ]; then
     $Threads
     Strava
     SoundCloud
+    ProtonVPN
     Crunchyroll
     Cricbuzz
   )
@@ -969,6 +978,10 @@ while true; do
             ;;
           ProtonMail)
             pkgName="ch.protonmail.android"
+            getListOfPatches "$pkgName"
+            ;;
+          ProtonVPN)
+            pkgName="ch.protonvpn.android"
             getListOfPatches "$pkgName"
             ;;
           MyFitnessPal)
@@ -1366,6 +1379,20 @@ while true; do
       fi
       activityPatched="ch.protonmail.android/.MainActivity"
       build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "$web" "protonmail_patches_args" "$pkgName" "$activityPatched" "" "" ""
+      ;;
+    ProtonVPN)
+      pkgName="ch.protonvpn.android"
+      appName=("ProtonVPN")
+      pkgVersion="5.14.76.0"
+      #pkgVersion=""
+      if [ -z "$pkgVersion" ]; then
+        getVersion "$pkgName"
+        pkgVersion="$pkgVersion"
+      fi
+      Type="BUNDLE"
+      Arch=("universal")
+      activityPatched="ch.protonvpn.android/.RoutingActivity"
+      build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "APKMirror" "protonvpn_patches_args" "$pkgName" "$activityPatched" "" "" ""
       ;;
     MyFitnessPal)
       pkgName="com.myfitnesspal.android"
