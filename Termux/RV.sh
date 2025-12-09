@@ -205,6 +205,8 @@ prime_video_patches_args=(
   -e "Rename shared permissions"
 )
 
+disneyplus_patches_args=()
+
 twitch_patches_args=()
 
 tumblr_patches_args=(
@@ -253,13 +255,13 @@ if [ "$ReadPatchesFile" -eq 1 ]; then
     # [12] PrimeVideo
     '-e "Rename shared permissions"'
     
-    # [13] Twitch | No default patches
-    ''
+    # [13] Disney+, [14] Twitch | No default patches
+    '' ''
     
-    # [14] Tumblr
+    # [15] Tumblr
     '-e "Fix old versions"'
     
-    # [15] Threads, [16] Strava, [17] SoundCloud, [18] ProtonMail, [19] ProtonVPN, [20] MyFitnessPal, [21] Crunchyroll, [22] Cricbuzz | No default patches
+    # [16] Threads, [17] Strava, [18] SoundCloud, [19] ProtonMail, [20] ProtonVPN, [21] MyFitnessPal, [22] Crunchyroll, [23] Cricbuzz | No default patches
     '' '' '' '' '' '' '' ''
   )
   
@@ -278,6 +280,7 @@ if [ "$ReadPatchesFile" -eq 1 ]; then
     duolingo_patches_args
     rar_patches_args
     prime_video_patches_args
+    disneyplus_patches_args
     twitch_patches_args
     tumblr_patches_args
     threads_patches_args
@@ -662,6 +665,7 @@ getListOfPatches() {
   Duolingo 10+
   RAR 4.4+
   Amazon Prime Video 5.0
+  Disney+ 5.0+
   Twitch 5.0
   Tumblr 7.0+
   Threads arm64 + x64 9.0+
@@ -722,6 +726,7 @@ if [ $Android -ge 12 ]; then
     Duolingo
     RAR
     ${amazonPrimeVideo}
+    Disney+
     Twitch
     Tumblr
     $Threads
@@ -749,6 +754,7 @@ elif [ $Android -eq 11 ]; then
     Duolingo
     RAR
     ${amazonPrimeVideo}
+    Disney+
     Twitch
     Tumblr
     $Threads
@@ -775,6 +781,7 @@ elif [ $Android -eq 10 ]; then
     Duolingo
     RAR
     ${amazonPrimeVideo}
+    Disney+
     Twitch
     Tumblr
     $Threads
@@ -799,6 +806,7 @@ elif [ $Android -eq 9 ]; then
     Photomath
     RAR
     ${amazonPrimeVideo}
+    Disney+
     Twitch
     Tumblr
     $Threads
@@ -823,6 +831,7 @@ elif [ $Android -eq 8 ]; then
     Photomath
     RAR
     ${amazonPrimeVideo}
+    Disney+
     Twitch
     Tumblr
     $Threads
@@ -843,6 +852,7 @@ elif [ $Android -eq 7 ]; then
     Photomath
     RAR
     ${amazonPrimeVideo}
+    Disney+
     Twitch
     Tumblr
     Cricbuzz
@@ -856,6 +866,7 @@ elif [ $Android -eq 6 ]; then
     Photomath
     RAR
     ${amazonPrimeVideo}
+    Disney+
     Twitch
     Cricbuzz
   )
@@ -868,6 +879,7 @@ elif [ $Android -eq 5 ]; then
     Photomath
     RAR
     ${amazonPrimeVideo}
+    Disney+
     Twitch
     Cricbuzz
   )
@@ -958,6 +970,10 @@ while true; do
             ;;
           AmazonPrimeVideo)
             pkgName="com.amazon.avod.thirdpartyclient"
+            getListOfPatches "$pkgName"
+            ;;
+          "Disney+")
+            pkgName="com.disney.disneyplus"
             getListOfPatches "$pkgName"
             ;;
           Twitch)
@@ -1266,6 +1282,20 @@ while true; do
       Arch=("$cpuAbi")
       activityPatched="com.amazon.avod.thirdpartyclient/.LauncherActivity"
       build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "$web" "prime_video_patches_args" "$pkgName" "$activityPatched" "" "" ""
+      ;;
+    "Disney+")
+      pkgName="com.disney.disneyplus"
+      appName=("Disney+")
+      pkgVersion="4.19.3+rc1-2025.11.21"
+      #pkgVersion=""
+      if [ -z "$pkgVersion" ]; then
+        getVersion "$pkgName"
+        pkgVersion="$pkgVersion"
+      fi
+      Type="BUNDLE"
+      Arch=("universal")
+      activityPatched="com.disney.disneyplus/com.bamtechmedia.dominguez.main.MainActivity"
+      build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "APKMirror" "disneyplus_patches_args" "$pkgName" "$activityPatched" "" "" ""
       ;;
     Twitch)
       pkgName="tv.twitch.android.app"
