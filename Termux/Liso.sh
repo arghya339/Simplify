@@ -232,7 +232,7 @@ build_app() {
 getListOfPatches() {
   local pkgName="$1"
   # https://github.com/LisoUseInAIKyrios/revanced-patches/tree/dev/bundles
-  Patches=$(curl -sL 'https://raw.githubusercontent.com/LisoUseInAIKyrios/revanced-patches/refs/heads/dev/bundles/lisouseInaikyrios-latest-patches-list.json' | jq --arg pkgName "$pkgName" '.[] | select(.compatiblePackages."'"$pkgName"'" != null)')
+  Patches=$(curl -sL 'https://raw.githubusercontent.com/LisoUseInAIKyrios/revanced-patches/refs/heads/dev/bundles/lisouseInaikyrios-latest-patches-list.json' | jq --arg pkgName "$pkgName" '.patches[] | select(.compatiblePackages == null or .compatiblePackages[$pkgName] != null)')
   if [ "$ReadPatchesFile" -eq 1 ]; then
     jq <<< "$Patches" | tee "$SimplUsr/${pkgName}_list-patches.txt"
   else
