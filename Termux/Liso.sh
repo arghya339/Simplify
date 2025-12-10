@@ -61,7 +61,11 @@ patch_app() {
 
 yt_patches_args=(-d "Announcements")
 
+[ $su -eq 1 ] && yt_patches_args+=(-d "GmsCore support") || yt_patches_args+=(-e "GmsCore support" -O gmsCoreVendorGroupId="com.mgoogle")
+
 yt_music_patches_args=()
+
+[ $su -eq 1 ] && yt_music_patches_args+=(-d "GmsCore support") || yt_music_patches_args+=(-e "GmsCore support" -O gmsCoreVendorGroupId="com.mgoogle")
 
 if [ "$ReadPatchesFile" -eq 1 ]; then
   default_content=(
