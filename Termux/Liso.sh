@@ -2,6 +2,10 @@
 
 [ $su -eq 1 ] && echo -e "$info ${Blue}Target device:${Reset} $Model ($Serial)" || echo -e "$info ${Blue}Target device:${Reset} $Model"
 
+bash $Simplify/dlGitHub.sh "LisoUseInAIKyrios" "revanced-cli" "latest" ".jar" "$Liso"
+ReVancedCLIJar=$(find "$Liso" -type f -name "revanced-cli-*-all.jar" -print -quit)
+echo -e "$info ${Blue}ReVancedCLIJar:${Reset} $ReVancedCLIJar"
+
 # https://github.com/Jman-Github/ReVanced-Patch-Bundles/?tab=readme-ov-file#-lisouseinaikyrios-patches-bundle-api-v4
 lisoPatchesBundleJson=$(curl -sL "https://raw.githubusercontent.com/Jman-Github/ReVanced-Patch-Bundles/bundles/patch-bundles/lisouseInaikyrios-patch-bundles/lisouseInaikyrios-latest-patches-bundle.json")
 downloadUrl=$(jq -r '.download_url' <<< "$lisoPatchesBundleJson")
@@ -18,12 +22,9 @@ if [ -f "$findPatchesRvp" ]; then
 else
   dlPatchesRvp
 fi
-#bash $Simplify/dlGitHub.sh "LisoUseInAIKyrios" "revanced-cli" "latest" ".jar" "$Liso"
-#ReVancedCLIJar=$(find "$Liso" -type f -name "revanced-cli-*-all.jar" -print -quit)
-echo -e "$info ${Blue}ReVancedCLIJar:${Reset} $ReVancedCLIJar"
 
-bash $Simplify/dlGitHub.sh "LisoUseInAIKyrios" "revanced-patches" "latest" ".rvp" "$Liso"
-PatchesRvp=$(find "$Liso" -type f -name "patches-*.rvp" -print -quit)
+#bash $Simplify/dlGitHub.sh "LisoUseInAIKyrios" "revanced-patches" "latest" ".rvp" "$Liso"
+#PatchesRvp=$(find "$Liso" -type f -name "patches-*.rvp" -print -quit)
 echo -e "$info ${Blue}PatchesRvp:${Reset} $PatchesRvp"
 
 if [ $su -eq 0 ]; then
