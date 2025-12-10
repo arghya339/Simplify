@@ -105,11 +105,12 @@ RV="$Simplify/RV"
 RVX="$Simplify/RVX"
 RV4="$RVX/RV4"
 RVX6_7="$Simplify/RVX6-7"  # RVX for Android 6 and 7
+Liso="$Simplify/Liso"
 pikoTwitter="$Simplify/pikoTwitter"
 Dropped="$Simplify/Dropped"
 LSPatch="$Simplify/LSPatch"
 POST_INSTALL="$Simplify/POST_INSTALL"
-mkdir -p "$Simplify" "$SimplUsr" "$RV" "$RVX" "$RV4" "$pikoTwitter" "$Dropped" "$LSPatch" "$POST_INSTALL"  # Create $Simplify, $SimplUsr, $RV, $RVX, $RV4, $pikoTwitter, $Dropped, $LSPatch and $POST_INSTALL dir if it does't exist
+mkdir -p "$Simplify" "$SimplUsr" "$RV" "$RVX" "$RV4" "$Liso" "$pikoTwitter" "$Dropped" "$LSPatch" "$POST_INSTALL"  # Create $Simplify, $SimplUsr, $RV, $RVX, $RV4, $Liso, $pikoTwitter, $Dropped, $LSPatch and $POST_INSTALL dir if it does't exist
 simplifyJson="$Simplify/simplify.json"  # Configuration file to store simplify settings
 
 isPreRelease=0  # Default value (false/off/0) for isPreRelease, it's enabled latest release for Patches source
@@ -1204,7 +1205,11 @@ about() {
 }
 
 while true; do
-  options=(Download\ Patched\ App ReVanced ReVanced\ Extended Piko\ Twitter Dropped\ Patches LSPatch Configuration Miscellaneous Feature\ request Bug\ report Support About); buttons=("<Select>" "<Exit>"); menu "options" "buttons"; selected="${options[$selected]}"
+  options=(Download\ Patched\ App ReVanced ReVanced\ Extended)
+  [ $Android -ge 8 ] && options+=(Liso)
+  options+=(Piko\ Twitter Dropped\ Patches LSPatch Configuration Miscellaneous Feature\ request Bug\ report Support About)
+  buttons=("<Select>" "<Exit>")
+  menu "options" "buttons"; selected="${options[$selected]}"
   case "$selected" in
     Download\ Patched\ App)
       curl -sL -o "$Simplify/dlPatchedApp.sh" "https://raw.githubusercontent.com/arghya339/Simplify/refs/heads/main/Termux/dlPatchedApp.sh"
@@ -1220,6 +1225,10 @@ while true; do
       curl -sL -o "$RVX/RVX.sh" "https://raw.githubusercontent.com/arghya339/Simplify/refs/heads/main/Termux/RVX.sh"
       source "$RVX/RVX.sh"  # source = run in same shell environment (both scripts can share variables/functions both ways)
       sleep 3
+      ;;
+    Liso)
+      curl -sL -o "$Liso/Liso.sh" "https://raw.githubusercontent.com/arghya339/Simplify/refs/heads/main/Termux/Liso.sh"
+      source "$Liso/Liso.sh"  # source = run in same shell environment (both scripts can share variables/functions both ways)
       ;;
     Piko\ Twitter)
       curl -sL -o "$pikoTwitter/pikoTwitter.sh" "https://raw.githubusercontent.com/arghya339/Simplify/refs/heads/main/Termux/pikoTwitter.sh"
