@@ -293,7 +293,7 @@ while true; do
       ;;
     YTMusic)
       pkgName="com.google.android.apps.youtube.music"
-      appName=("YTMusic")
+      appName=("YouTube Music")
       pkgVersion="8.47.54"
       if [ -z "$pkgVersion" ]; then
         getVersion "$pkgName"
