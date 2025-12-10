@@ -1209,7 +1209,7 @@ while true; do
   [ $Android -ge 8 ] && options+=(Liso)
   options+=(Piko\ Twitter Dropped\ Patches LSPatch Configuration Miscellaneous Feature\ request Bug\ report Support About)
   buttons=("<Select>" "<Exit>")
-  menu "options" "buttons"; selected="${options[$selected]}"
+  menu "options" "buttons" "${#options[@]}"; selected="${options[$selected]}"
   case "$selected" in
     Download\ Patched\ App)
       curl -sL -o "$Simplify/dlPatchedApp.sh" "https://raw.githubusercontent.com/arghya339/Simplify/refs/heads/main/Termux/dlPatchedApp.sh"
