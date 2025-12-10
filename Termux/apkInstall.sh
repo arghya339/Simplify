@@ -41,7 +41,7 @@ apkInstall() {
   outputFileName=$(basename "$targetAPK")
   app_info=$($HOME/aapt2 dump badging "$targetAPK" 2>/dev/null)
   pkgName=$(awk -F"'" '/package/ {print $2}' <<< "$app_info" | head -1)
-  appName=$(awk -F"'" '/application-label:/ {print $2}' <<< "$app_info")
+  appLabel=$(awk -F"'" '/application-label:/ {print $2}' <<< "$app_info")
   if [ $su -eq 1 ]; then
     [ "$(su -c 'getenforce 2>/dev/null')" = "Enforcing" ] && { su -c "setenforce 0"; writeSELinux=1; } || writeSELinux=0
   fi
@@ -59,7 +59,7 @@ apkInstall() {
       [ $Android -le 10 ] && iCmd "settings put global package_verifier_enable 1" || iCmd "settings put global verifier_verify_adb_installs 1"  # Enabled Verify Adb Installs
     fi
     if [[ $output == *"Downgrade detected"* ]] && [ $KeepsData -eq 1 ]; then
-      echo -e "${Green}$appName uninstall successfully with keeps app data.${Reset}\n${Yellow}Don't forget to restart Simplify after reboot!${Reset}"
+      echo -e "${Green}$appLabel uninstall successfully with keeps app data.${Reset}\n${Yellow}Don't forget to restart Simplify after reboot!${Reset}"
       iCmd "cmd package uninstall -k $pkgName"
       cp "$targetAPK" "$POST_INSTALL"
       sleep 12
@@ -71,9 +71,9 @@ apkInstall() {
     fi
     iCmd "rm -f '/data/local/tmp/$outputFileName'"
     if [ $EnableRoolback -eq 1 ]; then
-      buttons=("<Yes>" "<No>"); confirmPrompt "Is $appName app working correctly?" "buttons" && response=Yes || response=No
+      buttons=("<Yes>" "<No>"); confirmPrompt "Is $appLabel app working correctly?" "buttons" && response=Yes || response=No
       if [[ "$response" == [Yy]* ]]; then
-        echo "Great! The $appName app is working properly."
+        echo "Great! The $appLabel app is working properly."
       else
         echo -e "$running Roolback to previous version.."
         iCmd "pm rollback-app $pkgName"
