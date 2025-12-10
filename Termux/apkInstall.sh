@@ -26,7 +26,7 @@ esac
 
 # Install final apk
 apkInstall() {
-  outputAPK=${1}
+  targetAPK=${1}
   activity=$2  # for non-rooted user to launch app after installtion
   iCmd() {
     icmd=${1}
@@ -38,8 +38,8 @@ apkInstall() {
       ~/adb -s $("$HOME/adb" devices 2>/dev/null | grep "device$" | awk '{print $1}' | tail -1) shell "$icmd"
     fi
   }
-  outputFileName=$(basename "$outputAPK")
-  app_info=$($HOME/aapt2 dump badging "$outputAPK" 2>/dev/null)
+  outputFileName=$(basename "$targetAPK")
+  app_info=$($HOME/aapt2 dump badging "$targetAPK" 2>/dev/null)
   pkgName=$(awk -F"'" '/package/ {print $2}' <<< "$app_info" | head -1)
   appName=$(awk -F"'" '/application-label:/ {print $2}' <<< "$app_info")
   if [ $su -eq 1 ]; then
@@ -48,7 +48,7 @@ apkInstall() {
   if [ $su -eq 1 ] || "$HOME/rish" -c "id" >/dev/null 2>&1 || "$HOME/adb" -s $(~/adb devices | grep "device$" | awk '{print $1}' | tail -1) shell "id" >/dev/null 2>&1; then
     iCmdOut=$(iCmd "pm resolve-activity --brief $pkgName")
     activityClass=$(tail -n 1 <<< "$iCmdOut") && unset iCmdOut
-    iCmd "cp '$outputAPK' '/data/local/tmp/$outputFileName'"
+    iCmd "cp '$targetAPK' '/data/local/tmp/$outputFileName'"
     [ $DisablePlayProtect -eq 1 ] && iCmd "settings put global package_verifier_user_consent -1"  # Disabled Play Protect
     if [ $DisableVerifyAdbInstalls -eq 1 ]; then
       [ $Android -le 10 ] && iCmd "settings put global package_verifier_enable 0" || iCmd "settings put global verifier_verify_adb_installs 0"  # Disable Verify Adb Installs
@@ -61,7 +61,7 @@ apkInstall() {
     if [[ $output == *"Downgrade detected"* ]] && [ $KeepsData -eq 1 ]; then
       echo -e "${Green}$appName uninstall successfully with keeps app data.${Reset}\n${Yellow}Don't forget to restart Simplify after reboot!${Reset}"
       iCmd "cmd package uninstall -k $pkgName"
-      cp "$outputAPK" "$POST_INSTALL"
+      cp "$targetAPK" "$POST_INSTALL"
       sleep 12
       iCmd "reboot"
     fi
@@ -82,10 +82,10 @@ apkInstall() {
   else
     activityClass="$activity"
     if [ $Android -le 6 ]; then
-      am start -a android.intent.action.VIEW -t application/vnd.android.package-archive -d "file://$outputAPK" > /dev/null 2>&1  # Activity Manager
+      am start -a android.intent.action.VIEW -t application/vnd.android.package-archive -d "file://$targetAPK" > /dev/null 2>&1  # Activity Manager
       sleep 15 && am start -n "$activityClass" &> /dev/null  # launch app after update
     else
-      termux-open --view "$outputAPK"  # install apk using Session installer
+      termux-open --view "$targetAPK"  # install apk using Session installer
       sleep 15 && am start -n "$activityClass" &> /dev/null  # launch app after update
     fi
   fi
