@@ -18,7 +18,7 @@ dlPatchesRvp() {
   done
 }
 if [ -f "$findPatchesRvp" ]; then
-  [ "$(basename "$findPatchesRvp" 2>/dev/null)" != "$PatchesRvp" ] && { echo -e "$notice diffs: $PatchesRvp ~ $(basename $findPatchesRvp)"; rm -f "$findPatchesRvp"; dlPatchesRvp; }
+  [ "$(basename "$findPatchesRvp" 2>/dev/null)" != "$(basename "$PatchesRvp" 2>/dev/null)" ] && { echo -e "$notice diffs: "$(basename $PatchesRvp 2>/dev/null)" ~ $(basename $findPatchesRvp)"; rm -f "$findPatchesRvp"; dlPatchesRvp; }
 else
   dlPatchesRvp
 fi
