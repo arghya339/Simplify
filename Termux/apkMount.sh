@@ -163,20 +163,12 @@ unmount() {
   if [ -n \$stock_path ]; then
     grep $pkgName /proc/mounts | while read -r line; do echo \$line | cut -d " " -f 2 | sed "s/apk.*/apk/" | xargs -r umount -l; done
   fi
-  if [ "\$(ls /data/adb/revanced/ | wc -l)" == "1" ]; then
-    for DIR in /data/adb/revanced/ /data/adb/post-fs-data.d/ /data/adb/service.d/; do
-      if [ -e \$DIR ]; then
-        rm -rf "\$DIR"
-      fi
-    done
-  else
-    rm -rf "/data/adb/revanced/$pkgName"
-    for FILE in "/data/adb/post-fs-data.d/$pkgName.sh" "/data/adb/service.d/$pkgName.sh"; do
-      if [ -e "\$FILE" ]; then
-        rm "\$FILE"
-      fi
-    done
-  fi
+  [ "\$(ls /data/adb/revanced/ | wc -l)" == "1" ] && rm -rf /data/adb/revanced || rm -rf "/data/adb/revanced/$pkgName"
+  for FILE in "/data/adb/post-fs-data.d/$pkgName.sh" "/data/adb/service.d/$pkgName.sh"; do
+    if [ -e "\$FILE" ]; then
+      rm -f "\$FILE"
+    fi
+  done
   am force-stop "$pkgName"
   pm clear --cache-only "$pkgName"  &> /dev/null
 }
