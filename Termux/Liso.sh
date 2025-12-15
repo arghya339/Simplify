@@ -2,7 +2,7 @@
 
 [ $su -eq 1 ] && echo -e "$info ${Blue}Target device:${Reset} $Model ($Serial)" || echo -e "$info ${Blue}Target device:${Reset} $Model"
 
-bash $Simplify/dlGitHub.sh "LisoUseInAIKyrios" "revanced-cli" "latest" ".jar" "$Liso"
+bash $Simplify/dlGitHub.sh "inotia00" "revanced-cli-patcher-22" "pre" ".jar" "$Liso"
 ReVancedCLIJar=$(find "$Liso" -type f -name "revanced-cli-*-all.jar" -print -quit)
 echo -e "$info ${Blue}ReVancedCLIJar:${Reset} $ReVancedCLIJar"
 
@@ -45,7 +45,7 @@ patch_app() {
   local appName=$4
 
   echo -e "$running Patching ${appName} Liso.."
-  $PREFIX/lib/jvm/java-$jdkVersion-openjdk/bin/java -jar $ReVancedCLIJar patch -p $PatchesRvp -o "$outputAPK" "${stock_apk_ref}" "${patches[@]}" --custom-aapt2-binary="$HOME/aapt2" --purge -f | tee "$log"
+  $PREFIX/lib/jvm/java-$jdkVersion-openjdk/bin/java -jar $ReVancedCLIJar patch -p $PatchesRvp -o "$outputAPK" "${stock_apk_ref}" "${patches[@]}" --custom-aapt2-binary="$HOME/aapt2" --purge $ripLib -f | tee "$log"
 
   if grep -q "OutOfMemory" "$log"; then
     echo -e "$bad ${Red}OutOfMemoryError${Reset}: ${Yellow}Device RAM overloaded!${Reset}\n ${Blue}Solutions${Reset}:\n   1. ${Yellow}Close background apps.${Reset}\n   2. ${Yellow}Use device with ≥4GB ~ ≥6GB RAM for patching apk.${Reset}"
