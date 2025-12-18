@@ -92,7 +92,7 @@ mkVersionURL() {
       for ((i=0; i<${#versionLinks[@]}; i++)); do
         vlink="${versionLinks[i]}"
         echo -e "$info versionLinkPattern$((i+1)): $vlink"
-        curl -sfL --doh-url "$cloudflareDOH" -A "$USER_AGENT" -H "Referer: https://www.apkmirror.com/" --head --silent --fail "$vlink" >/dev/null 2>&1 && versionLink="$vlink"
+        curl -L --doh-url "$cloudflareDOH" -A "$USER_AGENT" -H "Referer: https://www.apkmirror.com/" --head --silent --fail "$vlink" >/dev/null 2>&1 && versionLink="$vlink"
       done
     fi
     [ -z "$versionLink" ] && fetchVersionURL  # Fallback to fetchVersionURL if hardcoded pattern fails (inefficient for old versions)
