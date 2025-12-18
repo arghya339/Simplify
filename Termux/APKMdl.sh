@@ -78,7 +78,7 @@ mkVersionURL() {
   if ! grep -q "_cf_chl_" <<< "$appPageHtml"; then
     latestUploadsUrl="https://www.apkmirror.com$(pup '#primary a:contains("See more uploads...") attr{href}' <<< "$appPageHtml")"
     appCategoryValue="${latestUploadsUrl##*=}"
-    elif [ "$VERSION" == "Any" ] || [ "$VERSION" == "null" ] || [ -z "$VERSION" ]; then
+    if [ "$VERSION" == "Any" ] || [ "$VERSION" == "null" ] || [ -z "$VERSION" ]; then
       versionLink="$releaseLink"
     else
       VERSION=$(tr '.' '-' <<< "$VERSION")
