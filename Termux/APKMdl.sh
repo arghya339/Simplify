@@ -285,7 +285,7 @@ downloadApp() {
   FileName="${appName}_v${VERSION}-${Arch}${file_ext}"
   outputPath="${Download}/${FileName}"
   rmPreDownloadApp
-  if [ ! -f "$Download/${appName}_v${VERSION}-${cpuAbi}.apk" ]; then
+  if [ ! -f "$Download/${appName}_v${VERSION}-${cpuAbi}.apk" ] || [ ! -f "$outputPath" ]; then
     echo -e "$running Downloading $appName from ${Blue}$dlLink${Reset}.."
     while true; do
       aria2c -x 16 -s 16 --continue=true --console-log-level=error --download-result=hide --summary-interval=0 -d "$Download" -o "$FileName" -U "User-Agent: $USER_AGENT" -U "Referer: $downloadButtonLink" --async-dns=true --async-dns-server="$cloudflareIP" "$dlLink"
@@ -301,7 +301,7 @@ downloadApp() {
       echo -e "$notice SHA-256 SUM Diffs - Expected: ${Cyan}$SHA256${Reset} ~ Result: ${Cyan}$sha256sum${Reset}"
     fi
   else
-    echo -e "$notice Download skiped! ${Cyan}${appName}_v${VERSION}-${Arch}.apk${Reset} already exist."
+    [ "$file_ext" == ".apk" ] && echo -e "$notice Download skiped! ${Cyan}${appName}_v${VERSION}-${Arch}.apk${Reset} already exist." || echo -e "$notice Download skiped! ${Cyan}${appName}_v${VERSION}-${cpuAbi}.apk${Reset} already exist."
   fi
   [ "$file_ext" == ".apkm" ] && antisplitApp
 }
@@ -317,6 +317,5 @@ APKMdl() {
   OR=$8
   
   fetchAppsInfo && mkVersionURL && fetchVariant && fetchDownloadURL && downloadApp
-  echo; read -p "Press Enter to continue..."
 }
 ##################################################################################
