@@ -214,7 +214,7 @@ fetchDownloadURL() {
   
     if [ -n "$downloadButtonLink" ]; then
       echo -e "$running Scraping Download Link.."
-      downloadButtonHtml=$(curl -sL --doh-url $cloudflareDOH -A "$USER_AGENT" -H "Referer: $Link" "$final_apk_link")
+      downloadButtonHtml=$(curl -sL --doh-url $cloudflareDOH -A "$USER_AGENT" -H "Referer: $variantLink" "$downloadButtonLink")
       if ! grep -q "_cf_chl_" <<< "$downloadButtonHtml"; then
         downloadLink="https://www.apkmirror.com$(pup -p --charset UTF-8 'a:contains("here") attr{href}' <<< "$downloadButtonHtml" | head -1 2>/dev/null)"
           # https://www.apkmirror.com/wp-content/themes/APKMirror/download.php?id=XXXXXXX&key=XxX 
