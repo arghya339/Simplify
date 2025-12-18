@@ -2,12 +2,14 @@
   
 fetchAppsInfo() {
   unset appLink
+  echo -e "$running Fetching app info from APKMirror.."
   RESPONSE_JSON=$(curl -sS --doh-url "$cloudflareDOH" $APKM_REST_API_URL -A "$USER_AGENT" -H 'Accept: application/json' -H 'Content-Type: application/json' -H "Authorization: Basic $AUTH_TOKEN" -d "{\"pnames\":[\"$PKG_NAME\"]}")
   if jq -e ".data[] | select(.pname == \"$PKG_NAME\") | .exists == true" <<< "$RESPONSE_JSON" > /dev/null 2>&1; then
     appName="$(jq -r ".data[] | select(.pname == \"$PKG_NAME\") | .app.name" <<< "$RESPONSE_JSON")"
     baseDeveloperLink=$(basename "$(jq -r ".data[] | select(.pname == \"$PKG_NAME\") | .developer.name" <<< "$RESPONSE_JSON")")
     appLink="https://www.apkmirror.com$(jq -r ".data[] | select(.pname == \"$PKG_NAME\") | .app.link" <<< "$RESPONSE_JSON")"
     releaseLink="https://www.apkmirror.com$(jq -r ".data[] | select(.pname == \"$PKG_NAME\") | .release.link" <<< "$RESPONSE_JSON")"
+    echo -e "$info appLink: ${Blue}$appLink${Reset}"
   else
     echo -e "$bad ${Blue}$PKG_NAME${Reset} not found on APKMirror!" >&2
   fi
@@ -97,6 +99,7 @@ mkVersionURL() {
     cf_chl_error
   fi
   [ -n "$versionLink" ] && return || return 1
+  unset VERSION
 }
 
 fetchVariant() {
