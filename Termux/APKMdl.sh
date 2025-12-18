@@ -190,14 +190,14 @@ fetchDownloadURL() {
   echo -e "$running Scraping Download Button Link.."
   downloadPageHtml=$(curl -sL --doh-url "$cloudflareDOH" -A "$USER_AGENT" -H "Referer: https://www.apkmirror.com/" "$variantLink")
   if ! grep -q "_cf_chl_" <<< "$downloadPageHtml"; then
-    or=$(echo "$HTML_CONTENT" | pup -p --charset utf-8 'a.downloadButton text{}, p:contains("- or -") text{}' 2>/dev/null)
+    or=$(pup -p --charset utf-8 'a.downloadButton text{}, p:contains("- or -") text{}' <<< "$downloadPageHtml" 2>/dev/null)
     if [ -n "$or" ]; then
       if [ "$OR" == "Download APK" ] || [ -z "$OR" ]; then
-        SHA256=$(<<<"$HTML_CONTENT" sed -n '/APK certificate fingerprints/,+10 { s/.*SHA-256:.*<a[^>]*>\([0-9a-fA-F]\{64\}\)<\/a>.*/\1/p; }' | head -n1)
+        SHA256=$(<<<"$downloadPageHtml" sed -n '/APK certificate fingerprints/,+10 { s/.*SHA-256:.*<a[^>]*>\([0-9a-fA-F]\{64\}\)<\/a>.*/\1/p; }' | head -n1)
         downloadButtonLink="https://www.apkmirror.com$(pup -p --charset utf-8 'a.downloadButton attr{href}' <<< "$downloadPageHtml" | head -1 2>/dev/null)"
         file_ext=".apk"
       elif [ "$OR" == "Download APK Bundle" ]; then
-        SHA256=$(<<<"$HTML_CONTENT" awk '/<h4>APK bundle file hashes<\/h4>/,/<h5>Verify the APK bundle file you downloaded/' | sed -n 's/.*SHA-256: *<span[^>]*>\([0-9a-fA-F]\{64\}\)<\/span.*/\1/p' | head -n1)
+        SHA256=$(<<<"$downloadPageHtml" awk '/<h4>APK bundle file hashes<\/h4>/,/<h5>Verify the APK bundle file you downloaded/' | sed -n 's/.*SHA-256: *<span[^>]*>\([0-9a-fA-F]\{64\}\)<\/span.*/\1/p' | head -n1)
         downloadButtonLink="https://www.apkmirror.com$(pup -p --charset utf-8 'a.downloadButton attr{href}' <<< "$downloadPageHtml" | tail -1 2>/dev/null)"
         file_ext=".apkm"
       fi
@@ -205,10 +205,10 @@ fetchDownloadURL() {
       downloadButtonLink="https://www.apkmirror.com$(pup -p --charset utf-8 'a.downloadButton attr{href}' <<< "$downloadPageHtml" 2>/dev/null)"
       if [ "$Type" == "APK" ]; then
         file_ext=".apk"
-        SHA256=$(<<<"$HTML_CONTENT" awk '/<h4>APK file hashes<\/h4>/,/<h5>Verify the file you downloaded/' | sed -n 's/.*SHA-256: *<span[^>]*>\([0-9a-fA-F]\{64\}\)<\/span.*/\1/p' | head -n1)
+        SHA256=$(<<<"$downloadPageHtml" awk '/<h4>APK file hashes<\/h4>/,/<h5>Verify the file you downloaded/' | sed -n 's/.*SHA-256: *<span[^>]*>\([0-9a-fA-F]\{64\}\)<\/span.*/\1/p' | head -n1)
       else
         file_ext=".apkm"
-        SHA256=$(<<<"$HTML_CONTENT" awk '/<h4>APK bundle file hashes<\/h4>/,/<h5>Verify the APK bundle file you downloaded/' | sed -n 's/.*SHA-256: *<span[^>]*>\([0-9a-fA-F]\{64\}\)<\/span.*/\1/p' | head -n1)
+        SHA256=$(<<<"$downloadPageHtml" awk '/<h4>APK bundle file hashes<\/h4>/,/<h5>Verify the APK bundle file you downloaded/' | sed -n 's/.*SHA-256: *<span[^>]*>\([0-9a-fA-F]\{64\}\)<\/span.*/\1/p' | head -n1)
       fi
     fi
   
