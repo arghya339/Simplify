@@ -233,10 +233,6 @@ fetchDownloadURL() {
     cf_chl_error
   fi
   [ -n "$dlLink" ] && return || return 1
-  #appName="${appName//[\*\\\/:\?\|<>]/}"
-  appName=$(echo "${appName%%[:—(]*}" | xargs)
-  FileName="${appName}_v${VERSION}-${Arch}${file_ext}"
-  outputPath="${Download}/${FileName}"
 }
 
 antisplitApp() {   
@@ -281,8 +277,12 @@ rmPreDownloadApp() {
 }
 
 downloadApp() {
+  #appName="${appName//[\*\\\/:\?\|<>]/}"
+  appName=$(echo "${appName%%[:—(]*}" | xargs)
+  FileName="${appName}_v${VERSION}-${Arch}${file_ext}"
+  outputPath="${Download}/${FileName}"
   rmPreDownloadApp
-  if [ ! -f "$Download/${appName}_v${VERSION}-${cpuAbi}.apk" ] && [ ! -f "$outputPath" ]; then
+  if [ ! -f "$Download/${appName}_v${VERSION}-${cpuAbi}.apk" ]; then
     echo -e "$running Downloading $appName from ${Blue}$dlLink${Reset}.."
     while true; do
       aria2c -x 16 -s 16 --continue=true --console-log-level=error --download-result=hide --summary-interval=0 -d "$Download" -o "$FileName" -U "User-Agent: $USER_AGENT" -U "Referer: $downloadButtonLink" --async-dns=true --async-dns-server="$cloudflareIP" "$dlLink"
@@ -314,5 +314,6 @@ APKMdl() {
   OR=$8
   
   fetchAppsInfo && mkVersionURL && fetchVariant && fetchDownloadURL && downloadApp
+  echo; read -p "Press Enter to continue..."
 }
 ##################################################################################
