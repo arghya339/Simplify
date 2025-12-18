@@ -83,6 +83,7 @@ mkVersionURL() {
     if [ "$VERSION" == "Any" ] || [ "$VERSION" == "null" ] || [ -z "$VERSION" ]; then
       versionLink="$releaseLink"
     else
+      echo -e "$info baseDeveloperLink/appCategoryValue: $baseDeveloperLink/$appCategoryValue"
       VERSION=$(tr '.' '-' <<< "$VERSION")
       versionLinks=("${appLink}${baseDeveloperLink}-${VERSION}-release/")  # {applink}{baseDeveloperLink}-{version}-release/
       versionLinks=("${appLink}${appCategoryValue}-${VERSION}-release/")  # {applink}{appCategoryValue}-{version}-release/
@@ -213,6 +214,7 @@ fetchDownloadURL() {
     fi
   
     if [ -n "$downloadButtonLink" ]; then
+      echo "$good Found download button Link: ${Blue}$downloadButtonLink${Reset}"
       echo -e "$running Scraping Download Link.."
       downloadButtonHtml=$(curl -sL --doh-url $cloudflareDOH -A "$USER_AGENT" -H "Referer: $variantLink" "$downloadButtonLink")
       if ! grep -q "_cf_chl_" <<< "$downloadButtonHtml"; then
