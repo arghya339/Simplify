@@ -91,6 +91,7 @@ mkVersionURL() {
       VERSION=$(tr '-' '.' <<< "$VERSION")
       for ((i=0; i<${#versionLinks[@]}; i++)); do
         vlink="${versionLinks[i]}"
+        echo -e "$info versionLinkPattern$((i+1)): $vlink"
         curl -sfL --doh-url "$cloudflareDOH" -A "$USER_AGENT" -H "Referer: https://www.apkmirror.com/" --head --silent --fail "$vlink" >/dev/null 2>&1 && versionLink="$vlink"
       done
     fi
@@ -214,7 +215,7 @@ fetchDownloadURL() {
     fi
   
     if [ -n "$downloadButtonLink" ]; then
-      echo "$good Found download button Link: ${Blue}$downloadButtonLink${Reset}"
+      echo -e "$good Found download button Link: ${Blue}$downloadButtonLink${Reset}"
       echo -e "$running Scraping Download Link.."
       downloadButtonHtml=$(curl -sL --doh-url $cloudflareDOH -A "$USER_AGENT" -H "Referer: $variantLink" "$downloadButtonLink")
       if ! grep -q "_cf_chl_" <<< "$downloadButtonHtml"; then
