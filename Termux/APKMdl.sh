@@ -86,8 +86,8 @@ mkVersionURL() {
       echo -e "$info baseDeveloperLink/appCategoryValue: $baseDeveloperLink/$appCategoryValue"
       VERSION=$(tr '.' '-' <<< "$VERSION")
       versionLinks=("${appLink}${baseDeveloperLink}-${VERSION}-release/")  # {applink}{baseDeveloperLink}-{version}-release/
-      versionLinks=("${appLink}${appCategoryValue}-${VERSION}-release/")  # {applink}{appCategoryValue}-{version}-release/
-      versionLinks=("${appLink}${baseDeveloperLink}-${appCategoryValue}-${VERSION}-release/")  # {applink}{baseDeveloperLink}-{appCategoryValue}-{version}-release/
+      versionLinks+=("${appLink}${appCategoryValue}-${VERSION}-release/")  # {applink}{appCategoryValue}-{version}-release/
+      versionLinks+=("${appLink}${baseDeveloperLink}-${appCategoryValue}-${VERSION}-release/")  # {applink}{baseDeveloperLink}-{appCategoryValue}-{version}-release/
       VERSION=$(tr '-' '.' <<< "$VERSION")
       for ((i=0; i<${#versionLinks[@]}; i++)); do
         vlink="${versionLinks[i]}"
