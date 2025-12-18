@@ -285,7 +285,7 @@ downloadApp() {
   if [ ! -f "$Download/${appName}_v${VERSION}-${cpuAbi}.apk" ] && [ ! -f "$outputPath" ]; then
     echo -e "$running Downloading $appName from ${Blue}$dlLink${Reset}.."
     while true; do
-      aria2c -x 16 -s 16 --continue=true --console-log-level=error --download-result=hide --summary-interval=0 -d "$Download" -o "$FileName" -U "User-Agent: $USER_AGENT" -U "Referer: $final_apk_link" --async-dns=true --async-dns-server="$cloudflareIP" "$final_app_url"
+      aria2c -x 16 -s 16 --continue=true --console-log-level=error --download-result=hide --summary-interval=0 -d "$Download" -o "$FileName" -U "User-Agent: $USER_AGENT" -U "Referer: $downloadButtonLink" --async-dns=true --async-dns-server="$cloudflareIP" "$dlLink"
       exitStatus=$?
       echo  # Space
       [ $exitStatus -eq 0 ] && { echo -e "$good Download Complete. Saved to ${Cyan}$outputPath${Reset}"; break; } || { echo -e "$bad Download failed! retrying in 5 secons.." && sleep 5; }
