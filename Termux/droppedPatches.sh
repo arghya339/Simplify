@@ -63,7 +63,7 @@ build_app() {
   local activityPatched=$9
   
 
-  bash $Simplify/APKMdl.sh "$pkgName" "$pkgVersion" "$Type" "${archRef[0]}"  # Download stock apk from APKMirror
+  APKMdl "$pkgName" "" "$pkgVersion" "$Type" "${archRef[0]}"  # Download stock apk from APKMirror
   stockFileName=$(basename "$(find "$Download" -type f -name "${appNameRef[0]}_v*-${archRef[0]}.apk" -print -quit)")
   local stock_apk_path=("$Download/$stockFileName")
   

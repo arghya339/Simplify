@@ -893,7 +893,7 @@ while true; do
           Google\ Maps\ →\ OsmAnd) termux-open-url "https://play.google.com/store/apps/details?id=net.osmand" ;;
           Google\ Maps\ Compass\ →\ Xiaomi\ Compass)
             version="16.0.6.0"; tag="$version"
-            bash $Simplify/APKMdl.sh "com.miui.compass" "$version" "APK" "noarch" "" "" ""  # Download stock apk from APKMirror
+            APKMdl "com.miui.compass" "" "$version" "APK" "noarch" "" "" ""  # Download stock apk from APKMirror
             appName="Xiaomi Compass"; repo="$appName"; updated_at=
             file_pattern="${appName}_v$version-noarch.apk"
             apk_path=$(find "$Download" -type f -name "$file_pattern" -print -quit)

@@ -246,7 +246,7 @@ fileName=$(basename $outputAPK)
 activityPatched="com.twitter.android/.StartActivity"
 
 # --- Download Twitter apk ---
-bash $Simplify/APKMdl.sh "$pkgName" "$pkgVersion" "$Type" "${Arch[0]}"  # Download stock Twitter apk from APKMirror
+APKMdl "$pkgName" "" "$pkgVersion" "$Type" "${Arch[0]}"  # Download stock Twitter apk from APKMirror
 xFileName=$(basename "$(find "$Download" -type f -name "${appName[0]}_v*-$cpuAbi.apk" -print -quit)")
 stock_apk_path=("$Download/$xFileName")
 

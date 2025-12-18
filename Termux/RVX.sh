@@ -368,7 +368,7 @@ build_app() {
   
   
   if [ "$web" == "APKMirror" ]; then
-    bash $Simplify/APKMdl.sh "$pkgName" "$pkgVersion" "$Type" "$Arch"  # Download stock apk from APKMirror
+    APKMdl "$pkgName" "" "$pkgVersion" "$Type" "$Arch"  # Download stock apk from APKMirror
   elif [ "$web" == "Uptodown" ]; then
     bash $Simplify/dlUptodown.sh "${appNameRef[0]}" "$pkgVersion" "$Type" "${Arch}"  # Download stock apk from Uptodown
   elif [ "$web" == "APKPure" ]; then

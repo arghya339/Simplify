@@ -101,7 +101,7 @@ build_app() {
     cpuAbi=$(getprop ro.product.cpu.abi)  # Get Android arch
   else
     if [ "$web" == "APKMirror" ]; then
-      bash $Simplify/APKMdl.sh "$pkgName" "$pkgVersion" "$Type" "${archRef[0]}"  # Download stock apk from APKMirror
+      APKMdl "$pkgName" "" "$pkgVersion" "$Type" "${archRef[0]}"  # Download stock apk from APKMirror
     else
       bash $Simplify/dlUptodown.sh "${appNameRef[0]}" "$pkgVersion" "$Type" "${archRef[0]}"  # Download stock apk from Uptodown
     fi
@@ -203,7 +203,7 @@ sign_app() {
   local activityPatched=$8
   
   if [ "$web" == "APKMirror" ]; then
-    bash $Simplify/APKMdl.sh "$pkgName" "$pkgVersion" "$Type" "${ArchRef[0]}"  # Download stock apk from APKMirror
+    APKMdl "$pkgName" "" "$pkgVersion" "$Type" "${ArchRef[0]}"  # Download stock apk from APKMirror
   else
     bash $Simplify/dlUptodown.sh "${appNameRef[0]}" "$pkgVersion" "$Type" "${ArchRef[0]}"  # Download stock apk from Uptodown
   fi

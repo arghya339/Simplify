@@ -149,7 +149,7 @@ build_app() {
   local pkgPatched=$7
   local activityPatched=$8
 
-  bash $Simplify/APKMdl.sh "$pkgName" "$pkgVersion" "$Type" "${archRef[0]}"
+  APKMdl "$pkgName" "" "$pkgVersion" "$Type" "${archRef[0]}"
   sleep 0.5
   if [ "$Type" == "APK" ]; then
     if [ "$pkgVersion" == "Any" ] || [ -z "$pkgVersion" ]; then

@@ -34,50 +34,6 @@ if [ ! -f "$PREFIX/bin/simplify" ]; then
 fi
 chmod +x "$HOME/.Simplify.sh"  # give execute permission to the Simplify.sh
 
-<<comment
-# --- dash supports ANSI escape codes for terminal text formatting ---
-Color Forground_Color_Code Background_Color_Code
-Black 30 40
-Red 31 41
-Green 32 42
-Yellow 33 43
-Blue 34 44
-Magenta 35 45
-Cyan 36 46
-White 37 47
-
-Gray_Background_Code 48
-Default_background_Code 49
-
-Color Bright_Color_Code
-Bright-Black(Gray) 90
-Bright-Red 91
-Bright-Green 92
-Bright-Yellow 93
-Bright-Blue 94
-Bright-Magenta 95
-Bright-Cyan 96
-Bright-White 97
-
-Text_Format Code
-Reset 0
-Bold 1
-Dim 2
-Italic 3
-Underline 4
-Bold 5
-Less Bold 6
-Text with Background 7
-invisible 8
-Strikethrough 9
-
-Examples
-echo -e "\e[32mThis is green text\e[0m"
-echo -e "\e[47mThis is a white background\e[0m"
-echo -e "\e[32;47mThis is green text on white background\e[0m"
-echo -e "\e[1;32;47mThis is bold green text on white background\e[0m"
-comment
-
 # Construct the simplify shape using string concatenation
 print_simplify=$(cat <<'EOF'
     https://github.com/arghya339/Simplify
@@ -112,6 +68,17 @@ LSPatch="$Simplify/LSPatch"
 POST_INSTALL="$Simplify/POST_INSTALL"
 mkdir -p "$Simplify" "$SimplUsr" "$RV" "$RVX" "$RV4" "$Liso" "$pikoTwitter" "$Dropped" "$LSPatch" "$POST_INSTALL"  # Create $Simplify, $SimplUsr, $RV, $RVX, $RV4, $Liso, $pikoTwitter, $Dropped, $LSPatch and $POST_INSTALL dir if it does't exist
 simplifyJson="$Simplify/simplify.json"  # Configuration file to store simplify settings
+
+cloudflareDOH="https://cloudflare-dns.com/dns-query"
+cloudflareIP="1.1.1.1,1.0.0.1"
+APKM_REST_API_URL="https://www.apkmirror.com/wp-json/apkm/v1/app_exists/"
+AUTH_TOKEN="YXBpLXRvb2xib3gtZm9yLWdvb2dsZS1wbGF5OkNiVVcgQVVMZyBNRVJXIHU4M3IgS0s0SCBEbmJL"
+AndroidF=$(getprop ro.build.version.release)
+Model=$(getprop ro.product.model)
+Build=$(getprop ro.build.id)
+K="$Model Build/$Build"
+crVersion=$(curl -sL "https://chromiumdash.appspot.com/fetch_releases?channel=Stable&platform=Android&num=1" | jq -r '.[0].version') || crVersion="143.0.0.0"
+USER_AGENT="Mozilla/5.0 (Linux; Android $AndroidF; $K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/${crVersion} Mobile Safari/537.36"
 
 isPreRelease=0  # Default value (false/off/0) for isPreRelease, it's enabled latest release for Patches source
 isRipLocale=1  # Default value (true/on/1) for RipLocale, it's delete locale from patched apk file except device specific locale by default
@@ -243,7 +210,6 @@ fi
 
 su -c "id" >/dev/null 2>&1 && su=1 || su=0
 [ $su -eq 1 ] && Serial=$(su -c 'getprop ro.serialno')  # Get Serial Number required root
-Model=$(getprop ro.product.model)  # Get Device Model
 
 clear && echo -e "🚀 ${Yellow}Please wait! starting simplify...${Reset}"
 
@@ -410,6 +376,7 @@ fi
 curl -sL "https://raw.githubusercontent.com/arghya339/Simplify/refs/heads/main/Termux/dlGitHub.sh" --progress-bar -o $Simplify/dlGitHub.sh
 
 curl -sL "https://raw.githubusercontent.com/arghya339/Simplify/refs/heads/main/Termux/APKMdl.sh" --progress-bar -o $Simplify/APKMdl.sh
+source $Simplify/APKMdl.sh
 
 curl -sL "https://raw.githubusercontent.com/arghya339/Simplify/refs/heads/main/Termux/dlUptodown.sh" --progress-bar -o $Simplify/dlUptodown.sh
 

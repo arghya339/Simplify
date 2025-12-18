@@ -1,256 +1,165 @@
 #!/usr/bin/bash
-
-# --- Colored log indicators ---
-good="\033[92;1m[✔]\033[0m"
-bad="\033[91;1m[✘]\033[0m"
-info="\033[94;1m[i]\033[0m"
-running="\033[37;1m[~]\033[0m"
-notice="\033[93;1m[!]\033[0m"
-question="\033[93;1m[?]\033[0m"
-
-Green="\033[92m"
-Red="\033[91m"
-Blue="\033[94m"
-skyBlue="\033[38;5;117m"
-Cyan="\033[96m"
-White="\033[37m"
-Yellow="\033[93m"
-Orange="\e[38;5;208m"
-Reset="\033[0m"
-
-# --- Global Variable ---
-APKM_REST_API_URL="https://www.apkmirror.com/wp-json/apkm/v1/app_exists/"
-Android=$(getprop ro.build.version.release)
-Model=$(getprop ro.product.model)
-Build=$(getprop ro.build.id)
-K="$Model Build/$Build"
-#milestone=$(curl -sL "https://chromiumdash.appspot.com/fetch_releases?channel=Stable&platform=Android&num=1" | jq -r '.[0].milestone') || milestone=140; milestone=${milestone:-"140"}
-#USER_AGENT="Mozilla/5.0 (Linux; Android $Android; $K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/${milestone}.0.0.0 Mobile Safari/537.36"  # HTML User Agent: chrome://version/
-version=$(curl -sL "https://chromiumdash.appspot.com/fetch_releases?channel=Stable&platform=Android&num=1" | jq -r '.[0].version') || version="140.0.0.0"
-USER_AGENT="Mozilla/5.0 (Linux; Android $Android; $K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/${version} Mobile Safari/537.36"
-AUTH_TOKEN="YXBpLXRvb2xib3gtZm9yLWdvb2dsZS1wbGF5OkNiVVcgQVVMZyBNRVJXIHU4M3IgS0s0SCBEbmJL"
-cloudflareDOH="https://cloudflare-dns.com/dns-query"
-cloudflareIP="1.1.1.1,1.0.0.1"
-Download="/sdcard/Download"  # Download dir
-Simplify="$HOME/Simplify"
-simplifyJson="$Simplify/simplify.json"  # Configuration file to store simplify settings
-if jq -e '.DeviceArch != null' "$simplifyJson" >/dev/null 2>&1; then
-  cpuAbi=$(jq -r '.DeviceArch' "$simplifyJson" 2>/dev/null)  # Get Device Architecture from json
-else
-  cpuAbi=$(getprop ro.product.cpu.abi)  # Get Android architecture
-fi
-if jq -e '.openjdk != null' "$simplifyJson" >/dev/null 2>&1; then
-  jdkVersion=$(jq -r '.openjdk' "$simplifyJson" 2>/dev/null)  # Get openjdk value (verison) from json
-else
-  jdkVersion="21"
-fi
-RipLocale="$(jq -r '.RipLocale' "$simplifyJson" 2>/dev/null)"
-RipDpi="$(jq -r '.RipDpi' "$simplifyJson" 2>/dev/null)"
-RipLib="$(jq -r '.RipLib' "$simplifyJson" 2>/dev/null)"
-if [ $RipLocale -eq 1 ]; then
-  locale=$(getprop persist.sys.locale | cut -d'-' -f1)  # Get System Languages
-  if [ -z $locale ]; then
-    locale=$(getprop ro.product.locale | cut -d'-' -f1)  # Get Languages
-  fi
-elif [ $RipLocale -eq 0 ]; then
-  locale="[a-z][a-z]"
-  echo -e "$notice RipLocale Disabled!"
-fi
-if [ $RipDpi -eq 1 ]; then
-  density=$(getprop ro.sf.lcd_density)  # Get the device screen density
-  # Check and categorize the density
-  if [ "$density" -le "120" ]; then
-    lcd_dpi="ldpi"  # Low Density
-  elif [ "$density" -le "160" ]; then
-    lcd_dpi="mdpi"  # Medium Density
-  elif [ "$density" -le "213" ]; then
-    lcd_dpi="tvdpi"  # TV Density
-  elif [ "$density" -le "240" ]; then
-    lcd_dpi="hdpi"  # High Density
-  elif [ "$density" -le "320" ]; then
-    lcd_dpi="xhdpi"  # Extra High Density
-  elif [ "$density" -le "480" ]; then
-    lcd_dpi="xxhdpi"  # Extra Extra High Density
-  elif [ "$density" -gt "480" ] || [ "$density" -ge "640" ]; then
-    lcd_dpi="xxxhdpi"  # Extra Extra Extra High Density
-  else
-    lcd_dpi="*dpi"
-  fi
-elif [ $RipDpi -eq 0 ]; then
-  lcd_dpi="*dpi"
-  echo -e "$notice RipDpi Disabled!"
-fi
-
-APKMdl() {
-  local PKG_NAME=$1
-  local VERSION=$2
-  local TYPE=$3
-  local ARCH=$4
-  local OS=$5
-  local DPI=$6
-  local OR=$7
-  local RESPONSE_JSON
-  local html_content
-  local HTML_CONTENT
-  local final_apk_link_content
-  local FileName
   
-  cf_chl_error() {
-    echo -e "$bad ${Red}Cloudflare security challenge detected!${Reset}\n$notice ${Yellow}This webpage is protected by Cloudflare's anti-bot system.${Reset}\n ${Blue}Solutions${Reset}:\n   1. ${Yellow}Please try again after some time.${Reset}\n   2. ${Yellow}Disable your VPN if you are connected to one.${Reset}\n   3. ${Yellow}Connect to a Cloudflare WARP proxy and try again.${Reset}"
-    sleep 12
-    am start -n com.cloudflare.onedotonedotonedotone/com.cloudflare.app.presentation.main.SplashActivity &> /dev/null || termux-open-url "https://play.google.com/store/apps/details?id=com.cloudflare.onedotonedotonedotone"
-    exit 1
-  }
-
-  # dynamically version_link scraping method (inefficient for old app versions)
-  scrapeVersionUrl() {
-    appLink="$1"  # app Url
-    version="$2"  # target app version
-    
-    local html_content  # local variable: accessible only inside this function
-    local second_last_segment  # this variable has local scope and is not accessible outside of this function
-
-    html_content=$(curl -sL --doh-url "$cloudflareDOH" -A "$USER_AGENT" -H "Referer: https://www.apkmirror.com/" "$appLink")  # get html from appLink
-    echo "$html_content" | grep -q "_cf_chl_" 2>/dev/null && cf_chl_error
-    latestUploads=$(pup 'a[href*="?appcategory="] attr{href}' <<< "$html_content" | sed "s|^/|$APKM_DOMAIN/|")  # extract latest uploads page url for secific app using appLink page html
-    second_last_segment=$(echo "$latestUploads" | awk -F'appcategory=' '{print $2}')  # extract appName from lastestUploads page url
-    local appName; appName=$(pup 'h1 text{}' <<< "$html_content")  # get app name from appLink page html
-
-    echo -e "$running Scraping latest $appName uploads list from APKMirror..\n"
-    count="1"  # start searching target app vresion from first page (latest uploads)
-    while true; do
-      # for first page use lastestUploads url | https://www.apkmirror.com/uploads/?appcategory=$second_last_segment
-      # after first page use custom pattern lastestUploads url
-      if [ "$count" -ge 1 ]; then
-        latestUploads="https://www.apkmirror.com/uploads/page/$count/?appcategory=$second_last_segment"
-      fi
-      echo -e "$info Latest $appName Uploads - Page $count"
-      local HTML_CONTENT; HTML_CONTENT=$(curl -sL --doh-url "$cloudflareDOH" -A "$USER_AGENT" -H "Referer: https://www.apkmirror.com/" "$latestUploads")  # get html from latest uploads page
-      pup 'span.infoSlide-name:contains("Version:") + span.infoSlide-value text{}' <<< $HTML_CONTENT  # print Version list (30items/page) from latest uploads page html
-      # extract both title (appName version) & link (versionUrl)
-      local json_output; json_output=$(echo "$HTML_CONTENT" | pup 'a.fontBlack json{}' | jq -c '[.[] | select(.text != null and (.text | test("Wear OS|Android Automotive") | not)) | {title: .text, link: ("https://www.apkmirror.com" + .href)}]')
-      # try to match target version with a title in json_output and extract its link if found
-      version_link=$(echo "$json_output" | jq -r --arg version "$version" '.[] | select(.title | test($version)) | .link' | head -n1)
-      if [ -n "$version_link" ]; then
-        # if version_link populate (not empty) then print successfull messages
-        echo -e "$good Found version $version"
-        echo -e "$info version_link: ${Blue}$version_link${Reset}"
-        break  # break while loop
-      else
-        echo -e "$notice Version $version not found on page $count, moving to next page.."
-        ((count++))  # increase +1 page number
-        continue  # skip next iteration (remaining commands) of loop then continue to next iteration
-      fi
-    done  # end of while loop
-  }
-
+fetchAppsInfo() {
+  unset appLink
   RESPONSE_JSON=$(curl -sS --doh-url "$cloudflareDOH" $APKM_REST_API_URL -A "$USER_AGENT" -H 'Accept: application/json' -H 'Content-Type: application/json' -H "Authorization: Basic $AUTH_TOKEN" -d "{\"pnames\":[\"$PKG_NAME\"]}")
-  
-  if [ $? -ne 0 ]; then
-      echo -e "$bad Error: API request failed for ${Blue}apkmirror.com${Reset}.\nTry again later..." >&2
-    return 1
-  fi
-  
-  if ! echo "$RESPONSE_JSON" | jq -e ".data[] | select(.pname == \"$PKG_NAME\") | .exists == true" > /dev/null 2>&1; then
-    echo -e "$bad Error: ${Blue}$PKG_NAME${Reset} pkgName not found on APKMirror!" >&2
-    return 1
-  fi
-  #echo "$RESPONSE_JSON" | jq -e ".data[]"  # for debug
-  appLink="https://www.apkmirror.com$(jq -r ".data[] | select(.pname == \"$PKG_NAME\") | .app.link" <<< "$RESPONSE_JSON")"
-  appLink=$(echo "$appLink" | sed 's/-android-automotive//g; s/-wear-os//g; s/-daydream//g')
-  second_last_segment=$(basename "$appLink")  # chrome
-  appName=$(jq -r ".data[] | select(.pname == \"$PKG_NAME\") | .app.name" <<< "$RESPONSE_JSON")
-  appName=$(echo "$appName" | sed 's/(Android Automotive)//g; s/(Wear OS)//g; s/(Daydream)//g' | xargs)
-  versionLink=$(jq -r ".data[] | select(.pname == \"$PKG_NAME\") | .release.link" <<< "$RESPONSE_JSON" | grep -Eo "/apk/[^\"']+" | grep "/apk/.*$second_last_segment" | head -n 1 | sed -E 's/-[0-9].*//')
-  selectedApp=$(basename "$versionLink" | sed 's/-android-automotive//g; s/-wear-os//g; s/-daydream//g')  # google-chrome
-  if [ "$VERSION" != "Any" ] || [ "$VERSION" != "null" ] && [ -n "$VERSION" ]; then
-    VERSION=$(echo "$VERSION" | tr '.' '-')
-    version_link="${appLink}${selectedApp}-${VERSION}-release/"
-    if ! curl -sL --doh-url "$cloudflareDOH" -A "$USER_AGENT" -H "Referer: https://www.apkmirror.com/" --head --silent --fail "$version_link" >/dev/null 2>&1; then
-      version_link="${appLink}${second_last_segment}-${VERSION}-release/"
-    fi
-    if ! curl -sL --doh-url "$cloudflareDOH" -A "$USER_AGENT" -H "Referer: https://www.apkmirror.com/" --head --silent --fail "$version_link" >/dev/null 2>&1; then
-      version_link="${appLink}${selectedApp}-${second_last_segment}-${VERSION}-release/"
-    fi
-    VERSION=$(echo "$VERSION" | tr '-' '.')
-    if ! curl -sL --doh-url "$cloudflareDOH" -A "$USER_AGENT" -H "Referer: https://www.apkmirror.com/" --head --silent --fail "$version_link" >/dev/null 2>&1; then
-      scrapeVersionUrl "$appLink" "$VERSION"  # Fallback to scrapeVersionUrl if hardcoded pattern fails (inefficient for old versions)
-    fi
-    if ! curl -sL --doh-url "$cloudflareDOH" -A "$USER_AGENT" -H "Referer: https://www.apkmirror.com/" --head --silent --fail "$version_link" >/dev/null 2>&1; then
-      echo -e "${notice} Version link could not be generated! Falling back to latest version."
-      version_link="https://www.apkmirror.com$(jq -r ".data[] | select(.pname == \"$PKG_NAME\") | .release.link" <<< "$RESPONSE_JSON")"
-    fi
-  elif [ "$VERSION" == "Any" ] || [ "$VERSION" == "null" ] || [ -z "$VERSION" ]; then
-    version_link="https://www.apkmirror.com$(jq -r ".data[] | select(.pname == \"$PKG_NAME\") | .release.link" <<< "$RESPONSE_JSON")"
-  fi
-  
-  if [ -z "$appLink" ] || [ -z $second_last_segment ] || [ -z "$appName" ] || [ -z $selectedApp ]; then
-    echo -e "$bad Error: Could not retrieve appInfo!" >&2
-    return 1
+  if jq -e ".data[] | select(.pname == \"$PKG_NAME\") | .exists == true" <<< "$RESPONSE_JSON" > /dev/null 2>&1; then
+    appName="$(jq -r ".data[] | select(.pname == \"$PKG_NAME\") | .app.name" <<< "$RESPONSE_JSON")"
+    baseDeveloperLink=$(basename "$(jq -r ".data[] | select(.pname == \"$PKG_NAME\") | .developer.name" <<< "$RESPONSE_JSON")")
+    appLink="https://www.apkmirror.com$(jq -r ".data[] | select(.pname == \"$PKG_NAME\") | .app.link" <<< "$RESPONSE_JSON")"
+    releaseLink="https://www.apkmirror.com$(jq -r ".data[] | select(.pname == \"$PKG_NAME\") | .release.link" <<< "$RESPONSE_JSON")"
   else
-    echo -e "$info appName: $appName \n$info appLink: ${Blue}$appLink${Reset} \n$info second_last_segment: $second_last_segment \n$info selectedApp: $selectedApp \n$info version_link: ${Blue}$version_link${Reset}\n"
+    echo -e "$bad ${Blue}$PKG_NAME${Reset} not found on APKMirror!" >&2
   fi
-  
-  echo -e "$running Scraping variant details from: ${Blue}$version_link${Reset}"
-  html_content=$(curl -sL --doh-url "$cloudflareDOH" -A "$USER_AGENT" -H "Referer: https://www.apkmirror.com/" "$version_link")
-  echo "$html_content" | grep -q "_cf_chl_" 2>/dev/null && cf_chl_error
-  
-  variantsJson=$(echo "$html_content" | pup 'div.table-row json{}')
+  [ -n "$appLink" ] && return || return 1
+}
 
-  # Use local variables to hold the found variant's details
-  local found_type=""
-  local found_arch=""
-  local found_link=""
+cf_chl_error() {
+  echo -e "$bad ${Red}Cloudflare security challenge detected!${Reset}\n$notice ${Yellow}This webpage is protected by Cloudflare's anti-bot system.${Reset}\n ${Blue}Solutions${Reset}:\n   ${Blue}1${Reset}. ${Yellow}Please try again after some time.${Reset}\n   ${Blue}2${Reset}. ${Yellow}Disable your VPN if you are connected to one.${Reset}\n   ${Blue}3${Reset}. ${Yellow}Connect to a Cloudflare WARP proxy and try again.${Reset}"
+  am start -n com.cloudflare.onedotonedotonedotone/com.cloudflare.app.presentation.main.SplashActivity &> /dev/null || termux-open-url "https://play.google.com/store/apps/details?id=com.cloudflare.onedotonedotonedotone"
+  echo; read -p "Press Enter to continue..."
+}
 
-  mapfile -t parsed_rows < <(echo "$variantsJson" | jq -r '.[] | select((.children | type) == "array" and (.children | length) == 5)
-    | select(
-      (.children[0].children[0].text | type) == "string" and # Version text
-      (.children[0].children[1].text | type) == "string" and # Type text (BUNDLE/APK)
-      (.children[1].text | type) == "string" and # Arch text
-      (.children[2].text | type) == "string" and # OS text
-      (.children[3].text | type) == "string" and # DPI text
-      (.children[4].children[0].href | type) == "string" # Link href
-    )
-    | [
-        (.children[0].text // .children[0].children[0].text), # Version (fallback)
-        .children[0].children[1].text, # Type (BUNDLE/APK)
-        .children[1].text, # Arch
-        .children[2].text, # OS
-        .children[3].text, # DPI
-        ("https://www.apkmirror.com" + .children[4].children[0].href) # Link
-      ] | join("\t")
-  ')
-  
-  if [ ${#parsed_rows[@]} -eq 0 ]; then
-    echo -e "$bad No valid variants found!"
-    return 1
-  elif [ ${#parsed_rows[@]} -eq 1 ]; then
-    # Automatically select the single variant found
-    IFS=$'\t' read -r version type arch os dpi link <<< "${parsed_rows[0]}"
-    echo -e "[0] ${Blue}Version: $version | Type: $type | Arch: $arch | OS: $os | DPI: $dpi{Reset}"
-    found_version="$version"
-    found_type="$type"
-    found_arch="$arch"
-    found_os="$os"
-    found_dpi="$dpi"
-    found_link="$link"
-    echo -e "$notice Only one variant found! auto selected: [0]"
-    echo "Version : $found_version"
-    echo "Type    : $found_type"
-    echo "Arch    : $found_arch"
-    echo "OS      : $found_os"
-    echo "DPI     : $found_dpi"
-    echo -e "Link    : ${Blue}$found_link${Reset}"
+breadcrumbsMenu() {
+  INDEX=${1:-0}  # breadcrumbsMenuIndex
+  appPageHtml=$(curl -sL --doh-url "$cloudflareDOH" -A "$USER_AGENT" "$appLink")
+  hasBreadcrumbsMenu=$(pup '.breadcrumbs-menu json{}' <<< "$appPageHtml" | jq 'length > 0')
+  if [ "$hasBreadcrumbsMenu" == "true" ]; then
+    breadcrumbsMenuJson=$(pup 'ul.breadcrumbs-menu li a json{}' <<< "$appPageHtml" | jq 'map({name: [..|.text?]|add|sub("^ +| +$";""), link: ("https://www.apkmirror.com"+.href)})')
+    if [[ "$INDEX" == [0-9] ]]; then
+      breadcrumbsMenuAppLink=$(jq -r ".[$INDEX].link" <<< "$breadcrumbsMenuJson")
+    else
+      breadcrumbsMenuAppName=$(jq <<< "$breadcrumbsMenuJson" | jq -r '.[] | select(.name | test("[()]") | not).name')
+      breadcrumbsMenuAppLink=$(jq <<< "$breadcrumbsMenuJson" | jq -r '.[] | select(.name | test("[()]") | not).link')
+    fi
+    #[ -z "$breadcrumbsMenuAppLink" ] && breadcrumbsMenuAppLink=$(jq -r ".[0].link" <<< "$breadcrumbsMenuJson")
+    [ -n "$breadcrumbsMenuAppLink" ] && appLink="$breadcrumbsMenuAppLink"
+    echo -e "appLink: ${Blue}$appLink${Reset}"
   else
-    # Filter variants based on both TYPE and ARCH parameters
-    # Use a loop with indices to print the row number
-    for i in "${!parsed_rows[@]}"; do
-      IFS=$'\t' read -r version type arch os dpi link <<< "${parsed_rows[$i]}"
-      # Print the row number here (using $i)
-      echo -e "[$i] ${Blue}Version: $version | Type: $type | Arch: $arch | OS: $os | DPI: $dpi${Reset}"
+    echo "hasBreadcrumbsMenu: $hasBreadcrumbsMenu"
+  fi
+}
+
+fetchVersionURL() {
+  unset versionLink
+  echo -e "$running Searching for target app version in APKMirror's Latest Uploads page.."
+  breadcrumbsMenu
+  appPageHtml=$(curl -sL --doh-url "$cloudflareDOH" -A "$USER_AGENT" "$appLink")
+  if ! grep -q "_cf_chl_" <<< "$appPageHtml"; then
+    latestUploadsUrl="https://www.apkmirror.com$(pup '#primary a:contains("See more uploads...") attr{href}' <<< "$appPageHtml")"
+    latestUploadsQueryString=$(basename "$latestUploadsUrl" 2>/dev/null)
+    page=1
+    while true; do
+      [ $page -eq 1 ] && echo -e "$info Latest $appName Uploads" || echo -e "$info Latest $appName Uploads - Page $page"
+      latestUploadsUrl="https://www.apkmirror.com/uploads/page/$page/$latestUploadsQueryString"
+      latestUploadsHtml=$(curl -sL --doh-url "$cloudflareDOH" -A "$USER_AGENT" "$latestUploadsUrl")
+      grep -q "_cf_chl_" <<< "$latestUploadsHtml" && cf_chl_error && break
+      pup 'span.infoSlide-name:contains("Version:") + span.infoSlide-value text{}' <<< $latestUploadsHtml
+      latestUploadsJson=$(pup 'a.fontBlack json{}' <<< "$latestUploadsHtml" | jq -c '[.[] | select(.text != null) | {title: .text, link: ("https://www.apkmirror.com" + .href)}]')
+      versionLink=$(jq -r --arg version "$VERSION" '.[] | select(.title | test($version)) | .link' <<< "$latestUploadsJson" | head -1)
+      if [ -n "$versionLink" ]; then
+        echo -e "$good Found target version $VERSION on page $page. Version page URL: ${Blue}$versionLink${Reset}"
+        break
+      else
+        echo -e "$notice Target version $VERSION not found on page $page! moving to next page.."
+        ((page++))
+      fi
+    done
+  else
+    cf_chl_error
+  fi
+  [ -n "$versionLink" ] && return || return 1
+}
+
+mkVersionURL() {
+  unset versionLink
+  breadcrumbsMenu
+  appPageHtml=$(curl -sL --doh-url "$cloudflareDOH" -A "$USER_AGENT" "$appLink")
+  if ! grep -q "_cf_chl_" <<< "$appPageHtml"; then
+    latestUploadsUrl="https://www.apkmirror.com$(pup '#primary a:contains("See more uploads...") attr{href}' <<< "$appPageHtml")"
+    appCategoryValue="${latestUploadsUrl##*=}"
+    elif [ "$VERSION" == "Any" ] || [ "$VERSION" == "null" ] || [ -z "$VERSION" ]; then
+      versionLink="$releaseLink"
+    else
+      VERSION=$(tr '.' '-' <<< "$VERSION")
+      versionLinks=("${appLink}${baseDeveloperLink}-${VERSION}-release/")  # {applink}{baseDeveloperLink}-{version}-release/
+      versionLinks=("${appLink}${appCategoryValue}-${VERSION}-release/")  # {applink}{appCategoryValue}-{version}-release/
+      versionLinks=("${appLink}${baseDeveloperLink}-${appCategoryValue}-${VERSION}-release/")  # {applink}{baseDeveloperLink}-{appCategoryValue}-{version}-release/
+      VERSION=$(tr '-' '.' <<< "$VERSION")
+      for ((i=0; i<${#versionLinks[@]}; i++)); do
+        vlink="${versionLinks[i]}"
+        curl -sfL --doh-url "$cloudflareDOH" -A "$USER_AGENT" -H "Referer: https://www.apkmirror.com/" --head --silent --fail "$vlink" >/dev/null 2>&1 && versionLink="$vlink"
+      done
+    fi
+    [ -z "$versionLink" ] && fetchVersionURL  # Fallback to fetchVersionURL if hardcoded pattern fails (inefficient for old versions)
+    [ -n "$versionLink" ] && echo -e "$info appName: $appName \n$info appLink: ${Blue}$appLink${Reset}"
+  else
+    cf_chl_error
+  fi
+  [ -n "$versionLink" ] && return || return 1
+}
+
+fetchVariant() {
+  unset variantLink
+  echo -e "$running Fetching variant list from APKMirror.."
+  variantHtml=$(curl -sL --doh-url "$cloudflareDOH" -A "$USER_AGENT" -H "Referer: https://www.apkmirror.com/" "$versionLink")
+  if ! grep -q "_cf_chl_" <<< "$variantHtml"; then
+    variantsJson=$(pup 'div.table-row json{}' <<< "$variantHtml")
+    unset found_type found_arch found_link
+
+    mapfile -t parsed_rows < <(jq -r '.[] | select((.children | type) == "array" and (.children | length) == 5)
+      | select(
+        (.children[0].children[0].text | type) == "string" and # Version text
+        (.children[0].children[1].text | type) == "string" and # Type text (BUNDLE/APK)
+        (.children[1].text | type) == "string" and # Arch text
+        (.children[2].text | type) == "string" and # OS text
+        (.children[3].text | type) == "string" and # DPI text
+        (.children[4].children[0].href | type) == "string" # Link href
+      )
+      | [
+          (.children[0].text // .children[0].children[0].text), # Version (fallback)
+          .children[0].children[1].text, # Type (BUNDLE/APK)
+          .children[1].text, # Arch
+          .children[2].text, # OS
+          .children[3].text, # DPI
+          ("https://www.apkmirror.com" + .children[4].children[0].href) # Link
+        ] | join("\t")
+    ' <<< "$variantsJson")
+  
+    if [ ${#parsed_rows[@]} -eq 0 ]; then
+      echo -e "$bad No valid variants found!"
+      return 1
+    elif [ ${#parsed_rows[@]} -eq 1 ]; then
+      # Automatically select the single variant found
+      IFS=$'\t' read -r version type arch os dpi link <<< "${parsed_rows[0]}"
+      echo -e "[0] ${Blue}Version: $version | Type: $type | Arch: $arch | OS: $os | DPI: $dpi{Reset}"
+      found_version="$version"
+      found_type="$type"
+      found_arch="$arch"
+      found_os="$os"
+      found_dpi="$dpi"
+      found_link="$link"
+      echo -e "$notice Only one variant found! auto selected: [0]"
+      echo -e "Version : $found_version\nType    : $found_type\nArch    : $found_arch\nOS      : $found_os\nDPI     : $found_dpi\nLink    : ${Blue}$found_link${Reset}"
+    else
+      # Filter variants based on both TYPE and ARCH parameters
+      for i in "${!parsed_rows[@]}"; do
+        IFS=$'\t' read -r version type arch os dpi link <<< "${parsed_rows[$i]}"
+        echo -e "[$i] ${Blue}Version: $version | Type: $type | Arch: $arch | OS: $os | DPI: $dpi${Reset}"
       
-      if [ -n "$OS" ] && [ -n "$DPI" ]; then
-        if [ "$type" == "$TYPE" ] && [ "$arch" == "$ARCH" ] && [ "$os" == "$OS" ] && [ "$dpi" == "$DPI" ]; then
+        if [ -n "$OS" ] && [ -n "$DPI" ]; then
+          if [ "$type" == "$TYPE" ] && [ "$arch" == "$ARCH" ] && [ "$os" == "$OS" ] && [ "$dpi" == "$DPI" ]; then
+            found_version="$version"
+            found_type="$type"
+            found_arch="$arch"
+            found_os="$os"
+            found_dpi="$dpi"
+            found_link="$link"
+            echo -e "$info autoSelectedVariant: [$i]"
+            echo -e "Version : $found_version\nType    : $found_type\nArch    : $found_arch\nOS      : $found_os\nDPI     : $found_dpi\nLink    : ${Blue}$found_link${Reset}"
+            break
+          fi
+        elif [[ "$type" == "$TYPE" ]] && [[ "$arch" == "$ARCH" ]]; then
           found_version="$version"
           found_type="$type"
           found_arch="$arch"
@@ -258,106 +167,99 @@ APKMdl() {
           found_dpi="$dpi"
           found_link="$link"
           echo -e "$info autoSelectedVariant: [$i]"
-          echo "Version : $found_version"
-          echo "Type    : $found_type" # Print selected Type
-          echo "Arch    : $found_arch"
-          echo "OS      : $found_os"
-          echo "DPI     : $found_dpi"
-          echo -e "Link    : ${Blue}$found_link${Reset}"
-          break # Exit the loop once a match is found
+          echo -e "Version : $found_version\nType    : $found_type\nArch    : $found_arch\nOS      : $found_os\nDPI     : $found_dpi\nLink    : ${Blue}$found_link${Reset}"
+          break
         fi
-      elif [[ "$type" == "$TYPE" ]] && [[ "$arch" == "$ARCH" ]]; then
-        found_version="$version"
-        found_type="$type"
-        found_arch="$arch"
-        found_os="$os"
-        found_dpi="$dpi"
-        found_link="$link"
-        echo -e "$info autoSelectedVariant: [$i]"
-        echo "Version : $found_version"
-        echo "Type    : $found_type" # Print selected Type
-        echo "Arch    : $found_arch"
-        echo "OS      : $found_os"
-        echo "DPI     : $found_dpi"
-        echo -e "Link    : ${Blue}$found_link${Reset}"
-        break # Exit the loop once a match is found
-      fi
-    done
+      done
+    fi
+    VERSION="$found_version"
+    Type="$found_type"
+    Arch="$found_arch"
+    variantLink="$found_link"
+  else
+    cf_chl_error
   fi
+  [ -n "$variantLink" ] && return || return 1
+}
 
-  # Check if a variant was found
-  if [ -z "$found_type" ]; then
-    echo -e "$bad No $TYPE variant found for architecture $ARCH!"
-    return 1
-  fi
+fetchDownloadURL() {
+  unset dlLink
+  echo -e "$running Scraping Download Button Link.."
+  downloadPageHtml=$(curl -sL --doh-url "$cloudflareDOH" -A "$USER_AGENT" -H "Referer: https://www.apkmirror.com/" "$variantLink")
+  if ! grep -q "_cf_chl_" <<< "$downloadPageHtml"; then
+    or=$(echo "$HTML_CONTENT" | pup -p --charset utf-8 'a.downloadButton text{}, p:contains("- or -") text{}' 2>/dev/null)
+    if [ -n "$or" ]; then
+      if [ "$OR" == "Download APK" ] || [ -z "$OR" ]; then
+        SHA256=$(<<<"$HTML_CONTENT" sed -n '/APK certificate fingerprints/,+10 { s/.*SHA-256:.*<a[^>]*>\([0-9a-fA-F]\{64\}\)<\/a>.*/\1/p; }' | head -n1)
+        downloadButtonLink="https://www.apkmirror.com$(pup -p --charset utf-8 'a.downloadButton attr{href}' <<< "$downloadPageHtml" | head -1 2>/dev/null)"
+        file_ext=".apk"
+      elif [ "$OR" == "Download APK Bundle" ]; then
+        SHA256=$(<<<"$HTML_CONTENT" awk '/<h4>APK bundle file hashes<\/h4>/,/<h5>Verify the APK bundle file you downloaded/' | sed -n 's/.*SHA-256: *<span[^>]*>\([0-9a-fA-F]\{64\}\)<\/span.*/\1/p' | head -n1)
+        downloadButtonLink="https://www.apkmirror.com$(pup -p --charset utf-8 'a.downloadButton attr{href}' <<< "$downloadPageHtml" | tail -1 2>/dev/null)"
+        file_ext=".apkm"
+      fi
+    else
+      downloadButtonLink="https://www.apkmirror.com$(pup -p --charset utf-8 'a.downloadButton attr{href}' <<< "$downloadPageHtml" 2>/dev/null)"
+      if [ "$Type" == "APK" ]; then
+        file_ext=".apk"
+        SHA256=$(<<<"$HTML_CONTENT" awk '/<h4>APK file hashes<\/h4>/,/<h5>Verify the file you downloaded/' | sed -n 's/.*SHA-256: *<span[^>]*>\([0-9a-fA-F]\{64\}\)<\/span.*/\1/p' | head -n1)
+      else
+        file_ext=".apkm"
+        SHA256=$(<<<"$HTML_CONTENT" awk '/<h4>APK bundle file hashes<\/h4>/,/<h5>Verify the APK bundle file you downloaded/' | sed -n 's/.*SHA-256: *<span[^>]*>\([0-9a-fA-F]\{64\}\)<\/span.*/\1/p' | head -n1)
+      fi
+    fi
   
-  # Assign the found values to the variables used later in the script
-  VERSION="$found_version"
-  Type="$found_type"
-  Arch="$found_arch"
-  Link="$found_link"
-  echo  # Space
-  
-  echo -e "$running Scraping actual download button from: ${Blue}$Link${Reset}"
-  # Fetch the HTML of the download page
-  HTML_CONTENT=$(curl -sL --doh-url "$cloudflareDOH" -A "$USER_AGENT" -H "Referer: https://www.apkmirror.com/" "$Link")
-  echo "$HTML_CONTENT" | grep -q "_cf_chl_" 2>/dev/null && cf_chl_error
-  
-  or=$(echo "$HTML_CONTENT" | pup -p --charset utf-8 'a.downloadButton text{}, p:contains("- or -") text{}' 2>/dev/null)
-  if [ -n "$or" ]; then
-    # This selector looks for an <a> tag with 'downloadButton' in its class list and extracts its href.
-    if [ "$OR" == "Download APK" ] || [ -z "$OR" ]; then
-      SHA256=$(<<<"$HTML_CONTENT" sed -n '/APK certificate fingerprints/,+10 { s/.*SHA-256:.*<a[^>]*>\([0-9a-fA-F]\{64\}\)<\/a>.*/\1/p; }' | head -n1)
-      final_apk_link="https://www.apkmirror.com$(echo "$HTML_CONTENT" | pup -p --charset utf-8 'a.downloadButton attr{href}' | head -1 2>/dev/null)"
-      file_ext=".apk"
-    elif [ "$OR" == "Download APK Bundle" ]; then
-      SHA256=$(<<<"$HTML_CONTENT" awk '/<h4>APK bundle file hashes<\/h4>/,/<h5>Verify the APK bundle file you downloaded/' | sed -n 's/.*SHA-256: *<span[^>]*>\([0-9a-fA-F]\{64\}\)<\/span.*/\1/p' | head -n1)
-      final_apk_link="https://www.apkmirror.com$(echo "$HTML_CONTENT" | pup -p --charset utf-8 'a.downloadButton attr{href}' | tail -1 2>/dev/null)"
-      file_ext=".apkm"
+    if [ -n "$downloadButtonLink" ]; then
+      echo -e "$running Scraping Download Link.."
+      downloadButtonHtml=$(curl -sL --doh-url $cloudflareDOH -A "$USER_AGENT" -H "Referer: $Link" "$final_apk_link")
+      if ! grep -q "_cf_chl_" <<< "$downloadButtonHtml"; then
+        downloadLink="https://www.apkmirror.com$(pup -p --charset UTF-8 'a:contains("here") attr{href}' <<< "$downloadButtonHtml" | head -1 2>/dev/null)"
+          # https://www.apkmirror.com/wp-content/themes/APKMirror/download.php?id=XXXXXXX&key=XxX 
+          # https://www.androidpolice.com/2020/07/04/how-to-download-apps-without-the-play-store-and-why-apkmirror-is-the-best-place-to-get-them/
+          # https://github.com/illogical-robot/apkmirror-public/issues
+        if [ -n "$downloadLink" ]; then
+          ! grep -q "https://www.apkmirror.com" <<< "$downloadLink" && downloadLink="https://www.apkmirror.com$downloadLink"
+          dlLink=$(curl -sL -I --doh-url "$cloudflareDOH" -A "$USER_AGENT" -H "Referer: $variantLink" "$downloadLink" | grep -i "location:" | head -1 | sed 's/location: //i' | tr -d '\r')
+          echo -e "$good Found final download Link: ${Blue}$dlLink${Reset}"
+        fi
+      else
+        cf_chl_error
+      fi
     fi
   else
-    final_apk_link="https://www.apkmirror.com$(echo "$HTML_CONTENT" | pup -p --charset utf-8 'a.downloadButton attr{href}' 2>/dev/null)"
-    if [ "$Type" == "APK" ]; then
-      file_ext=".apk"
-      SHA256=$(<<<"$HTML_CONTENT" awk '/<h4>APK file hashes<\/h4>/,/<h5>Verify the file you downloaded/' | sed -n 's/.*SHA-256: *<span[^>]*>\([0-9a-fA-F]\{64\}\)<\/span.*/\1/p' | head -n1)
-    else
-      file_ext=".apkm"
-      SHA256=$(<<<"$HTML_CONTENT" awk '/<h4>APK bundle file hashes<\/h4>/,/<h5>Verify the APK bundle file you downloaded/' | sed -n 's/.*SHA-256: *<span[^>]*>\([0-9a-fA-F]\{64\}\)<\/span.*/\1/p' | head -n1)
-    fi
+    cf_chl_error
   fi
-  
-  if [ -n "$final_apk_link" ]; then
-    echo -e "$running Fetching intermediate download button content from: ${Blue}$final_apk_link${Reset}"
-    final_apk_link_content=$(curl -sL --doh-url $cloudflareDOH -A "$USER_AGENT" -H "Referer: $Link" "$final_apk_link")
-    echo "$final_apk_link_content" | grep -q "_cf_chl_" 2>/dev/null && cf_chl_error
-    if [ -z "$final_apk_link_content" ]; then
-      echo -e "$bad Error: Fetched empty content from intermediate download page ${Blue}$final_apk_link${Reset}!" >&2
-      return 1
-    fi
-    
-    # An <a> tag with an href attribute that 'contains("here")' or similar patterns.
-    final_app_url="https://www.apkmirror.com$(echo "$final_apk_link_content" | pup -p --charset UTF-8 'a:contains("here") attr{href}' | head -1 2>/dev/null)"
-      # https://www.apkmirror.com/wp-content/themes/APKMirror/download.php?id=XXXXXXX&key=XxX 
-      # https://www.androidpolice.com/2020/07/04/how-to-download-apps-without-the-play-store-and-why-apkmirror-is-the-best-place-to-get-them/
-      # https://github.com/illogical-robot/apkmirror-public/issues
-    if [ -z "$final_app_url" ]; then
-      echo -e "$bad Error: Could not find the final download URL in the content of ${Blue}$final_apk_link${Reset} using pup!" >&2
-      return 1
-    else
-      final_app_url="$(curl -sL -I --doh-url "$cloudflareDOH" -A "$USER_AGENT" -H "Referer: $Link" "$final_app_url" | grep -i "location:" | head -1 | sed 's/location: //i' | tr -d '\r')"
-      echo -e "$good Found final download URL: ${Blue}$final_app_url${Reset}"
-    fi
-  else
-    echo -e "$bad Error: Could not find the final download button link on ${Blue}$Link${Reset}!" >&2
-    return 1
-  fi
-  echo  # Space
-    
+  [ -n "$dlLink" ] && return || return 1
   #appName="${appName//[\*\\\/:\?\|<>]/}"
   appName=$(echo "${appName%%[:—(]*}" | xargs)
   FileName="${appName}_v${VERSION}-${Arch}${file_ext}"
-  outputPath="${Download}/${FileName}" 
-  
+  outputPath="${Download}/${FileName}"
+}
+
+antisplitApp() {   
+  bash $Simplify/dlGitHub.sh "REAndroid" "APKEditor" "latest" ".jar" "$Simplify"
+  APKEditor=$(find "$Simplify" -type f -name "APKEditor-*.jar" -print -quit)
+  mkdir -p "$Download/${appName}_v${VERSION}-${cpuAbi}"
+  echo -e "$running Extracting APKM content.."
+  termux-wake-lock
+  if [ $RipLib -eq 1 ]; then
+    pv "$outputPath" | bsdtar -xf - -C "$Download/${appName}_v${VERSION}-${cpuAbi}/" --include "base.apk" "split_config.${cpuAbi//-/_}.apk" "split_config.${locale}.apk" "split_config.${lcd_dpi}.apk"
+    bsdtar_exit_code=$?
+  elif [ $RipLib -eq 0 ]; then
+    pv "$outputPath" | bsdtar -xf - -C "$Download/${appName}_v${VERSION}-${cpuAbi}/" --include "base.apk" "split_config.arm64_v8a.apk" "split_config.armeabi_v7a.apk" "split_config.x86_64.apk" "split_config.x86.apk" "split_config.${locale}.apk" "split_config.${lcd_dpi}.apk"
+    bsdtar_exit_code=$?
+  fi
+  if [ $bsdtar_exit_code -ne 0 ]; then  # check if bsdtar return exit code 1 (error)
+    pv "$outputPath" | bsdtar -xf - -C "$Download/${appName}_v${VERSION}-${cpuAbi}/"
+  fi
+  rm -f "$outputPath"
+  echo -e "$running Merge splits apk to standalone apk.."
+  $PREFIX/lib/jvm/java-$jdkVersion-openjdk/bin/java -jar $APKEditor m -i "$Download/${appName}_v${VERSION}-${cpuAbi}" -o "$Download/${appName}_v${VERSION}-${cpuAbi}.apk"
+  termux-wake-unlock
+  rm -rf "$Download/${appName}_v${VERSION}-${cpuAbi}"
+}
+
+rmPreDownloadApp() {
   if [ "$file_ext" == ".apkm" ]; then
     fileNamePattern="${appName}_v*-${cpuAbi}.apk"
     apkName="${appName}_v${VERSION}-${cpuAbi}.apk"
@@ -373,21 +275,18 @@ APKMdl() {
       rm -f "$findFile"  # remove previous version apk
     fi
   fi
-  
+}
+
+downloadApp() {
+  rmPreDownloadApp
   if [ ! -f "$Download/${appName}_v${VERSION}-${cpuAbi}.apk" ] && [ ! -f "$outputPath" ]; then
-    echo -e "$running Attempting to download APK from: ${Blue}$final_app_url${Reset}"
+    echo -e "$running Downloading $appName from ${Blue}$dlLink${Reset}.."
     while true; do
       aria2c -x 16 -s 16 --continue=true --console-log-level=error --download-result=hide --summary-interval=0 -d "$Download" -o "$FileName" -U "User-Agent: $USER_AGENT" -U "Referer: $final_apk_link" --async-dns=true --async-dns-server="$cloudflareIP" "$final_app_url"
       exitStatus=$?
       echo  # Space
-      if [ "$exitStatus" == "0" ]; then
-        echo -e "$good Download Complete with aria2. Saved to ${Cyan}$outputPath${Reset}"
-        break
-      else
-        echo -e "$bad Download failed! retrying in 5 secons.." && sleep 5
-      fi
+      [ $exitStatus -eq 0 ] && { echo -e "$good Download Complete. Saved to ${Cyan}$outputPath${Reset}"; break; } || { echo -e "$bad Download failed! retrying in 5 secons.." && sleep 5; }
     done
-    
     sha256sum=$(sha256sum "$outputPath" | cut -d' ' -f1)
     if [ "$sha256sum" == "$SHA256" ]; then
       echo -e "$good Downloaded file appears in the original state."
@@ -395,46 +294,22 @@ APKMdl() {
       echo -e "$bad Look like downloaded file appears corrupted!"
       echo -e "$notice SHA-256 SUM Diffs - Expected: ${Cyan}$SHA256${Reset} ~ Result: ${Cyan}$sha256sum${Reset}"
     fi
-    echo  # Space
-    
-    if [ "$file_ext" == ".apkm" ]; then
-      bash $Simplify/dlGitHub.sh "REAndroid" "APKEditor" "latest" ".jar" "$Simplify"
-      APKEditor=$(find "$Simplify" -type f -name "APKEditor-*.jar" -print -quit)
-      mkdir -p "$Download/${appName}_v${VERSION}-${cpuAbi}"
-      echo -e "$running Extracting APKM content.."
-      termux-wake-lock
-      if [ -f $simplifyJson ]; then
-        if [ $RipLib -eq 1 ]; then
-          pv "$outputPath" | bsdtar -xf - -C "$Download/${appName}_v${VERSION}-${cpuAbi}/" --include "base.apk" "split_config.${cpuAbi//-/_}.apk" "split_config.${locale}.apk" "split_config.${lcd_dpi}.apk"
-          bsdtar_exit_code=$?
-        elif [ $RipLib -eq 0 ]; then
-          pv "$outputPath" | bsdtar -xf - -C "$Download/${appName}_v${VERSION}-${cpuAbi}/" --include "base.apk" "split_config.arm64_v8a.apk" "split_config.armeabi_v7a.apk" "split_config.x86_64.apk" "split_config.x86.apk" "split_config.${locale}.apk" "split_config.${lcd_dpi}.apk"
-          bsdtar_exit_code=$?
-        fi
-      else
-        pv "$outputPath" | bsdtar -xf - -C "$Download/${appName}_v${VERSION}-${cpuAbi}/" --include "base.apk" "split_config.${cpuAbi//-/_}.apk" "split_config.${locale}.apk" "split_config.${lcd_dpi}.apk"
-        bsdtar_exit_code=$?
-      fi
-      if [ $bsdtar_exit_code -ne 0 ]; then  # check if bsdtar return exit code 1 (error)
-        pv "$outputPath" | bsdtar -xf - -C "$Download/${appName}_v${VERSION}-${cpuAbi}/"
-      fi
-      rm "$outputPath"
-      echo -e "$running Merge splits apkm to standalone lite apk.."
-      $PREFIX/lib/jvm/java-$jdkVersion-openjdk/bin/java -jar $APKEditor m -i "$Download/${appName}_v${VERSION}-${cpuAbi}" -o "$Download/${appName}_v${VERSION}-${cpuAbi}.apk"
-      termux-wake-unlock
-      rm -rf "$Download/${appName}_v${VERSION}-${cpuAbi}"
-      echo
-    fi
   else
-    if [ "$file_ext" == ".apkm" ]; then
-      echo -e "$notice Download skiped! '${appName}_v${VERSION}-${cpuAbi}.apk' already exist."
-    else
-      echo -e "$notice Download skiped! '${appName}_v${VERSION}-${Arch}.apk' already exist."
-    fi
-    echo  # Space
+    echo -e "$notice Download skiped! ${Cyan}${appName}_v${VERSION}-${Arch}.apk${Reset} already exist."
   fi
+  [ "$file_ext" == ".apkm" ] && antisplitApp
 }
-#APKMdl "com.google.android.youtube" "20.21.37" "BUNDLE" "universal"
-#APKMdl "com.google.android.apps.youtube.music" "8.18.51" "APK" "$cpuAbi"
-APKMdl "$@"  # call the function with arguments
-#########################################################################
+
+APKMdl() {
+  PKG_NAME=$1
+  INDEX=$2
+  VERSION=$3
+  TYPE=$4
+  ARCH=$5
+  OS=$6
+  DPI=$7
+  OR=$8
+  
+  fetchAppsInfo && mkVersionURL && fetchVariant && fetchDownloadURL && downloadApp
+}
+##################################################################################
