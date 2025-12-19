@@ -38,32 +38,30 @@ apkInstall() {
       echo -e "${Green}$appLabel uninstall successfully with keeps app data.${Reset}\n${Yellow}Don't forget to restart Simplify after reboot!${Reset}"
       iCmd "cmd package uninstall -k $pkgName"
       cp "$targetAPK" "$POST_INSTALL"
-      sleep 12
+      echo; read -p "Press Enter to reboot..."
       iCmd "reboot"
     fi
-    am start -n "$activityClass" &> /dev/null  # launch app after update
+    am start -n "$activityClass" &> /dev/null  # launch app after install
     if [ $? != 0 ]; then
       iCmd "monkey -p $pkgName -c android.intent.category.LAUNCHER 1" > /dev/null 2>&1
     fi
     iCmd "rm -f '/data/local/tmp/$outputFileName'"
     if [ $EnableRoolback -eq 1 ]; then
       buttons=("<Yes>" "<No>"); confirmPrompt "Is $appLabel app working correctly?" "buttons" && response=Yes || response=No
-      if [[ "$response" == [Yy]* ]]; then
-        echo "Great! The $appLabel app is working properly."
-      else
+      if [[ "$response" == [Nn]* ]]; then
         echo -e "$running Roolback to previous version.."
         iCmd "pm rollback-app $pkgName"
+        am start -n "$activityClass" &> /dev/null
       fi
     fi
   else
     activityClass="$activity"
     if [ $Android -le 6 ]; then
       am start -a android.intent.action.VIEW -t application/vnd.android.package-archive -d "file://$targetAPK" > /dev/null 2>&1  # Activity Manager
-      sleep 15 && am start -n "$activityClass" &> /dev/null  # launch app after update
     else
       termux-open --view "$targetAPK"  # install apk using Session installer
-      sleep 15 && am start -n "$activityClass" &> /dev/null  # launch app after update
     fi
+    sleep 15 && am start -n "$activityClass" &> /dev/null  # launch app after install
   fi
   if [ $su -eq 1 ]; then
     [ $writeSELinux -eq 1 ] && su -c "setenforce 1"
