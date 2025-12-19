@@ -225,7 +225,7 @@ genPMCmd() {
   esac
   [ $Reinstall -eq 1 ] && pmCmd+=" -r"
   [ $EnableRoolback -eq 1 ] && pmCmd+=" --enable-rollback"
-}
+}; genPMCmd
 
 if [ -f "$HOME/.config/gh/hosts.yml" ] && gh auth status > /dev/null 2>&1; then
   token="$(gh auth token)"  # oauth_token: gho_************************************
