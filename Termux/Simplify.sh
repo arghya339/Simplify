@@ -201,6 +201,32 @@ ripLibGen() {
   fi
 }; ripLibGen  # Call ripLibGen function to generate ripLib args
 
+genPMCmd() {
+  InstallPackageFor=$(jq -r '.InstallPackageFor' "$simplifyJson" 2>/dev/null)
+  KeepsData=$(jq -r '.KeepsData' "$simplifyJson" 2>/dev/null)
+  GrantAllRuntimePermissions=$(jq -r '.GrantAllRuntimePermissions' "$simplifyJson" 2>/dev/null)
+  InstalledAsTestOnly=$(jq -r '.InstalledAsTestOnly' "$simplifyJson" 2>/dev/null)
+  BypassLowTargetSdkBolck=$(jq -r '.BypassLowTargetSdkBolck' "$simplifyJson" 2>/dev/null)
+  DisablePlayProtect=$(jq -r '.DisablePlayProtect' "$simplifyJson" 2>/dev/null)
+  DisableVerifyAdbInstalls=$(jq -r '.DisableVerifyAdbInstalls' "$simplifyJson" 2>/dev/null)
+  Installer=$(jq -r '.Installer' "$simplifyJson" 2>/dev/null)
+  Reinstall=$(jq -r '.Reinstall' "$simplifyJson" 2>/dev/null)
+  EnableRoolback=$(jq -r '.EnableRoolback' "$simplifyJson" 2>/dev/null)
+  
+  [ $InstallPackageFor -eq 0 ] && pmCmd="--user $(am get-current-user)" || pmCmd="--user all"
+  [ $GrantAllRuntimePermissions -eq 1 ] && pmCmd+=" -g"
+  [ $InstalledAsTestOnly -eq 1 ] && pmCmd+=" -t"
+  [ $BypassLowTargetSdkBolck -eq 1 ] && pmCmd+=" --bypass-low-target-sdk-block"
+  case "$Installer" in
+    "com.android.vending") pmCmd+=" -i com.android.vending" ;;
+    "com.android.packageinstaller") pmCmd+=" -i com.android.packageinstaller" ;;
+    "com.android.shell") pmCmd+=" -i com.android.shell" ;;
+    "adb") pmCmd+=" -i adb" ;;
+  esac
+  [ $Reinstall -eq 1 ] && pmCmd+=" -r"
+  [ $EnableRoolback -eq 1 ] && pmCmd+=" --enable-rollback"
+}
+
 if [ -f "$HOME/.config/gh/hosts.yml" ] && gh auth status > /dev/null 2>&1; then
   token="$(gh auth token)"  # oauth_token: gho_************************************
 elif [ -f "$simplifyJson" ] && jq -e '.PAT' "$simplifyJson" >/dev/null 2>&1; then
@@ -1338,16 +1364,7 @@ while true; do
             ;;
           "SU Installation Options"|"SUI Installation Options"|"ADB Installation Options")
             while true; do
-              InstallPackageFor=$(jq -r '.InstallPackageFor' "$simplifyJson" 2>/dev/null)
-              KeepsData=$(jq -r '.KeepsData' "$simplifyJson" 2>/dev/null)
-              GrantAllRuntimePermissions=$(jq -r '.GrantAllRuntimePermissions' "$simplifyJson" 2>/dev/null)
-              InstalledAsTestOnly=$(jq -r '.InstalledAsTestOnly' "$simplifyJson" 2>/dev/null)
-              BypassLowTargetSdkBolck=$(jq -r '.BypassLowTargetSdkBolck' "$simplifyJson" 2>/dev/null)
-              DisablePlayProtect=$(jq -r '.DisablePlayProtect' "$simplifyJson" 2>/dev/null)
-              DisableVerifyAdbInstalls=$(jq -r '.DisableVerifyAdbInstalls' "$simplifyJson" 2>/dev/null)
-              Installer=$(jq -r '.Installer' "$simplifyJson" 2>/dev/null)
-              Reinstall=$(jq -r '.Reinstall' "$simplifyJson" 2>/dev/null)
-              EnableRoolback=$(jq -r '.EnableRoolback' "$simplifyJson" 2>/dev/null)
+              genPMCmd
               options=("Install Package for *user" "Allow Downgrade with keeps App data (reboot required)" "Grant All Runtime/ Requested Permissions" Installed\ as\ test-only\ app Bypass\ Low\ Target\ SDK\ Bolck Disable\ Play\ Protect\ Package\ Verification Disable\ Verify\ Adb\ Installs Installer "Reinstall (Replace/ Upgrade) Existing Installed Package" Enable\ Version\ Roolback)
               buttons=("<Select>" "<Back>"); if menu "options" "buttons" "10"; then selected="${options[$selected]}"; else break; fi
               case "$selected" in

@@ -1,29 +1,5 @@
 #!/usr/bin/bash
 
-InstallPackageFor=$(jq -r '.InstallPackageFor' "$simplifyJson" 2>/dev/null)
-KeepsData=$(jq -r '.KeepsData' "$simplifyJson" 2>/dev/null)
-GrantAllRuntimePermissions=$(jq -r '.GrantAllRuntimePermissions' "$simplifyJson" 2>/dev/null)
-InstalledAsTestOnly=$(jq -r '.InstalledAsTestOnly' "$simplifyJson" 2>/dev/null)
-BypassLowTargetSdkBolck=$(jq -r '.BypassLowTargetSdkBolck' "$simplifyJson" 2>/dev/null)
-DisablePlayProtect=$(jq -r '.DisablePlayProtect' "$simplifyJson" 2>/dev/null)
-DisableVerifyAdbInstalls=$(jq -r '.DisableVerifyAdbInstalls' "$simplifyJson" 2>/dev/null)
-Installer=$(jq -r '.Installer' "$simplifyJson" 2>/dev/null)
-Reinstall=$(jq -r '.Reinstall' "$simplifyJson" 2>/dev/null)
-EnableRoolback=$(jq -r '.EnableRoolback' "$simplifyJson" 2>/dev/null)
-
-[ $InstallPackageFor -eq 0 ] && cmd="--user $(am get-current-user)" || cmd="--user all"
-[ $GrantAllRuntimePermissions -eq 1 ] && cmd+=" -g"
-[ $InstalledAsTestOnly -eq 1 ] && cmd+=" -t"
-[ $BypassLowTargetSdkBolck -eq 1 ] && cmd+=" --bypass-low-target-sdk-block"
-case "$Installer" in
-  "com.android.vending") cmd+=" -i com.android.vending" ;;
-  "com.android.packageinstaller") cmd+=" -i com.android.packageinstaller" ;;
-  "com.android.shell") cmd+=" -i com.android.shell" ;;
-  "adb") cmd+=" -i adb" ;;
-esac
-[ $Reinstall -eq 1 ] && cmd+=" -r"
-[ $EnableRoolback -eq 1 ] && cmd+=" --enable-rollback"
-
 # Install final apk
 apkInstall() {
   targetAPK=${1}
@@ -53,7 +29,7 @@ apkInstall() {
     if [ $DisableVerifyAdbInstalls -eq 1 ]; then
       [ $Android -le 10 ] && iCmd "settings put global package_verifier_enable 0" || iCmd "settings put global verifier_verify_adb_installs 0"  # Disable Verify Adb Installs
     fi
-    output=$(iCmd "pm install ${cmd} \"/data/local/tmp/${outputFileName}\"" 2>&1); echo "$output"
+    output=$(iCmd "pm install ${pmCmd} \"/data/local/tmp/${outputFileName}\"" 2>&1); echo "$output"
     [ $DisablePlayProtect -eq 1 ] && iCmd "settings put global package_verifier_user_consent 1"  # Enabled Play Protect
     if [ $DisableVerifyAdbInstalls -eq 1 ]; then
       [ $Android -le 10 ] && iCmd "settings put global package_verifier_enable 1" || iCmd "settings put global verifier_verify_adb_installs 1"  # Enabled Verify Adb Installs
