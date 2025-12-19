@@ -23,22 +23,25 @@ cf_chl_error() {
 }
 
 breadcrumbsMenu() {
-  INDEX=${1:-0}  # breadcrumbsMenuIndex
   appPageHtml=$(curl -sL --doh-url "$cloudflareDOH" -A "$USER_AGENT" "$appLink")
-  hasBreadcrumbsMenu=$(pup '.breadcrumbs-menu json{}' <<< "$appPageHtml" | jq 'length > 0')
-  if [ "$hasBreadcrumbsMenu" == "true" ]; then
-    breadcrumbsMenuJson=$(pup 'ul.breadcrumbs-menu li a json{}' <<< "$appPageHtml" | jq 'map({name: [..|.text?]|add|sub("^ +| +$";""), link: ("https://www.apkmirror.com"+.href)})')
-    if [[ "$INDEX" == [0-9] ]]; then
-      breadcrumbsMenuAppLink=$(jq -r ".[$INDEX].link" <<< "$breadcrumbsMenuJson")
+  if ! grep -q "_cf_chl_" <<< "$appPageHtml"; then
+    hasBreadcrumbsMenu=$(pup '.breadcrumbs-menu json{}' <<< "$appPageHtml" | jq 'length > 0')
+    if [ "$hasBreadcrumbsMenu" == "true" ]; then
+      breadcrumbsMenuJson=$(pup 'ul.breadcrumbs-menu li a json{}' <<< "$appPageHtml" | jq 'map({name: [..|.text?]|add|sub("^ +| +$";""), link: ("https://www.apkmirror.com"+.href)})')
+      if [[ "$INDEX" == [0-9] ]]; then
+        breadcrumbsMenuAppLink=$(jq -r ".[$INDEX].link" <<< "$breadcrumbsMenuJson")
+      else
+        breadcrumbsMenuAppName=$(jq <<< "$breadcrumbsMenuJson" | jq -r '.[] | select(.name | test("[()]") | not).name')
+        breadcrumbsMenuAppLink=$(jq <<< "$breadcrumbsMenuJson" | jq -r '.[] | select(.name | test("[()]") | not).link')
+      fi
+      #[ -z "$breadcrumbsMenuAppLink" ] && breadcrumbsMenuAppLink=$(jq -r ".[0].link" <<< "$breadcrumbsMenuJson")
+      [ -n "$breadcrumbsMenuAppLink" ] && appLink="$breadcrumbsMenuAppLink"
+      echo -e "appLink: ${Blue}$appLink${Reset}"
     else
-      breadcrumbsMenuAppName=$(jq <<< "$breadcrumbsMenuJson" | jq -r '.[] | select(.name | test("[()]") | not).name')
-      breadcrumbsMenuAppLink=$(jq <<< "$breadcrumbsMenuJson" | jq -r '.[] | select(.name | test("[()]") | not).link')
+      echo "hasBreadcrumbsMenu: $hasBreadcrumbsMenu"
     fi
-    #[ -z "$breadcrumbsMenuAppLink" ] && breadcrumbsMenuAppLink=$(jq -r ".[0].link" <<< "$breadcrumbsMenuJson")
-    [ -n "$breadcrumbsMenuAppLink" ] && appLink="$breadcrumbsMenuAppLink"
-    echo -e "appLink: ${Blue}$appLink${Reset}"
   else
-    echo "hasBreadcrumbsMenu: $hasBreadcrumbsMenu"
+    cf_chl_error
   fi
 }
 
@@ -308,7 +311,7 @@ downloadApp() {
 
 APKMdl() {
   PKG_NAME=$1
-  INDEX=$2
+  INDEX=${2:-0}  # breadcrumbsMenuIndex
   VERSION=$3
   TYPE=$4
   ARCH=$5
