@@ -30,6 +30,14 @@ apkInstall() {
       [ $Android -le 10 ] && iCmd "settings put global package_verifier_enable 0" || iCmd "settings put global verifier_verify_adb_installs 0"  # Disable Verify Adb Installs
     fi
     output=$(iCmd "pm install ${pmCmd} \"/data/local/tmp/${outputFileName}\"" 2>&1); echo "$output"
+    if [[ "$output" == *"signatures do not match"* ]]; then
+      echo -e "$notice The current app has a different signature than the patched one!"
+      buttons=("<Yes>" "<No>"); confirmPrompt "Do you want to uninstall the current app and proceed?" "buttons" "1" && response=Yes || response=No
+      if [ "$response" == "Yes" ]; then
+        iCmd "pm uninstall $pkgName"
+        output=$(iCmd "pm install ${pmCmd} \"/data/local/tmp/${outputFileName}\"" 2>&1); echo "$output"
+      fi
+    fi
     [ $DisablePlayProtect -eq 1 ] && iCmd "settings put global package_verifier_user_consent 1"  # Enabled Play Protect
     if [ $DisableVerifyAdbInstalls -eq 1 ]; then
       [ $Android -le 10 ] && iCmd "settings put global package_verifier_enable 1" || iCmd "settings put global verifier_verify_adb_installs 1"  # Enabled Verify Adb Installs
