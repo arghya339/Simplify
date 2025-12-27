@@ -25,8 +25,8 @@ apkInstall() {
     iCmdOut=$(iCmd "pm resolve-activity --brief $pkgName")
     activityClass=$(tail -n 1 <<< "$iCmdOut") && unset iCmdOut
     iCmd "cp '$targetAPK' '/data/local/tmp/$outputFileName'"
-    [ $DisablePlayProtect -eq 1 ] && iCmd "settings put global package_verifier_user_consent -1"  # Disabled Play Protect
-    if [ $DisableVerifyAdbInstalls -eq 1 ]; then
+    ([ "$DisablePlayProtect" == "1" ] || [ "$DisablePlayProtect" == "true" ]) && iCmd "settings put global package_verifier_user_consent -1"  # Disabled Play Protect
+    if ([ "$DisableVerifyAdbInstalls" == "1" ] || [ "$DisableVerifyAdbInstalls" == "true" ]); then
       [ $Android -le 10 ] && iCmd "settings put global package_verifier_enable 0" || iCmd "settings put global verifier_verify_adb_installs 0"  # Disable Verify Adb Installs
     fi
     output=$(iCmd "pm install ${pmCmd} \"/data/local/tmp/${outputFileName}\"" 2>&1); echo "$output"
@@ -38,11 +38,11 @@ apkInstall() {
         output=$(iCmd "pm install ${pmCmd} \"/data/local/tmp/${outputFileName}\"" 2>&1); echo "$output"
       fi
     fi
-    [ $DisablePlayProtect -eq 1 ] && iCmd "settings put global package_verifier_user_consent 1"  # Enabled Play Protect
-    if [ $DisableVerifyAdbInstalls -eq 1 ]; then
+    ([ "$DisablePlayProtect" == "1" ] || [ "$DisablePlayProtect" == "true" ]) && iCmd "settings put global package_verifier_user_consent 1"  # Enabled Play Protect
+    if ([ "$DisableVerifyAdbInstalls" == "1" ] || [ "$DisableVerifyAdbInstalls" == "true" ]); then
       [ $Android -le 10 ] && iCmd "settings put global package_verifier_enable 1" || iCmd "settings put global verifier_verify_adb_installs 1"  # Enabled Verify Adb Installs
     fi
-    if [[ $output == *"Downgrade detected"* ]] && [ $KeepsData -eq 1 ]; then
+    if [[ $output == *"Downgrade detected"* ]] && { [ "$KeepsData" == "1" ] || [ "$KeepsData" == "true" ]; }; then
       echo -e "${Green}$appLabel uninstall successfully with keeps app data.${Reset}\n${Yellow}Don't forget to restart Simplify after reboot!${Reset}"
       iCmd "cmd package uninstall -k $pkgName"
       cp "$targetAPK" "$POST_INSTALL"
