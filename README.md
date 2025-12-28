@@ -14,8 +14,8 @@ A Simple Cross Platform Automated ReVanced Shell Script for Patching apk
 ## Prerequisites
 - Android device with USB debugging enabled (and enable it form Developer options and you can enable Developer options by tapping the build number 7 times from Device Settings)
 - Android 5 and up device
-- A PC [Windows 10 1809 (build 17763) or later (Windows 11)] with Microsoft [DesktopAppInstaller](https://apps.microsoft.com/detail/9nblggh4nns1) known as [winget-cli](https://github.com/microsoft/winget-cli/releases/latest) or macOS or Android device with [Termux](https://github.com/termux/termux-app/releases/) with working internet connection 
-- Latest Microsoft PowerShell (and you can check PowerShell Version uisng following command ~ `$PSVersionTable`) or Terminal (~ `zsh --version`) or Termux (~ `termux-info`)
+- A macOS or Android device with [Termux](https://github.com/termux/termux-app/releases/) with working internet connection 
+- Latest Terminal (~ `zsh --version`) or Termux (~ `termux-info`)
 
 ## Usage
 ### ![Android](https://img.shields.io/badge/Android-3DDC84?style=for-the-badge&logo=android&logoColor=white)
@@ -52,9 +52,6 @@ universal
 
 macOS
 ["brew"](https://github.com/Homebrew/brew) [[BSD 2]](https://github.com/Homebrew/brew/blob/master/LICENSE.txt), ["Java"](https://www.java.com/en/download/) [GFTC], ["Android SDK"](https://developer.android.com/tools) [Apache 2.0], ["Python"](https://www.python.org/downloads/) [PSF / GPL], ["jq"](https://github.com/jqlang/jq) [[MIT]](https://github.com/jqlang/jq/blob/master/COPYING), ["APKEditor"](https://github.com/REAndroid/APKEditor) [[Apache 2.0]](https://github.com/REAndroid/APKEditor/blob/master/LICENSE)
-
-Windows
-["Chocolatey"](https://github.com/chocolatey/choco) [[Apache 2.0]](https://github.com/chocolatey/choco/blob/develop/LICENSE), ["Java"](https://www.java.com/en/download/) [GFTC], ["Android SDK"](https://developer.android.com/tools) [Apache 2.0], ["Python"](https://www.python.org/downloads/) [PSF / GPL], ["jq"](https://github.com/jqlang/jq) [[MIT]](https://github.com/jqlang/jq/blob/master/COPYING), ["APKEditor"](https://github.com/REAndroid/APKEditor) [[Apache 2.0]](https://github.com/REAndroid/APKEditor/blob/master/LICENSE)
 
 Android
 ["Java"](https://www.java.com/en/download/) [GFTC], ["Python"](https://www.python.org/downloads/) [PSF / GPL], ["jq"](https://github.com/jqlang/jq) [[MIT]](https://github.com/jqlang/jq/blob/master/COPYING), ["APKEditor"](https://github.com/REAndroid/APKEditor) [[Apache 2.0]](https://github.com/REAndroid/APKEditor/blob/master/LICENSE)
