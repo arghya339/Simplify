@@ -5,7 +5,7 @@ A Simple Cross Platform Automated ReVanced Shell Script for Patching apk
 <br>
 <img src="docs/images/Main.png">
 <br>
-<b> This Script works on Android devices, macOS and Windows! </b>
+<b> This Script works on Android devices and macOS! </b>
 <br>
 
 ## Purpose
