@@ -44,27 +44,6 @@ A Simple Cross Platform Automated ReVanced Shell Script for Patching apk
   zsh $HOME/Downloads/RVX.zsh
   ```
 
-### ![Windows](https://img.shields.io/badge/Windows-0078D6?style=for-the-badge&logo=windows&logoColor=white)
-  - Open `Windows Terminal (Admin)`
-  - Install Microsoft PowerShell on Windows using winget (Windows built in package manager): ~ `winget install Microsoft.PowerShell --accept-source-agreements --silent --force`
-  - Check MsPS Verison ~ `pwsh -v`
-  - Remove the existing WindowsPowerShell directory: ~ `Remove-Item $env:USERPROFILE\Documents\WindowsPowerShell -Force -Recurse`
-  - Open `Microsoft Terminal` right click in the `tab row` >  `Settings` > `Startup` > from `Default profile` `drop-down menu` select `PowerShell` > `Save` > Close `Windows Terminal` window
-  - Open `Windows Terminal (Admin)`
-  - Check MicrosoftPowerShell Version: ~ `$PSVersionTable`
-  - Open [Microsoft PowerShell](https://github.com/PowerShell/PowerShell) Terminal (Admin) and run the script with the following command:
-
-  ```
-  Invoke-WebRequest -Uri https://raw.githubusercontent.com/arghya339/Simplify/refs/heads/main/PowerShell/RVX.ps1 -OutFile "$env:USERPROFILE\Downloads\RVX.ps1"
-  ```
-
-  ```
-  Set-ExecutionPolicy Bypass -Scope Process -Force; & "$env:USERPROFILE\Downloads\RVX.ps1"
-  ```
-
-## Safety!
-After patching Complite, Please disabled Developer options from Device Settings.
-
 ## Dependencies
 universal
 ["revanced-cli"](https://github.com/inotia00/revanced-cli) [[GNU 3]](https://github.com/inotia00/revanced-cli/blob/main/LICENSE),
