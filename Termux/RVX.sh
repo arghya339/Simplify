@@ -625,7 +625,7 @@ while true; do
       ;;
     Reddit)
       pkgName="com.reddit.frontpage"
-      pkgVersion="2025.45.0"; ARSCLib="true"
+      pkgVersion="2025.52.0"; ARSCLib="true"
       #pkgVersion=""
       if [ -z "$pkgVersion" ]; then
         getVersion "$pkgName"
