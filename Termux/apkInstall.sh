@@ -54,7 +54,7 @@ apkInstall() {
       iCmd "monkey -p $pkgName -c android.intent.category.LAUNCHER 1" > /dev/null 2>&1
     fi
     iCmd "rm -f '/data/local/tmp/$outputFileName'"
-    if [ $EnableRoolback -eq 1 ]; then
+    if [ "$EnableRoolback" == "1" ] || [ "$EnableRoolback" == "true" ]; then
       buttons=("<Yes>" "<No>"); confirmPrompt "Is $appLabel app working correctly?" "buttons" && response=Yes || response=No
       if [[ "$response" == [Nn]* ]]; then
         echo -e "$running Roolback to previous version.."
