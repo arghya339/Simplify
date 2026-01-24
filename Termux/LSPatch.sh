@@ -418,7 +418,7 @@ while true; do
       pkgName="com.google.android.dialer"
       Index=1
       if [ $Android -ge 11 ]; then
-        pkgVersion="204.0.852029473"
+        pkgVersion="204.0.856863189"
         #pkgVersion=""
       elif [ $Android -eq 10 ]; then
         pkgVersion="161.0.726587057"
