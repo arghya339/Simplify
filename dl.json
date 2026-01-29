@@ -1,0 +1,651 @@
+[
+  {
+    "name": "YouTube Morphe",
+    "repo": "FiorenMas/Revanced-And-Revanced-Extended-Non-Root",
+    "assets": {
+      "stable": {
+        "universal": "youtube-morphe.apk",
+        "arm64-v8a": "youtube-arm64-v8a-morphe.apk",
+        "armeabi-v7a": "youtube-armeabi-v7a-morphe.apk",
+        "x86_64": "youtube-x86_64-morphe.apk",
+        "x86": "youtube-x86-morphe.apk"
+      },
+      "beta": {
+        "universal": "youtube-beta-morphe.apk",
+        "arm64-v8a": "youtube-beta-arm64-v8a-morphe.apk",
+        "armeabi-v7a": "youtube-beta-armeabi-v7a-morphe.apk",
+        "x86_64": "youtube-beta-x86_64-morphe.apk",
+        "x86": "youtube-beta-x86-morphe.apk"
+      },
+      "stable_lite": {},
+      "beta_lite": {}
+    }
+  },
+  {
+    "name": "YouTube ReVanced",
+    "repo": "FiorenMas/Revanced-And-Revanced-Extended-Non-Root",
+    "assets": {
+      "stable": {
+        "universal": "youtube-revanced.apk",
+        "arm64-v8a": "youtube-arm64-v8a-revanced.apk",
+        "armeabi-v7a": "youtube-armeabi-v7a-revanced.apk",
+        "x86_64": "youtube-x86_64-revanced.apk",
+        "x86": "youtube-x86-revanced.apk"
+      },
+      "beta": {
+        "universal": "youtube-beta-revanced.apk",
+        "arm64-v8a": "youtube-beta-arm64-v8a-revanced.apk",
+        "armeabi-v7a": "youtube-beta-armeabi-v7a-revanced.apk",
+        "x86_64": "youtube-beta-x86_64-revanced.apk",
+        "x86": "youtube-beta-x86-revanced.apk"
+      },
+      "stable_lite": {
+        "arm64-v8a": "youtube-lite-arm64-v8a-revanced.apk",
+        "armeabi-v7a": "youtube-lite-armeabi-v7a-revanced.apk"
+      },
+      "beta_lite": {
+        "arm64-v8a": "youtube-lite-beta-arm64-v8a-revanced.apk",
+        "armeabi-v7a": "youtube-lite-beta-armeabi-v7a-revanced.apk"
+      }
+    }
+  },
+  {
+    "name": "YouTube ReVanced Extended",
+    "repo": "FiorenMas/Revanced-And-Revanced-Extended-Non-Root",
+    "assets": {
+      "stable": {
+        "universal": "youtube-revanced-extended.apk",
+        "arm64-v8a": "youtube-arm64-v8a-revanced-extended.apk",
+        "armeabi-v7a": "youtube-armeabi-v7a-revanced-extended.apk",
+        "x86_64": "youtube-x86_64-revanced-extended.apk",
+        "x86": "youtube-x86-revanced-extended.apk"
+      },
+      "beta": {
+        "universal": "youtube-beta-revanced-extended.apk",
+        "arm64-v8a": "youtube-beta-arm64-v8a-revanced-extended.apk",
+        "armeabi-v7a": "youtube-beta-armeabi-v7a-revanced-extended.apk",
+        "x86_64": "youtube-beta-x86_64-revanced-extended.apk",
+        "x86": "youtube-beta-x86-revanced-extended.apk"
+      },
+      "stable_lite": {
+        "arm64-v8a": "youtube-lite-arm64-v8a-revanced-extended.apk",
+        "armeabi-v7a": "youtube-lite-armeabi-v7a-revanced-extended.apk"
+      },
+      "beta_lite": {
+        "arm64-v8a": "youtube-lite-beta-arm64-v8a-revanced-extended.apk",
+        "armeabi-v7a": "youtube-lite-beta-armeabi-v7a-revanced-extended.apk"
+      }
+    }
+  },
+  {
+    "name": "YouTube ReVanced Extended Fork",
+    "repo": "FiorenMas/Revanced-And-Revanced-Extended-Non-Root",
+    "assets": {
+      "stable": {
+        "universal": "youtube-stable-anddea.apk",
+        "arm64-v8a": "youtube-stable-arm64-v8a-anddea.apk",
+        "armeabi-v7a": "youtube-stable-armeabi-v7a-anddea.apk",
+        "x86_64": "youtube-stable-x86_64-anddea.apk",
+        "x86": "youtube-stable-x86-anddea.apk"
+      },
+      "beta": {
+        "universal": "youtube-beta-anddea.apk",
+        "arm64-v8a": "youtube-beta-arm64-v8a-anddea.apk",
+        "armeabi-v7a": "youtube-beta-armeabi-v7a-anddea.apk",
+        "x86_64": "youtube-beta-x86_64-anddea.apk",
+        "x86": "youtube-beta-x86-anddea.apk"
+      },
+      "stable_lite": {
+        "arm64-v8a": "youtube-lite-arm64-v8a--anddea.apk",
+        "armeabi-v7a": "youtube-lite-armeabi-v7a-anddea.apk"
+      },
+      "beta_lite": {
+        "arm64-v8a": "youtube-lite-beta-arm64-v8a-anddea.apk",
+        "armeabi-v7a": "youtube-lite-beta-armeabi-v7a-anddea.apk"
+      }
+    }
+  },
+  {
+    "name": "YouTube ReVanced Extended Android 6-7",
+    "repo": "FiorenMas/Revanced-And-Revanced-Extended-Non-Root",
+    "assets": {
+      "stable": {
+        "universal": "youtube-revanced-extended-android-6-7.apk",
+        "arm64-v8a": "youtube-arm64-v8a-revanced-extended-android-6-7.apk",
+        "armeabi-v7a": "youtube-armeabi-v7a-revanced-extended-android-6-7.apk",
+        "x86_64": "youtube-x86_64-revanced-extended-android-6-7.apk",
+        "x86": "youtube-x86-revanced-extended-android-6-7.apk"
+      },
+      "beta": {},
+      "stable_lite": {},
+      "beta_lite": {}
+    }
+  },
+  {
+    "name": "YouTube RVX Android 6-7 Fork",
+    "repo": "arghya339/ReVancedApp-Actions",
+    "assets": {
+      "stable": {
+        "universal": "youtube-revanced-extended-android-6-7-arghya339.apk",
+        "arm64-v8a": "youtube-arm64-v8a-revanced-extended-android-6-7-arghya339.apk",
+        "armeabi-v7a": "youtube-armeabi-v7a-revanced-extended-android-6-7-arghya339.apk",
+        "x86_64": "youtube-x86_64-revanced-extended-android-6-7-arghya339.apk",
+        "x86": "youtube-x86-revanced-extended-android-6-7-arghya339.apk"
+      },
+      "beta": {},
+      "stable_lite": {},
+      "beta_lite": {}
+    }
+  },
+  {
+    "name": "YouTube ReVanced Extended Android 5",
+    "repo": "FiorenMas/Revanced-And-Revanced-Extended-Non-Root",
+    "assets": {
+      "stable": {
+        "universal": "youtube-revanced-extended-android-5.apk",
+        "arm64-v8a": "youtube-arm64-v8a-revanced-extended-android-5.apk",
+        "armeabi-v7a": "youtube-armeabi-v7a-revanced-extended-android-5.apk",
+        "x86_64": "youtube-x86_64-revanced-extended-android-5.apk",
+        "x86": "youtube-x86-revanced-extended-android-5.apk"
+      },
+      "beta": {},
+      "stable_lite": {},
+      "beta_lite": {}
+    }
+  },
+  {
+    "name": "YT Music Morphe",
+    "repo": "FiorenMas/Revanced-And-Revanced-Extended-Non-Root",
+    "assets": {
+      "stable": {
+        "arm64-v8a": "youtube-music-arm64-v8a-morphe.apk",
+        "armeabi-v7a": "youtube-music-armeabi-v7a-morphe.apk",
+        "x86_64": "youtube-music-x86_64-morphe.apk",
+        "x86": "youtube-music-x86-morphe.apk"
+      },
+      "beta": {
+        "arm64-v8a": "youtube-music-beta-arm64-v8a-morphe.apk",
+        "armeabi-v7a": "youtube-music-beta-armeabi-v7a-morphe.apk",
+        "x86_64": "youtube-music-beta-x86_64-morphe.apk",
+        "x86": "youtube-music-beta-x86-morphe.apk"
+      },
+      "stable_lite": {},
+      "beta_lite": {}
+    }
+  },
+  {
+    "name": "YT Music ReVanced",
+    "repo": "FiorenMas/Revanced-And-Revanced-Extended-Non-Root",
+    "assets": {
+      "stable": {
+        "arm64-v8a": "youtube-music-arm64-v8a-revanced.apk",
+        "armeabi-v7a": "youtube-music-armeabi-v7a-revanced.apk",
+        "x86_64": "youtube-music-x86_64-revanced.apk",
+        "x86": "youtube-music-x86-revanced.apk"
+      },
+      "beta": {
+        "arm64-v8a": "youtube-music-beta-arm64-v8a-revanced.apk",
+        "armeabi-v7a": "youtube-music-beta-armeabi-v7a-revanced.apk",
+        "x86_64": "youtube-music-beta-x86_64-revanced.apk",
+        "x86": "youtube-music-beta-x86-revanced.apk"
+      },
+      "stable_lite": {},
+      "beta_lite": {}
+    }
+  },
+  {
+    "name": "YT Music ReVanced Extended",
+    "repo": "FiorenMas/Revanced-And-Revanced-Extended-Non-Root",
+    "assets": {
+      "stable": {
+        "arm64-v8a": "youtube-music-arm64-v8a-revanced-extended.apk",
+        "armeabi-v7a": "youtube-music-armeabi-v7a-revanced-extended.apk",
+        "x86_64": "youtube-music-x86_64-revanced-extended.apk",
+        "x86": "youtube-music-x86-revanced-extended.apk"
+      },
+      "beta": {
+        "arm64-v8a": "youtube-music-beta-arm64-v8a-revanced-extended.apk",
+        "armeabi-v7a": "youtube-music-beta-armeabi-v7a-revanced-extended.apk",
+        "x86_64": "youtube-music-beta-x86_64-revanced-extended.apk",
+        "x86": "youtube-music-beta-x86-revanced-extended.apk"
+      },
+      "stable_lite": {},
+      "beta_lite": {}
+    }
+  },
+  {
+    "name": "YT Music ReVanced Extended Fork",
+    "repo": "FiorenMas/Revanced-And-Revanced-Extended-Non-Root",
+    "assets": {
+      "stable": {
+        "arm64-v8a": "youtube-music-stable-arm64-v8a-anddea.apk",
+        "armeabi-v7a": "youtube-music-stable-armeabi-v7a-anddea.apk",
+        "x86_64": "youtube-music-stable-x86_64-anddea.apk",
+        "x86": "youtube-music-stable-x86-anddea.apk"
+      },
+      "beta": {
+        "arm64-v8a": "youtube-music-beta-arm64-v8a-anddea.apk",
+        "armeabi-v7a": "youtube-music-beta-armeabi-v7a-anddea.apk",
+        "x86_64": "youtube-music-beta-x86_64-anddea.apk",
+        "x86": "youtube-music-beta-x86-anddea.apk"
+      },
+      "stable_lite": {},
+      "beta_lite": {}
+    }
+  },
+  {
+    "name": "YT Music RVX Android 7",
+    "repo": "arghya339/ReVancedApp-Actions",
+    "assets": {
+      "stable": {
+        "arm64-v8a": "youtube-music-android-7-arm64-v8a-revanced-extended.apk",
+        "armeabi-v7a": "youtube-music-android-7-armeabi-v7a-revanced-extended.apk",
+        "x86_64": "youtube-music-android-7-x86_64-revanced-extended.apk",
+        "x86": "youtube-music-android-7-x86-revanced-extended.apk"
+      },
+      "beta": {},
+      "stable_lite": {},
+      "beta_lite": {}
+    }
+  },
+  {
+    "name": "YT Music RVX Android 5-6",
+    "repo": "arghya339/ReVancedApp-Actions",
+    "assets": {
+      "stable": {
+        "arm64-v8a": "youtube-music-android-5-6-arm64-v8a-revanced-extended.apk",
+        "armeabi-v7a": "youtube-music-android-5-6-armeabi-v7a-revanced-extended.apk",
+        "x86_64": "youtube-music-android-5-6-x86_64-revanced-extended.apk",
+        "x86": "youtube-music-android-5-6-x86-revanced-extended.apk"
+      },
+      "beta": {},
+      "stable_lite": {},
+      "beta_lite": {}
+    }
+  },
+  {
+    "name": "Facebook ReVanced",
+    "repo": "FiorenMas/Revanced-And-Revanced-Extended-Non-Root",
+    "assets": {
+      "stable": {
+        "arm64-v8a": "facebook-arm64-v8a-revanced.apk"
+      },
+      "beta": {
+        "arm64-v8a": "facebook-arm64-v8a-beta-revanced.apk"
+      },
+      "stable_lite": {},
+      "beta_lite": {}
+    }
+  },
+  {
+    "name": "Piko Twitter",
+    "repo": "FiorenMas/Revanced-And-Revanced-Extended-Non-Root",
+    "assets": {
+      "stable": {
+        "universal": "twitter-stable-piko.apk",
+        "arm64-v8a": "twitter-arm64-v8a-stable-piko.apk"
+      },
+      "beta": {
+        "universal": "twitter-beta-piko.apk",
+        "arm64-v8a": "twitter-arm64-v8a-beta-piko.apk"
+      },
+      "stable_lite": {},
+      "beta_lite": {}
+    }
+  },
+  {
+    "name": "Instagram ReVanced",
+    "repo": "FiorenMas/Revanced-And-Revanced-Extended-Non-Root",
+    "assets": {
+      "stable": {
+        "arm64-v8a": "instagram-arm64-v8a-revanced.apk"
+      },
+      "beta": {
+        "arm64-v8a": "instagram-arm64-v8a-beta-revanced.apk"
+      },
+      "stable_lite": {},
+      "beta_lite": {}
+    }
+  },
+  {
+    "name": "Threads ReVanced",
+    "repo": "FiorenMas/Revanced-And-Revanced-Extended-Non-Root",
+    "assets": {
+      "stable": {
+        "arm64-v8a": "threads-arm64-v8a-revanced.apk"
+      },
+      "beta": {
+        "arm64-v8a": "threads-beta-arm64-v8a-revanced.apk"
+      },
+      "stable_lite": {},
+      "beta_lite": {}
+    }
+  },
+  {
+    "name": "Google Photos ReVanced",
+    "repo": "FiorenMas/Revanced-And-Revanced-Extended-Non-Root",
+    "assets": {
+      "stable": {
+        "arm64-v8a": "google-photos-arm64-v8a-revanced.apk",
+        "armeabi-v7a": "google-photos-armeabi-v7a-revanced.apk",
+        "x86_64": "google-photos-x86_64-revanced.apk",
+        "x86": "google-photos-x86-revanced.apk"
+      },
+      "beta": {
+        "arm64-v8a": "google-photos-arm64-v8a-beta-revanced.apk",
+        "armeabi-v7a": "google-photos-armeabi-v7a-beta-revanced.apk",
+        "x86_64": "google-photos-x86_64-beta-revanced.apk",
+        "x86": "google-photos-x86-beta-revanced.apk"
+      },
+      "stable_lite": {},
+      "beta_lite": {}
+    }
+  },
+  {
+    "name": "Facebook Messenger ReVanced",
+    "repo": "FiorenMas/Revanced-And-Revanced-Extended-Non-Root",
+    "assets": {
+      "stable": {
+        "arm64-v8a": "messenger-arm64-v8a-revanced.apk"
+      },
+      "beta": {
+        "arm64-v8a": "messenger-arm64-v8a-beta-revanced.apk"
+      },
+      "stable_lite": {},
+      "beta_lite": {}
+    }
+  },
+  {
+    "name": "Spotify ReVanced Extended Fork",
+    "repo": "FiorenMas/Revanced-And-Revanced-Extended-Non-Root",
+    "assets": {
+      "stable": {
+        "arm64-v8a": "spotjfy-arm64-v8a-anddea.apk"
+      },
+      "beta": {
+        "arm64-v8a": "spotjfy-beta-arm64-v8a-beta-anddea.apk"
+      },
+      "stable_lite": {},
+      "beta_lite": {}
+    }
+  },
+  {
+    "name": "TikTok ReVanced",
+    "repo": "FiorenMas/Revanced-And-Revanced-Extended-Non-Root",
+    "assets": {
+      "stable": {
+        "universal": "tiktok-revanced.apk"
+      },
+      "beta": {
+        "universal": "tiktok-beta-revanced.apk"
+      },
+      "stable_lite": {},
+      "beta_lite": {}
+    }
+  },
+  {
+    "name": "Twitch ReVanced",
+    "repo": "FiorenMas/Revanced-And-Revanced-Extended-Non-Root",
+    "assets": {
+      "stable": {
+        "universal": "twitch-revanced.apk",
+        "arm64-v8a": "twitch-arm64-v8a-revanced.apk"
+      },
+      "beta": {
+        "universal": "twitch-beta-revanced.apk",
+        "arm64-v8a": "twitch-arm64-v8a-beta-piko.apk"
+      },
+      "stable_lite": {},
+      "beta_lite": {}
+    }
+  },
+  {
+    "name": "Reddit ReVanced Extended ARSCLib",
+    "repo": "FiorenMas/Revanced-And-Revanced-Extended-Non-Root",
+    "assets": {
+      "stable": {
+        "universal": "reddit-revanced-extended-arsclib.apk",
+        "arm64-v8a": "reddit-arm64-v8a-revanced-extended-arsclib.apk"
+      },
+      "beta": {},
+      "stable_lite": {},
+      "beta_lite": {}
+    }
+  },
+  {
+    "name": "Lightroom ReVanced",
+    "repo": "FiorenMas/Revanced-And-Revanced-Extended-Non-Root",
+    "assets": {
+      "stable": {
+        "arm64-v8a": "lightroom-revanced.apk"
+      },
+      "beta": {
+        "arm64-v8a": "lightroom-beta-revanced.apk"
+      },
+      "stable_lite": {},
+      "beta_lite": {}
+    }
+  },
+  {
+    "name": "Tumblr ReVanced",
+    "repo": "FiorenMas/Revanced-And-Revanced-Extended-Non-Root",
+    "assets": {
+      "stable": {
+        "universal": "tumblr-revanced.apk",
+        "arm64-v8a": "tumblr-arm64-v8a-revanced.apk"
+      },
+      "beta": {
+        "universal": "tumblr-beta-revanced.apk",
+        "arm64-v8a": "tumblr-arm64-v8a-beta-revanced.apk"
+      },
+      "stable_lite": {},
+      "beta_lite": {}
+    }
+  },
+  {
+    "name": "SoundCloud ReVanced",
+    "repo": "FiorenMas/Revanced-And-Revanced-Extended-Non-Root",
+    "assets": {
+      "stable": {
+        "universal": "soundcloud-revanced.apk",
+        "arm64-v8a": "soundcloud-arm64-v8a-revanced.apk"
+      },
+      "beta": {
+        "universal": "soundcloud-beta-revanced.apk",
+        "arm64-v8a": "soundcloud-arm64-v8a-beta-revanced.apk"
+      },
+      "stable_lite": {},
+      "beta_lite": {}
+    }
+  },
+  {
+    "name": "Duolingo ReVanced",
+    "repo": "FiorenMas/Revanced-And-Revanced-Extended-Non-Root",
+    "assets": {
+      "stable": {
+        "universal": "duolingo-revanced.apk"
+      },
+      "beta": {
+        "universal": "duolingo-beta-revanced.apk"
+      },
+      "stable_lite": {},
+      "beta_lite": {}
+    }
+  },
+  {
+    "name": "Photomath ReVanced",
+    "repo": "FiorenMas/Revanced-And-Revanced-Extended-Non-Root",
+    "assets": {
+      "stable": {
+        "universal": "photomath-revanced.apk"
+      },
+      "beta": {
+        "universal": "photomath-beta-revanced.apk"
+      },
+      "stable_lite": {},
+      "beta_lite": {}
+    }
+  },
+  {
+    "name": "Proton VPN ReVanced",
+    "repo": "FiorenMas/Revanced-And-Revanced-Extended-Non-Root",
+    "assets": {
+      "stable": {
+        "universal": "protonvpn-revanced.apk"
+      },
+      "beta": {
+        "universal": "protonvpn-beta-revanced.apk"
+      },
+      "stable_lite": {},
+      "beta_lite": {}
+    }
+  },
+  {
+    "name": "Proton Mail ReVanced",
+    "repo": "FiorenMas/Revanced-And-Revanced-Extended-Non-Root",
+    "assets": {
+      "stable": {
+        "universal": "protonmail-revanced.apk"
+      },
+      "beta": {
+        "universal": "protonmail-beta-revanced.apk"
+      },
+      "stable_lite": {},
+      "beta_lite": {}
+    }
+  },
+  {
+    "name": "RAR ReVanced",
+    "repo": "FiorenMas/Revanced-And-Revanced-Extended-Non-Root",
+    "assets": {
+      "stable": {
+        "universal": "rar-revanced.apk"
+      },
+      "beta": {
+        "universal": "rar-beta-revanced.apk"
+      },
+      "stable_lite": {},
+      "beta_lite": {}
+    }
+  },
+  {
+    "name": "Strava ReVanced",
+    "repo": "FiorenMas/Revanced-And-Revanced-Extended-Non-Root",
+    "assets": {
+      "stable": {
+        "arm64-v8a": "strava-arm64-v8a-revanced.apk"
+      },
+      "beta": {
+        "arm64-v8a": "strava-beta-arm64-v8a-revanced.apk"
+      },
+      "stable_lite": {},
+      "beta_lite": {}
+    }
+  },
+  {
+    "name": "Prime Video ReVanced",
+    "repo": "FiorenMas/Revanced-And-Revanced-Extended-Non-Root",
+    "assets": {
+      "stable": {
+        "arm64-v8a": "prime-video-arm64-v8a-revanced.apk"
+      },
+      "beta": {
+        "arm64-v8a": "prime-video-beta-arm64-v8a-revanced.apk"
+      },
+      "stable_lite": {},
+      "beta_lite": {}
+    }
+  },
+  {
+    "name": "Disney+ ReVanced",
+    "repo": "FiorenMas/Revanced-And-Revanced-Extended-Non-Root",
+    "assets": {
+      "stable": {
+        "arm64-v8a": "disney-revanced.apk"
+      },
+      "beta": {
+        "arm64-v8a": "disney-beta-revanced.apk"
+      },
+      "stable_lite": {},
+      "beta_lite": {}
+    }
+  },
+  {
+    "name": "Viber ReVanced",
+    "repo": "FiorenMas/Revanced-And-Revanced-Extended-Non-Root",
+    "assets": {
+      "stable": {
+        "universal": "viber-revanced.apk"
+      },
+      "beta": {
+        "universal": "viber-beta-revanced.apk"
+      },
+      "stable_lite": {},
+      "beta_lite": {}
+    }
+  },
+  {
+    "name": "Crunchyroll ReVanced",
+    "repo": "FiorenMas/Revanced-And-Revanced-Extended-Non-Root",
+    "assets": {
+      "stable": {
+        "universal": "crunchyroll-revanced.apk"
+      },
+      "beta": {
+        "universal": "crunchyroll-beta-revanced.apk"
+      },
+      "stable_lite": {},
+      "beta_lite": {}
+    }
+  },
+  {
+    "name": "MyFitnessPal ReVanced",
+    "repo": "FiorenMas/Revanced-And-Revanced-Extended-Non-Root",
+    "assets": {
+      "stable": {
+        "universal": "MyFitnessPal-revanced.apk"
+      },
+      "beta": {
+        "universal": "MyFitnessPal-beta-revanced.apk"
+      },
+      "stable_lite": {},
+      "beta_lite": {}
+    }
+  },
+  {
+    "name": "Solid Explorer",
+    "repo": "FiorenMas/Revanced-And-Revanced-Extended-Non-Root",
+    "assets": {
+      "stable": {
+        "arm64-v8a": "solid-explorer-arm64-v8a-scrazzz.apk"
+      },
+      "beta": {},
+      "stable_lite": {},
+      "beta_lite": {}
+    }
+  },
+  {
+    "name": "Nova Launcher",
+    "repo": "FiorenMas/Revanced-And-Revanced-Extended-Non-Root",
+    "assets": {
+      "stable": {
+        "universal": "nova-launcher-indrastorms.apk"
+      },
+      "beta": {},
+      "stable_lite": {},
+      "beta_lite": {}
+    }
+  },
+  {
+    "name": "Tasker",
+    "repo": "FiorenMas/Revanced-And-Revanced-Extended-Non-Root",
+    "assets": {
+      "stable": {
+        "universal": "tasker-indrastorms.apk"
+      },
+      "beta": {},
+      "stable_lite": {},
+      "beta_lite": {}
+    }
+  }
+]
