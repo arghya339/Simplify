@@ -88,11 +88,11 @@
     "cli": "inotia00/revanced-cli",
     "patches": "crimera/piko",
     "patchesjson": "https://raw.githubusercontent.com/crimera/piko/refs/heads/main/patches.json",
-    "integrations": "crimera/revanced-integrations",
+    "integrations": null,
     "microg": null,
     "prereleases": false,
     "autoupdates": true,
-    "cliv": 4,
+    "cliv": 5,
     "arsclib": false
   },
   {
