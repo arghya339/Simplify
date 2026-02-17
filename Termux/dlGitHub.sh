@@ -76,7 +76,7 @@ dlGitHub() {
     if [ "$repo" == "APKEditor" ]; then
       latestReleases=$(jq -r '.tag_name | sub("^V"; "")' <<< "$ghApiResponseJson")  # 1.4.3
       echo -e "$info latestReleases: V$latestReleases"
-    elif [ "$repo" == "FreeTubeAndroid" ] || [ "$repo" == "bundletool" ] || [ "$repo" == "twitter-apk" ] || [ "$repo" == "lawnchair" ] || [ "$repo" == "Nagram" ] || [ "$repo" == "revenge-xposed" ] || [ "$repo" == "io.github.vvb2060.callrecording" ] || [ "$repo" == "Gallery" ] || [ "$repo" == "PixelPlay" ] || [ "$repo" == "SmartTube" ] || [ "$repo" == "Android-DataBackup" ] || [ "$repo" == "com.wizpizz.reddidnt" ] || [ "$repo" == "MicroG-RE" ]; then
+    elif [ "$repo" == "FreeTubeAndroid" ] || [ "$repo" == "bundletool" ] || [ "$repo" == "twitter-apk" ] || [ "$repo" == "lawnchair" ] || [ "$repo" == "Nagram" ] || [ "$repo" == "revenge-xposed" ] || [ "$repo" == "io.github.vvb2060.callrecording" ] || [ "$repo" == "Gallery" ] || [ "$repo" == "PixelPlay" ] || [ "$repo" == "SmartTube" ] || [ "$repo" == "Android-DataBackup" ] || [ "$repo" == "com.wizpizz.reddidnt" ] || [ "$repo" == "MicroG-RE" ] || [ "$repo" == "dev.fzer0x.fucksolidexplorer" ]; then
       latestReleases=$(jq -r '.tag_name' <<< "$ghApiResponseJson")  # 0.23.5.17
       echo -e "$info latestReleases: $latestReleases"
     else
@@ -89,9 +89,9 @@ dlGitHub() {
     fi
     
     # Extract assets from GH API response json & built assets name pattern for find downloaded assets
-    if [ "$repo" == "VancedMicroG" ] || [ "$repo" == "LSPatch" ] || [ "$repo" == "YTPro" ] || [ "$repo" == "cloudstream" ] || [ "$repo" == "revenge-xposed" ] || [ "$repo" == "io.github.vvb2060.callrecording" ] || [ "$owner" == "Droid-ify" ] || [ "$repo" == "Obtainium" ] || [ "$repo" == "Metrolist" ] || [ "$repo" == "Acode" ] || [ "$repo" == "PrivateDNSAndroid" ] || [ "$repo" == "RecordYou" ] || [ "$repo" == "android-appcachecleaner" ] || [ "$repo" == "com.wizpizz.reddidnt" ] || [ "$repo" == "cromite" ] || [ "$repo" == "nextdnsmanager" ] || [ "$repo" == "AmazeFileManager" ] || [ "$repo" == "MicroG-RE" ]; then
+    if [ "$repo" == "VancedMicroG" ] || [ "$repo" == "LSPatch" ] || [ "$repo" == "YTPro" ] || [ "$repo" == "cloudstream" ] || [ "$repo" == "revenge-xposed" ] || [ "$repo" == "io.github.vvb2060.callrecording" ] || [ "$owner" == "Droid-ify" ] || [ "$repo" == "Obtainium" ] || [ "$repo" == "Metrolist" ] || [ "$repo" == "Acode" ] || [ "$repo" == "PrivateDNSAndroid" ] || [ "$repo" == "RecordYou" ] || [ "$repo" == "android-appcachecleaner" ] || [ "$repo" == "com.wizpizz.reddidnt" ] || [ "$repo" == "cromite" ] || [ "$repo" == "nextdnsmanager" ] || [ "$repo" == "AmazeFileManager" ] || [ "$repo" == "MicroG-RE" ] || [ "$repo" == "dev.fzer0x.fucksolidexplorer" ]; then
       assetsName=$(jq -r --arg regex "$regex" '.assets[] | select(.name | test($regex)) | .name' <<< "$ghApiResponseJson" | head -1)
-      if [ "$repo" == "cloudstream" ] || [ "$repo" == "revenge-xposed" ] || [ "$repo" == "io.github.vvb2060.callrecording" ] || [ "$repo" == "PrivateDNSAndroid" ] || [ "$repo" == "RecordYou" ] || [ "$repo" == "android-appcachecleaner" ] || [ "$repo" == "nextdnsmanager" ] || [ "$repo" == "MicroG-RE" ]; then
+      if [ "$repo" == "cloudstream" ] || [ "$repo" == "revenge-xposed" ] || [ "$repo" == "io.github.vvb2060.callrecording" ] || [ "$repo" == "PrivateDNSAndroid" ] || [ "$repo" == "RecordYou" ] || [ "$repo" == "android-appcachecleaner" ] || [ "$repo" == "nextdnsmanager" ] || [ "$repo" == "MicroG-RE" ] || [ "$repo" == "dev.fzer0x.fucksolidexplorer" ]; then
         fileName="$repo-${latestReleases}$ext"
       elif [ "$repo" == "com.wizpizz.reddidnt" ]; then
         name=$(jq -r '.name' <<< "$ghApiResponseJson")
@@ -138,11 +138,11 @@ dlGitHub() {
     fi
     
     # Download assets from GitHub
-    if [ "$repo" == "VancedMicroG" ] || [ "$repo" == "LSPatch" ] || [ "$repo" == "YTPro" ] || [ "$repo" == "cloudstream" ] || [ "$repo" == "revenge-xposed" ] || [ "$repo" == "io.github.vvb2060.callrecording" ] || [ "$owner" == "Droid-ify" ] || [ "$repo" == "Obtainium" ] || [ "$repo" == "Metrolist" ] || [ "$repo" == "Acode" ] || [ "$repo" == "PrivateDNSAndroid" ] || [ "$repo" == "RecordYou" ] || [ "$repo" == "android-appcachecleaner" ] || [ "$repo" == "com.wizpizz.reddidnt" ] || [ "$repo" == "cromite" ] || [ "$repo" == "nextdnsmanager" ] || [ "$repo" == "AmazeFileManager" ] || [ "$repo" == "MicroG-RE" ]; then
+    if [ "$repo" == "VancedMicroG" ] || [ "$repo" == "LSPatch" ] || [ "$repo" == "YTPro" ] || [ "$repo" == "cloudstream" ] || [ "$repo" == "revenge-xposed" ] || [ "$repo" == "io.github.vvb2060.callrecording" ] || [ "$owner" == "Droid-ify" ] || [ "$repo" == "Obtainium" ] || [ "$repo" == "Metrolist" ] || [ "$repo" == "Acode" ] || [ "$repo" == "PrivateDNSAndroid" ] || [ "$repo" == "RecordYou" ] || [ "$repo" == "android-appcachecleaner" ] || [ "$repo" == "com.wizpizz.reddidnt" ] || [ "$repo" == "cromite" ] || [ "$repo" == "nextdnsmanager" ] || [ "$repo" == "AmazeFileManager" ] || [ "$repo" == "MicroG-RE" ] || [ "$repo" == "dev.fzer0x.fucksolidexplorer" ]; then
       if [ "$fileName" != "$fileBaseName" ]; then
         [ -n "$fileBaseName" ] && echo -e "$notice diffs: $fileName ~ $fileBaseName"
         [ -f "$findFile" ] && rm -f "$findFile"
-        [[ ( "$repo" == "revenge-xposed" || "$repo" == "io.github.vvb2060.callrecording" || "$repo" == "com.wizpizz.reddidnt" || "$repo" == "MicroG-RE" ) ]] && dlUrl="https://github.com/$owner/$repo/releases/download/${latestReleases}/$assetsName" || dlUrl="https://github.com/$owner/$repo/releases/download/v${latestReleases}/$assetsName"
+        [[ ( "$repo" == "revenge-xposed" || "$repo" == "io.github.vvb2060.callrecording" || "$repo" == "com.wizpizz.reddidnt" || "$repo" == "MicroG-RE" || "$repo" == "dev.fzer0x.fucksolidexplorer" ) ]] && dlUrl="https://github.com/$owner/$repo/releases/download/${latestReleases}/$assetsName" || dlUrl="https://github.com/$owner/$repo/releases/download/v${latestReleases}/$assetsName"
         findFile="$dir/$fileName"
         if [ "$repo" == "cloudstream" ] || [ "$repo" == "cromite" ]; then
           dl "aria2" "$dlUrl" "$findFile"

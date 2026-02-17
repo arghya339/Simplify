@@ -286,7 +286,7 @@ comment
 
 # --- Decisions block for app that required specific arch && root ---
 if [ "$cpuAbi" == "arm64-v8a" ] || [ "$cpuAbi" == "armeabi-v7a" ]; then
-  Snapchat="Snapchat"
+  #Snapchat="Snapchat"
   LINE="LINE"
   [ $su -eq 1 ] && googleDialer="PhoneByGoogle"
 fi
@@ -297,6 +297,7 @@ if [ $Android -ge 10 ]; then
     ${Snapchat}
     Reddit
     Discord
+    SolidExplorer
     ${LINE}
     ${googleDialer}
     "1.1.1.1 + WARP"
@@ -306,6 +307,7 @@ elif [ $Android -eq 9 ]; then
     ${Snapchat}
     Reddit
     Discord
+    SolidExplorer
     ${googleDialer}
     "1.1.1.1 + WARP"
   )
@@ -313,17 +315,20 @@ elif [ $Android -eq 8 ]; then
   apps=(
     ${Snapchat}
     Discord
+    SolidExplorer
     "1.1.1.1 + WARP"
   )
 elif [ $Android -eq 7 ]; then
   apps=(
     ${Snapchat}
     Discord
+    SolidExplorer
     "1.1.1.1 + WARP"
   )
 elif [ $Android -eq 6 ]; then
   apps=(
     ${Snapchat}
+    SolidExplorer
     "1.1.1.1 + WARP"
   )
 elif [ $Android -eq 5 ]; then
@@ -397,6 +402,19 @@ while true; do
       activityPatched="com.discord/.main.MainDefault"
       BugReport="https://github.com/revenge-mod/revenge-xposed/issues/new"
       build_app "$pkgName" "appName" "$pkgVersion" "" "$Arch" "" "$module_apk_path" "$BugReport" "$pkgName" "$activityPatched"
+      ;;
+    SolidExplorer)
+      appName=("Solid Explorer File Manager")
+      pkgName="pl.solidexplorer2"
+      pkgVersion=""
+      Type="BUNDLE"
+      Arch=("universal")
+      bash $Simplify/dlGitHub.sh "fzer0x" "dev.fzer0x.fucksolidexplorer" "latest" ".apk" "$LSPatch"
+      module_apk_path=$(find "$LSPatch" -type f -name "dev.fzer0x.fucksolidexplorer-*.apk" -print -quit)
+      echo -e "$info module_apk_path: $module_apk_path"
+      activityPatched="pl.solidexplorer2/pl.solidexplorer.SolidExplorer"
+      BugReport="https://github.com/fzer0x/dev.fzer0x.fucksolidexplorer/issues/new"
+      build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "APKMirror" "$module_apk_path" "$BugReport" "$pkgName" "$activityPatched"
       ;;
     LINE)
       appName=("LINE")
