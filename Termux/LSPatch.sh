@@ -303,6 +303,7 @@ if [ $Android -ge 10 ]; then
     ${Truecaller}
     Duolingo
     Thanox
+    AdvancedDownloadManager
     Discord
     SolidExplorer
     ${LINE}
@@ -315,6 +316,7 @@ elif [ $Android -eq 9 ]; then
     Reddit
     ${Truecaller}
     Thanox
+    AdvancedDownloadManager
     Discord
     SolidExplorer
     ${googleDialer}
@@ -325,6 +327,7 @@ elif [ $Android -eq 8 ]; then
     ${Snapchat}
     ${Truecaller}
     Thanox
+    AdvancedDownloadManager
     Discord
     SolidExplorer
     "1.1.1.1 + WARP"
@@ -333,6 +336,7 @@ elif [ $Android -eq 7 ]; then
   apps=(
     ${Snapchat}
     Thanox
+    AdvancedDownloadManager
     Discord
     SolidExplorer
     "1.1.1.1 + WARP"
@@ -341,12 +345,14 @@ elif [ $Android -eq 6 ]; then
   apps=(
     ${Snapchat}
     Thanox
+    AdvancedDownloadManager
     SolidExplorer
     "1.1.1.1 + WARP"
   )
 elif [ $Android -eq 5 ]; then
   apps=(
     ${Snapchat}
+    AdvancedDownloadManager
     "1.1.1.1 + WARP"
   )
 fi
@@ -433,6 +439,19 @@ while true; do
       activityPatched="github.tornaco.android.thanos/now.fortuitous.thanos.main.NavActivity"
       BugReport="https://github.com/NKR00711/xVIPHook/issues/new"
       build_app "$pkgName" "appName" "" "" "" "" "$module_apk_path" "$BugReport" "$pkgName" "$activityPatched"
+      ;;
+    AdvancedDownloadManager)
+      appName=("Advanced Download Manager")
+      pkgName="com.dv.adm"
+      pkgVersion="13.0.8"
+      Type="APK"
+      Arch=("universal")
+      bash $Simplify/dlGitHub.sh "NKR00711" "xVIPHook" "latest" ".apk" "$LSPatch"
+      module_apk_path=$(find "$LSPatch" -type f -name "xVIPHookXposed-*.apk" -print -quit)
+      echo -e "$info module_apk_path: $module_apk_path"
+      activityPatched="com.dv.adm/com.dv.get.Main"
+      BugReport="https://github.com/NKR00711/xVIPHook/issues/new"
+      build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "APKMirror" "$module_apk_path" "$BugReport" "$pkgName" "$activityPatched"
       ;;
     Discord)
       appName=("Discord")
