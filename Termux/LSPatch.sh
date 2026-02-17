@@ -54,7 +54,9 @@ build_app() {
   local pkgPatched=$9
   local activityPatched=$10
 
-  if [ "${appNameRef[0]}" == "Discord" ]; then
+  if [ "${appNameRef[0]}" == "Thanox" ]; then
+    bash $Simplify/dlGitHub.sh "Tornaco" "Thanox" "latest" ".apk" "$Download"
+  elif [ "${appNameRef[0]}" == "Discord" ]; then
     # src: https://github.com/revenge-mod/revenge-manager/blob/85fdd3c2d25e509960bdb99e0e9882b16f5d541f/app/src/main/java/app/revenge/manager/installer/step/download/DownloadBaseStep.kt#L20
     baseUrl="https://tracker.vendetta.rocks/tracker/download/$pkgVersion/base"  # Size >= 100 MB
     # src: https://github.com/revenge-mod/revenge-manager/blob/85fdd3c2d25e509960bdb99e0e9882b16f5d541f/app/src/main/java/app/revenge/manager/installer/step/download/DownloadLangStep.kt#L20
@@ -122,6 +124,7 @@ build_app() {
       stock_apk_path="$Download/${appNameRef[0]}_v${pkgVersion}-$cpuAbi.apk"
     fi
   fi
+  [ "${appNameRef[0]}" == "Thanox" ] && stock_apk_path=$(find "$Download" -type f -name "thanox_*.apk" -print -quit)
   [ "${appNameRef[0]}" == "Discord" ] && stock_apk_path="$dlDIR.apk"
 
   local stockFileName=$(basename "${stock_apk_path}")
@@ -296,6 +299,7 @@ if [ $Android -ge 10 ]; then
   apps=(
     ${Snapchat}
     Reddit
+    Thanox
     Discord
     SolidExplorer
     ${LINE}
@@ -306,6 +310,7 @@ elif [ $Android -eq 9 ]; then
   apps=(
     ${Snapchat}
     Reddit
+    Thanox
     Discord
     SolidExplorer
     ${googleDialer}
@@ -314,6 +319,7 @@ elif [ $Android -eq 9 ]; then
 elif [ $Android -eq 8 ]; then
   apps=(
     ${Snapchat}
+    Thanox
     Discord
     SolidExplorer
     "1.1.1.1 + WARP"
@@ -321,6 +327,7 @@ elif [ $Android -eq 8 ]; then
 elif [ $Android -eq 7 ]; then
   apps=(
     ${Snapchat}
+    Thanox
     Discord
     SolidExplorer
     "1.1.1.1 + WARP"
@@ -328,6 +335,7 @@ elif [ $Android -eq 7 ]; then
 elif [ $Android -eq 6 ]; then
   apps=(
     ${Snapchat}
+    Thanox
     SolidExplorer
     "1.1.1.1 + WARP"
   )
@@ -384,6 +392,16 @@ while true; do
       echo -e "$info module_apk_path: $module_apk_path"
       activityPatched="com.reddit.frontpage/launcher.default"
       build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "APKMirror" "$module_apk_path" "" "$pkgName" "$activityPatched"
+      ;;
+    Thanox)
+      appName=("Thanox")
+      pkgName="github.tornaco.android.thanos"
+      bash $Simplify/dlGitHub.sh "NKR00711" "xVIPHook" "latest" ".apk" "$LSPatch"
+      module_apk_path=$(find "$LSPatch" -type f -name "xVIPHookXposed-*.apk" -print -quit)
+      echo -e "$info module_apk_path: $module_apk_path"
+      activityPatched="github.tornaco.android.thanos/now.fortuitous.thanos.main.NavActivity"
+      BugReport="https://github.com/NKR00711/xVIPHook/issues/new"
+      build_app "$pkgName" "appName" "" "" "" "" "$module_apk_path" "$BugReport" "$pkgName" "$activityPatched"
       ;;
     Discord)
       appName=("Discord")
