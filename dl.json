@@ -400,6 +400,20 @@
     }
   },
   {
+    "name": "Reddit Morphe",
+    "repo": "FiorenMas/Revanced-And-Revanced-Extended-Non-Root",
+    "assets": {
+      "stable": {
+        "universal": "reddit-morphe.apk"
+      },
+      "beta": {
+        "universal": "reddit-beta-morphe.apk"
+      },
+      "stable_lite": {},
+      "beta_lite": {}
+    }
+  },
+  {
     "name": "Reddit ReVanced Extended ARSCLib",
     "repo": "FiorenMas/Revanced-And-Revanced-Extended-Non-Root",
     "assets": {
