@@ -290,6 +290,7 @@ comment
 # --- Decisions block for app that required specific arch && root ---
 if [ "$cpuAbi" == "arm64-v8a" ] || [ "$cpuAbi" == "armeabi-v7a" ]; then
   #Snapchat="Snapchat"
+  Truecaller="Truecaller"
   LINE="LINE"
   [ $su -eq 1 ] && googleDialer="PhoneByGoogle"
 fi
@@ -299,6 +300,7 @@ if [ $Android -ge 10 ]; then
   apps=(
     ${Snapchat}
     Reddit
+    ${Truecaller}
     Thanox
     Discord
     SolidExplorer
@@ -310,6 +312,7 @@ elif [ $Android -eq 9 ]; then
   apps=(
     ${Snapchat}
     Reddit
+    ${Truecaller}
     Thanox
     Discord
     SolidExplorer
@@ -319,6 +322,7 @@ elif [ $Android -eq 9 ]; then
 elif [ $Android -eq 8 ]; then
   apps=(
     ${Snapchat}
+    ${Truecaller}
     Thanox
     Discord
     SolidExplorer
@@ -392,6 +396,19 @@ while true; do
       echo -e "$info module_apk_path: $module_apk_path"
       activityPatched="com.reddit.frontpage/launcher.default"
       build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "APKMirror" "$module_apk_path" "" "$pkgName" "$activityPatched"
+      ;;
+    Truecaller)
+      appName=("Truecaller")
+      pkgName="com.truecaller"
+      pkgVersion=""
+      Type="BUNDLE"
+      Arch=("arm64-v8a + armeabi-v7a")
+      bash $Simplify/dlGitHub.sh "NKR00711" "xVIPHook" "latest" ".apk" "$LSPatch"
+      module_apk_path=$(find "$LSPatch" -type f -name "xVIPHookXposed-*.apk" -print -quit)
+      echo -e "$info module_apk_path: $module_apk_path"
+      activityPatched="com.truecaller/.ui.TruecallerInit"
+      BugReport="https://github.com/NKR00711/xVIPHook/issues/new"
+      build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "APKMirror" "$module_apk_path" "$BugReport" "$pkgName" "$activityPatched"
       ;;
     Thanox)
       appName=("Thanox")
