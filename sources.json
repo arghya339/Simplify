@@ -120,15 +120,15 @@
     "arsclib": false
   },
   {
-    "source": "scrazzz-revanced-patches",
-    "cli": "inotia00/revanced-cli",
-    "patches": "scrazzz/my-revanced-patches",
-    "patchesjson": "https://raw.githubusercontent.com/Jman-Github/ReVanced-Patch-Bundles/refs/heads/bundles/patch-bundles/scrazzz-patch-bundles/scrazzz-latest-patches-list.json",
+    "source": "hoo-dles-patches",
+    "cli": "MorpheApp/morphe-cli",
+    "patches": "hoo-dles/morphe-patches",
+    "patchesjson": "https://raw.githubusercontent.com/hoo-dles/morphe-patches/refs/heads/main/patches-list.json",
     "integrations": null,
     "microg": null,
-    "prereleases": true,
+    "prereleases": false,
     "autoupdates": true,
-    "cliv": 5,
+    "cliv": 6,
     "arsclib": false
   }
 ]
