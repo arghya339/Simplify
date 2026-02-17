@@ -301,6 +301,7 @@ if [ $Android -ge 10 ]; then
     ${Snapchat}
     Reddit
     ${Truecaller}
+    Duolingo
     Thanox
     Discord
     SolidExplorer
@@ -407,6 +408,19 @@ while true; do
       module_apk_path=$(find "$LSPatch" -type f -name "xVIPHookXposed-*.apk" -print -quit)
       echo -e "$info module_apk_path: $module_apk_path"
       activityPatched="com.truecaller/.ui.TruecallerInit"
+      BugReport="https://github.com/NKR00711/xVIPHook/issues/new"
+      build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "APKMirror" "$module_apk_path" "$BugReport" "$pkgName" "$activityPatched"
+      ;;
+    Duolingo)
+      appName=("Duolingo")
+      pkgName="com.duolingo"
+      pkgVersion=""
+      Type="BUNDLE"
+      Arch=("universal")
+      bash $Simplify/dlGitHub.sh "NKR00711" "xVIPHook" "latest" ".apk" "$LSPatch"
+      module_apk_path=$(find "$LSPatch" -type f -name "xVIPHookXposed-*.apk" -print -quit)
+      echo -e "$info module_apk_path: $module_apk_path"
+      activityPatched="com.duolingo/.app.LoginActivity"
       BugReport="https://github.com/NKR00711/xVIPHook/issues/new"
       build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "APKMirror" "$module_apk_path" "$BugReport" "$pkgName" "$activityPatched"
       ;;
