@@ -64,10 +64,11 @@ RV4="$RVX/RV4"
 RVX6_7="$Simplify/RVX6-7"  # RVX for Android 6 and 7
 Morphe="$Simplify/Morphe"
 pikoTwitter="$Simplify/pikoTwitter"
+hoodles="$Simplify/hoodles"
 Dropped="$Simplify/Dropped"
 LSPatch="$Simplify/LSPatch"
 POST_INSTALL="$Simplify/POST_INSTALL"
-mkdir -p "$Simplify" "$SimplUsr" "$RV" "$RVX" "$RV4" "$Morphe" "$pikoTwitter" "$Dropped" "$LSPatch" "$POST_INSTALL"  # Create $Simplify, $SimplUsr, $RV, $RVX, $RV4, $Morphe, $pikoTwitter, $Dropped, $LSPatch and $POST_INSTALL dir if it does't exist
+mkdir -p "$Simplify" "$SimplUsr" "$RV" "$RVX" "$RV4" "$Morphe" "$pikoTwitter" "$hoodles" "$Dropped" "$LSPatch" "$POST_INSTALL"  # Create $Simplify, $SimplUsr, $RV, $RVX, $RV4, $Morphe, $pikoTwitter, $hoodles, $Dropped, $LSPatch and $POST_INSTALL dir if it does't exist
 simplifyJson="$Simplify/simplify.json"  # Configuration file to store simplify settings
 
 cloudflareDOH="https://cloudflare-dns.com/dns-query"
@@ -1200,7 +1201,7 @@ about() {
 while true; do
   options=(Download\ Patched\ App ReVanced ReVanced\ Extended)
   [ $Android -ge 8 ] && options+=(Morphe Piko\ Twitter)
-
+  [ $Android -ge 6 ] && options+=(hoodles)
   options+=(Dropped\ Patches LSPatch Configuration Miscellaneous Feature\ request Bug\ report Support About)
   buttons=("<Select>" "<Exit>")
   menu options buttons; selected="${options[$selected]}"
@@ -1224,6 +1225,10 @@ while true; do
     Piko\ Twitter)
       curl -sL -o "$pikoTwitter/pikoTwitter.sh" "https://raw.githubusercontent.com/arghya339/Simplify/refs/heads/main/Termux/pikoTwitter.sh"
       source "$pikoTwitter/pikoTwitter.sh"  # source = run in same shell environment (both scripts can share variables/functions both ways)
+      ;;
+    hoodles)
+      curl -sL -o "$hoodles/hoodles.sh" "https://raw.githubusercontent.com/arghya339/Simplify/refs/heads/main/Termux/hoodles.sh"
+      source "$hoodles/hoodles.sh"  # source = run in same shell environment (both scripts can share variables/functions both ways)
       ;;
     Dropped\ Patches)
       curl -sL -o "$Dropped/droppedPatches.sh" "https://raw.githubusercontent.com/arghya339/Simplify/refs/heads/main/Termux/droppedPatches.sh"
