@@ -3,7 +3,7 @@
 [ $su -eq 1 ] && echo -e "$info ${Blue}Target device:${Reset} $Model ($Serial)" || echo -e "$info ${Blue}Target device:${Reset} $Model"
 
 # --- Download LSPatch ---
-bash $Simplify/dlGitHub.sh "JingMatrix" "LSPatch" "latest" ".jar" "$LSPatch"
+bash $Simplify/dlGitHub.sh "JingMatrix" "LSPatch" "latest" ".jar" "$LSPatch" "lspatch.jar"
 LSPatchJar=$(find "$LSPatch" -type f -name "lspatch-*.jar" -print -quit)
 echo -e "$info ${Blue}LSPatchJar:${Reset} $LSPatchJar"
 

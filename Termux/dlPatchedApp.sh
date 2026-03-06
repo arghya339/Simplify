@@ -1514,9 +1514,9 @@ while true; do
       owner="FiorenMas"
       repo="Revanced-And-Revanced-Extended-Non-Root"
       if [ $FetchPreRelease -eq 0 ]; then
-        assets="reddit-$cpuAbi-revanced-extended.apk"  # Use Stable release
+        assets="reddit-morphe.apk"  # Use Stable release
       else
-        assets="reddit-$cpuAbi-beta-revanced-extended.apk"  # Use Beta release
+        assets="reddit-beta-morphe.apk"  # Use Beta release
       fi
       pkgPatched="com.reddit.frontpage"
       activityPatched="com.reddit.frontpage/launcher.default"
