@@ -340,6 +340,7 @@ while true; do
       pkgName="com.reddit.frontpage"
       appName=("Reddit")
       pkgVersion=""
+      [ $FetchPreRelease -eq 1 ] && pkgVersion="2026.10.0"
       if [ -z "$pkgVersion" ]; then
         getVersion "$pkgName"
         pkgVersion="$pkgVersion"
