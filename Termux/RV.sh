@@ -1413,14 +1413,14 @@ while true; do
     ProtonVPN)
       pkgName="ch.protonvpn.android"
       appName=("ProtonVPN")
-      pkgVersion="5.14.76.0"
+      pkgVersion="5.16.88.0"
       #pkgVersion=""
       if [ -z "$pkgVersion" ]; then
         getVersion "$pkgName"
         pkgVersion="$pkgVersion"
       fi
       Type="xapk"
-      Arch=("arm64-v8a, armeabi-v7a, x86_64")
+      Arch=("arm64-v8a, armeabi-v7a, x86, x86_64")
       activityPatched="ch.protonvpn.android/.RoutingActivity"
       build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "Uptodown" "protonvpn_patches_args" "$pkgName" "$activityPatched" "" "" ""
       ;;
