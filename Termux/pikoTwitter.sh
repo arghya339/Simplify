@@ -57,7 +57,7 @@ patch_twitter() {
   
   $PREFIX/lib/jvm/java-$jdkVersion-openjdk/bin/java -jar $MorpheCLIJar patch -p $PatchesMpp \
     -o "$outputAPK" "${stock_apk_ref}" \
-    -e "Bring back twitter" -e "Enable app downgrading" -d "Export all activities" \
+    -e "Bring back twitter" -e "Dynamic color" -d "Export all activities" \
     --purge $stripLibs -f | tee "$log"
   
   if [ ! -f "$outputAPK" ] && [ -f "${stock_apk_ref[0]}" ]; then
