@@ -85,14 +85,14 @@
   },
   {
     "source": "Piko",
-    "cli": "inotia00/revanced-cli",
+    "cli": "MorpheApp/morphe-cli",
     "patches": "crimera/piko",
-    "patchesjson": "https://raw.githubusercontent.com/crimera/piko/refs/heads/main/patches.json",
+    "patchesjson": "https://raw.githubusercontent.com/crimera/piko/refs/heads/main/patches-list.json",
     "integrations": null,
     "microg": null,
     "prereleases": false,
     "autoupdates": true,
-    "cliv": 5,
+    "cliv": 6,
     "arsclib": false
   },
   {
