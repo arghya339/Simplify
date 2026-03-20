@@ -339,8 +339,8 @@ while true; do
     Reddit)
       pkgName="com.reddit.frontpage"
       appName=("Reddit")
-      pkgVersion=""
-      [ $FetchPreRelease -eq 1 ] && pkgVersion="2026.11.0"
+      [ $Android -eq 9 ] && pkgVersion="2026.10.0" || pkgVersion=""
+      ([ $Android -gt 9 ] && [ $FetchPreRelease -eq 1 ]) && pkgVersion="2026.11.0"
       if [ -z "$pkgVersion" ]; then
         getVersion "$pkgName"
         pkgVersion="$pkgVersion"
