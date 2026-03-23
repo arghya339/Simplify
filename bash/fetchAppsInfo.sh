@@ -9,13 +9,8 @@ fetchAppsInfo() {
     if [ "$cli" == "inotia00/revanced-cli" ]; then
       java -jar $cliPath patches $patchesPath -p $patchesJson
     else
-      if [ "$patches" == "ReVanced/revanced-patches" ]; then
-        [ "$prereleases" == true ] && patchesjson="$patchesjson?prerelease=true"
-        curl -sL "$patchesjson" > $patchesJson
-      else
-        [ "$prereleases" == true ] && patchesjson=$(sed -E 's/(main|revanced-extended|arsclib-old|stable)/dev/g' <<< "$patchesjson")  # replace main, revanced-extended, arsclib-old, or stable with dev
+      [ "$prereleases" == true ] && patchesjson=$(sed -E 's/(main|revanced-extended|arsclib-old|stable)/dev/g' <<< "$patchesjson")  # replace main, revanced-extended, arsclib-old, or stable with dev
         curl -sL "$patchesjson" | jq -r '.patches' > $patchesJson
-      fi
       jq 'map(.compatiblePackages |= (if . == null then null else to_entries | map({name: .key, versions: .value}) end))' "$patchesJson" > "tmp.json" && mv "tmp.json" "$patchesJson"  # convert compatiblePackages into array of objects (containing name & versions) instead of a dictionary
     fi
   fi

@@ -3,7 +3,7 @@
     "source": "ReVanced",
     "cli": "ReVanced/revanced-cli",
     "patches": "ReVanced/revanced-patches",
-    "patchesjson": "https://api.revanced.app/v4/patches/list",
+    "patchesjson": "https://raw.githubusercontent.com/Jman-Github/ReVanced-Patch-Bundles/refs/heads/bundles/patch-bundles/revanced-patch-bundles/revanced-stable-patches-list.json",
     "integrations": null,
     "microg": "ReVanced/GmsCore",
     "prereleases": false,
