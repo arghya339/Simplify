@@ -5,17 +5,17 @@
 branding "revanced_branding"  # Call branding function
 
 # --- Download ReVanced CLI ---
-bash $Simplify/dlGitHub.sh "inotia00" "revanced-cli" "latest" ".jar" "$RVX"
-ReVancedCLIJar=$(find "$RVX" -type f -name "revanced-cli-*-all.jar" -print -quit)
+bash $Simplify/dlGitHub.sh "ReVanced" "revanced-cli" "latest" ".jar" "$RV"
+ReVancedCLIJar=$(find "$RV" -type f -name "revanced-cli-*-all.jar" -print -quit)
 echo -e "$info ${Blue}ReVancedCLIJar:${Reset} $ReVancedCLIJar"
 
 # --- Download ReVanced Patches ---
 if [ "$FetchPreRelease" -eq 0 ]; then
   release="latest"  # Use latest release
-  requestUrl="https://api.revanced.app/v4/patches"
+  requestUrl="https://api.revanced.app/v5/patches"
 else
   release="pre"  # Use pre-release
-  requestUrl="https://api.revanced.app/v4/patches?prerelease=true"
+  requestUrl="https://api.revanced.app/v5/patches/prerelease"
 fi
 rvApiResponseJson=$(curl -sX 'GET' "$requestUrl" -H 'accept: application/json')
 downloadUrl=$(jq -r '.download_url' <<< "$rvApiResponseJson")
@@ -74,9 +74,6 @@ patch_app() {
   local appName=$4
   
   if [ "$appName" == "Instagram" ] || [ "$appName" == "Facebook" ] || [ "$appName" == "Facebook Messenger" ] || [ "$appName" == "Threads" ]; then
-    bash $Simplify/dlGitHub.sh "ReVanced" "revanced-cli" "pre" ".jar" "$RV"
-    ReVancedCLIJar=$(find "$RV" -type f -name "revanced-cli-*-all.jar" -print -quit)
-    echo -e "$info ${Blue}ReVancedCLIJar:${Reset} $ReVancedCLIJar"
     universalPatches=(
       -d "Hex"
     )
@@ -102,22 +99,12 @@ patch_app() {
     )
   fi
   echo -e "$running Patching ${appName} RV.."
-  if [ "$appName" == "Instagram" ] || [ "$appName" == "Facebook" ] || [ "$appName" == "Facebook Messenger" ] || [ "$appName" == "Threads" ]; then
-    $PREFIX/lib/jvm/java-$jdkVersion-openjdk/bin/java -jar $ReVancedCLIJar patch -p $PatchesRvp \
-    -o "$outputAPK" "${stock_apk_ref}" \
-    "${patches[@]}" \
-    "${universalPatches[@]}" \
-    --custom-aapt2-binary="$HOME/aapt2" \
-    --purge -f | tee "$log"
-  else
-    ReVancedCLIJar=$(find "$RVX" -type f -name "revanced-cli-*-all.jar" -print -quit)
-    $PREFIX/lib/jvm/java-$jdkVersion-openjdk/bin/java -jar $ReVancedCLIJar patch -p $PatchesRvp \
+  $PREFIX/lib/jvm/java-$jdkVersion-openjdk/bin/java -jar $ReVancedCLIJar patch -p $PatchesRvp \
       -o "$outputAPK" "${stock_apk_ref}" \
       "${patches[@]}" \
       "${universalPatches[@]}" \
       --custom-aapt2-binary="$HOME/aapt2" \
-      --purge $ripLib -f | tee "$log"
-  fi
+      --purge -f | tee "$log"
   
   if grep -q "OutOfMemory" "$log"; then
     echo -e "$bad ${Red}OutOfMemoryError${Reset}: ${Yellow}Device RAM overloaded!${Reset}\n ${Blue}Solutions${Reset}:\n   1. ${Yellow}Close background apps.${Reset}\n   2. ${Yellow}Use device with ≥4GB ~ ≥6GB RAM for patching apk.${Reset}"
@@ -630,21 +617,20 @@ build_app() {
 # --- Function to retrieve the list of patches for a specific filtered app
 getListOfPatches() {
   local pkgName="$1"
-  curl -sL 'https://api.revanced.app/v4/patches/list' | jq --arg pkgName "$pkgName" '.[] | select(.compatiblePackages."'"$pkgName"'" != null)'
+  curl -sL 'https://raw.githubusercontent.com/Jman-Github/ReVanced-Patch-Bundles/refs/heads/bundles/patch-bundles/revanced-patch-bundles/revanced-stable-patches-list.json' | jq --arg pkgName "$pkgName" '.patches.[] | select(.compatiblePackages."'"$pkgName"'" != null)'
   if [ "$ReadPatchesFile" -eq 1 ]; then
-    $PREFIX/lib/jvm/java-$jdkVersion-openjdk/bin/java -jar $ReVancedCLIJar list-patches -d=true -f=$pkgName -i=true -o=true -p=false -u -v=false $PatchesRvp > "$SimplUsr/${pkgName}_list-patches.txt"
+    $PREFIX/lib/jvm/java-$jdkVersion-openjdk/bin/java -jar $ReVancedCLIJar list-patches --descriptions=true --filter-package-name=$pkgName --index=true --options=true --packages=false --universal-patches --versions=false --bypass-verification --patches=$PatchesRvp > "$SimplUsr/${pkgName}_list-patches.txt"
   fi
-  Patches=$(curl -sL 'https://api.revanced.app/v4/patches/list' | jq --arg pkgName "$pkgName" '.[] | select(.compatiblePackages."'"$pkgName"'" != null)')
+  Patches=$(curl -sL 'https://raw.githubusercontent.com/Jman-Github/ReVanced-Patch-Bundles/refs/heads/bundles/patch-bundles/revanced-patch-bundles/revanced-stable-patches-list.json' | jq --arg pkgName "$pkgName" '.patches.[] | select(.compatiblePackages."'"$pkgName"'" != null)')
   if [ "$pkgName" == "app.revanced" ]; then
     if [ "$ReadPatchesFile" -eq 1 ]; then
-      $PREFIX/lib/jvm/java-$jdkVersion-openjdk/bin/java -jar $ReVancedCLIJar list-patches -d=true -f=$pkgName -i=true -o=true -p=false -u=true -v=false $PatchesRvp | tee "$SimplUsr/${pkgName}_list-patches.txt"
+      $PREFIX/lib/jvm/java-$jdkVersion-openjdk/bin/java -jar $ReVancedCLIJar list-patches --descriptions=true --filter-package-name=$pkgName --index=true --options=true --packages=false --universal-patches=true --versions=false --bypass-verification --patches=$PatchesRvp | tee "$SimplUsr/${pkgName}_list-patches.txt"
     else
-      $PREFIX/lib/jvm/java-$jdkVersion-openjdk/bin/java -jar $ReVancedCLIJar list-patches -d=true -f=$pkgName -i=true -o=true -p=false -u=true -v=false $PatchesRvp  # get only universal-patches list
+      $PREFIX/lib/jvm/java-$jdkVersion-openjdk/bin/java -jar $ReVancedCLIJar list-patches --descriptions=true --filter-package-name=$pkgName --index=true --options=true --patches=false --universal-patches=true --versions=false --bypass-verification --patches=$PatchesRvp  # get only universal-patches list
     fi
   elif [ -z "$Patches" ]; then
     # java -jar revanced-cli-*-all.jar list-patches patches-*.rvp -h
-    # -d=--with-descriptions, -f=--filter-package-name, -i=--index, -o=--with-options, -p=--with-packages, -u=--with-universal-patches, -v, --with-versions
-    $PREFIX/lib/jvm/java-$jdkVersion-openjdk/bin/java -jar $ReVancedCLIJar list-patches -d=true -f=$pkgName -i=true -o=true -p=false -u -v=false $PatchesRvp
+    $PREFIX/lib/jvm/java-$jdkVersion-openjdk/bin/java -jar $ReVancedCLIJar list-patches --descriptions=true --filter-package-name=$pkgName --index=true --options=true --patches=false --universal-patches --versions=false --bypass-verification --patches=$PatchesRvp
   fi
 }
 
