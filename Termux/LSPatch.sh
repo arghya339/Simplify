@@ -305,6 +305,7 @@ if [ $Android -ge 10 ]; then
     Thanox
     AdvancedDownloadManager
     Discord
+    RAR
     SolidExplorer
     ${LINE}
     ${googleDialer}
@@ -318,6 +319,7 @@ elif [ $Android -eq 9 ]; then
     Thanox
     AdvancedDownloadManager
     Discord
+    RAR
     SolidExplorer
     ${googleDialer}
     "1.1.1.1 + WARP"
@@ -329,6 +331,7 @@ elif [ $Android -eq 8 ]; then
     Thanox
     AdvancedDownloadManager
     Discord
+    RAR
     SolidExplorer
     "1.1.1.1 + WARP"
   )
@@ -338,6 +341,7 @@ elif [ $Android -eq 7 ]; then
     Thanox
     AdvancedDownloadManager
     Discord
+    RAR
     SolidExplorer
     "1.1.1.1 + WARP"
   )
@@ -346,6 +350,7 @@ elif [ $Android -eq 6 ]; then
     ${Snapchat}
     Thanox
     AdvancedDownloadManager
+    RAR
     SolidExplorer
     "1.1.1.1 + WARP"
   )
@@ -353,6 +358,7 @@ elif [ $Android -eq 5 ]; then
   apps=(
     ${Snapchat}
     AdvancedDownloadManager
+    RAR
     "1.1.1.1 + WARP"
   )
 fi
@@ -470,6 +476,19 @@ while true; do
       activityPatched="com.discord/.main.MainDefault"
       BugReport="https://github.com/revenge-mod/revenge-xposed/issues/new"
       build_app "$pkgName" "appName" "$pkgVersion" "" "$Arch" "" "$module_apk_path" "$BugReport" "$pkgName" "$activityPatched"
+      ;;
+    RAR)
+      appName=("RAR")
+      pkgName="com.rarlab.rar"
+      pkgVersion=""
+      Type="BUNDLE"
+      Arch=("universal")
+      bash $Simplify/dlGitHub.sh "fzer0x" "SilentRAR" "latest" ".apk" "$LSPatch"
+      module_apk_path=$(find "$LSPatch" -type f -name "SilentRAR-*.apk" -print -quit)
+      echo -e "$info module_apk_path: $module_apk_path"
+      activityPatched="com.rarlab.rar/.MainActivity"
+      BugReport="https://github.com/fzer0x/SilentRAR/issues/new"
+      build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "APKMirror" "$module_apk_path" "$BugReport" "$pkgName" "$activityPatched"
       ;;
     SolidExplorer)
       appName=("Solid Explorer File Manager")
