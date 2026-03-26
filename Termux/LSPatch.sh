@@ -56,6 +56,11 @@ build_app() {
 
   if [ "${appNameRef[0]}" == "Thanox" ]; then
     bash $Simplify/dlGitHub.sh "Tornaco" "Thanox" "latest" ".apk" "$Download"
+  elif [ "${appNameRef[0]}" == "NagramX" ]; then
+    while true; do
+      curl -L --progress-bar -C - -o "$Download/NagramX-v12.5.1-1240-arm64-v8a.apk" "https://github.com/risin42/NagramX/releases/download/1240/NagramX-v12.5.1-1240-arm64-v8a.apk"
+      [ $? -eq 0 ] && break || sleep 5
+    done
   elif [ "${appNameRef[0]}" == "Discord" ]; then
     # src: https://github.com/revenge-mod/revenge-manager/blob/85fdd3c2d25e509960bdb99e0e9882b16f5d541f/app/src/main/java/app/revenge/manager/installer/step/download/DownloadBaseStep.kt#L20
     baseUrl="https://tracker.vendetta.rocks/tracker/download/$pkgVersion/base"  # Size >= 100 MB
@@ -125,6 +130,7 @@ build_app() {
     fi
   fi
   [ "${appNameRef[0]}" == "Thanox" ] && stock_apk_path=$(find "$Download" -type f -name "thanox_*.apk" -print -quit)
+  [ "${appNameRef[0]}" == "NagramX" ] && stock_apk_path="$Download/NagramX-v12.5.1-1240-arm64-v8a.apk"
   [ "${appNameRef[0]}" == "Discord" ] && stock_apk_path="$dlDIR.apk"
 
   local stockFileName=$(basename "${stock_apk_path}")
@@ -299,6 +305,7 @@ fi
 if [ $Android -ge 10 ]; then
   apps=(
     ${Snapchat}
+    NagramX
     Reddit
     ${Truecaller}
     Duolingo
@@ -314,6 +321,7 @@ if [ $Android -ge 10 ]; then
 elif [ $Android -eq 9 ]; then
   apps=(
     ${Snapchat}
+    NagramX
     Reddit
     ${Truecaller}
     Thanox
@@ -327,6 +335,7 @@ elif [ $Android -eq 9 ]; then
 elif [ $Android -eq 8 ]; then
   apps=(
     ${Snapchat}
+    NagramX
     ${Truecaller}
     Thanox
     AdvancedDownloadManager
@@ -338,6 +347,7 @@ elif [ $Android -eq 8 ]; then
 elif [ $Android -eq 7 ]; then
   apps=(
     ${Snapchat}
+    NagramX
     Thanox
     AdvancedDownloadManager
     Discord
@@ -348,6 +358,7 @@ elif [ $Android -eq 7 ]; then
 elif [ $Android -eq 6 ]; then
   apps=(
     ${Snapchat}
+    NagramX
     Thanox
     AdvancedDownloadManager
     RAR
@@ -398,6 +409,17 @@ while true; do
       BugReport="https://github.com/rhunk/SnapEnhance/issues/new?template=bug_report.yml"
       build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "APKMirror" "$module_apk_path" "$BugReport" "$pkgName" "$activityPatched"
       ;;
+    NagramX)
+      appName=("NagramX")
+      pkgName="nu.gpu.nagram"
+      pkgVersion="1240"  # https://github.com/risin42/NagramX/releases/download/1240/NagramX-v12.5.1-1240-arm64-v8a.apk
+      bash $Simplify/dlGitHub.sh "mustafa1dev" "TeleVip-Lsposed" "latest" ".apk" "$LSPatch"
+      module_apk_path=$(find "$LSPatch" -type f -name "TeleVip-*.apk" -print -quit)
+      echo -e "$info module_apk_path: $module_apk_path"
+      activityPatched="nu.gpu.nagram/org.telegram.messenger.BlueIcon"
+      BugReport="https://github.com/mustafa1dev/TeleVip-Lsposed/issues/new"
+      build_app "$pkgName" "appName" "$pkgVersion" "" "" "" "$module_apk_path" "$BugReport" "$pkgName" "$activityPatched"
+      ;;
     Reddit)
       appName=("Reddit")
       pkgName="com.reddit.frontpage"
@@ -408,7 +430,8 @@ while true; do
       module_apk_path=$(find "$LSPatch" -type f -name "com.wizpizz.reddidnt-v*.apk" -print -quit)
       echo -e "$info module_apk_path: $module_apk_path"
       activityPatched="com.reddit.frontpage/launcher.default"
-      build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "APKMirror" "$module_apk_path" "" "$pkgName" "$activityPatched"
+      BugReport="https://t.me/reddidntappdiscussion"
+      build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "APKMirror" "$module_apk_path" "$BugReport" "$pkgName" "$activityPatched"
       ;;
     Truecaller)
       appName=("Truecaller")
