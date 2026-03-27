@@ -37,21 +37,9 @@
   },
   {
     "source": "RVE",
-    "cli": "inotia00/revanced-cli",
-    "patches": "anddea/revanced-patches",
-    "patchesjson": "https://raw.githubusercontent.com/anddea/revanced-patches/refs/heads/main/patches.json",
-    "integrations": null,
-    "microg": "MorpheApp/MicroG-RE",
-    "prereleases": false,
-    "autoupdates": true,
-    "cliv": 5,
-    "arsclib": false
-  },
-  {
-    "source": "RVX-Morphed",
     "cli": "MorpheApp/morphe-cli",
-    "patches": "wchill/rvx-morphed",
-    "patchesjson": "https://raw.githubusercontent.com/wchill/rvx-morphed/refs/heads/main/patches-list.json",
+    "patches": "anddea/revanced-patches",
+    "patchesjson": "https://raw.githubusercontent.com/anddea/revanced-patches/refs/heads/main/patches-list.json",
     "integrations": null,
     "microg": "MorpheApp/MicroG-RE",
     "prereleases": false,
