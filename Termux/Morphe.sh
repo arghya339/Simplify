@@ -310,7 +310,7 @@ while true; do
       pkgName="com.google.android.youtube"
       appName=("YouTube")
       [ $Android -eq 8 ] && pkgVersion="20.26.46" || pkgVersion=""
-      ([ $Android -ge 9 ] && [ $FetchPreRelease -eq 1 ]) && pkgVersion="21.12.521"
+      ([ $Android -ge 9 ] && [ $FetchPreRelease -eq 1 ]) && pkgVersion="21.13.163"
       if [ -z "$pkgVersion" ]; then
         getVersion "$pkgName"
         pkgVersion="$pkgVersion"
@@ -325,7 +325,7 @@ while true; do
       pkgName="com.google.android.apps.youtube.music"
       appName=("YouTube Music")
       pkgVersion=""
-      [ $FetchPreRelease -eq 1 ] && pkgVersion="9.11.54"
+      [ $FetchPreRelease -eq 1 ] && pkgVersion="9.12.51"
       if [ -z "$pkgVersion" ]; then
         getVersion "$pkgName"
         pkgVersion="$pkgVersion"
