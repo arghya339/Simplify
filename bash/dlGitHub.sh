@@ -40,7 +40,7 @@ dlgh() {
     ghApiUrl="https://api.github.com/repos/${repositorySlug}/releases/latest"
   else
     ghApiUrl="https://api.github.com/repos/${repositorySlug}/releases"
-    tagName=$(curl -sL ${ghAuthH} $ghApiUrl | jq -r '.[0].tag_name')
+    tagName=$(curl -sL ${ghAuthH} $ghApiUrl | jq -r 'sort_by(.published_at) | reverse | .[0].tag_name')
     ghApiUrl+="/tags/$tagName"
   fi
   responseJson=$(curl -sL ${ghAuthH} $ghApiUrl)
