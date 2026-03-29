@@ -2,40 +2,48 @@
 
 [ $su -eq 1 ] && echo -e "$info ${Blue}Target device:${Reset} $Model ($Serial)" || echo -e "$info ${Blue}Target device:${Reset} $Model"
 
-[ $ChangeRVXSource -eq 0 ] && BugReportUrl="https://github.com/inotia00/ReVanced_Extended/issues/new?template=bug-report.yml" || BugReportUrl="https://github.com/anddea/revanced-patches/issues/new?template=bug-report.yml"
-
 branding  # Call branding function
 
-# --- Download ReVanced CLI ---
-bash $Simplify/dlGitHub.sh "inotia00" "revanced-cli" "latest" ".jar" "$RVX"
-ReVancedCLIJar=$(find "$RVX" -type f -name "revanced-cli-*-all.jar" -print -quit)
-echo -e "$info ${Blue}ReVancedCLIJar:${Reset} $ReVancedCLIJar"
-
-# --- Download ReVanced Patches ---
-if [ "$FetchPreRelease" -eq 0 ]; then
-  release="latest"  # Use latest release
-else
-  release="pre"  # Use pre-release
-fi
-if [ "$ChangeRVXSource" -eq 0 ]; then
+[ "$FetchPreRelease" -eq 0 ] && release="latest" || release="pre"
+if [ $ChangeRVXSource -eq 0 ]; then
+  BugReportUrl="https://github.com/inotia00/ReVanced_Extended/issues/new?template=bug-report.yml"
   owner="inotia00"  # Use inotia00 as owner
+  org="$owner"
+  repo="revanced"
+  ext=".rvp"
 else
+  BugReportUrl="https://github.com/anddea/revanced-patches/issues/new?template=bug-report.yml"
   owner="anddea"  # Use anddea as owner
+  org="MorpheApp"
+  repo="morphe"
+  ext=".mpp"
 fi
-bash $Simplify/dlGitHub.sh "$owner" "revanced-patches" "$release" ".rvp" "$RVX"
-PatchesRvp=$(find "$RVX" -type f -name "patches-*.rvp" -print -quit)
-echo -e "$info ${Blue}PatchesRvp:${Reset} $PatchesRvp"
 
-# --- Download Vanced MicroG ---
+# --- Download CLI ---
+bash $Simplify/dlGitHub.sh "$org" "$repo-cli" "latest" ".jar" "$RVX"
+CLI=$(find "$RVX" -type f -name "$repo-cli-*-all.jar" -print -quit)
+echo -e "$info ${Blue}CLI:${Reset} $CLI"
+
+# --- Download Patches ---
+bash $Simplify/dlGitHub.sh "$owner" "revanced-patches" "$release" "$ext" "$RVX"
+Patches=$(find "$RVX" -type f -name "patches-*${ext}" -print -quit)
+echo -e "$info ${Blue}Patches:${Reset} $Patches"
+
+# --- Download MicroG ---
 if [ $su -eq 0 ]; then
   if [ $Android -eq 5 ]; then
-    VancedMicroG="$SimplUsr/microg-0.2.22.212658.apk"
-    [ ! -f "$VancedMicroG" ] && curl -sL "https://github.com/TeamVanced/VancedMicroG/releases/download/v0.2.22.212658-212658001/microg.apk" --progress-bar -C - -o "$VancedMicroG"
-  elif [ "$Android" -ge "6" ]; then
-    bash $Simplify/dlGitHub.sh "inotia00" "VancedMicroG" "latest" ".apk" "$SimplUsr"
-    VancedMicroG=$(find "$SimplUsr" -type f -name "microg-*.apk" -print -quit)
+    MicroG="$SimplUsr/microg-0.2.22.212658.apk"
+    [ ! -f "$MicroG" ] && curl -L --progress-bar -C - -o "$MicroG" "https://github.com/TeamVanced/VancedMicroG/releases/download/v0.2.22.212658-212658001/microg.apk"
+  else
+    if [ $ChangeRVXSource -eq 1 ]; then
+      bash $Simplify/dlGitHub.sh "MorpheApp" "MicroG-RE" "latest" ".apk" "$SimplUsr"
+      MicroG=$(find "$SimplUsr" -type f -name "MicroG-RE-*.apk" -print -quit)
+    else
+      bash $Simplify/dlGitHub.sh "inotia00" "VancedMicroG" "latest" ".apk" "$SimplUsr"
+      MicroG=$(find "$SimplUsr" -type f -name "microg-*.apk" -print -quit)
+    fi
   fi
-  echo -e "$info ${Blue}VancedMicroG:${Reset} $VancedMicroG"
+  echo -e "$info ${Blue}MicroG:${Reset} $MicroG"
 fi
 
 if [ $RipLib -eq 1 ]; then
@@ -50,12 +58,12 @@ fi
 getVersion() {
   local pkgName="$1"
   
-  preVersion=$($PREFIX/lib/jvm/java-$jdkVersion-openjdk/bin/java -jar $ReVancedCLIJar list-versions $PatchesRvp -f=$pkgName | sed 's/^[[:space:]]*//; s/ (.*//;' | grep -E '^[0-9]|^Any$' | sort -rV | head -n 2 | tail -n 1)
+  preVersion=$($PREFIX/lib/jvm/java-$jdkVersion-openjdk/bin/java -jar $CLI list-versions $Patches -f=$pkgName | sed 's/^[[:space:]]*//; s/ (.*//;' | grep -E '^[0-9]|^Any$' | sort -rV | head -n 2 | tail -n 1)
   pre_stock_apk_path=$(find "$Download" -type f -name "${appName[0]}_v${preVersion}-*.apk" -print -quit)
-  [[ -f "$pre_stock_apk_path" ]] && rm "$pre_stock_apk_path"  # Remove previous stock apk if exists
+  [ -f "$pre_stock_apk_path" ] && rm -f "$pre_stock_apk_path"  # Remove previous stock apk if exists
   
   # Get all versions for the package and sort them, then take the highest version
-  pkgVersion=$($PREFIX/lib/jvm/java-$jdkVersion-openjdk/bin/java -jar $ReVancedCLIJar list-versions $PatchesRvp -f=$pkgName | sed 's/^[[:space:]]*//; s/ (.*//;' | grep -E '^[0-9]|^Any$' | sort -rV | head -n 2 | head -n 1)
+  pkgVersion=$($PREFIX/lib/jvm/java-$jdkVersion-openjdk/bin/java -jar $CLI list-versions $Patches -f=$pkgName | sed 's/^[[:space:]]*//; s/ (.*//;' | grep -E '^[0-9]|^Any$' | sort -rV | head -n 2 | head -n 1)
 }
 
 # --- Download ReVanced CLI v3 ---
@@ -88,7 +96,7 @@ patch_app() {
   local appName="$5"
   local Url=$6
   
-  ReVancedCLIJar=$(find "$RVX" -type f -name "revanced-cli-*-all.jar" -print -quit)
+  CLI=$(find "$RVX" -type f -name "$repo-cli-*-all.jar" -print -quit)
   if [[ ( $Android -eq 7 || $Android -eq 6 ) && ( "$appName" == "YouTube" ) && ( $ChangeRVXSource -eq 0 ) ]]; then
     bash $Simplify/dlGitHub.sh "kitadai31" "revanced-patches-android6-7" "$release" ".rvp" "$RVX6_7"
     PatchesRvp=$(find "$RVX6_7" -type f -name "patches-*.rvp" -print -quit)
@@ -122,7 +130,7 @@ patch_app() {
     rvIntegrations=$(find "$RVX/ARSCLib" -type f -name "revanced-integrations-*.apk" -print -quit)
   fi
   
-  echo -e "$running Patching ${appName} RVX.."
+  echo -e "$running Patching ${appName}.."
   if [[ ( $Android -eq 7 || $Android -eq 6 ) && ( "$appName" == "YouTube" ) && ( $ChangeRVXSource -eq 1 ) ]]; then
     $PREFIX/lib/jvm/java-$jdkVersion-openjdk/bin/java -jar $ReVancedCLIv4 patch $stock_apk_path -o $outputAPK -m $IntegrationsApk -b $PatchesJar \
       -i "materialyou" -i "spoof-streaming-data" -e "hide-autoplay-button" -e "hide-cast-button"  -e "hide-create-button" -e "hide-endscreen-overlay" -e "hide-next-prev-button" \
@@ -138,15 +146,17 @@ patch_app() {
     $PREFIX/lib/jvm/java-$jdkVersion-openjdk/bin/java -jar $rvCli options -b $rvPatches  # Genarate patches options.json
     jq '(.[] | select(.patchName == "Change version code").options[] | select(.key == "ChangeVersionCode").value) |= true' options.json > temp.json && mv temp.json options.json  # modifiy ChangeVersionCode key value = true
     $PREFIX/lib/jvm/java-$jdkVersion-openjdk/bin/java -jar "$rvCli" -a "$stock_apk_path" -o "$SimplUsr" -m "$rvIntegrations" --options options.json -b "$rvPatches" -i "Change version code" -e "Custom branding name for Reddit" -c  # Patch
-    rm -f options.json; rm -f $SimplUsr/revanced.keystore  # remove files
+    rm -f options.json $SimplUsr/revanced.keystore  # remove files
     mv "$SimplUsr/base.apk" "$outputAPK"  # rename output patched apk using mv
-  else
-    $PREFIX/lib/jvm/java-$jdkVersion-openjdk/bin/java -jar $ReVancedCLIJar patch -p $PatchesRvp \
+  elif [ $ChangeRVXSource -eq 0 ]; then
+    $PREFIX/lib/jvm/java-$jdkVersion-openjdk/bin/java -jar $CLI patch -p $Patches \
       -o "$outputAPK" "$stock_apk_path" \
       "${patches[@]}" \
       -e "Change version code" -OversionCode="2147483647" \
       --custom-aapt2-binary="$HOME/aapt2" \
       --purge $ripLib -f | tee "$log"
+  else
+    $PREFIX/lib/jvm/java-$jdkVersion-openjdk/bin/java -jar $CLI patch -p $Patches -o "$outputAPK" "${stock_apk_path}" "${patches[@]}" -e "Change version code" -OversionCode="2147483647" --purge $stripLibs -f | tee "$log"
   fi
 
   if [ ! -f "$outputAPK" ] && [ -f "$stock_apk_path" ]; then
@@ -155,7 +165,7 @@ patch_app() {
     termux-open --send "$log"
     rm -rf "$without_ext-temporary-files"  # Remove temporary files directory
   else
-    [[ -f "$without_ext.keystore" ]] && rm -f "$without_ext.keystore"
+    [ -f "$without_ext.keystore" ] && rm -f "$without_ext.keystore"
   fi
 }
 
@@ -184,7 +194,7 @@ else
   if [ $Android -eq 7 ] || [ $Android -eq 6 ]; then
     yt_patches_args+=(-e "GmsCore support" -OgmsCoreVendorGroupId="app.revanced" -OcheckGmsCore=true -OpackageNameYouTube="app.rvx.android.youtube")
   else
-    yt_patches_args+=(-e "GmsCore support" -OgmsCoreVendorGroupId="com.mgoogle" -OcheckGmsCore=true -OpackageNameYouTube="app.rvx.android.youtube")
+    [ $ChangeRVXSource -eq 0 ] && yt_patches_args+=(-e "GmsCore support" -OgmsCoreVendorGroupId="com.mgoogle" -OcheckGmsCore=true -OpackageNameYouTube="app.rvx.android.youtube") || yt_patches_args+=(-e "GmsCore support" -OgmsCoreVendorGroupId="app.revanced" -OcheckGmsCore=true -OpackageNameYouTube="app.rvx.android.youtube")
   fi
   yt_patches_args+=(-e "Custom branding name for YouTube" -OappName="YouTube RVX")
 fi
@@ -205,10 +215,8 @@ if [ $su -eq 1 ]; then
     -e "Custom branding name for YouTube Music" -OappNameNotification="YouTube Music" -OappNameLauncher="YT Music"
   )
 else
-  yt_music_patches_args+=(
-    -e "GmsCore support" -OgmsCoreVendorGroupId="com.mgoogle" -OcheckGmsCore=true -OpackageNameYouTubeMusic="app.rvx.android.apps.youtube.music"
-    -e "Custom branding name for YouTube Music" -OappNameNotification="YouTube Music RVX" -OappNameLauncher="YT Music RVX"
-  )
+  [ $ChangeRVXSource -eq 0 ] && yt_music_patches_args+=(-e "GmsCore support" -OgmsCoreVendorGroupId="com.mgoogle" -OcheckGmsCore=true -OpackageNameYouTubeMusic="app.rvx.android.apps.youtube.music") || yt_music_patches_args+=(-e "GmsCore support" -OgmsCoreVendorGroupId="app.revanced" -OcheckGmsCore=true -OpackageNameYouTubeMusic="app.rvx.android.apps.youtube.music")
+  yt_music_patches_args+=(-e "Custom branding name for YouTube Music" -OappNameNotification="YouTube Music RVX" -OappNameLauncher="YT Music RVX")
 fi
 
 spotify_patches_args=(
@@ -283,11 +291,11 @@ if [ "$ReadPatchesFile" -eq 1 ]; then
             if [[ ( $Android -eq 7 || $Android -eq 6 ) && "${arraynames[$i]}" == "yt_patches_args" ]]; then
               echo "-e \"GmsCore support\" -O gmsCoreVendorGroupId=\"app.revanced\" -OcheckGmsCore=true -OpackageNameYouTube=\"app.rvx.android.youtube\"" >> "$SimplUsr/${arraynames[$i]}.txt"
             else
-              echo "-e \"GmsCore support\" -O gmsCoreVendorGroupId=\"com.mgoogle\" -OcheckGmsCore=true -OpackageNameYouTube=\"app.rvx.android.youtube\"" >> "$SimplUsr/${arraynames[$i]}.txt"
+              [ $ChangeRVXSource -eq 0 ] && echo "-e \"GmsCore support\" -O gmsCoreVendorGroupId=\"com.mgoogle\" -OcheckGmsCore=true -OpackageNameYouTube=\"app.rvx.android.youtube\"" >> "$SimplUsr/${arraynames[$i]}.txt" || echo "-e \"GmsCore support\" -O gmsCoreVendorGroupId=\"app.revanced\" -OcheckGmsCore=true -OpackageNameYouTube=\"app.rvx.android.youtube\"" >> "$SimplUsr/${arraynames[$i]}.txt"
             fi
             echo "-e \"Custom branding name for YouTube\" -OappName=\"YouTube RVX\"" >> "$SimplUsr/${arraynames[$i]}.txt"
           else
-            echo "-e \"GmsCore support\" -O gmsCoreVendorGroupId=\"com.mgoogle\" -OcheckGmsCore=true -OpackageNameYouTubeMusic=\"app.rvx.android.apps.youtube.music\"" >> "$SimplUsr/${arraynames[$i]}.txt"
+            [ $ChangeRVXSource -eq 0 ] && echo "-e \"GmsCore support\" -O gmsCoreVendorGroupId=\"com.mgoogle\" -OcheckGmsCore=true -OpackageNameYouTubeMusic=\"app.rvx.android.apps.youtube.music\"" >> "$SimplUsr/${arraynames[$i]}.txt" || echo "-e \"GmsCore support\" -O gmsCoreVendorGroupId=\"app.revanced\" -OcheckGmsCore=true -OpackageNameYouTubeMusic=\"app.rvx.android.apps.youtube.music\"" >> "$SimplUsr/${arraynames[$i]}.txt"
             echo "-e \"Custom branding name for YouTube Music\" -OappNameNotification=\"YouTube Music RVX\" -OappNameLauncher=\"YT Music RVX\"" >> "$SimplUsr/${arraynames[$i]}.txt"
           fi
         fi
@@ -319,20 +327,20 @@ fi
 commonPrompt() {
     buttons=("<Yes>" "<No>"); confirmPrompt "Do you want to install ${appNameRef[0]} RVX app?" "buttons" && opt=Yes || opt=No
     case $opt in
-      y*|Y*|"")
+      Yes)
         echo -e "$running Please Wait !! Installing Patched ${appNameRef[0]} RVX apk.."
         apkInstall "$outputAPK" "$activityPatched"
         ;;
-      n*|N*) echo -e "$notice ${appNameRef[0]} RVX Installaion skipped!" ;;
+      No) echo -e "$notice ${appNameRef[0]} RVX Installaion skipped!" ;;
     esac
     
     buttons=("<Yes>" "<No>"); confirmPrompt "Do you want to Share ${appNameRef[0]} RVX app?" "buttons" "1" && opt=Yes || opt=No
     case $opt in
-      y*|Y*|"")
+      Yes)
         echo -e "$running Please Wait !! Sharing Patched ${appNameRef[0]} RVX apk.."
         termux-open --send "$outputAPK"
         ;;
-      n*|N*) echo -e "$notice ${appNameRef[0]} RVX Sharing skipped!"
+      No) echo -e "$notice ${appNameRef[0]} RVX Sharing skipped!"
         echo -e "$info Locate '$fileName' in '/sdcard/Simplify/' dir, Share it with your Friends and Family ;)" && sleep 3
         am start -a android.intent.action.VIEW -d "content://com.android.externalstorage.documents/document/primary:Simplify" -t "vnd.android.document/directory" -n com.google.android.documentsui/com.android.documentsui.files.FilesActivity &> /dev/null  # Open Android Files by Google
         if [ $? -ne 0 ] || [ $? -eq 2 ]; then
@@ -386,7 +394,7 @@ build_app() {
           exit_status=$?
           if [ $exit_status -eq 0 ]; then opt=Install; elif [ $exit_status -eq 1 ]; then opt=Mount; elif [ $exit_status -eq 2 ]; then opt=Cancel; fi
           case $opt in
-            I*|i*|"")
+            Install)
               if [ $su -eq 1 ]; then
                 pkgInstall "python"  # python install/update
                 ! pip list 2>/dev/null | grep -q "apksigcopier" && pip install apksigcopier > /dev/null 2>&1  # install apksigcopier using pip
@@ -399,35 +407,35 @@ build_app() {
               echo -e "$running Please Wait !! Installing Patched ${appNameRef[0]} RVX CS apk.."
               apkInstall "$SimplUsr/${appNameRef[0]}-RVX-CS_v${pkgVersion}-$Arch.apk" ""
               ;;
-            M*|m*)
+            Mount)
               echo -e "$running Please Wait !! Mounting Patched ${appNameRef[0]} RVX apk.."
               su -mm -c "/system/bin/sh $Simplify/apkMount.sh \"${stock_apk_ref[0]}\" $outputAPK" &> /dev/null
               su -mm -c "/system/bin/sh $Simplify/apkMount.sh \"${stock_apk_ref[0]}\" $outputAPK" | tee "$SimplUsr/${appNameRef[0]}-RVX_mount_log.txt"
               rm $outputAPK
               ;;
-            C*|c*) echo -e "$notice ${appNameRef[0]} RVX Installaion skipped!" ;;
+            Cancel) echo -e "$notice ${appNameRef[0]} RVX Installaion skipped!" ;;
           esac
         else
           buttons=("<Yes>" "<No>"); confirmPrompt "Do you want to Mount ${appNameRef[0]} RVX app?" "buttons" && opt=Yes || opt=No
           case $opt in
-            y*|Y*|"")
+            Yes)
               echo -e "$running Please Wait !! Mounting Patched ${appNameRef[0]} RVX apk.."
               su -mm -c "/system/bin/sh $Simplify/apkMount.sh \"${stock_apk_ref[0]}\" $outputAPK" &> /dev/null
               su -mm -c "/system/bin/sh $Simplify/apkMount.sh \"${stock_apk_ref[0]}\" $outputAPK" | tee "$SimplUsr/${appNameRef[0]}-RVX_mount_log.txt"
               rm $outputAPK
               ;;
-            n*|N*) echo -e "$notice ${appNameRef[0]} RVX Installaion skipped!" ;;
+            No) echo -e "$notice ${appNameRef[0]} RVX Installaion skipped!" ;;
           esac
         fi
       else
-        echo -e "$info VancedMicroG is used to run MicroG services without root. \nYouTube and YouTube Music won't work without it. \nIf you already have VancedMicroG, You don't need to install it."
-        buttons=("<Yes>" "<No>"); confirmPrompt "Do you want to install VancedMicroG app?" "buttons" && opt=Yes || opt=No
+        echo -e "$info MicroG is used to run MicroG services without root. \nYouTube and YouTube Music won't work without it. \nIf you already have MicroG, You don't need to install it."
+        buttons=("<Yes>" "<No>"); confirmPrompt "Do you want to install MicroG app?" "buttons" && opt=Yes || opt=No
         case $opt in
-          y*|Y*|"")
-            echo -e "$running Please Wait !! Installing VancedMicroG apk.."
-            apkInstall "$VancedMicroG" "com.mgoogle.android.gms/org.microg.gms.ui.SettingsActivity"
+          Yes)
+            echo -e "$running Please Wait !! Installing MicroG apk.."
+            [ $ChangeRVXSource -eq 0 ] && apkInstall "$MicroG" "com.mgoogle.android.gms/org.microg.gms.ui.SettingsActivity" || apkInstall "$MicroG" "app.revanced.android.gms/org.microg.gms.ui.SettingsActivity"
             ;;
-          n*|N*) echo -e "$notice VancedMicroG Installaion skipped!" ;;
+          No) echo -e "$notice MicroG Installaion skipped!" ;;
         esac
         commonPrompt
       fi
@@ -439,10 +447,12 @@ build_app() {
 
 # --- Function to retrieve the list of patches for a specific filtered app
 getListOfPatches() {
-  local pkgName=$1
-  $PREFIX/lib/jvm/java-$jdkVersion-openjdk/bin/java -jar $ReVancedCLIJar list-patches -d=true -f=$pkgName -i=true -o=true -p=false -u -v=false $PatchesRvp
-  if [ "$ReadPatchesFile" -eq 1 ]; then
-    $PREFIX/lib/jvm/java-$jdkVersion-openjdk/bin/java -jar $ReVancedCLIJar list-patches -d=true -f=$pkgName -i=true -o=true -p=false -u -v=false $PatchesRvp > "$SimplUsr/${pkgName}_list-patches.txt"
+  if [ $ChangeRVXSource -eq 0 ]; then
+    $PREFIX/lib/jvm/java-$jdkVersion-openjdk/bin/java -jar $CLI list-patches -d=true -f=${1} -i=true -o=true -p=false -u -v=false $Patches
+    [ $ReadPatchesFile -eq 1 ] && $PREFIX/lib/jvm/java-$jdkVersion-openjdk/bin/java -jar $CLI list-patches -d=true -f=${1} -i=true -o=true -p=false -u -v=false $Patches > "$SimplUsr/${1}_list-patches.txt"
+  else
+    $PREFIX/lib/jvm/java-$jdkVersion-openjdk/bin/java -jar $CLI list-patches -d=true -f=${1} -i=true -o=true -p=false -u -v=false --patches=$Patches
+    [ $ReadPatchesFile -eq 1 ] && $PREFIX/lib/jvm/java-$jdkVersion-openjdk/bin/java -jar $CLI list-patches -d=true -f=${1} -i=true -o=true -p=false -u -v=false --patches=$Patches > "$SimplUsr/${1}_list-patches.txt"
   fi
 }
 
@@ -459,9 +469,9 @@ if [ $Android -ge 13 ]; then
     List\ of\ Patches
     YouTube
     YT\ Music
-    $Spotify
+    #$Spotify
     Reddit
-    $NetWall
+    #$NetWall
   )
 elif [ $Android -eq 9 ] || [ $Android -eq 10 ] || [ $Android -eq 11 ] || [ $Android -eq 12 ]; then
   apps=(
@@ -470,7 +480,7 @@ elif [ $Android -eq 9 ] || [ $Android -eq 10 ] || [ $Android -eq 11 ] || [ $Andr
     List\ of\ Patches
     YouTube
     YT\ Music
-    $Spotify
+    #$Spotify
     Reddit
   )
 elif [ $Android -eq 8 ] || [ $Android -eq 7 ]; then
@@ -480,7 +490,7 @@ elif [ $Android -eq 8 ] || [ $Android -eq 7 ]; then
     List\ of\ Patches
     YouTube
     YT\ Music
-    $Spotify
+    #$Spotify
   )
 elif [ $Android -eq 6 ]; then
   apps=(
@@ -506,7 +516,7 @@ while true; do
   # main conditional control flow
   case "$selected" in
     CHANGELOG)
-      [ $release == "latest" ] && tag=$(curl -sL ${auth} "https://api.github.com/repos/$owner/revanced-patches/releases/latest" | jq -r '.tag_name') || tag=$(curl -sL ${auth} "https://api.github.com/repos/$owner/revanced-patches/releases" | jq -r '.[].tag_name | select(contains("dev"))' | head -n 1)
+      [ $release == "latest" ] && tag=$(curl -sL ${auth} "https://api.github.com/repos/$owner/revanced-patches/releases/latest" | jq -r '.tag_name') || tag=$(curl -sL ${auth} "https://api.github.com/repos/$owner/revanced-patches/releases" | jq -r '.[].tag_name | select(contains("dev"))' | head -1)
       curl -sL ${auth} "https://api.github.com/repos/$owner/revanced-patches/releases/tags/$tag" | jq -r .body | glow  # Display release notes
       ;;
     Spoof\ Device\ Arch) overwriteArch ;;
