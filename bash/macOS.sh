@@ -46,7 +46,11 @@ dependencies() {
   brew --version >/dev/null 2>&1 && brew update > /dev/null 2>&1 || /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
   formulaeInstall "bash"
   formulaeInstall "grep"
-  formulaeInstall "curl"
+  curlV=$(curl -V | head -1 | awk '{print $2}')
+  if [ $(cut -d. -f1 <<< $curlV) -lt 8 ] || [ $(cut -d. -f2 <<< $curlV) -lt 19 ]; then
+    formulaeInstall "curl"
+    grep -qF 'export PATH="/usr/local/opt/curl/bin:$PATH"' ~/.zshrc || { echo 'export PATH="/usr/local/opt/curl/bin:$PATH"' >> ~/.zshrc; source ~/.zshrc; }
+  fi
   formulaeInstall "aria2"
   formulaeInstall "ca-certificate"
   formulaeInstall "jq"
@@ -60,7 +64,7 @@ dependencies() {
   if [ "$jdk" == "openjdk@8" ] || [ "$jdk" == "openjdk@11" ] || [ "$jdk" == "openjdk@17" ]; then
     sudo ln -sfn /usr/local/opt/$jdk/libexec/openjdk.jdk /Library/Java/JavaVirtualMachines/$(sed 's|@|-|g' <<< $jdk).jdk
   fi
-  grep -q "export PATH=\"/usr/local/opt/$jdk/bin:$PATH\"" ~/.zshrc 2>/dev/null || echo "export PATH=\"/usr/local/opt/$jdk/bin:$PATH\"" >> ~/.zshrc
+  grep -q "export PATH=\"/usr/local/opt/$jdk/bin:\$PATH\"" ~/.zshrc 2>/dev/null || echo "export PATH=\"/usr/local/opt/$jdk/bin:\$PATH\"" >> ~/.zshrc
   
   formulaeInstall "android-commandlinetools"
   aapt2=(/usr/local/share/android-commandlinetools/build-tools/*/aapt2) && aapt2="${aapt2[-1]}"
