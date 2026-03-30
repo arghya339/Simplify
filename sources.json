@@ -48,6 +48,42 @@
     "arsclib": false
   },
   {
+    "source": "Piko",
+    "cli": "MorpheApp/morphe-cli",
+    "patches": "crimera/piko",
+    "patchesjson": "https://raw.githubusercontent.com/crimera/piko/refs/heads/main/patches-list.json",
+    "integrations": null,
+    "microg": null,
+    "prereleases": false,
+    "autoupdates": true,
+    "cliv": 6,
+    "arsclib": false
+  },
+  {
+    "source": "De-ReVanced",
+    "cli": "MorpheApp/morphe-cli",
+    "patches": "RookieEnough/De-ReVanced",
+    "patchesjson": "https://raw.githubusercontent.com/RookieEnough/De-ReVanced/refs/heads/main/patches-list.json",
+    "integrations": null,
+    "microg": null,
+    "prereleases": false,
+    "autoupdates": true,
+    "cliv": 6,
+    "arsclib": false
+  },
+  {
+    "source": "hoo-dles-patches",
+    "cli": "MorpheApp/morphe-cli",
+    "patches": "hoo-dles/morphe-patches",
+    "patchesjson": "https://raw.githubusercontent.com/hoo-dles/morphe-patches/refs/heads/main/patches-list.json",
+    "integrations": null,
+    "microg": null,
+    "prereleases": false,
+    "autoupdates": true,
+    "cliv": 6,
+    "arsclib": false
+  },
+  {
     "source": "RVX-Android-6-7",
     "cli": "inotia00/revanced-cli",
     "patches": "kitadai31/revanced-patches-android6-7",
@@ -60,27 +96,27 @@
     "arsclib": false
   },
   {
-    "source": "RVX-Android-5",
+    "source": "privacy-revanced-patches",
     "cli": "inotia00/revanced-cli",
-    "patches": "d4n3436/revanced-patches-android5",
-    "patchesjson": "https://raw.githubusercontent.com/d4n3436/revanced-patches-android5/refs/heads/revanced-extended/patches.json",
-    "integrations": "d4n3436/revanced-integrations",
-    "microg": "YT-Advanced/GmsCore",
-    "prereleases": false,
-    "autoupdates": true,
-    "cliv": 3,
-    "arsclib": false
-  },
-  {
-    "source": "Piko",
-    "cli": "MorpheApp/morphe-cli",
-    "patches": "crimera/piko",
-    "patchesjson": "https://raw.githubusercontent.com/crimera/piko/refs/heads/main/patches-list.json",
+    "patches": "jkennethcarino/privacy-revanced-patches",
+    "patchesjson": "https://raw.githubusercontent.com/Jman-Github/ReVanced-Patch-Bundles/refs/heads/bundles/patch-bundles/privacy-patch-bundles/privacy-stable-patches-list.json",
     "integrations": null,
     "microg": null,
     "prereleases": false,
     "autoupdates": true,
-    "cliv": 6,
+    "cliv": 5,
+    "arsclib": false
+  },
+  {
+    "source": "Dropped-Patches",
+    "cli": "inotia00/revanced-cli",
+    "patches": "indrastorms/Dropped-Patches",
+    "patchesjson": "https://raw.githubusercontent.com/Jman-Github/ReVanced-Patch-Bundles/refs/heads/bundles/patch-bundles/dropped-patch-bundles/dropped-stable-patches-list.json",
+    "integrations": null,
+    "microg": null,
+    "prereleases": false,
+    "autoupdates": true,
+    "cliv": 5,
     "arsclib": false
   },
   {
@@ -96,27 +132,15 @@
     "arsclib": true
   },
   {
-    "source": "Dropped-Patches",
+    "source": "RVX-Android-5",
     "cli": "inotia00/revanced-cli",
-    "patches": "indrastorms/Dropped-Patches",
-    "patchesjson": "https://raw.githubusercontent.com/Jman-Github/ReVanced-Patch-Bundles/refs/heads/bundles/patch-bundles/dropped-patch-bundles/dropped-stable-patches-list.json",
-    "integrations": null,
-    "microg": null,
+    "patches": "d4n3436/revanced-patches-android5",
+    "patchesjson": "https://raw.githubusercontent.com/d4n3436/revanced-patches-android5/refs/heads/revanced-extended/patches.json",
+    "integrations": "d4n3436/revanced-integrations",
+    "microg": "YT-Advanced/GmsCore",
     "prereleases": false,
     "autoupdates": true,
-    "cliv": 5,
-    "arsclib": false
-  },
-  {
-    "source": "hoo-dles-patches",
-    "cli": "MorpheApp/morphe-cli",
-    "patches": "hoo-dles/morphe-patches",
-    "patchesjson": "https://raw.githubusercontent.com/hoo-dles/morphe-patches/refs/heads/main/patches-list.json",
-    "integrations": null,
-    "microg": null,
-    "prereleases": false,
-    "autoupdates": true,
-    "cliv": 6,
+    "cliv": 3,
     "arsclib": false
   }
 ]
