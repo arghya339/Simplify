@@ -11,6 +11,7 @@ isPrintArt=true
 isAutoUpdatesScript="true"
 isAutoUpdatesDependencies="true"
 
+isSearchEngine=Google
 isShowUniversalPatches="false"
 
 isButtonsSymbol="27A4"
@@ -42,8 +43,8 @@ config() {
   jq --arg key "$key" --arg value "$value" '.[$key] = $value' "$jsonFile" > temp.json && mv temp.json "$jsonFile"
 }
 
-all_key=(RipLocale RipDpi RipLib printArt AutoUpdatesScript AutoUpdatesDependencies ShowUniversalPatches ButtonsSymbol ToggleSymbol SecureSymbol rmStockApk rmPatchedApk jdk)
-all_value=("$isRipLocale" "$isRipDpi" "$isRipLib" "$isPrintArt" "$isAutoUpdatesScript" "$isAutoUpdatesDependencies" "$isShowUniversalPatches" "$isButtonsSymbol" "$isToggleSymbol" "$isSecureSymbol" "$isRmStockApk" "$isRmPatchedApk" "$isJdk")
+all_key=(RipLocale RipDpi RipLib printArt AutoUpdatesScript AutoUpdatesDependencies SearchEngine ShowUniversalPatches ButtonsSymbol ToggleSymbol SecureSymbol rmStockApk rmPatchedApk jdk)
+all_value=("$isRipLocale" "$isRipDpi" "$isRipLib" "$isPrintArt" "$isAutoUpdatesScript" "$isAutoUpdatesDependencies" "$isSearchEngine" "$isShowUniversalPatches" "$isButtonsSymbol" "$isToggleSymbol" "$isSecureSymbol" "$isRmStockApk" "$isRmPatchedApk" "$isJdk")
 [ $isAndroid == true ] && { all_key+=(AutoUpdatesTermux); all_value+=("$isAutoUpdatesTermux"); }
 all_key+=(InstallPackageFor KeepsData GrantAllRuntimePermissions InstalledAsTestOnly DisablePlayProtect DisableVerifyAdbInstalls Installer Reinstall EnableRoolback)
 all_value+=("$isU" "$isK" "$isG" "$isT" "$isV" "$isA" "$isI" "$isR" "$isB")
@@ -64,6 +65,7 @@ reloadConfig() {
   AutoUpdatesScript="$(jq -r '.AutoUpdatesScript' "$simplifyNextJson" 2>/dev/null)"
   AutoUpdatesDependencies="$(jq -r '.AutoUpdatesDependencies' "$simplifyNextJson" 2>/dev/null)"
 
+  SearchEngine=$(jq -r '.SearchEngine' "$simplifyNextJson" 2>/dev/null)
   ShowUniversalPatches="$(jq -r '.ShowUniversalPatches' "$simplifyNextJson" 2>/dev/null)"
 
   rmStockApk="$(jq -r '.rmStockApk' "$simplifyNextJson" 2>/dev/null)"
@@ -744,8 +746,8 @@ configure() {
         done
         ;;
       Advanced)
-        advancedOptions=("Manage GitHub PAT" "Installation Options" "Show Universal Patches" RipLib RipDpi RipLocale "Change Java Version" "Java Memory Limits")
-        advancedDescriptions=("increases gh api rate limit" "" "" "Remove unused native libraries from patched apps" "Remove unused native dpi from stock split apks" "Remove unused native locale from stock split apks" "" "")
+        advancedOptions=("Manage GitHub PAT" "Installation Options" "Show Universal Patches" "Search engine" RipLib RipDpi RipLocale "Change Java Version" "Java Memory Limits")
+        advancedDescriptions=("increases gh api rate limit" "Install APKs on-device with advanced options" "Enable or disable universal patches across all applications" "Manage search engines for app version search" "Remove unused native libraries from patched apps" "Remove unused native dpi from stock split apks" "Remove unused native locale from stock split apks" "" "")
         while true; do
           reloadConfig
           menu advancedOptions bButtons advancedDescriptions || break
@@ -770,6 +772,19 @@ configure() {
             "Show Universal Patches")
               confirmPrompt "Show Universal Patches" "tfButtons" "$ShowUniversalPatches" && isShowUniversalPatches=true || isShowUniversalPatches=false
               config "ShowUniversalPatches" "$isShowUniversalPatches"
+              ;;
+            "Search engine")
+              case "$SearchEngine" in
+                Google) selected_option=0 ;;
+                DuckDuckGo) selected_option=1 ;;
+                Bing) selected_option=2 ;;
+              esac
+              searchEngines=(Google DuckDuckGo Bing)
+              domainNames=("google.com" "duckduckgo.com" "bing.com")
+              if menu searchEngines bButtons domainNames "" "$selected_option"; then
+                SearchEngine="${searchEngines[selected]}"
+                config "SearchEngine" "$SearchEngine"   
+              fi
               ;;
             "Java Memory Limits")
               PrintFlagsFinal=$($java -XX:+PrintFlagsFinal -version 2>&1)
