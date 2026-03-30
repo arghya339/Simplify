@@ -50,6 +50,16 @@ dependencies() {
   aptInstall "sed"
   aptInstall "findutils"
   aptInstall "curl"
+  curlV=$(curl -V | head -1 | awk '{print $2}')
+  if [ $(cut -d. -f1 <<< $curlV) -lt 8 ] || [ $(cut -d. -f2 <<< $curlV) -lt 19 ]; then
+    snap version &>/dev/null || sudo apt install snapd -y
+    sudo snap install curl
+    if [ "$(basename $SHELL)" == "zsh" ]; then
+      grep -qF 'export PATH="/snap/bin:$PATH"' ~/.zshrc || { echo 'export PATH="/snap/bin:$PATH"' >> ~/.zshrc; source ~/.zshrc; }
+    else
+      grep -qF 'export PATH="/snap/bin:$PATH"' ~/.bashrc || { echo 'export PATH="/snap/bin:$PATH"' >> ~/.bashrc; source ~/.bashrc; }
+    fi
+  fi
   aptInstall "aria2"
   aptInstall "jq"
   aptInstall "libarchive-tools"
@@ -65,7 +75,7 @@ dependencies() {
   aptInstall "adb"
   aptInstall "aapt"
   if ! glow -v >/dev/null 2>&1; then
-    if grep -qi "linuxmint" /etc/os-release 2>/dev/null || grep -qi "netrunner" /etc/os-release 2>/dev/null; then
+    if grep -qi "linuxmint" /etc/os-release 2>/dev/null || grep -qi "pop" /etc/os-release 2>/dev/null || grep -qi "netrunner" /etc/os-release 2>/dev/null; then
       sudo mkdir -p /etc/apt/keyrings
       curl -sL https://repo.charm.sh/apt/gpg.key | sudo gpg --dearmor -o /etc/apt/keyrings/charm.gpg
       echo "deb [signed-by=/etc/apt/keyrings/charm.gpg] https://repo.charm.sh/apt/ * *" | sudo tee /etc/apt/sources.list.d/charm.list
