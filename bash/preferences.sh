@@ -959,7 +959,8 @@ configure() {
             "About Host")
               printf '\033[?25l' && printArt
               echo "Made with ❤️  in India"
-              echo "Script Version  : $localVersion"  # YYYYMMDDHHMM
+              #echo "Script Version  : $localVersion"  # YYYYMMDDHHMM
+              echo "Script Version  : ${localVersion:0:4} ${localVersion:4:2} ${localVersion:6:2} ${localVersion:8:2} ${localVersion:10:2}"  # YYYY MM DD HH MM
               echo "Bash            : $(bash --version | head -1 | awk '{print $4}')"
               echo "Java            : $(java --version | head -1 | awk '{print $2}')"
               hostInfo
@@ -968,7 +969,8 @@ configure() {
             "About Device")
               printf '\033[?25l' && printArt
               [ $isAndroid == true ] && echo "Made with ❤️ in India" || echo "Made with ❤️  in India"
-              echo "Script Version : $localVersion"  # YYYYMMDDHHMM
+              #echo "Script Version : $localVersion"  # YYYYMMDDHHMM
+              echo "Script Version : ${localVersion:0:4} ${localVersion:4:2} ${localVersion:6:2} ${localVersion:8:2} ${localVersion:10:2}"  # YYYY MM DD HH MM
               [ $isAndroid == true ] && echo "TERMUX_VERSION : $TERMUX_VERSION"
               echo "Bash           : $(bash --version | head -1 | awk '{print $4}')"
               echo "Java           : $(java --version | head -1 | awk '{print $2}')"
