@@ -37,7 +37,7 @@ elif [[ -d "/sdcard" ]] && [[ -d "/system" ]]; then
 elif [[ -f "/etc/os-release" ]]; then
   if grep -qi "debian" /etc/os-release 2>/dev/null; then
     isDebian=true; isArchLinux=false; isFedora=false; isOpenSUSE=false; isAlpine=false; isAndroid=false; isMacOS=false
-    curl -V >/dev/null 2>&1 || { echo -e "$running Installing curl package.."; sudo apt install curl -y >/dev/null 2>&1; }
+    curl -V &>/dev/null || { echo -e "$running Installing curl package.."; sudo apt update &>/dev/null; sudo apt install curl -y &>/dev/null; }
   elif grep -qi "arch" /etc/os-release 2>/dev/null; then
     isArchLinux=true; isFedora=false; isDebian=false; isOpenSUSE=false; isAlpine=false; isAndroid=false; isMacOS=false
   elif grep -qi "fedora" /etc/os-release 2>/dev/null; then
@@ -46,7 +46,7 @@ elif [[ -f "/etc/os-release" ]]; then
     isOpenSUSE=true; isFedora=false; isDebian=false; isArchLinux=false; isAlpine=false; isAndroid=false; isMacOS=false
   elif grep -qi "alpine" /etc/os-release 2>/dev/null; then
     isAlpine=true; isFedora=false; isDebian=false; isArchLinux=false; isOpenSUSE=false; isAndroid=false; isMacOS=false
-    curl -V &>/dev/null || { echo -e "$running Installing curl package.."; sudo apk add curl &>/dev/null; }
+    curl -V &>/dev/null || { echo -e "$running Installing curl package.."; sudo apk update &>/dev/null; sudo apk add curl &>/dev/null; }
   fi
 fi
 
