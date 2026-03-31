@@ -287,6 +287,9 @@ deviceInfo() {
     echo "Build          : $(getprop ro.build.fingerprint)"
     echo "Kernel         : $(uname -s) $(uname -n) $(uname -r)"
     echo "Supported Archs: $(getprop ro.product.cpu.abilist)"
+    echo "Arch           : $cpuAbi"
+    echo "Locale         : $locale"
+    echo "DPI            : $lcd_dpi"
     echo "Memory         : $(free | awk '/Mem:/ {printf "%.1fGi / %.1fGi (%.0f%%)", $3/1048576, $2/1048576, ($3/$2)*100}')"
     echo "Storage        : $(df -h /storage/emulated | awk 'NR==2 {printf "%s / %s (%s)", $3, $2, $5}')"
     echo "CPU Model      : $(lscpu | grep "Model name" | cut -d: -f2 | xargs)"
@@ -301,6 +304,9 @@ deviceInfo() {
     echo "Build          : $(adb -s $serial shell getprop ro.build.fingerprint)"
     echo "Kernel         : $(adb -s $serial shell uname -s) $(adb -s $serial shell uname -n) $(adb -s $serial shell uname -r)"
     echo "Supported Archs: $(adb -s $serial shell getprop ro.product.cpu.abilist)"
+    echo "Arch           : $cpuAbi"
+    echo "Locale         : $locale"
+    echo "DPI            : $lcd_dpi"
     echo "Memory         : $(adb -s $serial shell free | awk '/Mem:/ {printf "%.1fGi / %.1fGi (%.0f%%)", $3/1073741824, $2/1073741824, ($3/$2)*100}')"
     echo "Storage        : $(adb -s $serial shell df -h /storage/emulated | awk 'NR==2 {printf "%s / %s (%s)", $3, $2, $5}')"
     cpuModel=$(adb -s $serial shell cat /proc/cpuinfo | grep "model name" | cut -d: -f2 | sort -u | xargs)
@@ -954,6 +960,8 @@ configure() {
               printf '\033[?25l' && printArt
               echo "Made with ❤️  in India"
               echo "Script Version  : $localVersion"  # YYYYMMDDHHMM
+              echo "Bash            : $(bash --version | head -1 | awk '{print $4}')"
+              echo "Java            : $(java --version | head -1 | awk '{print $2}')"
               hostInfo
               echo; read -p "Press Enter to continue..."; printf '\033[?25h'
               ;;
@@ -962,6 +970,8 @@ configure() {
               [ $isAndroid == true ] && echo "Made with ❤️ in India" || echo "Made with ❤️  in India"
               echo "Script Version : $localVersion"  # YYYYMMDDHHMM
               [ $isAndroid == true ] && echo "TERMUX_VERSION : $TERMUX_VERSION"
+              echo "Bash           : $(bash --version | head -1 | awk '{print $4}')"
+              echo "Java           : $(java --version | head -1 | awk '{print $2}')"
               deviceInfo
               [ -n "$serial" ] && echo "Serial         : $serial"
               echo; read -p "Press Enter to continue..."; printf '\033[?25h'
