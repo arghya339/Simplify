@@ -59,6 +59,7 @@ dependencies() {
     else
       grep -qF 'export PATH="/snap/bin:$PATH"' ~/.bashrc || { echo 'export PATH="/snap/bin:$PATH"' >> ~/.bashrc; source ~/.bashrc; }
     fi
+    curl.snap-acked >/dev/null
   fi
   aptInstall "aria2"
   aptInstall "jq"
