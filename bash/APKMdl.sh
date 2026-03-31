@@ -20,11 +20,19 @@ cf_chl_error() {
     xdg-open "https://pkg.cloudflareclient.com/" &>/dev/null
   fi
   case "$SearchEngine" in
-    Google) searchQuery="https://www.google.com/search?q=site%3Auptodown.com+OR+site%3Aapkpure.com+-site%3Aapkmirror.com+-site%3A+play.google.com+$appName" ;;
-    DuckDuckGo) searchQuery="https://duckduckgo.com/?ia=web&q=(site%3Auptodown.com+OR+site%3Aapkpure.com)+-site%3Aapkmirror.com+-site%3Aplay.google.com+$appName" ;;
-    Bing) searchQuery="https://www.bing.com/search?q=%28site%3Auptodown.com+OR+site%3Aapkpure.com%29+-site%3Aapkmirror.com+-site%3Aplay.google.com+$appName" ;;
+    Google)
+      searchQuery="https://www.google.com/search?q=%28uptodown.com+OR+apkpure.com%29+$appName"  # +-site%3Aapkmirror.com+-site%3A+play.google.com
+      [ -n "$version" ] && searchQuery+="+$version"
+      ;;
+    DuckDuckGo)
+      searchQuery="https://duckduckgo.com/?ia=web&q=(site%3Auptodown.com+OR+site%3Aapkpure.com)+-site%3Aapkmirror.com+-site%3Aplay.google.com+$appName"
+      [ -n "$version" ] && searchQuery+="+v$version"
+      ;;
+    Bing)
+      searchQuery="https://www.bing.com/search?q=%28site%3Auptodown.com+OR+site%3Aapkpure.com%29+-site%3Aapkmirror.com+-site%3Aplay.google.com+$appName"
+      [ -n "$version" ] && searchQuery+="+v$version"
+      ;;
   esac
-  [ -n "$version" ] && searchQuery+="+$version"
   if [ $isAndroid == true ]; then termux-open-url "$searchQuery"; elif [ $isMacOS == true ]; then open "$searchQuery"; else xdg-open "$searchQuery" &>/dev/null; fi
   echo; read -p "Press Enter to continue..."
 }
