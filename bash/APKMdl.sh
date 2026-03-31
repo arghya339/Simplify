@@ -20,17 +20,33 @@ cf_chl_error() {
     xdg-open "https://pkg.cloudflareclient.com/" &>/dev/null
   fi
   case "$SearchEngine" in
-    Google)
-      searchQuery="https://www.google.com/search?q=%28uptodown.com+OR+apkpure.com%29+$appName"  # +-site%3Aapkmirror.com+-site%3A+play.google.com
-      [ -n "$version" ] && searchQuery+="+$version"
-      ;;
     DuckDuckGo)
       searchQuery="https://duckduckgo.com/?ia=web&q=(site%3Auptodown.com+OR+site%3Aapkpure.com)+-site%3Aapkmirror.com+-site%3Aplay.google.com+$appName"
       [ -n "$version" ] && searchQuery+="+v$version"
       ;;
+    Brave)
+      searchQuery="https://search.brave.com/search?q=%28site%3Auptodown.com+OR+site%3Aapkpure.com%29+-site%3Aapkmirror.com+-site%3Aplay.google.com+$appName"
+      [ -n "$version" ] && searchQuery+="+$version"
+      ;;
+    Google)
+      searchQuery="https://www.google.com/search?q=%28uptodown.com+OR+apkpure.com%29+$appName"  # +-site%3Aapkmirror.com+-site%3Aplay.google.com
+      [ -n "$version" ] && searchQuery+="+$version"
+      ;;
     Bing)
       searchQuery="https://www.bing.com/search?q=%28site%3Auptodown.com+OR+site%3Aapkpure.com%29+-site%3Aapkmirror.com+-site%3Aplay.google.com+$appName"
       [ -n "$version" ] && searchQuery+="+v$version"
+      ;;
+    Yahoo)
+      searchQuery="https://search.yahoo.com/search?p=%28site%3Auptodown.com+OR+site%3Aapkpure.com%29+-site%3Aapkmirror.com+-site%3Aplay.google.com+$appName"
+      [ -n "$version" ] && searchQuery+="+$version"
+      ;;
+    Ecosia)
+      searchQuery="https://www.ecosia.org/search?q=%28site%3Auptodown.com+OR+site%3Aapkpure.com%29+-site%3Aapkmirror.com+-site%3Aplay.google.com+$appName"
+      [ -n "$version" ] && searchQuery+="+$version"
+      ;;
+    Yandex)
+      searchQuery="https://yandex.com/search?text=(uptodown.com+OR+apkpure.com)+$appName"
+      [ -n "$version" ] && searchQuery+="+$version"
       ;;
   esac
   if [ $isAndroid == true ]; then termux-open-url "$searchQuery"; elif [ $isMacOS == true ]; then open "$searchQuery"; else xdg-open "$searchQuery" &>/dev/null; fi

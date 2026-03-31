@@ -11,7 +11,7 @@ isPrintArt=true
 isAutoUpdatesScript="true"
 isAutoUpdatesDependencies="true"
 
-isSearchEngine=Google
+isSearchEngine=DuckDuckGo
 isShowUniversalPatches="false"
 
 isButtonsSymbol="27A4"
@@ -775,12 +775,16 @@ configure() {
               ;;
             "Search engine")
               case "$SearchEngine" in
-                Google) selected_option=0 ;;
-                DuckDuckGo) selected_option=1 ;;
-                Bing) selected_option=2 ;;
+                DuckDuckGo) selected_option=0 ;;
+                Brave) selected_option=1 ;;
+                Google) selected_option=2 ;;
+                Bing) selected_option=3 ;;
+                Yahoo) selected_option=4 ;;
+                Ecosia) selected_option=5 ;;
+                Yandex) selected_option=6 ;;
               esac
-              searchEngines=(Google DuckDuckGo Bing)
-              domainNames=("google.com" "duckduckgo.com" "bing.com")
+              searchEngines=(DuckDuckGo Brave Google Bing Yahoo Ecosia Yandex)
+              domainNames=("duckduckgo.com" "search.brave.com" "google.com" "bing.com" "search.yahoo.com" "ecosia.org" "yandex.com")
               if menu searchEngines bButtons domainNames "" "$selected_option"; then
                 SearchEngine="${searchEngines[selected]}"
                 config "SearchEngine" "$SearchEngine"   
