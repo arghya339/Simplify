@@ -197,10 +197,11 @@ fileSelector() {
                 [ $isMacOS == true ] && archiveUtility="tar" || archiveUtility="bsdtar"
                 if [ "$ext" == "apk" ] || [ "$ext" == "apks" ]; then
                   if [ "$ext" == "apks" ]; then
-                    pv "$filePath" | ${archiveUtility} -xf - -C "$(dirname "$filePath" 2>/dev/null)/" --include "splits/base-master.apk"
-                    baseMaster="$(dirname "$filePath" 2>/dev/null)/splits/base-master.apk"
-                    appInfo=$($aapt2 dump badging "$baseMaster" 2>/dev/null)
-                    rm -rf "$(dirname "$filePath" 2>/dev/null)/splits"
+                    bsdtar -tf "$filePath" | grep -q "splits/base-master.apk" && base="splits/base-master.apk" || base="base.apk"
+                    pv "$filePath" | ${archiveUtility} -xf - -C "$(dirname "$filePath" 2>/dev/null)/" --include "$base"
+                    basePath="$(dirname "$filePath" 2>/dev/null)/$base"
+                    appInfo=$($aapt2 dump badging "$basePath" 2>/dev/null)
+                    [ "$base" == "splits/base-master.apk" ] && rm -rf "$(dirname "$filePath" 2>/dev/null)/splits" || rm -f "$basePath"
                   else
                     appInfo=$($aapt2 dump badging "$filePath" 2>/dev/null)
                   fi

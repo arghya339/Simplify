@@ -232,7 +232,8 @@ antisplitApp() {
     mkdir -p "$parentPath/$fileNameWOExt"
     if [ $RipLib == true ]; then
       if [ "$fileExt" == "apks" ]; then
-        includeFile=("splits/base-master.apk" "splits/base-${cpuAbi//-/_}.apk" "splits/base-${locale}.apk" "splits/base-${lcd_dpi}.apk")
+        bsdtar -tf "$filePath" | grep -q "splits/base-master.apk" && byBundletool=true || byBundletool=false
+        [ $byBundletool == true ] && includeFile=("splits/base-master.apk" "splits/base-${cpuAbi//-/_}.apk" "splits/base-${locale}.apk" "splits/base-${lcd_dpi}.apk") || includeFile=("base.apk" "split_config.${cpuAbi//-/_}.apk" "split_config.${locale}.apk" "split_config.${lcd_dpi}.apk")
       elif [ "$fileExt" == "xapk" ]; then
         includeFile=("$pkgName.apk" "config.${cpuAbi//-/_}.apk" "config.${locale}.apk" "config.${lcd_dpi}.apk")
       elif [ "$fileExt" == "apkm" ]; then
@@ -240,7 +241,7 @@ antisplitApp() {
       fi
     elif [ $RipLib == false ]; then
       if [ "$fileExt" == "apks" ]; then
-        includeFile=("splits/base-master.apk" "splits/base-arm64_v8a.apk" "splits/base-armeabi_v7a.apk" "splits/base-x86_64.apk" "splits/base-x86.apk" "splits/base-${locale}.apk" "splits/base-${lcd_dpi}.apk")
+        [ $byBundletool == true ] && includeFile=("splits/base-master.apk" "splits/base-arm64_v8a.apk" "splits/base-armeabi_v7a.apk" "splits/base-x86_64.apk" "splits/base-x86.apk" "splits/base-${locale}.apk" "splits/base-${lcd_dpi}.apk") || includeFile=("base.apk" "split_config.arm64_v8a.apk" "split_config.arm64_v7a.apk" "split_config.x86_64.apk" "split_config.x86.apk" "split_config.${locale}.apk" "split_config.${lcd_dpi}.apk")
       elif [ "$fileExt" == "xapk" ]; then
         includeFile=("$pkgName.apk" "config.arm64_v8a.apk" "config.armeabi_v7a.apk" "config.x86_64.apk" "config.x86.apk" "config.${locale}.apk" "config.${lcd_dpi}.apk")
       elif [ $fileExt == "apkm" ]; then
@@ -251,6 +252,7 @@ antisplitApp() {
     pv "$filePath" | ${archiveUtility} -xf - -C "$parentPath/$fileNameWOExt/" --include "${includeFile[@]}"
     archiveExitStatus=$?
     echo -e "$running Merge splits apk to standalone apk.."
+    ([ "$fileExt" == "apks" ] && [ $byBundletool == true ]) && mv "$parentPath/$fileNameWOExt"/splits/* "$parentPath/$fileNameWOExt/"
     if [ $archiveExitStatus -eq 0 ]; then
       rm -f "$filePath"
       $java -jar $APKEditorPath m -i "$parentPath/$fileNameWOExt" -o "$parentPath/$fileNameWOExt.apk" && rm -rf "$parentPath/$fileNameWOExt"
@@ -264,7 +266,7 @@ antisplitApp() {
   fi
   [ $isAndroid == true ] && termux-wake-unlock
   fileName="$fileNameWOExt.apk"
-  filePath="$Download/$fileName"
+  filePath="$parentPath/$fileName"
 }
 
 downloadApp() {
