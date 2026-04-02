@@ -118,6 +118,8 @@ updates() {
     source $simplifyNext/apkInstall.sh
   fi
   curl -sL -o "$simplifyNext/apkMount.sh" "https://raw.githubusercontent.com/arghya339/Simplify/refs/heads/main/Termux/apkMount.sh"
+  [ ! -f "$simplifyNext/done.mp3" ] && curl -sL -o "$simplifyNext/done.mp3" "https://raw.githubusercontent.com/arghya339/Simplify/refs/heads/next/.res/raw/done.mp3"
+  [ ! -f "$simplifyNext/error.mp3" ] && curl -sL -o "$simplifyNext/error.mp3" "https://raw.githubusercontent.com/arghya339/Simplify/refs/heads/next/.res/raw/error.mp3"
 }
 [ -f "$simplifyNextJson" ] && AutoUpdatesScript=$(jq -r '.AutoUpdatesScript' "$simplifyNextJson" 2>/dev/null) || AutoUpdatesScript=true
 if [ "$AutoUpdatesScript" == true ]; then
@@ -151,11 +153,13 @@ fi
 
 [ $printArt == true ] && { printf '\033[?25l' && printArt && sleep 3 && printf '\033[?25h'; }
 
+selected_src=0
 while true; do
   sources=($(jq -r '.[].source' $simplifyNext/sources.json))
   patches=($(jq -r '.[].patches' $simplifyNext/sources.json))
   sources+=("Add Sources" Apps "Download Patched Apps" Settings); patches+=("Add Custom Patches Sources" "Manage Patched Apps" "Download Patched Apps" "SimplifyNext Settings")
-  if menu sources eButtons patches; then
+  if menu sources eButtons patches "" "$selected_src"; then
+    selected_src=$selected
     source="${sources[selected]}"
     echo "selected: $source"
     if [ "$source" == "Settings" ]; then
@@ -242,8 +246,10 @@ EOF
       ([ "$patches" == "inotia00/revanced-patches" ] || [ "$patches" == "anddea/revanced-patches" ]) && branding
       [ "$patches" == "ReVanced/revanced-patches" ] && branding "revanced_branding"
       [ "$patches" == "MorpheApp/morphe-patches" ] && branding "morphe_branding"
+      selected_src_opt=0
       while true; do
-        if menu sourceOptions bButtons; then
+        if menu sourceOptions bButtons "" "" "$selected_src_opt"; then
+          selected_src_opt=$selected
           sourceOption="${sourceOptions[selected]}"
           case "$sourceOption" in
             "View Changelog") glow $sourceDir/CHANGELOG.md ;;

@@ -2,24 +2,25 @@
 
 # Copyright (C) 2026, Arghyadeep Mondal <github.com/arghya339>
 
-isRipLocale="true"  # RipLocale: options: true / false | it's delete locale (language) from patched apk file except device specific locale by default
-isRipDpi="true"  # RipDpi: options: true / false | it's delete dpi from patched apk file except device specific dpi by default
-isRipLib="true"  # RipLib: options: true / false | it's delete lib dir from patched apk file except device specific arch lib by default
+isRipLocale=true  # RipLocale: options: true / false | it's delete locale (language) from patched apk file except device specific locale by default
+isRipDpi=true  # RipDpi: options: true / false | it's delete dpi from patched apk file except device specific dpi by default
+isRipLib=true  # RipLib: options: true / false | it's delete lib dir from patched apk file except device specific arch lib by default
 
 isPrintArt=true
 
-isAutoUpdatesScript="true"
-isAutoUpdatesDependencies="true"
+isAutoUpdatesScript=true
+isAutoUpdatesDependencies=true
 
+isEnableOptionalFeatures=true
 isSearchEngine=DuckDuckGo
-isShowUniversalPatches="false"
+isShowUniversalPatches=false
 
 isButtonsSymbol="27A4"
 isToggleSymbol="Toggle"
 isSecureSymbol="Asterisk"
 
-isRmStockApk="false"
-isRmPatchedApk="false"
+isRmStockApk=false
+isRmPatchedApk=false
 
 isU=0  # Install Package for: options: 0 (default-user) / 1 (all-users)
 isK=false  # Allow Downgrade with keeps App data: options: 0 (false) / 1 (true) | default 0 because it's required reboot after pkg install.
@@ -43,8 +44,8 @@ config() {
   jq --arg key "$key" --arg value "$value" '.[$key] = $value' "$jsonFile" > temp.json && mv temp.json "$jsonFile"
 }
 
-all_key=(RipLocale RipDpi RipLib printArt AutoUpdatesScript AutoUpdatesDependencies SearchEngine ShowUniversalPatches ButtonsSymbol ToggleSymbol SecureSymbol rmStockApk rmPatchedApk jdk)
-all_value=("$isRipLocale" "$isRipDpi" "$isRipLib" "$isPrintArt" "$isAutoUpdatesScript" "$isAutoUpdatesDependencies" "$isSearchEngine" "$isShowUniversalPatches" "$isButtonsSymbol" "$isToggleSymbol" "$isSecureSymbol" "$isRmStockApk" "$isRmPatchedApk" "$isJdk")
+all_key=(RipLocale RipDpi RipLib printArt AutoUpdatesScript AutoUpdatesDependencies EnableOptionalFeatures SearchEngine ShowUniversalPatches ButtonsSymbol ToggleSymbol SecureSymbol rmStockApk rmPatchedApk jdk)
+all_value=("$isRipLocale" "$isRipDpi" "$isRipLib" "$isPrintArt" "$isAutoUpdatesScript" "$isAutoUpdatesDependencies" "$isEnableOptionalFeatures" "$isSearchEngine" "$isShowUniversalPatches" "$isButtonsSymbol" "$isToggleSymbol" "$isSecureSymbol" "$isRmStockApk" "$isRmPatchedApk" "$isJdk")
 [ $isAndroid == true ] && { all_key+=(AutoUpdatesTermux); all_value+=("$isAutoUpdatesTermux"); }
 all_key+=(InstallPackageFor KeepsData GrantAllRuntimePermissions InstalledAsTestOnly DisablePlayProtect DisableVerifyAdbInstalls Installer Reinstall EnableRoolback)
 all_value+=("$isU" "$isK" "$isG" "$isT" "$isV" "$isA" "$isI" "$isR" "$isB")
@@ -65,6 +66,7 @@ reloadConfig() {
   AutoUpdatesScript="$(jq -r '.AutoUpdatesScript' "$simplifyNextJson" 2>/dev/null)"
   AutoUpdatesDependencies="$(jq -r '.AutoUpdatesDependencies' "$simplifyNextJson" 2>/dev/null)"
 
+  EnableOptionalFeatures=$(jq -r '.EnableOptionalFeatures' "$simplifyNextJson" 2>/dev/null)
   SearchEngine=$(jq -r '.SearchEngine' "$simplifyNextJson" 2>/dev/null)
   ShowUniversalPatches="$(jq -r '.ShowUniversalPatches' "$simplifyNextJson" 2>/dev/null)"
 
@@ -325,44 +327,90 @@ configure() {
   configureOptions=(Customize Updates Delete Import Export Reset Advanced About)
   [ $isAndroid == true ] && configureOptions+=(Share)
   configureDescriptions=("Toggle Symbol" "SimplifyNext Updates" "Delete Apps" "Import Patch Selection" "Export Patch Selection" "Reset Patch Selection" "RipLib" "About SimplifyNext" "Share SimplifyNext")
+  selected_setting=0
   while true; do
-    menu configureOptions bButtons configureDescriptions || break
-    configureOption="${configureOptions[selected]}"
+    menu configureOptions bButtons configureDescriptions "" "$selected_setting" && selected_setting=$selected || break
+    configureOption="${configureOptions[selected_setting]}"
     case "$configureOption" in
       Customize)
         customizeOptions=("Highlighted Button Symbol" "Toggle Symbol" "Secure Symbol" "Show Script Branding On Launch")
+        selected_customize_opt=0
         while true; do
-          reloadConfig
-          menu customizeOptions bButtons || break
-          customizeOption="${customizeOptions[selected]}"
+          menu customizeOptions bButtons "" "$selected_customize_opt" && selected_customize_opt=$selected || break
+          customizeOption="${customizeOptions[selected_customize_opt]}"
           case "$customizeOption" in
             "Highlighted Button Symbol")
+              case "$ButtonsSymbol" in
+                "27A4") selected_button_symbol=0 ;;
+                "27A3") selected_button_symbol=1 ;;
+                "27A2") selected_button_symbol=2 ;;
+                "25B6") selected_button_symbol=3 ;;
+                "25B7") selected_button_symbol=4 ;;
+                "276F") selected_button_symbol=5 ;;
+                "2771") selected_button_symbol=6 ;;
+                "00AA") selected_button_symbol=7 ;;
+                "2A20") selected_button_symbol=8 ;;
+                "279C") selected_button_symbol=9 ;;
+                "279E") selected_button_symbol=10 ;;
+                "2794") selected_button_symbol=11 ;;
+                "27A0") selected_button_symbol=12 ;;
+                "27BE") selected_button_symbol=13 ;;
+                "1433") selected_button_symbol=14 ;;
+              esac
               symbols=("➤" "➣" "➢" "▶" "▷" "❯" "❱" "»" "⨠" "➜" "➞" "➔" "➠" "➾" "ᐳ")
               unicodes=("27A4" "27A3" "27A2" "25B6" "25B7" "276F" "2771" "00AA" "2A20" "279C" "279E" "2794" "27A0" "27BE" "1433")
-              if menu unicodes bButtons symbols; then
-                unicode="${unicodes[selected]}"
-                config "ButtonsSymbol" "$unicode"
+              if menu unicodes bButtons symbols "" "$selected_button_symbol"; then
+                ButtonsSymbol="${unicodes[selected]}"
+                config "ButtonsSymbol" "$ButtonsSymbol"
               fi
               ;;
             "Toggle Symbol")
+              case "$ToggleSymbol" in
+                asteriskBox) selected_toggle_symbol=0 ;;
+                hashBox) selected_toggle_symbol=1 ;;
+                plusBox) selected_toggle_symbol=2 ;;
+                Binary) selected_toggle_symbol=3 ;;
+                tickBox) selected_toggle_symbol=4 ;;
+                checkBox) selected_toggle_symbol=5 ;;
+                Regulus) selected_toggle_symbol=6 ;;
+                Toggle) selected_toggle_symbol=7 ;;
+                radioButton) selected_toggle_symbol=8 ;;
+                Hexagon) selected_toggle_symbol=9 ;;
+                Star) selected_toggle_symbol=10 ;;
+                Sparkle) selected_toggle_symbol=11 ;;
+                Dymond) selected_toggle_symbol=12 ;;
+                Flag) selected_toggle_symbol=13 ;;
+              esac
               symbols=("[ ]|[*]" "[ ]|[#]" "[ ]|[+]" "[0]|[1]" "[ ]|[✓]" "☐|☑" " |🜲" "〇━|━⚪" "〇|🔘" " |⬢" " |★" " |✦" " |⬧" " |⚑")
               names=(asteriskBox hashBox plusBox Binary tickBox checkBox Regulus Toggle radioButton Hexagon Star Sparkle Dymond Flag)
-              if menu names bButtons symbols; then
-                name="${names[selected]}"
-                config "ToggleSymbol" "$name"
+              if menu names bButtons symbols "" "$selected_toggle_symbol"; then
+                ToggleSymbol="${names[selected]}"
+                config "ToggleSymbol" "$ToggleSymbol"
               fi
               ;;
             "Secure Symbol")
+              case "$SecureSymbol" in
+                Asterisk) selected_secure_symbol=0 ;;
+                solidCircle) selected_secure_symbol=1 ;;
+                Hash) selected_secure_symbol=2 ;;
+                Multiplication) selected_secure_symbol=3 ;;
+                Star) selected_secure_symbol=4 ;;
+                Sparkle) selected_secure_symbol=5 ;;
+                Dymond) selected_secure_symbol=6 ;;
+                Hexagon) selected_secure_symbol=7 ;;
+                Square) selected_secure_symbol=8 ;;
+                dollarSign) selected_secure_symbol=9 ;;
+              esac
               symbols=("*" "●" "#" "×" "★" "✦" "⬧" "⬢" "■" "$")
               names=(Asterisk solidCircle Hash Multiplication Star Sparkle Dymond Hexagon Square dollarSign)
-              if menu names bButtons symbols; then
-                name="${names[selected]}"
-                config "SecureSymbol" "$name"
+              if menu names bButtons symbols "" "$selected_secure_symbol"; then
+                SecureSymbol="${names[selected]}"
+                config "SecureSymbol" "$SecureSymbol"
               fi
               ;;
             "Show Script Branding On Launch")
-              confirmPrompt "Show simplifyNext branding on launch" tfButtons "$printArt" && isPrintArt=true || isPrintArt=false
-              config "printArt" "$isPrintArt"
+              confirmPrompt "Show simplifyNext branding on launch" tfButtons "$printArt" && printArt=true || printArt=false
+              config "printArt" "$printArt"
               ;;
           esac
           source $simplifyNext/symbol.sh
@@ -372,34 +420,34 @@ configure() {
         updatesOptions=("Check for script updates" "View Changelogs" "Check for dependencies updates" "Auto updates script on launch" "Auto updates dependencies on launch")
         updatesDescriptions=("Manually updating SimplifyNext" "Check out the latest changes in this update" "Manually updating dependencies" "Auto updates SimplifyNext on launch" "")
         [ $isAndroid == true ] && { updatesOptions+=("Auto updates Termux on launch"); updatesDescriptions+=(""); }
+        selected_up_opt=0
         while true; do
-          reloadConfig
-          menu updatesOptions bButtons updatesDescriptions || break
-          updatesOption="${updatesOptions[selected]}"
+          menu updatesOptions bButtons updatesDescriptions "" "$selected_up_opt" && selected_up_opt=$selected || break
+          updatesOption="${updatesOptions[selected_up_opt]}"
           case "$updatesOption" in
             "Check for script updates") checkInternet && updates ;;
             "View Changelogs") glow $simplifyNext/CHANGELOG.md; echo; read -p "Press Enter to continue..." ;;
             "Check for dependencies updates") checkInternet && dependencies ;;
             "Auto updates script on launch")
-              confirmPrompt "Auto updates simplifyNext on launch" tfButtons "$AutoUpdatesScript" && autoupdates=true || autoupdates=false
-              config "AutoUpdatesScript" "$autoupdates"
+              confirmPrompt "Auto updates simplifyNext on launch" tfButtons "$AutoUpdatesScript" && AutoUpdatesScript=true || AutoUpdatesScript=false
+              config "AutoUpdatesScript" "$AutoUpdatesScript"
               ;;
             "Auto updates dependencies on launch")
-              confirmPrompt "Auto updates dependencies on launch" tfButtons "$AutoUpdatesDependencies" && autoupdates=true || autoupdates=false
-              config "AutoUpdatesDependencies" "$autoupdates"
+              confirmPrompt "Auto updates dependencies on launch" tfButtons "$AutoUpdatesDependencies" && AutoUpdatesDependencies=true || AutoUpdatesDependencies=false
+              config "AutoUpdatesDependencies" "$AutoUpdatesDependencies"
               ;;
             "Auto updates Termux on launch")
-              confirmPrompt "AutoUpdatesTermux" tfButtons "$AutoUpdatesTermux" && isAutoUpdatesTermux=true || isAutoUpdatesTermux=false
-              config "AutoUpdatesTermux" "$isAutoUpdatesTermux"
+              confirmPrompt "AutoUpdatesTermux" tfButtons "$AutoUpdatesTermux" && AutoUpdatesTermux=true || AutoUpdatesTermux=false
+              config "AutoUpdatesTermux" "$AutoUpdatesTermux"
           esac
         done
         ;;
       Delete)
         deleteOptions=("Delete Stock Apk" "Delete Patched Apk" "Delete All Patched Log" "Delete All Mount Log" "Delete CLI" "Delete Patches" "Delete Integrations" "Delete MicroG" "Delete Keystore" "Delete Stock Apks After Successful Patching" "Delete Patched Apk After Installation" "Uninstall SimplifyNext")
+        selected_del_opt=0
         while true; do
-          reloadConfig
-          menu deleteOptions bButtons || break
-          deleteOption="${deleteOptions[selected]}"
+          menu deleteOptions bButtons "" "$selected_del_opt" && selected_del_opt=$selected || break
+          deleteOption="${deleteOptions[selected_del_opt]}"
           case "$deleteOption" in
             "Delete Stock Apk")
               while true; do
@@ -505,12 +553,12 @@ configure() {
               fi
               ;;
             "Delete Stock Apks After Successful Patching")
-              confirmPrompt "deleteStockApksAfterSuccessfulPatching" tfButtons "$rmStockApk" && response=true || response=false
-              config "rmStockApk" "$response"
+              confirmPrompt "deleteStockApksAfterSuccessfulPatching" tfButtons "$rmStockApk" && rmStockApk=true || rmStockApk=false
+              config "rmStockApk" "$rmStockApk"
               ;;
             "Delete Patched Apk After Installation")
-              confirmPrompt "deletePatchedApksAfterInstallation" tfButtons "$rmPatchedApk" && response=true || response=false
-              config "rmPatchedApk" "$response"
+              confirmPrompt "deletePatchedApksAfterInstallation" tfButtons "$rmPatchedApk" && rmPatchedApk=true || rmPatchedApk=false
+              config "rmPatchedApk" "$rmPatchedApk"
               ;;
             "Uninstall SimplifyNext")
               confirmPrompt "Are you sure you want to uninstall SimplifyNext?" "ynButtons" "1" && response=Yes || response=No
@@ -528,6 +576,11 @@ configure() {
                         [ -f "$HOME/.termux/widget/dynamic_shortcuts/simplifyx" ] && rm -f ~/.termux/widget/dynamic_shortcuts/simplifyx
                       else
                         [ -f "/usr/local/bin/simplifyx" ] && rm -f "/usr/local/bin/simplifyx"
+                      fi
+                      if [ $isMacOS == true ]; then
+                        [ -d "/Applications/simplifyx.app/" ] && rm -rf "/Applications/simplifyx.app/"
+                      elif [ $isAndroid == false ]; then
+                        [ -f "$HOME/.local/share/applications/simplifyx.desktop" ] && rm -f "$HOME/.local/share/applications/simplifyx.desktop"
                       fi
                       confirmPrompt "Do you want to remove this script-related dependency?" "ynButtons" "1" && response=Yes || response=No
                       case "$response" in
@@ -617,9 +670,10 @@ configure() {
       Import)
         importOptions=("Import Keystore" "Import Patch Selection" "Import sources.json" "Import Script Settings" "Restore Script")
         importDescriptions=("Import Android Keystore" "Import Patch Selection from ReVanced Manager" "" "" "")
+        selected_import_opt=0
         while true; do
-          menu importOptions bButtons importDescriptions || break
-          importOption="${importOptions[selected]}"
+          menu importOptions bButtons importDescriptions "" "$selected_import_opt" && selected_import_opt=$selected || break
+          importOption="${importOptions[selected_import_opt]}"
           case "$importOption" in
             "Import Patch Selection")
               sources=($(jq -r '.[].source' $simplifyNext/sources.json))
@@ -676,9 +730,10 @@ configure() {
       Export)
         exportOptions=("Export Keystore" "Export Patch Selection" "Export sources.json" "Export Script Settings" "Backup Script")
         exportDescriptions=("Export Android Keystore" "Export Patch Selection for ReVanced Manager" "" "" "")
+        selected_export_opt=0
         while true; do
-          menu exportOptions bButtons exportDescriptions || break
-          exportOption="${exportOptions[selected]}"
+          menu exportOptions bButtons exportDescriptions "" "$selected_export_opt" && selected_export_opt=$selected || break
+          exportOption="${exportOptions[selected_export_opt]}"
           case "$exportOption" in
             "Export Patch Selection")
               sources=($(jq -r '.[].source' $simplifyNext/sources.json))
@@ -703,9 +758,10 @@ configure() {
         ;;
       Reset)
         resetOptions=("Regenerate Keystore" "Reset Patch Selection" "Reset Patch Options" "Reset PatchSelection & PatchOptions" "Reset sources.json" "Reset Script Settings")
+        selected_rst_opt=0
         while true; do
-          menu resetOptions bButtons || break
-          resetOption="${resetOptions[selected]}"
+          menu resetOptions bButtons "" "$selected_rst_opt" && selected_rst_opt=$selected || break
+          resetOption="${resetOptions[selected_rst_opt]}"
           case "$resetOption" in
             "Reset sources.json")
               pButtons=("<Confirm>" "<Cancel>"); confirmPrompt "Are you sure you want to reset sources.json as default?" "pButtons" "1" && response=Confirm || response=Cancel
@@ -752,32 +808,55 @@ configure() {
         done
         ;;
       Advanced)
-        advancedOptions=("Manage GitHub PAT" "Installation Options" "Show Universal Patches" "Search engine" RipLib RipDpi RipLocale "Change Java Version" "Java Memory Limits")
-        advancedDescriptions=("increases gh api rate limit" "Install APKs on-device with advanced options" "Enable or disable universal patches across all applications" "Manage search engines for app version search" "Remove unused native libraries from patched apps" "Remove unused native dpi from stock split apks" "Remove unused native locale from stock split apks" "" "")
+        advancedOptions=("Manage GitHub PAT" "Installation Options" "Show Universal Patches" "Enable-SimplifyNextOptionalFeatures" "Search engine" RipLib RipDpi RipLocale "Change Java Version" "Java Memory Limits")
+        advancedDescriptions=("increases gh api rate limit" "Install APKs on-device with advanced options" "Enable or disable universal patches across all applications" "Enable/Disable-SimplifyNextOptionalFeatures" "Manage search engines for app version search" "Remove unused native libraries from patched apps" "Remove unused native dpi from stock split apks" "Remove unused native locale from stock split apks" "" "")
+        selected_advanced_opt=0
         while true; do
           reloadConfig
-          menu advancedOptions bButtons advancedDescriptions || break
-          advancedOption="${advancedOptions[selected]}"
+          menu advancedOptions bButtons advancedDescriptions "" "$selected_advanced_opt" && selected_advanced_opt=$selected || break
+          advancedOption="${advancedOptions[selected_advanced_opt]}"
           case "$advancedOption" in
             "Manage GitHub PAT") checkInternet && ghAuth ;;
             RipLib)
-              confirmPrompt "RipLib" "tfButtons" "$RipLib" && isRipLib=true || isRipLib=false
-              config "RipLib" "$isRipLib"
+              confirmPrompt "RipLib" "tfButtons" "$RipLib" && RipLib=true || RipLib=false
+              config "RipLib" "$RipLib"
               ripLibGen
               ;;
             RipDpi)
-              confirmPrompt "RipDpi" "tfButtons" "$RipDpi" && isRipDpi=true || isRipDpi=false
-              config "RipDpi" "$isRipDpi"
+              confirmPrompt "RipDpi" "tfButtons" "$RipDpi" && RipDpi=true || RipDpi=false
+              config "RipDpi" "$RipDpi"
               ripDpiGen
               ;;
             RipLocale)
-              confirmPrompt "RipLocale" "tfButtons" "$RipLocale" && isRipLocale=true || isRipLocale=false
-              config "RipLocale" "$isRipLocale"
+              confirmPrompt "RipLocale" "tfButtons" "$RipLocale" && RipLocale=true || RipLocale=false
+              config "RipLocale" "$RipLocale"
               ripLocaleGen
               ;;
             "Show Universal Patches")
-              confirmPrompt "Show Universal Patches" "tfButtons" "$ShowUniversalPatches" && isShowUniversalPatches=true || isShowUniversalPatches=false
-              config "ShowUniversalPatches" "$isShowUniversalPatches"
+              confirmPrompt "Show Universal Patches" "tfButtons" "$ShowUniversalPatches" && ShowUniversalPatches=true || ShowUniversalPatches=false
+              config "ShowUniversalPatches" "$ShowUniversalPatches"
+              ;;
+            "Enable-SimplifyNextOptionalFeatures")
+              confirmPrompt "Enable-SimplifyNextOptionalFeatures" "tfButtons" "$EnableOptionalFeatures" && EnableOptionalFeatures=true || EnableOptionalFeatures=false
+              config "EnableOptionalFeatures" "$EnableOptionalFeatures"
+              if [ $EnableOptionalFeatures == true ]; then
+                if [ $isAndroid == true ]; then
+                  checkTermuxAPI
+                elif [ $isFedora == true ]; then
+                  dnfInstall "mpv"
+                elif [ $isDebian == true ]; then
+                  wl-copy -v &>/dev/null || aptInstall "wl-clipboard"
+                  aptInstall "mpv"
+                elif [ $isArchLinux == true ]; then
+                  pacInstall "mpv"
+                elif [ $isOpenSUSE == true ]; then
+                  wl-copy -v &>/dev/null || pkgInstall "wl-clipboard"
+                  pkgInstall "mpv"
+                elif [ $isAlpine == true ]; then
+                  wl-copy -v &>/dev/null || apkAdd "wl-clipboard"
+                  apkAdd "mpv"
+                fi
+              fi
               ;;
             "Search engine")
               case "$SearchEngine" in
@@ -801,9 +880,16 @@ configure() {
               MaxHeapSize=$(grep "MaxHeapSize" <<< "$PrintFlagsFinal" | awk '{print $4 / 1024 / 1024}' | uniq)
               MinHeapSize=$(grep "MinHeapSize" <<< "$PrintFlagsFinal" | awk '{print $4 / 1024 / 1024}' | uniq)
               AvgHeapSize=$(( (MaxHeapSize + MinHeapSize) / 2 ))
-              memOpts=(Automatic Recommended Maximum Minimum Average Manually)
-              memDesc=("Let the JVM decide based on system resources" "512M" "${MaxHeapSize}M" "${MinHeapSize}M" "${AvgHeapSize}M" "User Defined")
-              if menu memOpts bButtons memDesc; then
+              memOpts=(Automatic Recommended Maximum Average Manually)
+              memDesc=("Let the JVM decide based on system resources" "512M" "${MaxHeapSize}M" "${AvgHeapSize}M" "User Defined")
+              case "$JvmHeapSize" in
+                "") selected_mem_lim=0 ;;
+                "512") selected_mem_lim=1 ;;
+                "$MaxHeapSize") selected_mem_lim=2 ;;
+                "$AvgHeapSize") selected_mem_lim=3 ;;
+                *) selected_mem_lim=4 ;;
+              esac
+              if menu memOpts bButtons memDesc "" "$selected_mem_lim"; then
                 memOpt="${memOpts[selected]}"
                 case "$memOpt" in
                   Automatic)
@@ -816,10 +902,6 @@ configure() {
                     ;;
                   Maximum)
                     JvmHeapSize="$MaxHeapSize"
-                    config "JvmHeapSize" "$JvmHeapSize"
-                    ;;
-                  Minimum)
-                    JvmHeapSize="$MinHeapSize"
                     config "JvmHeapSize" "$JvmHeapSize"
                     ;;
                   Average)
@@ -857,7 +939,8 @@ configure() {
                   ((attempt++))
                   sleep 0.5
                 done
-                if menu jdks bButtons; then
+                for ((i=0; i<${#jdks}; i++)); do [ "${jdks[i]}" == "$jdk" ] && selected_jdk=$i; done
+                if menu jdks bButtons "" "" "$selected_jdk"; then
                   jdk="${jdks[selected]}"
                   if [ $isAndroid == true ]; then
                     echo "selected: openjdk-$jdk"
@@ -885,40 +968,41 @@ configure() {
               fi
               ;;
             "Installation Options")
+              selected_install_opt=0
               while true; do
                 genPMCmd
                 installationOptions=("Install Package for *user" "Allow Downgrade with keeps App data (reboot required)" "Grant All Runtime/ Requested Permissions" "Installed as test-only app" "Disable Play Protect Package Verification" "Disable Verify Adb Installs" Installer "Reinstall (Replace/ Upgrade) Existing Installed Package" "Enable Version Roolback")
                 [ $Android -ge 14 ] && installationOptions+=("Bypass Low Target SDK Bolck")
-                menu installationOptions bButtons || break
-                installationOption="${installationOptions[selected]}"
+                menu installationOptions bButtons "" "$selected_install_opt" && selected_install_opt=$selected || break
+                installationOption="${installationOptions[selected_install_opt]}"
                 case "$installationOption" in
                   "Install Package for *user")
-                    users=("<default-user>" "<all-users>"); confirmPrompt "InstallPackageFor" "users" "$InstallPackageFor" && isU=0 || isU=1
-                    config "InstallPackageFor" "$isU"
+                    users=("<default-user>" "<all-users>"); confirmPrompt "InstallPackageFor" "users" "$InstallPackageFor" && InstallPackageFor=0 || InstallPackageFor=1
+                    config "InstallPackageFor" "$InstallPackageFor"
                     ;;
                   "Allow Downgrade with keeps App data (reboot required)")
-                    confirmPrompt "KeepsData" tfButtons "$KeepsData" && isK=true || isK=false
-                    config "KeepsData" "$isK"
+                    confirmPrompt "KeepsData" tfButtons "$KeepsData" && KeepsData=true || KeepsData=false
+                    config "KeepsData" "$KeepsData"
                     ;;
                   "Grant All Runtime/ Requested Permissions")
-                    confirmPrompt "GrantAllRuntimePermissions" tfButtons "$GrantAllRuntimePermissions" && isG=true || isG=false
-                    config "GrantAllRuntimePermissions" "$isG"
+                    confirmPrompt "GrantAllRuntimePermissions" tfButtons "$GrantAllRuntimePermissions" && GrantAllRuntimePermissions=true || GrantAllRuntimePermissions=false
+                    config "GrantAllRuntimePermissions" "$GrantAllRuntimePermissions"
                     ;;
                   "Installed as test-only app")
-                    confirmPrompt "InstalledAsTestOnly" tfButtons "$InstalledAsTestOnly" && isT=true || isT=false
-                    config "InstalledAsTestOnly" "$isT"
+                    confirmPrompt "InstalledAsTestOnly" tfButtons "$InstalledAsTestOnly" && InstalledAsTestOnly=true || InstalledAsTestOnly=false
+                    config "InstalledAsTestOnly" "$InstalledAsTestOnly"
                     ;;
                   "Bypass Low Target SDK Bolck")
-                    confirmPrompt "BypassLowTargetSdkBolck" tfButtons "$BypassLowTargetSdkBolck" && isL=true || isL=false
-                    config "BypassLowTargetSdkBolck" "$isL"
+                    confirmPrompt "BypassLowTargetSdkBolck" tfButtons "$BypassLowTargetSdkBolck" && BypassLowTargetSdkBolck=true || BypassLowTargetSdkBolck=false
+                    config "BypassLowTargetSdkBolck" "$BypassLowTargetSdkBolck"
                     ;;
                   "Disable Play Protect Package Verification")
-                    confirmPrompt "DisablePlayProtect" tfButtons "$DisablePlayProtect" && isV=true || isV=false
-                    config "DisablePlayProtect" "$isV"
+                    confirmPrompt "DisablePlayProtect" tfButtons "$DisablePlayProtect" && DisablePlayProtect=true || DisablePlayProtect=false
+                    config "DisablePlayProtect" "$DisablePlayProtect"
                     ;;
                   "Disable Verify Adb Installs")
-                    confirmPrompt "DisableVerifyAdbInstalls" tfButtons "$DisableVerifyAdbInstalls" && isA=true || isA=false
-                    config "DisableVerifyAdbInstalls" "$isA"
+                    confirmPrompt "DisableVerifyAdbInstalls" tfButtons "$DisableVerifyAdbInstalls" && DisableVerifyAdbInstalls=true || DisableVerifyAdbInstalls=false
+                    config "DisableVerifyAdbInstalls" "$DisableVerifyAdbInstalls"
                     ;;
                   Installer)
                     case "$Installer" in
@@ -930,17 +1014,17 @@ configure() {
                     installerPackages=("com.android.vending" "com.android.packageinstaller" "com.android.shell" "adb")
                     installerNames=(PlayStore PackageInstaller Shell ADB)
                     if menu installerPackages bButtons installerNames "" "$selected_option"; then
-                      installerPackage="${installerPackages[selected]}"
-                      config "Installer" "$installerPackage"   
+                      installer="${installerPackages[selected]}"
+                      config "Installer" "$installer"   
                     fi
                     ;;
                   "Reinstall (Replace/ Upgrade) Existing Installed Package")
-                    confirmPrompt "Reinstall" tfButtons "$Reinstall" && isR=true || isR=false
-                    config "Reinstall" "$isR"
+                    confirmPrompt "Reinstall" tfButtons "$Reinstall" && Reinstall=true || Reinstall=false
+                    config "Reinstall" "$Reinstall"
                     ;;
                   "Enable Version Roolback")
-                    confirmPrompt "EnableRoolback" tfButtons "$EnableRoolback" && isB=true || isB=false
-                    config "EnableRoolback" "$isB"
+                    confirmPrompt "EnableRoolback" tfButtons "$EnableRoolback" && EnableRoolback=true || EnableRoolback=false
+                    config "EnableRoolback" "$EnableRoolback"
                     ;;
                 esac
               done
@@ -952,9 +1036,10 @@ configure() {
         [ $isAndroid == false ] && aboutOptions=("About Host") || aboutOptions=()
         ([ $isAndroid == true ] || [ -n "$serial" ]) && aboutOptions+=("About Device")
         aboutOptions+=(GitHub Donate YouTube)
+        selected_about_opt=0
         while true; do
-          menu aboutOptions bButtons || break
-          aboutOption="${aboutOptions[selected]}"
+          menu aboutOptions bButtons "" "$selected_about_opt" && selected_about_opt=$selected || break
+          aboutOption="${aboutOptions[selected_about_opt]}"
           case "$aboutOption" in
             "About Host")
               printf '\033[?25l' && printArt

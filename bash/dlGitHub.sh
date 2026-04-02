@@ -8,7 +8,7 @@ dl() {
   assetsPath=$3
   fileName=$(basename $assetsPath 2>/dev/null)
   
-  echo -e "$running Downloading $fileName from ${Blue}$dlUrl${Reset}"
+  echo -e "$running Downloading ${Red}$fileName${Reset} from ${Blue}$dlUrl${Reset}"
   while true; do
     if [ "$dlUtility" == "curl" ]; then
       curl -L -C - --progress-bar -o "$assetsPath" "$dlUrl"

@@ -79,13 +79,58 @@ patchingWorkflow() {
       echo -e "$running Patching $appName.."
       [ $isAndroid == true ] && termux-wake-lock
       echo "-----------------Patch Log-----------------" >> "$patchedLOG"
+      if [ $EnableOptionalFeatures == true ]; then
+        tasks=("Decoding all resources" "Executing patches" "Compiling patched dex files" "Compiling modified resources" "Aligning APK" "Signing APK" "Purging temporary files" "Purged resource cache directory")
+        status=(false false false false false false false false)
+        while true; do
+          unset task
+          for ((i=0; i<${#tasks[@]}; i++)); do
+            ( grep -q "${tasks[i]}" "$patchedLOG" && [ ${status[i]} == false ] ) && { task="${tasks[i]}"; status[i]=true; break; }
+          done
+          if [ -n "$task" ]; then
+            if [ "$task" != "Purged resource cache directory" ]; then
+              if [ $isAndroid == true ] && [ $foundTermuxAPI == true ]; then
+                termux-notification --title "SimplifyNext" --content "Patcher: $task" --id "patching_task" --ongoing
+              elif [ $isMacOS == true ]; then
+                osascript -e "display notification \"Patcher: $task\" with title \"SimplifyNext\""
+              elif [ $isAndroid == false ]; then
+                notify-send "SimplifyNext" "Patcher: $task"
+              fi
+            else
+              ([ $isAndroid == true ] && [ $foundTermuxAPI == true ]) && termux-notification-remove "patching_task"
+              break
+            fi
+          fi
+        sleep 0.5
+        done &
+      fi
+      time_now=$(date +%s)
       "${patchCmd[@]}" 2>&1 | tee -a "$patchedLOG"
+      time_diff=$(($(date +%s) - time_now))
+      if [ $time_diff -ge 60 ]; then
+        time_taken=$((time_diff / 60))
+        unit=minute
+      else
+        time_taken=$time_diff
+        unit=second
+      fi
+      [ $time_taken -ne 1 ] && unit="${unit}s"
+      echo "Patching takes about $time_taken $unit"
       echo "~~~~~~~~~~~~~~~~~~~~END~~~~~~~~~~~~~~~~~~~~" >> "$patchedLOG"
       [ $isAndroid == true ] && termux-wake-unlock
       [ "$source" == "RVX-ARSCLib" ] && { mv $SimplUsr/base.apk $patchedAPK; rm -f $SimplUsr/revanced.keystore; }
       rm -f "$SimplUsr/$patchedAppsFilenameFormat.keystore"
       rm -f "$SimplUsr/$patchedAppsFilenameFormat-options.json"
       if [ -f "$patchedAPK" ]; then
+        if [ $EnableOptionalFeatures == true ]; then
+          if [ $isAndroid == true ] && [ $foundTermuxAPI == true ]; then
+            termux-media-player play "$simplifyNext/done.mp3" >/dev/null
+          elif [ $isMacOS == true ]; then
+            afplay "$simplifyNext/done.mp3"
+          elif mpv -V &>/dev/null; then
+            mpv "$simplifyNext/done.mp3" >/dev/null
+          fi
+        fi
         isPatchingSucceeded=true
         [ "$rmStockApk" == true ] && { rm -f "$stockAPK"; stock=null; } || stock="$stockAPK"
         stockPKG="$package"
@@ -133,6 +178,18 @@ patchingWorkflow() {
           fi
         fi
       else
+        if [ $EnableOptionalFeatures == true ]; then
+          if [ $isAndroid == true ] && [ $foundTermuxAPI == true ]; then
+            termux-media-player play "$simplifyNext/error.mp3" >/dev/null
+            termux-clipboard-set < "$patchedLOG"
+          elif [ $isMacOS == true ]; then
+            afplay "$simplifyNext/error.mp3"
+            pbcopy < "$patchedLOG"
+          else
+            mpv -V &>/dev/null && mpv "$simplifyNext/error.mp3" >/dev/null
+            wl-copy -v &>/dev/null && wl-copy < "$patchedLOG"
+          fi
+        fi
         isPatchingSucceeded=false
         if grep -q "OutOfMemory" "$patchedLOG"; then
           echo -e "$bad ${Red}OutOfMemoryError${Reset}: ${Yellow}Device RAM overloaded!${Reset}\n ${Blue}Solutions${Reset}:\n   1. ${Yellow}Close background apps.${Reset}\n   2. ${Yellow}Use device with >${memSize}GB RAM for patching apk.${Reset}"

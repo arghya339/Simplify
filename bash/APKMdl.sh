@@ -273,7 +273,7 @@ downloadApp() {
   filePath="${3}"
   fileName="$(basename "$filePath" 2>/dev/null)"
   
-  echo -e "$running Downloading $fileName from ${Blue}$dlLink${Reset}"
+  echo -e "$running Downloading ${Red}$fileName${Reset} from ${Blue}$dlLink${Reset}"
   while true; do
     if [ "$dlUtility" == "curl" ]; then
       curl -L -C - --progress-bar -o "$filePath" "$dlLink"

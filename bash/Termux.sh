@@ -173,6 +173,26 @@ dependencies() {
 }
 [ "$AutoUpdatesDependencies" == true ] && checkInternet && dependencies
 
+checkTermuxAPI() {
+  termux-api-start &>/dev/null && foundTermuxAPI=true || foundTermuxAPI=false
+}; checkTermuxAPI
+
+installTermuxAPI() {
+  if ! am start -n "com.termux.api/com.termux.shared.activities.ReportActivity" &>/dev/null; then
+    tag_name=$(curl -sL "https://api.github.com/repos/termux/termux-api/releases/latest" | jq -r '.tag_name')
+    while true; do
+      curl -L -C - --progress-bar -o "$Download/termux-api-app_${tag_name}+github.debug.apk" "https://github.com/termux/termux-api/releases/download/$tag_name/termux-api-app_$tag_name+github.debug.apk"
+      [ $? -eq 0 ] && break || sleep 5
+    done
+    [ -f $Download/termux-api-app_${tag_name}+github.debug.apk ] && appInstall "$Download/termux-api-app_${tag_name}+github.debug.apk" "com.termux.api/com.termux.shared.activities.ReportActivity"
+  else
+    filePath=$(find "$Download" -type f -name "termux-api-app_v*+github.debug.apk" -print -quit)
+    [ -f "$filePath" ] && rm -f "$filePath"
+  fi
+  pkgInstall "termux-api"
+  checkTermuxAPI
+}
+
 aapt2="$HOME/aapt2"; [[ $(~/aapt2 version 2>&1 | awk '{print $NF}') =~ ^(2.19-1023|2.19-3401)$ ]] || { rm -f ~/aapt2 && curl -L --progress-bar -C - -o ~/aapt2 $(curl -sL https://api.github.com/repos/ReVanced/aapt2/releases/latest | jq -r --arg arch "$cpuAbi" '.assets[] | select(.name == "aapt2-" + $arch) | .browser_download_url') && chmod +x ~/aapt2 && ~/aapt2 version 2>&1; }
 java="$PREFIX/lib/jvm/java-$jdk-openjdk/bin/java"
 keytool="$PREFIX/lib/jvm/java-$jdk-openjdk/bin/keytool"

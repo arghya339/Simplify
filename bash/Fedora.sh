@@ -2,6 +2,27 @@
 
 # Copyright (C) 2026, Arghyadeep Mondal <github.com/arghya339>
 
+CreateBinaryLauncherShortcuts() {
+  shortcutLabel=${1}
+  iconPath=${2}
+  binaryPath=${3}
+  Interactive=${4:-true}
+  PolicyKit=${5:-false}
+  Categories=${6:-Utility}
+  [ $PolicyKit == true ] && polkit="pkexec " || polkit=""
+  cat > "$HOME/.local/share/applications/${shortcutLabel}.desktop" <<EOL
+[Desktop Entry]
+Name=${shortcutLabel}
+Icon=${iconPath}
+Exec=${polkit}${binaryPath}
+Terminal=${Interactive}
+Type=Application
+Categories=${Categories};
+EOL
+}
+[ ! -f "$simplifyNext/ic_launcher.png" ] && curl -L --progress-bar -C - -o "$simplifyNext/ic_launcher.png" "https://raw.githubusercontent.com/arghya339/Simplify/refs/heads/next/.res/mipmap-xxxhdpi/ic_launcher.png"  # https://raw.githubusercontent.com/bmax121/APatch/main/app/src/main/ic_launcher-playstore.png
+[ ! -f "$HOME/.local/share/applications/simplifyx.desktop" ] && CreateBinaryLauncherShortcuts "simplifyx" "$simplifyNext/ic_launcher.png" "$HOME/.simplifyx.sh"
+
 isJdk="java-21-openjdk"
 isAutoUpdatesDependencies=true
 if [ -f "$simplifyNextJson" ]; then

@@ -2,6 +2,47 @@
 
 # Copyright (C) 2026, Arghyadeep Mondal <github.com/arghya339>
 
+CreateAppIcon() {
+  source="$simplifyNext/ic_launcher.png"
+  [ ! -f "$source" ] && curl -L --progress-bar -C - -o "$source" "https://raw.githubusercontent.com/arghya339/Simplify/refs/heads/next/.res/mipmap-xxxhdpi/ic_launcher.png"  # https://raw.githubusercontent.com/bmax121/APatch/main/app/src/main/ic_launcher-playstore.png
+  PointSizeNames=("16x16" "16x16@2x" "32x32" "32x32@2x" "128x128" "128x128@2x" "256x256" "256x256@2x" "512x512" "512x512@2x")
+  PixelResolutions=("16" "32" "32" "64" "128" "256" "256" "512" "512" "1024")
+  iconset="$simplifyNext/ic_launcher.iconset"
+  mkdir -p $iconset
+  for ((i=0; i<${#PointSizeNames[@]}; i++)); do
+    [ ${PixelResolutions[i]} -eq 1024 ] && cp $source $iconset/icon_${PointSizeNames[i]}.png || sips -z ${PixelResolutions[i]} ${PixelResolutions[i]} $source --out $iconset/icon_${PointSizeNames[i]}.png
+  done
+  iconutil -c icns $iconset -o $simplifyNext/ic_launcher.icns && rm -rf $iconset
+}
+CreateScriptLaunchpadShortcuts() {
+  shortcutLabel=${1}
+  scriptPath=${2}
+  Interactive=${3:-true}
+  [ ! -f "$simplifyNext/ic_launcher.icns" ] && CreateAppIcon
+  mkdir -p "/Applications/${shortcutLabel}.app/Contents/Resources"
+  cp "$simplifyNext/ic_launcher.icns" "/Applications/${shortcutLabel}.app/Contents/Resources/ic_launcher.icns"
+  mkdir -p "/Applications/${shortcutLabel}.app/Contents/MacOS"
+  [ $Interactive == true ] && echo -e "#!/bin/bash\nosascript -e 'tell application \"Terminal\" to do script \"bash ${scriptPath}\"'\nosascript -e 'tell application \"System Events\" to set frontmost of process \"Terminal\" to true'" > "/Applications/${shortcutLabel}.app/Contents/MacOS/launcher" || echo -e "#!/bin/bash\nexport PATH="/usr/local/bin:/opt/homebrew/bin:/usr/bin:/bin:/usr/sbin:/sbin"\nsource ${scriptPath}" > "/Applications/${shortcutLabel}.app/Contents/MacOS/launcher"
+  chmod +x "/Applications/${shortcutLabel}.app/Contents/MacOS/launcher"
+  cat > "/Applications/${shortcutLabel}.app/Contents/Info.plist" <<EOL
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>CFBundleExecutable</key>
+    <string>launcher</string>
+    <key>CFBundleIconFile</key>
+    <string>ic_launcher</string>
+    <key>CFBundlePackageType</key>
+    <string>APPL</string>
+</dict>
+</plist>
+EOL
+  touch /Applications/${shortcutLabel}.app
+  killall Dock
+}
+[ ! -d "/Applications/simplifyx.app/" ] && CreateScriptLaunchpadShortcuts "simplifyx" "$HOME/.simplifyx.sh"
+
 isJdk="openjdk@21"
 isAutoUpdatesDependencies=true
 if [ -f "$simplifyNextJson" ]; then
