@@ -291,7 +291,7 @@ deviceInfo() {
     echo "Supported Archs: $(getprop ro.product.cpu.abilist)"
     echo "Arch           : $cpuAbi"
     echo "Locale         : $locale"
-    echo "DPI            : $lcd_dpi"
+    echo "DPI            : $lcd_dpi ($density)"
     echo "Memory         : $(free | awk '/Mem:/ {printf "%.1fGi / %.1fGi (%.0f%%)", $3/1048576, $2/1048576, ($3/$2)*100}')"
     echo "Storage        : $(df -h /storage/emulated | awk 'NR==2 {printf "%s / %s (%s)", $3, $2, $5}')"
     echo "CPU Model      : $(lscpu | grep "Model name" | cut -d: -f2 | xargs)"
@@ -308,7 +308,7 @@ deviceInfo() {
     echo "Supported Archs: $(adb -s $serial shell getprop ro.product.cpu.abilist)"
     echo "Arch           : $cpuAbi"
     echo "Locale         : $locale"
-    echo "DPI            : $lcd_dpi"
+    echo "DPI            : $lcd_dpi ($density)"
     echo "Memory         : $(adb -s $serial shell free | awk '/Mem:/ {printf "%.1fGi / %.1fGi (%.0f%%)", $3/1073741824, $2/1073741824, ($3/$2)*100}')"
     echo "Storage        : $(adb -s $serial shell df -h /storage/emulated | awk 'NR==2 {printf "%s / %s (%s)", $3, $2, $5}')"
     cpuModel=$(adb -s $serial shell cat /proc/cpuinfo | grep "model name" | cut -d: -f2 | sort -u | xargs)
