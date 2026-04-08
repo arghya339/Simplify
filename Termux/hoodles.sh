@@ -206,7 +206,7 @@ while true; do
     ibisPaintX)
       pkgName="jp.ne.ibis.ibispaintx.app"
       appName=("ibis Paint X")
-      pkgVersion="13.1.19"
+      pkgVersion="14.0.0"
       Type="xapk"
       Arch=("arm64-v8a, armeabi-v7a, x86_64")
       activityPatched="jp.ne.ibis.ibispaintx.app/.InitializeCheckActivity"
