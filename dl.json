@@ -294,6 +294,20 @@
     }
   },
   {
+    "name": "Piko Instagram",
+    "repo": "FiorenMas/Revanced-And-Revanced-Extended-Non-Root",
+    "assets": {
+      "stable": {
+        "arm64-v8a": "instagram-arm64-v8a-piko.apk"
+      },
+      "beta": {
+        "arm64-v8a": "instagram-beta-arm64-v8a-piko.apk"
+      },
+      "stable_lite": {},
+      "beta_lite": {}
+    }
+  },
+  {
     "name": "Instagram ReVanced",
     "repo": "FiorenMas/Revanced-And-Revanced-Extended-Non-Root",
     "assets": {
@@ -436,6 +450,18 @@
       "beta": {
         "arm64-v8a": "lightroom-beta-revanced.apk"
       },
+      "stable_lite": {},
+      "beta_lite": {}
+    }
+  },
+  {
+    "name": "Truecaller",
+    "repo": "FiorenMas/Revanced-And-Revanced-Extended-Non-Root",
+    "assets": {
+      "stable": {
+        "arm64-v8a": "truecaller-arm64-v8a-paresh.apk"
+      },
+      "beta": {},
       "stable_lite": {},
       "beta_lite": {}
     }
