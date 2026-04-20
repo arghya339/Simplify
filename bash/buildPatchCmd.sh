@@ -62,7 +62,10 @@ buildPatchCmd() {
   [ "$patches" == "inotia00/revanced-patches-arsclib" ] && patchCmd+=("-a" "$stockAPK" "-o" "$SimplUsr" "-c" "--experimental") || patchCmd+=("$stockAPK" "-o" "$patchedAPK" "--purge" "-f")
   [ $cliv -lt 5 ] && patchCmd+=("-m" "$integrationsPath" "--options" "$sourceDir/options.json")
   ([ $cli == "inotia00/revanced-cli" ] && [ -n "$ripLib" ]) && patchCmd+=("$ripLib")
-  ([ $cli == "MorpheApp/morphe-cli" ] && [ -n "$stripLibs" ]) && patchCmd+=("$stripLibs")
+  if [ $cli == "MorpheApp/morphe-cli" ]; then
+    [ -n "$stripLibs" ] && patchCmd+=("$stripLibs")
+    [ -n "$BytecodeMode" ] && patchCmd+=("--bytecode-mode=$BytecodeMode")
+  fi
   ([ $isAndroid == true ] && [ "$patches" != "inotia00/revanced-patches-arsclib" ] && [ "$patches" != "MorpheApp/morphe-patches" ]) && patchCmd+=("--custom-aapt2-binary=$HOME/aapt2")
 
   if [ -f "$simplifyNext/ks.json" ] && [ -f "$simplifyNext/ks.keystore" ]; then

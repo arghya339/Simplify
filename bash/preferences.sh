@@ -5,6 +5,7 @@
 isRipLocale=true  # RipLocale: options: true / false | it's delete locale (language) from patched apk file except device specific locale by default
 isRipDpi=true  # RipDpi: options: true / false | it's delete dpi from patched apk file except device specific dpi by default
 isRipLib=true  # RipLib: options: true / false | it's delete lib dir from patched apk file except device specific arch lib by default
+[ $isAndroid == true ] && isBytecodeMode="STRIP_FAST" || isBytecodeMode="FULL"  # https://github.com/MorpheApp/morphe-cli/pull/108
 
 isPrintArt=true
 
@@ -44,8 +45,8 @@ config() {
   jq --arg key "$key" --arg value "$value" '.[$key] = $value' "$jsonFile" > temp.json && mv temp.json "$jsonFile"
 }
 
-all_key=(RipLocale RipDpi RipLib printArt AutoUpdatesScript AutoUpdatesDependencies EnableOptionalFeatures SearchEngine ShowUniversalPatches ButtonsSymbol ToggleSymbol SecureSymbol rmStockApk rmPatchedApk jdk)
-all_value=("$isRipLocale" "$isRipDpi" "$isRipLib" "$isPrintArt" "$isAutoUpdatesScript" "$isAutoUpdatesDependencies" "$isEnableOptionalFeatures" "$isSearchEngine" "$isShowUniversalPatches" "$isButtonsSymbol" "$isToggleSymbol" "$isSecureSymbol" "$isRmStockApk" "$isRmPatchedApk" "$isJdk")
+all_key=(RipLocale RipDpi RipLib BytecodeMode printArt AutoUpdatesScript AutoUpdatesDependencies EnableOptionalFeatures SearchEngine ShowUniversalPatches ButtonsSymbol ToggleSymbol SecureSymbol rmStockApk rmPatchedApk jdk)
+all_value=("$isRipLocale" "$isRipDpi" "$isRipLib" "$isBytecodeMode" "$isPrintArt" "$isAutoUpdatesScript" "$isAutoUpdatesDependencies" "$isEnableOptionalFeatures" "$isSearchEngine" "$isShowUniversalPatches" "$isButtonsSymbol" "$isToggleSymbol" "$isSecureSymbol" "$isRmStockApk" "$isRmPatchedApk" "$isJdk")
 [ $isAndroid == true ] && { all_key+=(AutoUpdatesTermux); all_value+=("$isAutoUpdatesTermux"); }
 all_key+=(InstallPackageFor KeepsData GrantAllRuntimePermissions InstalledAsTestOnly DisablePlayProtect DisableVerifyAdbInstalls Installer Reinstall EnableRoolback)
 all_value+=("$isU" "$isK" "$isG" "$isT" "$isV" "$isA" "$isI" "$isR" "$isB")
@@ -60,6 +61,7 @@ reloadConfig() {
   RipLocale="$(jq -r '.RipLocale' "$simplifyNextJson" 2>/dev/null)"
   RipDpi="$(jq -r '.RipDpi' "$simplifyNextJson" 2>/dev/null)"
   RipLib="$(jq -r '.RipLib' "$simplifyNextJson" 2>/dev/null)"
+  BytecodeMode=$(jq -r '.BytecodeMode' "$simplifyNextJson" 2>/dev/null)
 
   printArt="$(jq -r '.printArt' "$simplifyNextJson" 2>/dev/null)"
 
@@ -808,8 +810,8 @@ configure() {
         done
         ;;
       Advanced)
-        advancedOptions=("Manage GitHub PAT" "Installation Options" "Show Universal Patches" "Enable-SimplifyNextOptionalFeatures" "Search engine" RipLib RipDpi RipLocale "Change Java Version" "Java Memory Limits")
-        advancedDescriptions=("increases gh api rate limit" "Install APKs on-device with advanced options" "Enable or disable universal patches across all applications" "Enable/Disable-SimplifyNextOptionalFeatures" "Manage search engines for app version search" "Remove unused native libraries from patched apps" "Remove unused native dpi from stock split apks" "Remove unused native locale from stock split apks" "" "")
+        advancedOptions=("Manage GitHub PAT" "Installation Options" "Show Universal Patches" "Enable-SimplifyNextOptionalFeatures" "Search engine" RipLib RipDpi RipLocale BytecodeMode "Change Java Version" "Java Memory Limits")
+        advancedDescriptions=("increases gh api rate limit" "Install APKs on-device with advanced options" "Enable or disable universal patches across all applications" "Enable/Disable-SimplifyNextOptionalFeatures" "Manage search engines for app version search" "Remove unused native libraries from patched apps" "Remove unused native dpi from stock split apks" "Remove unused native locale from stock split apks" "Set bytecode mode for Morphe CLI" "" "")
         selected_advanced_opt=0
         while true; do
           reloadConfig
@@ -831,6 +833,18 @@ configure() {
               confirmPrompt "RipLocale" "tfButtons" "$RipLocale" && RipLocale=true || RipLocale=false
               config "RipLocale" "$RipLocale"
               ripLocaleGen
+              ;;
+            BytecodeMode)
+              bytecodeModes=(FULL STRIP_SAFE STRIP_FAST)
+              bytecodeModeDescriptions=("The legacy behavior, rebuilds all dex files, requires the most time and memory." "Faster than FULL with somewhat reduced memory requirements, not as performant as STRIP_FAST, similar APK file size to FULL." "The default for CLI, fastest with least memory requirements but produces bigger APK files.")
+              case "$BytecodeMode" in
+                FULL) SelectedBytecodeMode=0 ;;
+                STRIP_SAFE) SelectedBytecodeMode=1 ;;
+                STRIP_FAST) SelectedBytecodeMode=2 ;;
+              esac
+              menu bytecodeModes bButtons bytecodeModeDescriptions "" $SelectedBytecodeMode && SelectedBytecodeMode=$selected
+              BytecodeMode="${bytecodeModes[SelectedBytecodeMode]}"
+              config "BytecodeMode" "$BytecodeMode"
               ;;
             "Show Universal Patches")
               confirmPrompt "Show Universal Patches" "tfButtons" "$ShowUniversalPatches" && ShowUniversalPatches=true || ShowUniversalPatches=false
