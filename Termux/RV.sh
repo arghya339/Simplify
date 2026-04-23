@@ -17,17 +17,18 @@ else
   release="pre"  # Use pre-release
   requestUrl="https://api.revanced.app/v5/patches/prerelease"
 fi
-rvApiResponseJson=$(curl -sX 'GET' "$requestUrl" -H 'accept: application/json')
+rvApiResponseJson=$(curl -sL "$requestUrl")
+version=$(jq -r '.version | sub("^v"; "")' <<< "$rvApiResponseJson")
 downloadUrl=$(jq -r '.download_url' <<< "$rvApiResponseJson")
-PatchesRvp="$RV/$(basename "$downloadUrl")"
+PatchesRvp="$RV/patches-$version.rvp"
 findPatchesRvp=$(find "$RV" -type f -name "patches-*.rvp" -print -quit)
-if [ -f "$findPatchesRvp" ]; then
-  [ "$(basename "$findPatchesRvp" 2>/dev/null)" != "$(basename "$downloadUrl")" ] && { echo -e "$notice diffs: $(basename $downloadUrl) ~ $(basename $findPatchesRvp)"; rm -f "$findPatchesRvp"; }
+if [ "$(basename "$findPatchesRvp" 2>/dev/null)" != "$(basename "$PatchesRvp")" ]; then
+  [ -f "$findPatchesRvp" ] && { echo -e "$notice diffs: $(basename $PatchesRvp) ~ $(basename $findPatchesRvp)"; rm -f "$findPatchesRvp"; }
+  while true; do
+    curl -L -C - --progress-bar -o "$PatchesRvp" "$downloadUrl"
+    [ $? -eq 0 ] && break || { echo -e "${bad} ${Red}Download failed! retrying in 5 seconds..${Reset}"; sleep 5; }
+  done
 fi
-while true; do
-  curl -L -C - --progress-bar -o "$PatchesRvp" "$downloadUrl"
-  [ $? -eq 0 ] && break || { echo -e "${bad} ${Red}Download failed! retrying in 5 seconds..${Reset}"; sleep 5; }
-done
 #bash $Simplify/dlGitHub.sh "ReVanced" "revanced-patches" "$release" ".rvp" "$RV"
 #PatchesRvp=$(find "$RV" -type f -name "patches-*.rvp" -print -quit)
 echo -e "$info ${Blue}PatchesRvp:${Reset} $PatchesRvp"
@@ -56,12 +57,12 @@ fi
 getVersion() {
   local pkgName="$1"
   
-  preVersion=$($PREFIX/lib/jvm/java-$jdkVersion-openjdk/bin/java -jar $ReVancedCLIJar list-versions $PatchesRvp -f=$pkgName | sed 's/^[[:space:]]*//; s/ (.*//;' | grep -E '^[0-9]|^Any$' | sort -rV | head -n 2 | tail -n 1)
+  preVersion=$($PREFIX/lib/jvm/java-$jdkVersion-openjdk/bin/java -jar $ReVancedCLIJar list-versions -p=$PatchesRvp -b -f=$pkgName | sed 's/^[[:space:]]*//; s/ (.*//;' | grep -E '^[0-9]|^Any$' | sort -rV | head -n 2 | tail -n 1)
   pre_stock_apk_path=$(find "$Download" -type f -name "${appName[0]}_v${preVersion}-*.apk" -print -quit)
   [[ -f "$pre_stock_apk_path" ]] && rm "$pre_stock_apk_path"  # Remove previous stock apk if exists
   
   # Get all versions for the package and sort them, then take the highest version
-  pkgVersion=$($PREFIX/lib/jvm/java-$jdkVersion-openjdk/bin/java -jar $ReVancedCLIJar list-versions $PatchesRvp -f=$pkgName | sed 's/^[[:space:]]*//; s/ (.*//;' | grep -E '^[0-9]|^Any$' | sort -rV | head -n 2 | head -n 1)
+  pkgVersion=$($PREFIX/lib/jvm/java-$jdkVersion-openjdk/bin/java -jar $ReVancedCLIJar list-versions -p=$PatchesRvp -b -f=$pkgName | sed 's/^[[:space:]]*//; s/ (.*//;' | grep -E '^[0-9]|^Any$' | sort -rV | head -n 2 | head -n 1)
 }
 
 #  --- Patching Apps Method ---
@@ -99,7 +100,7 @@ patch_app() {
     )
   fi
   echo -e "$running Patching ${appName} RV.."
-  $PREFIX/lib/jvm/java-$jdkVersion-openjdk/bin/java -jar $ReVancedCLIJar patch -p $PatchesRvp \
+  $PREFIX/lib/jvm/java-$jdkVersion-openjdk/bin/java -jar $ReVancedCLIJar patch -p $PatchesRvp -b \
       -o "$outputAPK" "${stock_apk_ref}" \
       "${patches[@]}" \
       "${universalPatches[@]}" \
@@ -626,11 +627,11 @@ getListOfPatches() {
     if [ "$ReadPatchesFile" -eq 1 ]; then
       $PREFIX/lib/jvm/java-$jdkVersion-openjdk/bin/java -jar $ReVancedCLIJar list-patches --descriptions=true --filter-package-name=$pkgName --index=true --options=true --packages=false --universal-patches=true --versions=false --bypass-verification --patches=$PatchesRvp | tee "$SimplUsr/${pkgName}_list-patches.txt"
     else
-      $PREFIX/lib/jvm/java-$jdkVersion-openjdk/bin/java -jar $ReVancedCLIJar list-patches --descriptions=true --filter-package-name=$pkgName --index=true --options=true --patches=false --universal-patches=true --versions=false --bypass-verification --patches=$PatchesRvp  # get only universal-patches list
+      $PREFIX/lib/jvm/java-$jdkVersion-openjdk/bin/java -jar $ReVancedCLIJar list-patches --descriptions=true --filter-package-name=$pkgName --index=true --options=true --universal-patches=true --versions=false --bypass-verification --patches=$PatchesRvp  # get only universal-patches list
     fi
   elif [ -z "$Patches" ]; then
     # java -jar revanced-cli-*-all.jar list-patches patches-*.rvp -h
-    $PREFIX/lib/jvm/java-$jdkVersion-openjdk/bin/java -jar $ReVancedCLIJar list-patches --descriptions=true --filter-package-name=$pkgName --index=true --options=true --patches=false --universal-patches --versions=false --bypass-verification --patches=$PatchesRvp
+    $PREFIX/lib/jvm/java-$jdkVersion-openjdk/bin/java -jar $ReVancedCLIJar list-patches --descriptions=true --filter-package-name=$pkgName --index=true --options=true --universal-patches --versions=false --bypass-verification --patches=$PatchesRvp
   fi
 }
 
