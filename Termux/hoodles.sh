@@ -22,7 +22,7 @@ else
 fi
 
 getVersion() {
-  pkgVersion=$($PREFIX/lib/jvm/java-$jdkVersion-openjdk/bin/java -jar $MorpheCLIJar list-versions $patchesPath -f=$pkgName | sed 's/^[[:space:]]*//; s/ (.*//;' | grep -E '^[0-9]|^Any$' | sort -rV | head -n 2 | head -n 1)
+  pkgVersion=$($PREFIX/lib/jvm/java-$jdkVersion-openjdk/bin/java -jar $MorpheCLIJar list-versions $patchesPath -f=${1} | sed 's/^[[:space:]]*//; s/ (.*//;' | grep -E '^[0-9]|^Any$' | sort -rV | head -n 2 | head -n 1)
 }
 
 patchApp() {
@@ -49,6 +49,7 @@ patchApp() {
 }
 
 wpsoffice_patches_args=()
+adguard_patches_args=()
 ibispaintx_patches_args=()
 solidexplorer_patches_args=()
 
@@ -59,6 +60,7 @@ if [ "$ReadPatchesFile" -eq 1 ]; then
   )
   patches_array_names=(
     wpsoffice_patches_args
+    adguard_patches_args
     ibispaintx_patches_args
     solidexplorer_patches_args
   )
@@ -158,6 +160,7 @@ getListOfPatches() {
 
 options=(CHANGELOG Spoof\ Device\ Arch List\ of\ Patches)
 [ $Android -ge 7 ] && apps=(WPSOffice ibisPaintX)
+[ $Android -ge 9 ] && apps+=(AdGuard)
 [ $Android -ge 6 ] && apps+=(SolidExplorer)
 options+=(${apps[@]})
 
@@ -183,6 +186,10 @@ while true; do
             pkgName="cn.wps.moffice_eng"
             getListOfPatches "$pkgName"
             ;;
+          AdGuard)
+            pkgName="com.adguard.android"
+            getListOfPatches "$pkgName"
+            ;;
           ibisPaintX)
             pkgName="jp.ne.ibis.ibispaintx.app"
             getListOfPatches "$pkgName"
@@ -198,15 +205,27 @@ while true; do
       pkgName="cn.wps.moffice_eng"
       appName=("WPS Office-PDF, Word, Sheet")
       pkgVersion=""
+      [ -z "$pkgVersion" ] && getVersion "$pkgName"
       Type="APK"
       Arch=("arm64-v8a + armeabi-v7a")
       activityPatched="cn.wps.moffice_eng/cn.wps.moffice.documentmanager.PreStartActivity"
       buildApp "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "APKMirror" "wpsoffice_patches_args" "$pkgName" "$activityPatched"
       ;;
+    AdGuard)
+      pkgName="com.adguard.android"
+      appName=("AdGuard for Android")
+      pkgVersion=""
+      [ -z "$pkgVersion" ] && getVersion "$pkgName"
+      Type="APK"
+      Arch=("universal")
+      activityPatched="com.adguard.android/.ui.activity.SplashActivity"
+      buildApp "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "APKMirror" "adguard_patches_args" "$pkgName" "$activityPatched"
+      ;;
     ibisPaintX)
       pkgName="jp.ne.ibis.ibispaintx.app"
       appName=("ibis Paint X")
-      pkgVersion="14.0.0"
+      pkgVersion=""
+      [ -z "$pkgVersion" ] && getVersion "$pkgName"
       Type="xapk"
       Arch=("arm64-v8a, armeabi-v7a, x86_64")
       activityPatched="jp.ne.ibis.ibispaintx.app/.InitializeCheckActivity"
@@ -216,6 +235,7 @@ while true; do
       pkgName="pl.solidexplorer2"
       appName=("Solid Explorer File Manager")
       pkgVersion=""
+      [ -z "$pkgVersion" ] && getVersion "$pkgName"
       Type="BUNDLE"
       Arch=("universal")
       activityPatched="pl.solidexplorer2/pl.solidexplorer.SolidExplorer"
