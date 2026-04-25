@@ -80,8 +80,12 @@ patchingWorkflow() {
       [ $isAndroid == true ] && termux-wake-lock
       echo "-----------------Patch Log-----------------" >> "$patchedLOG"
       if [ $EnableOptionalFeatures == true ]; then
-        tasks=("Decoding all resources" "Executing patches" "Compiling patched dex files" "Compiling modified resources" "Aligning APK" "Signing APK" "Purging temporary files" "Purged resource cache directory")
-        status=(false false false false false false false false)
+        if [ "$cli" == "MorpheApp/morphe-cli" ]; then
+          tasks=("Deleting existing temporary files directory" "Decoding all resources" "Executing patches" "Compiling patched dex files" "Compiling modified resources" "Aligning APK" "Signing APK" "Purging temporary files" "Purged resource cache directory")
+        else
+          tasks=("Deleting existing temporary files directory" "Decoding manifest" "Decoding resources" "Compiling patched dex files" "Compiling patched resources" "Aligning APK" "Signing APK" "Purging temporary files" "Purged resource cache directory")
+        fi
+        status=(false false false false false false false false false)
         while true; do
           unset task
           for ((i=0; i<${#tasks[@]}; i++)); do
@@ -195,6 +199,7 @@ patchingWorkflow() {
           echo -e "$bad ${Red}OutOfMemoryError${Reset}: ${Yellow}Device RAM overloaded!${Reset}\n ${Blue}Solutions${Reset}:\n   1. ${Yellow}Close background apps.${Reset}\n   2. ${Yellow}Use device with >${memSize}GB RAM for patching apk.${Reset}"
         else
           bugReportURL="https://github.com/$patches/issues"
+          curl -fsL "$bugReportURL" &>/dev/null || bugReportURL="https://gitlab.com/$patches/-/work_items"
           if [ $isAndroid == true ]; then termux-open-url "$bugReportURL"; elif [ $isMacOS == true ]; then open "$bugReportURL"; else xdg-open "$bugReportURL" &>/dev/null; fi
         fi
         rm -rf "$SimplUsr/$patchedAppsFilenameFormat-temporary-files"

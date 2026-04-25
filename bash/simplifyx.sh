@@ -339,7 +339,8 @@ EOF
               fi
               ;;
             "Source Code")
-              sourceURL="https://github.com/$patches"
+              curl -fsL "https://github.com/$patches" &>/dev/null
+              [ $? -eq 0 ] && sourceURL="https://github.com/$patches" || sourceURL="https://gitlab.com/$patches"
               if [ $isAndroid == true ]; then termux-open-url "$sourceURL"; elif [ $isMacOS == true ]; then open "$sourceURL"; else xdg-open "$sourceURL" &>/dev/null; fi
               ;;
             "Delete Source")

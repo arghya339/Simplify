@@ -57,6 +57,7 @@ buildPatchCmd() {
     [ "$patches" == "inotia00/revanced-patches-arsclib" ] && patchCmd+=("-b" "$patchesPath") || patchCmd+=("patch" "-b" "$patchesPath")
   else
     patchCmd+=("patch" "-p" "$patchesPath")
+    [ "$cli" == "ReVanced/revanced-cli" ] && patchCmd+=("-b")  # --bypass-verification
   fi
   patchCmd+=("${patchesCommand[@]}")
   [ "$patches" == "inotia00/revanced-patches-arsclib" ] && patchCmd+=("-a" "$stockAPK" "-o" "$SimplUsr" "-c" "--experimental") || patchCmd+=("$stockAPK" "-o" "$patchedAPK" "--purge" "-f")

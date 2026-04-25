@@ -22,7 +22,26 @@ fetchAssets() {
     assetsPaths=("$assetsPath") && unset assetsPath
   fi
   for ((i=1; i<${#repositorySlugs[@]}; i++)); do
-    dlgh "${repositorySlugs[i]}" "$prereleases" "${exts[i]}" "$sourceDir"
+    if [ "${repositorySlugs[i]}" == "ReVanced/revanced-patches" ]; then
+      [ $prereleases == false ] && requestURL="https://api.revanced.app/v5/patches" || requestURL="https://api.revanced.app/v5/patches/prerelease"
+      patchesRelease=$(curl -sL "$requestURL")
+      version=$(jq -r '.version | sub("^v"; "")' <<< "$patchesRelease")
+      description=$(jq -r '.description' <<< "$patchesRelease")
+      downloadURL=$(jq -r '.download_url' <<< "$patchesRelease")
+      #signatureDownloadURL=$(jq -r '.signature_download_url' <<< "$patchesRelease")
+      fileName=$(basename "$downloadURL")
+      assetsName="patches-$version.rvp"
+      assetsPath="$sourceDir/$assetsName"
+      findFile=$(find "$sourceDir" -type f -name "patches-*.rvp" -print -quit)
+      fileBaseName=$(basename "$findFile" 2>/dev/null)
+      if [ "$assetsName" != "$fileBaseName" ]; then
+        [ -f "$findFile" ] && { echo -e "$notice diffs: $assetsName ~ $fileBaseName"; rm -f "$findFile"; }
+        patchesUpdated=true; patchesVersion="$version"; cat <<< "$description" > "$sourceDir/CHANGELOG.md"
+        dl "curl" "$downloadURL" "$assetsPath"
+      fi
+    else
+      dlgh "${repositorySlugs[i]}" "$prereleases" "${exts[i]}" "$sourceDir"
+    fi
     assetsPaths+=("$assetsPath") && unset assetsPath
   done
   if [ $cliv -lt 5 ]; then
