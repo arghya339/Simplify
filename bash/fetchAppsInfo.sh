@@ -14,11 +14,14 @@ fetchAppsInfo() {
       jq 'map(.compatiblePackages |= (if . == null then null else to_entries | map({name: .key, versions: .value}) end))' "$patchesJson" > "tmp.json" && mv "tmp.json" "$patchesJson"  # convert compatiblePackages into array of objects (containing name & versions) instead of a dictionary
     fi
   fi
-  compatiblePackagesJson=$(jq '[.[] | select(.compatiblePackages != null) | .compatiblePackages[]] 
-    | group_by(.name) 
+  compatiblePackagesJson=$(jq '[.[] | select(.compatiblePackages != null) | .compatiblePackages[]]
+    | group_by(if .name | type == "string" then .name else .versions.packageName end)
     | map({
-        package: .[0].name, 
-        versions: ([.[].versions] | flatten | map(select(. != null)) | unique | sort | reverse | if length == 0 then null else . end)
+        package: (if .[0].name | type == "string" then .[0].name else .[0].versions.packageName end),
+        versions: (if .[0].name | type == "string"
+                   then ([.[].versions] | flatten | map(select(. != null)) | unique | sort | reverse)
+                   else ([.[].versions.targets[]?.version] | unique | sort | reverse)
+                   end | if length == 0 then null else . end)
     })' $patchesJson)
   totalPackages=$(jq length <<< "$compatiblePackagesJson")
   packages=($(jq -r ".[].package" <<< "$compatiblePackagesJson"))
