@@ -14,12 +14,7 @@ fetchAppsInfo() {
       jq 'map(.compatiblePackages |= (if . == null then null else to_entries | map({name: .key, versions: .value}) end))' "$patchesJson" > "tmp.json" && mv "tmp.json" "$patchesJson"  # convert compatiblePackages into array of objects (containing name & versions) instead of a dictionary
     fi
   fi
-  compatiblePackagesJson=$(jq '[.[] | select(.compatiblePackages != null) | .compatiblePackages[]] 
-    | group_by(.name) 
-    | map({
-        package: .[0].name, 
-        versions: ([.[].versions] | flatten | map(select(. != null)) | unique | sort | reverse | if length == 0 then null else . end)
-    })' $patchesJson)
+  compatiblePackagesJson=$(jq '[.[] | select(.compatiblePackages != null) | .compatiblePackages | if type == "array" then .[] else to_entries[] end] | group_by(if .key then .key elif .packageName then .packageName else .versions.packageName end) | map({package: (if .[0].key then .[0].key elif .[0].packageName then .[0].packageName else .[0].versions.packageName end), versions: (if .[0].value then ([.[].value] | flatten | map(select(. != null)) | unique | sort) elif .[0].targets then ([.[].targets[]?.version] | unique | sort) else ([.[].versions.targets[]?.version] | unique | sort) end | if . == [] then null else . end)}) | map(select(.package != null))' $patchesJson)
   totalPackages=$(jq length <<< "$compatiblePackagesJson")
   packages=($(jq -r ".[].package" <<< "$compatiblePackagesJson"))
   

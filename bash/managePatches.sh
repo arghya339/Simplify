@@ -5,9 +5,9 @@
 shopt -s extglob
 
 managePatches() {
-  mapfile -t patchNames < <(jq -r --arg pkg "$package" '.[] | select(.compatiblePackages[]?.name == $pkg) | .name' $sourceDir/patches-$patchesVersion.json)
-  mapfile -t patchDescriptions < <(jq -r --arg pkg "$package" '.[] | select(.compatiblePackages[]?.name == $pkg) | .description' $sourceDir/patches-$patchesVersion.json)
-  mapfile -t compatibleVersions < <(jq -c --arg pkg "$package" '.[] | select(any(.compatiblePackages[]?; .name == $pkg)) | .compatiblePackages[] | select(.name == $pkg) | .versions' $sourceDir/patches-$patchesVersion.json)
+  mapfile -t patchNames < <(jq -r --arg pkg "$package" '.[] | select(any(.compatiblePackages[]?; if .name? and (.name|type)=="string" then .name == $pkg else .versions | if type=="object" then .packageName == $pkg elif type=="array" then any(.[].packageName? == $pkg) else false end end)) | .name' $sourceDir/patches-$patchesVersion.json)
+  mapfile -t patchDescriptions < <(jq -r --arg pkg "$package" '.[] | select(any(.compatiblePackages[]?; if .name? and (.name|type)=="string" then .name == $pkg else .versions | if type=="object" then .packageName == $pkg elif type=="array" then any(.[].packageName? == $pkg) else false end end)) | .description' $sourceDir/patches-$patchesVersion.json)
+  mapfile -t compatibleVersions < <(jq -c --arg pkg "$package" '.[] | .compatiblePackages[]? | select( if .name? and (.name|type)=="string" then .name == $pkg else if .versions? and (.versions|type)=="object" then .versions.packageName == $pkg elif .versions? and (.versions|type)=="array" then any(.versions[]?.packageName? == $pkg) else false end end ) | ( if .versions? and (.versions|type)=="array" then .versions else .versions.targets? // [] | map(.version) end )' $sourceDir/patches-$patchesVersion.json)
   if [ "$patches" == "d4n3436/revanced-patches-android5" ] || [ "$patches" == "inotia00/revanced-patches-arsclib" ]; then
     mapfile -t excludeds < <(jq -r --arg pkg "$package" '.[] | select(.compatiblePackages[]?.name == $pkg) | .excluded' $sourceDir/patches-$patchesVersion.json)
     patchUses=()
@@ -16,7 +16,7 @@ managePatches() {
       patchUses+=($patchUse)
     done
   else
-    mapfile -t patchUses < <(jq -r --arg pkg "$package" '.[] | select(.compatiblePackages[]?.name == $pkg) | .use' $sourceDir/patches-$patchesVersion.json)
+    mapfile -t patchUses < <(jq -r --arg pkg "$package" '.[] | select(any(.compatiblePackages[]?; if .name? and (.name|type)=="string" then .name == $pkg else .versions | if type=="object" then .packageName == $pkg elif type=="array" then any(.[].packageName? == $pkg) else false end end)) | (if .use != null then .use else .default end)' $sourceDir/patches-$patchesVersion.json)
   fi
 
   if [ "$ShowUniversalPatches" == "true" ]; then
@@ -30,7 +30,7 @@ managePatches() {
         uPatchUses+=($patchUse)
       done
     else
-      mapfile -t uPatchUses < <(jq -r '.[] | select(.compatiblePackages == null) .use' $sourceDir/patches-$patchesVersion.json)
+      mapfile -t uPatchUses < <(jq -r '.[] | select(.compatiblePackages == null) | (if .use != null then .use else .default end)' $sourceDir/patches-$patchesVersion.json)
     fi
   fi
 
@@ -248,13 +248,13 @@ managePatches() {
     for ((i=0; i<${#patchNames[@]}; i++)); do
       patchName="${patchNames[i]}"
       state="${itemsStates["$patchName"]}"
-      [ $state -eq 1 ] && { patchStatesB="true"; excluded=false; } || { patchStatesB="false"; excluded=true; }
+      [ $state -eq 1 ] && { patchStatesB=true; excluded=false; } || { patchStatesB=false; excluded=true; }
       ([ "$patches" == "d4n3436/revanced-patches-android5" ] || [ "$patches" == "inotia00/revanced-patches-arsclib" ]) && { patchKey="excluded"; value="$excluded"; } || { patchKey="use"; value="$patchStatesB"; }
       isUniversal=$(jq -r --arg pn "$patchName" '.[] | select(.name == $pn) | if .compatiblePackages == null then "true" else "false" end' $sourceDir/patches-$patchesVersion.json)
       if [ "$isUniversal" == "true" ]; then
-        jq --arg pn "$patchName" --arg key "$patchKey" --argjson v "$value" 'map(if .name == $pn and .compatiblePackages == null then .[$key] = $v else . end)' $sourceDir/patches-$patchesVersion.json > tmp.json && mv tmp.json $sourceDir/patches-$patchesVersion.json
+        jq --arg pn "$patchName" --arg key "$patchKey" --argjson v "$value" 'map(if .name == $pn and .compatiblePackages == null then if .use != null then .[$key] = $v else .default = $v end else . end)' $sourceDir/patches-$patchesVersion.json > tmp.json && mv tmp.json $sourceDir/patches-$patchesVersion.json
       else
-        jq --arg pkg "$package" --arg pn "$patchName" --arg key "$patchKey" --argjson v "$value" 'map(if .name == $pn and any(.compatiblePackages[]?; .name == $pkg) then .[$key] = $v else . end)' $sourceDir/patches-$patchesVersion.json > tmp.json && mv tmp.json $sourceDir/patches-$patchesVersion.json
+        jq --arg pkg "$package" --arg pn "$patchName" --arg key "$patchKey" --argjson v "$value" 'map(if .name == $pn and any(.compatiblePackages[]?; if .name? and (.name|type)=="string" then .name == $pkg else .versions | if type=="object" then .packageName == $pkg elif type=="array" then any(.[].packageName? == $pkg) else false end end) then if .use != null then .[$key] = $v else .default = $v end else . end)' $sourceDir/patches-$patchesVersion.json > tmp.json && mv tmp.json $sourceDir/patches-$patchesVersion.json
       fi
     done
     [ $cliv -ge 5 ] && editOptions || editOptionsJson
