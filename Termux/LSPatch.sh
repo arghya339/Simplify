@@ -297,6 +297,7 @@ comment
 if [ "$cpuAbi" == "arm64-v8a" ] || [ "$cpuAbi" == "armeabi-v7a" ]; then
   #Snapchat="Snapchat"
   Truecaller="Truecaller"
+  TeraBox="TeraBox"
   LINE="LINE"
   [ $su -eq 1 ] && googleDialer="PhoneByGoogle"
 fi
@@ -308,6 +309,7 @@ if [ $Android -ge 10 ]; then
     NagramX
     Reddit
     ${Truecaller}
+    $TeraBox
     Duolingo
     Thanox
     AdvancedDownloadManager
@@ -324,6 +326,7 @@ elif [ $Android -eq 9 ]; then
     NagramX
     Reddit
     ${Truecaller}
+    $TeraBox
     Thanox
     AdvancedDownloadManager
     Discord
@@ -337,6 +340,7 @@ elif [ $Android -eq 8 ]; then
     ${Snapchat}
     NagramX
     ${Truecaller}
+    $TeraBox
     Thanox
     AdvancedDownloadManager
     Discord
@@ -348,6 +352,7 @@ elif [ $Android -eq 7 ]; then
   apps=(
     ${Snapchat}
     NagramX
+    $TeraBox
     Thanox
     AdvancedDownloadManager
     Discord
@@ -359,6 +364,7 @@ elif [ $Android -eq 6 ]; then
   apps=(
     ${Snapchat}
     NagramX
+    $TeraBox
     Thanox
     AdvancedDownloadManager
     RAR
@@ -443,6 +449,19 @@ while true; do
       module_apk_path=$(find "$LSPatch" -type f -name "xVIPHookXposed-*.apk" -print -quit)
       echo -e "$info module_apk_path: $module_apk_path"
       activityPatched="com.truecaller/.ui.TruecallerInit"
+      BugReport="https://github.com/NKR00711/xVIPHook/issues/new"
+      build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "APKMirror" "$module_apk_path" "$BugReport" "$pkgName" "$activityPatched"
+      ;;
+    TeraBox)
+      appName=("TeraBox")
+      pkgName="com.dubox.drive"
+      pkgVersion=
+      Type="BUNDLE"
+      Arch=("arm64-v8a + armeabi-v7a")
+      bash $Simplify/dlGitHub.sh "NKR00711" "xVIPHook" "latest" ".apk" "$LSPatch"
+      module_apk_path=$(find "$LSPatch" -type f -name "xVIPHookXposed-*.apk" -print -quit)
+      echo -e "$info module_apk_path: $module_apk_path"
+      activityPatched="com.dubox.drive/.ui.Logo0LauncherActivity"
       BugReport="https://github.com/NKR00711/xVIPHook/issues/new"
       build_app "$pkgName" "appName" "$pkgVersion" "$Type" "Arch" "APKMirror" "$module_apk_path" "$BugReport" "$pkgName" "$activityPatched"
       ;;
