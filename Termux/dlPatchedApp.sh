@@ -703,7 +703,7 @@ while true; do
         Google\ Clock\ →\ Fossify\ Clock
         Google\ Password\ Manager\ →\ Bitwarden
         Google\ Password\ Manager\ →\ Proton\ Pass
-        Google\ Tasks\ →\ Microsoft\ To\ Do
+        Google\ Tasks\ →\ Super\ Productivity
         Google\ News\ →\ Feeder
         Google\ Wallpapers\ →\ Starth\ Bing\ Wallpaper
         Gmail\ →\ Proton\ Mail
@@ -950,7 +950,7 @@ while true; do
           Google\ Clock\ →\ Fossify\ Clock) termux-open-url "https://play.google.com/store/apps/details?id=org.fossify.clock" ;;
           Google\ Password\ Manager\ →\ Bitwarden) termux-open-url "https://play.google.com/store/apps/details?id=com.x8bit.bitwarden" ;;
           Google\ Password\ Manager\ →\ Proton\ Pass) termux-open-url "https://play.google.com/store/apps/details?id=proton.android.pass" ;;
-          Google\ Tasks\ →\ Microsoft\ To\ Do) termux-open-url "https://play.google.com/store/apps/details?id=com.microsoft.todos" ;;
+          Google\ Tasks\ →\ Super\ Productivity) termux-open-url "https://play.google.com/store/apps/details?id=com.superproductivity.superproductivity" ;;
           Google\ News\ →\ Feeder) termux-open-url "https://play.google.com/store/apps/details?id=com.nononsenseapps.feeder.play" ;;
           Google\ Wallpapers\ →\ Starth\ Bing\ Wallpaper) termux-open-url "https://play.google.com/store/apps/details?id=me.liaoheng.wallpaper" ;;
           Gmail\ →\ Proton\ Mail) termux-open-url "https://play.google.com/store/apps/details?id=ch.protonmail.android" ;;
