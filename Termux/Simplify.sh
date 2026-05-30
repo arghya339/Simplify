@@ -373,8 +373,8 @@ if [ $su -eq 0 ] && { [ ! -f "$HOME/rish" ] || [ ! -f "$HOME/rish_shizuku.dex" ]
   termux-open-url "https://github.com/RikkaApps/Shizuku/releases/latest"
   am start -n com.android.settings/.Settings\$MyDeviceInfoActivity > /dev/null 2>&1  # Open Device Info
 
-  curl -sL -o "$HOME/rish" "https://raw.githubusercontent.com/arghya339/crdl/refs/heads/main/Termux/Shizuku/rish" && chmod +x "$HOME/rish"
-  sleep 0.5 && curl -sL -o "$HOME/rish_shizuku.dex" "https://raw.githubusercontent.com/arghya339/crdl/refs/heads/main/Termux/Shizuku/rish_shizuku.dex"
+  curl -sL -o "$HOME/rish" "https://raw.githubusercontent.com/arghya339/crdl/refs/heads/main/Shizuku/rish" && chmod +x "$HOME/rish"
+  sleep 0.5 && curl -sL -o "$HOME/rish_shizuku.dex" "https://raw.githubusercontent.com/arghya339/crdl/refs/heads/main/Shizuku/rish_shizuku.dex"
   
   if [ "$Android" -lt 11 ]; then
     url="https://youtu.be/ZxjelegpTLA"  # YouTube/@MrPalash360: Start Shizuku using Computer
@@ -389,7 +389,7 @@ if [ $su -eq 0 ] && { [ ! -f "$HOME/rish" ] || [ ! -f "$HOME/rish_shizuku.dex" ]
 fi
 if ! "$HOME/rish" -c "id" >/dev/null 2>&1 && [ -f "$HOME/rish_shizuku.dex" ]; then
   if ~/rish -c "id" 2>&1 | grep -q 'java.lang.UnsatisfiedLinkError'; then
-    rm -f "$HOME/rish_shizuku.dex" && curl -sL -o "$HOME/rish_shizuku.dex" "https://raw.githubusercontent.com/arghya339/crdl/refs/heads/main/Termux/Shizuku/Play/rish_shizuku.dex"
+    rm -f "$HOME/rish_shizuku.dex" && curl -sL -o "$HOME/rish_shizuku.dex" "https://raw.githubusercontent.com/arghya339/crdl/refs/heads/main/Shizuku/Play/rish_shizuku.dex"
   fi
 fi
 
@@ -398,7 +398,7 @@ if [ "$(getprop ro.product.manufacturer)" == "Genymobile" ] && [ ! -f "$HOME/adb
 fi
 
 # --- Download and give execute (--x) permission to AAPT2 Binary ---
-[[ $(~/aapt2 version 2>&1 | awk '{print $NF}') =~ ^(2.19-1023|2.19-3401)$ ]] || { rm -f ~/aapt2 && curl -L --progress-bar -C - -o ~/aapt2 $(curl -sL https://api.github.com/repos/ReVanced/aapt2/releases/latest | jq -r --arg arch "$cpuAbi" '.assets[] | select(.name == "aapt2-" + $arch) | .browser_download_url') && chmod +x ~/aapt2 && ~/aapt2 version 2>&1; }
+[[ $(~/aapt2 version 2>&1 | awk '{print $NF}') =~ ^(V14.0.6.0.TKSMIXM|2.19-3401)$ ]] || { rm -f ~/aapt2 && curl -L --progress-bar -C - -o ~/aapt2 $(curl -sL https://api.github.com/repos/ReVanced/aapt2/releases/latest | jq -r --arg arch "$cpuAbi" '.assets[] | select(.name == "aapt2-" + $arch) | .browser_download_url') && chmod +x ~/aapt2 && ~/aapt2 version 2>&1; }
 
 curl -sL "https://raw.githubusercontent.com/arghya339/Simplify/refs/heads/main/Termux/dlGitHub.sh" --progress-bar -o $Simplify/dlGitHub.sh
 
