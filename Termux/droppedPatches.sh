@@ -36,7 +36,7 @@ patch_app() {
   
   $PREFIX/lib/jvm/java-$jdkVersion-openjdk/bin/java -jar $ReVancedCLIJar patch -p $PatchesRvp \
     -o "$outputAPK" "${stock_apk_ref[0]}" \
-    --custom-aapt2-binary="$HOME/aapt2" --purge $ripLib -f | tee "$log"
+    --custom-aapt2-binary="$PREFIX/bin/aapt2" --purge $ripLib -f | tee "$log"
   
   if [ ! -f "$outputAPK" ] && [ -f "${stock_apk_ref[0]}" ]; then
     echo -e "$bad Oops, $appName Patching failed !! Logs saved to "$log". Share the Patchlog to developer."

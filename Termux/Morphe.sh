@@ -1,6 +1,6 @@
 #!/usr/bin/bash
 
-[ $su -eq 1 ] && echo -e "$info ${Blue}Target device:${Reset} $Model ($Serial)" || echo -e "$info ${Blue}Target device:${Reset} $Model"
+[ $su == true ] && echo -e "$info ${Blue}Target device:${Reset} $Model ($Serial)" || echo -e "$info ${Blue}Target device:${Reset} $Model"
 
 branding "morphe_branding"  # Call branding function
 
@@ -36,7 +36,7 @@ fi
 #PatchesMpp=$(find "$Morphe" -type f -name "patches-*.mpp" -print -quit)
 echo -e "$info ${Blue}PatchesMpp:${Reset} $PatchesMpp"
 
-if [ $su -eq 0 ]; then
+if [ $su == false ]; then
   bash $Simplify/dlGitHub.sh "MorpheApp" "MicroG-RE" "latest" ".apk" "$SimplUsr"
   MicroGRE=$(find "$SimplUsr" -type f -name "MicroG-RE-*.apk" -print -quit)
 fi
@@ -70,9 +70,9 @@ patch_app() {
 
 yt_patches_args=(-e "Change header" -O custom="$SimplUsr/.morphe_branding/youtube/header/$Branding")
 
-[ $su -eq 1 ] && yt_patches_args+=(-d "GmsCore support" -e "Custom branding" -O customName=YouTube -O customIcon="$SimplUsr/.morphe_branding/youtube/launcher/$Branding") || yt_patches_args+=(-e "Custom branding" -O customName="YouTube Morphe" -O customIcon="$SimplUsr/.morphe_branding/youtube/launcher/$Branding")
+[ $su == true ] && yt_patches_args+=(-d "GmsCore support" -e "Custom branding" -O customName=YouTube -O customIcon="$SimplUsr/.morphe_branding/youtube/launcher/$Branding") || yt_patches_args+=(-e "Custom branding" -O customName="YouTube Morphe" -O customIcon="$SimplUsr/.morphe_branding/youtube/launcher/$Branding")
 
-[ $su -eq 1 ] && yt_music_patches_args=(-d "GmsCore support" -e "Custom branding" -O customName="YouTube Music" -O customIcon="$SimplUsr/.morphe_branding/music/launcher/$Branding") || yt_music_patches_args=(-e "Custom branding" -O customName="YouTube Music Morphe" -O customIcon="$SimplUsr/.morphe_branding/music/launcher/$Branding")
+[ $su == true ] && yt_music_patches_args=(-d "GmsCore support" -e "Custom branding" -O customName="YouTube Music" -O customIcon="$SimplUsr/.morphe_branding/music/launcher/$Branding") || yt_music_patches_args=(-e "Custom branding" -O customName="YouTube Music Morphe" -O customIcon="$SimplUsr/.morphe_branding/music/launcher/$Branding")
 
 reddit_patches_args=()
 
@@ -94,7 +94,7 @@ if [ "$ReadPatchesFile" -eq 1 ]; then
     if [ ! -e "$SimplUsr/${arraynames[$i]}.txt" ]; then
       printf "%s\n" "${default_content[i]}" > "$SimplUsr/${arraynames[$i]}.txt"
       if [ "${arraynames[$i]}" == "yt_patches_args" ] || [ "${arraynames[$i]}" == "yt_music_patches_args" ]; then
-        if [ $su -eq 1 ]; then
+        if [ $su == true ]; then
           echo "-d \"GmsCore support\"" >> "$SimplUsr/${arraynames[$i]}.txt"
           if [ "${arraynames[$i]}" == "yt_patches_args" ]; then
             echo "-e \"Custom branding\" -O customName=YouTube -O customIcon=\"/sdcard/Simplify/.morphe_branding/youtube/launcher/google_family\"" >> "$SimplUsr/${arraynames[$i]}.txt"
@@ -198,7 +198,7 @@ build_app() {
   if [ -f "$outputAPK" ]; then
     
     if [ $pkgName == "com.google.android.youtube" ] || [ $pkgName == "com.google.android.apps.youtube.music" ]; then
-      if [ $su -eq 1 ]; then
+      if [ $su == true ]; then
         if [ "$pkgName" == "com.google.android.youtube" ]; then
           buttons=("<Install>" "<Mount>" "<Cancel>")
           confirmPrompt "Select ${appNameRef[0]} Morphe installation operation" "buttons" "1"
@@ -206,7 +206,7 @@ build_app() {
           if [ $exit_status -eq 0 ]; then opt=Install; elif [ $exit_status -eq 1 ]; then opt=Mount; elif [ $exit_status -eq 2 ]; then opt=Cancel; fi
           case $opt in
             Install)
-              if [ $su -eq 1 ]; then
+              if [ $su == true ]; then
                 pkgInstall "python"  # python install/update
                 ! pip list 2>/dev/null | grep -q "apksigcopier" && pip install apksigcopier > /dev/null 2>&1  # install apksigcopier using pip
               fi

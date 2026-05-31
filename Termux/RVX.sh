@@ -1,6 +1,6 @@
 #!/usr/bin/bash
 
-[ $su -eq 1 ] && echo -e "$info ${Blue}Target device:${Reset} $Model ($Serial)" || echo -e "$info ${Blue}Target device:${Reset} $Model"
+[ $su == true ] && echo -e "$info ${Blue}Target device:${Reset} $Model ($Serial)" || echo -e "$info ${Blue}Target device:${Reset} $Model"
 
 branding  # Call branding function
 
@@ -30,7 +30,7 @@ Patches=$(find "$RVX" -type f -name "patches-*${ext}" -print -quit)
 echo -e "$info ${Blue}Patches:${Reset} $Patches"
 
 # --- Download MicroG ---
-if [ $su -eq 0 ]; then
+if [ $su == false ]; then
   if [ $Android -eq 5 ]; then
     MicroG="$SimplUsr/microg-0.2.22.212658.apk"
     [ ! -f "$MicroG" ] && curl -L --progress-bar -C - -o "$MicroG" "https://github.com/TeamVanced/VancedMicroG/releases/download/v0.2.22.212658-212658001/microg.apk"
@@ -135,13 +135,13 @@ patch_app() {
     $PREFIX/lib/jvm/java-$jdkVersion-openjdk/bin/java -jar $ReVancedCLIv4 patch $stock_apk_path -o $outputAPK -m $IntegrationsApk -b $PatchesJar \
       -i "materialyou" -i "spoof-streaming-data" -e "hide-autoplay-button" -e "hide-cast-button"  -e "hide-create-button" -e "hide-endscreen-overlay" -e "hide-next-prev-button" \
       -e "hide-player-captions-button" -e "hide-player-overlay-filter" -e "hide-shorts-button" -e "switch-create-notification" \
-      --custom-aapt2-binary="$HOME/aapt2" --purge | tee "$log"  # --options $SimplUsr/options.json $ripLib 
+      --custom-aapt2-binary="$PREFIX/bin/aapt2" --purge | tee "$log"  # --options $SimplUsr/options.json $ripLib 
       [ -f $HOME/options.json ] && rm -f ~/options.json
   elif [ $Android -eq 5 ] && [ "$appName" == "YouTube" ]; then
     $PREFIX/lib/jvm/java-$jdkVersion-openjdk/bin/java -jar $ReVancedCLIv4 patch $stock_apk_path -o $outputAPK -m $IntegrationsApk --options $SimplUsr/options.json -b $PatchesJar \
       -i patch-options -i custom-branding-icon-afn-blue -i custom-branding-icon-revancify -i materialyou -i spoof-app-version \
       -e custom-branding-icon-afn-red -e hide-autoplay-button -e hide-cast-buttom -e hide-create-button -e hide-endscreen-overlay -e hide-next-prev-button -e hide-player-captions-button -e hide-player-overlay-filter -e hide-shorts-button -e hide-snackbar -e switch-create-notification \
-      --custom-aapt2-binary="$HOME/aapt2" --purge $ripLib | tee "$log"
+      --custom-aapt2-binary="$PREFIX/bin/aapt2" --purge $ripLib | tee "$log"
   elif [ $ChangeRVXSource -eq 0 ] && [ "$appName" == "Reddit" ] && [ "$ARSCLib" == "true" ]; then
     $PREFIX/lib/jvm/java-$jdkVersion-openjdk/bin/java -jar $rvCli options -b $rvPatches  # Genarate patches options.json
     jq '(.[] | select(.patchName == "Change version code").options[] | select(.key == "ChangeVersionCode").value) |= true' options.json > temp.json && mv temp.json options.json  # modifiy ChangeVersionCode key value = true
@@ -153,7 +153,7 @@ patch_app() {
       -o "$outputAPK" "$stock_apk_path" \
       "${patches[@]}" \
       -e "Change version code" -OversionCode="2147483647" \
-      --custom-aapt2-binary="$HOME/aapt2" \
+      --custom-aapt2-binary="$PREFIX/bin/aapt2" \
       --purge $ripLib -f | tee "$log"
   else
     $PREFIX/lib/jvm/java-$jdkVersion-openjdk/bin/java -jar $CLI patch -p $Patches -o "$outputAPK" "${stock_apk_path}" "${patches[@]}" -e "Change version code" -OversionCode="2147483647" --purge $stripLibs -f | tee "$log"
@@ -185,7 +185,7 @@ yt_patches_args=(
   -e="Return YouTube Username"
 )
 
-if [ $su -eq 1 ]; then
+if [ $su == true ]; then
   yt_patches_args+=(
     -d "GmsCore support"
     -e "Custom branding name for YouTube" -OappName=YouTube
@@ -209,7 +209,7 @@ yt_music_patches_args=(
   -e="Return YouTube Username" -e "Disable music video in album"
 )
 
-if [ $su -eq 1 ]; then
+if [ $su == true ]; then
   yt_music_patches_args+=(
     -d "GmsCore support"
     -e "Custom branding name for YouTube Music" -OappNameNotification="YouTube Music" -OappNameLauncher="YT Music"
@@ -279,7 +279,7 @@ if [ "$ReadPatchesFile" -eq 1 ]; then
       #touch "$SimplUsr/${arraynames[$i]}.txt"
       printf "%s\n" "${default_content[i]}" > "$SimplUsr/${arraynames[$i]}.txt"
       if [ "${arraynames[$i]}" == "yt_patches_args" ] || [ "${arraynames[$i]}" == "yt_music_patches_args" ]; then
-        if [ $su -eq 1 ]; then
+        if [ $su == true ]; then
           echo "-d \"GmsCore support\"" >> "$SimplUsr/${arraynames[$i]}.txt"
           if [ "${arraynames[$i]}" == "yt_patches_args" ]; then
             echo "-e \"Custom branding name for YouTube\" -OappName=YouTube" >> "$SimplUsr/${arraynames[$i]}.txt"
@@ -387,7 +387,7 @@ build_app() {
   if [ -f "$outputAPK" ]; then
     
     if [ $pkgName == "com.google.android.youtube" ] || [ $pkgName == "com.google.android.apps.youtube.music" ] || [ "$pkgName" == "com.spotify.music" ]; then
-      if [ $su -eq 1 ]; then
+      if [ $su == true ]; then
         if [ "$pkgName" == "com.google.android.youtube" ]; then
           buttons=("<Install>" "<Mount>" "<Cancel>")
           confirmPrompt "Select ${appNameRef[0]} RVX installation operation" "buttons" "1"
@@ -395,7 +395,7 @@ build_app() {
           if [ $exit_status -eq 0 ]; then opt=Install; elif [ $exit_status -eq 1 ]; then opt=Mount; elif [ $exit_status -eq 2 ]; then opt=Cancel; fi
           case $opt in
             Install)
-              if [ $su -eq 1 ]; then
+              if [ $su == true ]; then
                 pkgInstall "python"  # python install/update
                 ! pip list 2>/dev/null | grep -q "apksigcopier" && pip install apksigcopier > /dev/null 2>&1  # install apksigcopier using pip
               fi
@@ -457,7 +457,7 @@ getListOfPatches() {
 }
 
 if [ $ChangeRVXSource -eq 1 ]; then
-  [ $su -eq 1 ] && Spotify="Spotify"
+  [ $su == true ] && Spotify="Spotify"
   [ "$cpuAbi" == "arm64-v8a" ] && NetWall="NetWall"
 fi
 
@@ -552,7 +552,7 @@ while true; do
     YouTube)
       pkgName="com.google.android.youtube"
       Arch="universal"
-      [ $su -eq 1 ] && Type="APK" || Type="BUNDLE"
+      [ $su == true ] && Type="APK" || Type="BUNDLE"
       if [ $Android -ge 8 ]; then
         if [ $ChangeRVXSource -eq 0 ]; then
           pkgVersion="20.12.46"

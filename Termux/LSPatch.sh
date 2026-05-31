@@ -1,6 +1,6 @@
 #!/usr/bin/bash
 
-[ $su -eq 1 ] && echo -e "$info ${Blue}Target device:${Reset} $Model ($Serial)" || echo -e "$info ${Blue}Target device:${Reset} $Model"
+[ $su == true ] && echo -e "$info ${Blue}Target device:${Reset} $Model ($Serial)" || echo -e "$info ${Blue}Target device:${Reset} $Model"
 
 # --- Download LSPatch ---
 bash $Simplify/dlGitHub.sh "JingMatrix" "LSPatch" "latest" ".jar" "$LSPatch" "lspatch.jar"
@@ -299,7 +299,7 @@ if [ "$cpuAbi" == "arm64-v8a" ] || [ "$cpuAbi" == "armeabi-v7a" ]; then
   Truecaller="Truecaller"
   TeraBox="TeraBox"
   LINE="LINE"
-  [ $su -eq 1 ] && googleDialer="PhoneByGoogle"
+  [ $su == true ] && googleDialer="PhoneByGoogle"
 fi
 
 # --- Arrays of apps list that required specific android version ---

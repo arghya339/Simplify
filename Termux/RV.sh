@@ -1,6 +1,6 @@
 #!/usr/bin/bash
 
-[ $su -eq 1 ] && echo -e "$info ${Blue}Target device:${Reset} $Model ($Serial)" || echo -e "$info ${Blue}Target device:${Reset} $Model"
+[ $su == true ] && echo -e "$info ${Blue}Target device:${Reset} $Model ($Serial)" || echo -e "$info ${Blue}Target device:${Reset} $Model"
 
 branding "revanced_branding"  # Call branding function
 
@@ -34,7 +34,7 @@ fi
 echo -e "$info ${Blue}PatchesRvp:${Reset} $PatchesRvp"
 
 # --- Download Vanced MicroG ---
-if [ $su -eq 0 ]; then
+if [ $su == false ]; then
   if [ "$Android" -ge "6" ]; then
     bash $Simplify/dlGitHub.sh "inotia00" "VancedMicroG" "latest" ".apk" "$SimplUsr"
     VancedMicroG=$(find "$SimplUsr" -type f -name "microg-*.apk" -print -quit)
@@ -104,7 +104,7 @@ patch_app() {
       -o "$outputAPK" "${stock_apk_ref}" \
       "${patches[@]}" \
       "${universalPatches[@]}" \
-      --custom-aapt2-binary="$HOME/aapt2" \
+      --custom-aapt2-binary="$PREFIX/bin/aapt2" \
       --purge -f | tee "$log"
   
   if grep -q "OutOfMemory" "$log"; then
@@ -133,7 +133,7 @@ yt_patches_args=(
   -d "Announcements"
 )
 
-if [ $su -eq 1 ]; then
+if [ $su == true ]; then
   yt_patches_args+=(
     -d "GmsCore support"
     -e "Custom branding" -O customName=YouTube -O customIcon="$SimplUsr/.revanced_branding/youtube/launcher/$Branding"
@@ -145,7 +145,7 @@ else
   )
 fi
 
-if [ $su -eq 1 ]; then
+if [ $su == true ]; then
   spotify_patches_args=(
     -e "Change lyrics provider"
     -e "Custom theme"
@@ -167,7 +167,7 @@ tiktok_patches_args=(
 
 photos_patches_args=()
 
-if [ $su -eq 1 ]; then
+if [ $su == true ]; then
   photos_patches_args+=(-d "GmsCore support")
 else
   photos_patches_args+=(-e "GmsCore support" -O gmsCoreVendorGroupId="com.mgoogle")
@@ -289,7 +289,7 @@ if [ "$ReadPatchesFile" -eq 1 ]; then
       #touch "$SimplUsr/${arraynames[$i]}.txt"
       printf "%s\n" "${default_content[i]}" > "$SimplUsr/${arraynames[$i]}.txt"
       if [ "${arraynames[$i]}" == "yt_patches_args" ] || [ "${arraynames[$i]}" == "photos_patches_args" ]; then
-        if [ $su -eq 1 ]; then
+        if [ $su == true ]; then
           echo "-d \"GmsCore support\"" >> "$SimplUsr/${arraynames[$i]}.txt"
           if [ "${arraynames[$i]}" == "yt_patches_args" ]; then
             echo "-e \"Custom branding\" -O customName=YouTube -O customIcon=\"/sdcard/Simplify/.revanced_branding/youtube/launcher/google_family\"" >> "$SimplUsr/${arraynames[$i]}.txt"
@@ -301,7 +301,7 @@ if [ "$ReadPatchesFile" -eq 1 ]; then
           fi
         fi
       fi
-      if [ $su -eq 1 ] && [ "${arraynames[$i]}" == "spotify_patches_args" ]; then
+      if [ $su == true ] && [ "${arraynames[$i]}" == "spotify_patches_args" ]; then
         echo "-d \"Spoof client\"" >> "$SimplUsr/${arraynames[$i]}.txt"
       fi
     fi
@@ -331,8 +331,8 @@ changeVersionCode() {
   versionCode="2147483647"  # Sets the maximum version code to prevent an update.
   input_apk_path=${1}
   filename_wo_ext="${input_apk_path%.*}"
-  input_apk_packageName=$($HOME/aapt2 dump badging "$input_apk_path" 2>/dev/null | awk -F"'" '/package/ {print $2}')
-  input_apk_versionCode=$($HOME/aapt2 dump badging "$input_apk_path" 2>/dev/null | sed -n "s/.*versionCode='\([^']*\)'.*/\1/p")
+  input_apk_packageName=$($PREFIX/bin/aapt2 dump badging "$input_apk_path" 2>/dev/null | awk -F"'" '/package/ {print $2}')
+  input_apk_versionCode=$($PREFIX/bin/aapt2 dump badging "$input_apk_path" 2>/dev/null | sed -n "s/.*versionCode='\([^']*\)'.*/\1/p")
   
   # Download apktool
   bash $Simplify/dlGitHub.sh "iBotPeaches" "Apktool" "latest" ".jar" "$RV"
@@ -440,7 +440,7 @@ comment
   
   # Rename
   if [ -f "${filename_wo_ext}_src_aligned_signed.apk" ]; then
-    output_apk_versionCode=$($HOME/aapt2 dump badging "${filename_wo_ext}_src_aligned_signed.apk" 2>/dev/null | sed -n "s/.*versionCode='\([^']*\)'.*/\1/p")
+    output_apk_versionCode=$($PREFIX/bin/aapt2 dump badging "${filename_wo_ext}_src_aligned_signed.apk" 2>/dev/null | sed -n "s/.*versionCode='\([^']*\)'.*/\1/p")
     rm -f "$input_apk_path"  # remove input file
     rm -f "${filename_wo_ext}_src.apk"  # rm modified output apk
     rm -f "${filename_wo_ext}_src_aligned.apk"  # rm zip aligning output apk
@@ -552,7 +552,7 @@ build_app() {
   
   if [ -f "$outputAPK" ]; then
     if [ "$pkgName" == "com.google.android.youtube" ] || [ "$pkgName" == "com.google.android.apps.photos" ] || [ "$pkgName" == "com.google.android.apps.recorder" ] || [ "$pkgName" == "com.spotify.music" ]; then
-      if [ $su -eq 1 ]; then
+      if [ $su == true ]; then
         
         if [ "$pkgName" == "com.google.android.youtube" ]; then
           buttons=("<Install>" "<Mount>" "<Cancel>")
@@ -561,7 +561,7 @@ build_app() {
           if [ $exit_status -eq 0 ]; then opt=Install; elif [ $exit_status -eq 1 ]; then opt=Mount; elif [ $exit_status -eq 2 ]; then opt=Cancel; fi
           case $opt in
             I*|i*|"")
-              if [ $su -eq 1 ]; then
+              if [ $su == true ]; then
                 pkgInstall "python"  # python install/update
                 ! pip list 2>/dev/null | grep -q "apksigcopier" && pip install apksigcopier > /dev/null 2>&1  # install apksigcopier using pip
               fi
@@ -669,7 +669,7 @@ getListOfPatches() {
 comment
 
 # --- Decisions block for app that required specific arch & android version ---
-if [ $su -eq 1 ] && [ "$cpuAbi" == "arm64-v8a" ]; then
+if [ $su == true ] && [ "$cpuAbi" == "arm64-v8a" ]; then
   googleRecorder="GoogleRecorder"
 fi
 if  [[ $Android -ge 9  &&  ( "$cpuAbi" == "arm64-v8a" || "$cpuAbi" == "x86_64" ) ]]; then
@@ -694,7 +694,7 @@ fi
 if  [[ $Android -ge 11  &&  ( "$cpuAbi" == "arm64-v8a" || "$cpuAbi" == "armeabi-v7a" ) ]]; then
   Facebook="Facebook"
 fi
-[ $su -eq 1 ] && Spotify="Spotify"
+[ $su == true ] && Spotify="Spotify"
 
 options=(CHANGELOG Spoof\ Device\ Arch List\ of\ Patches)
 
@@ -1011,7 +1011,7 @@ while true; do
         getVersion "$pkgName"
         pkgVersion="$pkgVersion"
       fi
-      [ $su -eq 1 ] && Type="APK" || Type="BUNDLE"
+      [ $su == true ] && Type="APK" || Type="BUNDLE"
       Arch=("universal")
       pkgPatched="app.revanced.android.youtube"
       activityPatched="com.google.android.youtube/.app.honeycomb.Shell\$HomeActivity"
@@ -1456,5 +1456,5 @@ while true; do
   esac
   echo; read -p "Press Enter to continue..."
 done
-[ $su -eq 1 ] && unset Spotify
+[ $su == true ] && unset Spotify
 ###########################################################################################################################################

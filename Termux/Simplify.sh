@@ -55,7 +55,8 @@ comment
 
 # --- Global Variables ---
 read rows cols < <(stty size)
-Simplify="$HOME/Simplify"  # /data/data/com.termux/files/home/Simplify dir
+Simplify="$HOME/.Simplify"  # /data/data/com.termux/files/home/Simplify dir
+[ -d "$HOME/Simplify" ] && mv ~/Simplify ~/.Simplify  # Temporary: Hides script folder from $HOME
 SimplUsr="/sdcard/Simplify"  # /storage/emulated/0/Simplify dir
 Download="/sdcard/Download"  # Download dir
 RV="$Simplify/RV"
@@ -238,8 +239,8 @@ elif [ -f "$simplifyJson" ] && jq -e '.PAT' "$simplifyJson" >/dev/null 2>&1; the
 fi
 [ -n "$token" ] && auth="-H \"Authorization: Bearer $token\"" || auth=""
 
-su -c "id" >/dev/null 2>&1 && su=1 || su=0
-[ $su -eq 1 ] && Serial=$(su -c 'getprop ro.serialno')  # Get Serial Number required root
+su -c "id" &>/dev/null && su=true || su=false
+[ $su == true ] && Serial=$(su -c 'getprop ro.serialno')  # Get Serial Number required root
 
 clear && echo -e "🚀 ${Yellow}Please wait! starting simplify...${Reset}"
 
@@ -366,39 +367,41 @@ pkgInstall "findutils"  # find utils update
 pkgInstall "glow"  # glow install/update
 
 # --- Shizuku Setup first time ---
-if [ $su -eq 0 ] && { [ ! -f "$HOME/rish" ] || [ ! -f "$HOME/rish_shizuku.dex" ]; }; then
-  #echo -e "$info Please manually install Shizuku from Google Play Store." && sleep 1
-  #termux-open-url "https://play.google.com/store/apps/details?id=moe.shizuku.privileged.api"
-  echo -e "$info Please manually install Shizuku from GitHub." && sleep 1
-  termux-open-url "https://github.com/RikkaApps/Shizuku/releases/latest"
-  am start -n com.android.settings/.Settings\$MyDeviceInfoActivity > /dev/null 2>&1  # Open Device Info
-
-  curl -sL -o "$HOME/rish" "https://raw.githubusercontent.com/arghya339/crdl/refs/heads/main/Shizuku/rish" && chmod +x "$HOME/rish"
-  sleep 0.5 && curl -sL -o "$HOME/rish_shizuku.dex" "https://raw.githubusercontent.com/arghya339/crdl/refs/heads/main/Shizuku/rish_shizuku.dex"
-  
-  if [ "$Android" -lt 11 ]; then
-    url="https://youtu.be/ZxjelegpTLA"  # YouTube/@MrPalash360: Start Shizuku using Computer
-    activityClass="com.android.settings/.Settings\$DevelopmentSettingsDashboardActivity"  # Open Developer options
-  else
-    activityClass="com.android.settings/.Settings\$WirelessDebuggingActivity"  # Open Wireless Debugging Settings
-    url="https://youtu.be/YRd0FBfdntQ"  # YouTube/@MrPalash360: Start Shizuku Android 11+
+if [ $su == false ] && { [ ! -f "$PREFIX/bin/rish" ] || [ ! -f "$PREFIX/bin/rish_shizuku.dex" ]; }; then
+  curl -sL -o "$PREFIX/bin/rish" "https://raw.githubusercontent.com/arghya339/crdl/refs/heads/main/Shizuku/rish" && chmod +x "$PREFIX/bin/rish"
+  sleep 0.5 && curl -sL -o "$PREFIX/bin/rish_shizuku.dex" "https://raw.githubusercontent.com/arghya339/crdl/refs/heads/main/Shizuku/rish_shizuku.dex"
+  if ! am start -n "moe.shizuku.privileged.api/moe.shizuku.manager.legacy.ShellRequestHandlerActivity" &>/dev/null; then
+    #echo -e "$info Please manually install Shizuku from Google Play Store." && sleep 1
+    #termux-open-url "https://play.google.com/store/apps/details?id=moe.shizuku.privileged.api"
+    echo -e "$info Please manually install Shizuku from GitHub." && sleep 1
+    termux-open-url "https://github.com/RikkaApps/Shizuku/releases/latest"
   fi
-  echo -e "$info Please start Shizuku by following guide: $url" && sleep 1
-  am start -n "$activityClass" > /dev/null 2>&1
-  termux-open-url "$url"
-fi
-if ! "$HOME/rish" -c "id" >/dev/null 2>&1 && [ -f "$HOME/rish_shizuku.dex" ]; then
-  if ~/rish -c "id" 2>&1 | grep -q 'java.lang.UnsatisfiedLinkError'; then
-    rm -f "$HOME/rish_shizuku.dex" && curl -sL -o "$HOME/rish_shizuku.dex" "https://raw.githubusercontent.com/arghya339/crdl/refs/heads/main/Shizuku/Play/rish_shizuku.dex"
+  if ! rish -c "id" &>/dev/null; then
+    am start -n com.android.settings/.Settings\$MyDeviceInfoActivity &>/dev/null  # Open Device Info
+    if [ $Android -lt 11 ]; then
+      url="https://youtu.be/ZxjelegpTLA"  # YouTube/@MrPalash360: Start Shizuku using Computer
+      activityClass="com.android.settings/.Settings\$DevelopmentSettingsDashboardActivity"  # Open Developer options
+    else
+      activityClass="com.android.settings/.Settings\$WirelessDebuggingActivity"  # Open Wireless Debugging Settings
+      url="https://youtu.be/YRd0FBfdntQ"  # YouTube/@MrPalash360: Start Shizuku Android 11+
+    fi
+    echo -e "$info Please start Shizuku by following guide: ${Blue}$url${Reset}" && sleep 1
+    am start -n "$activityClass" &>/dev/null
+    termux-open-url "$url"
   fi
 fi
+if ! rish -c "id" &>/dev/null && [ -f "$PREFIX/bin/rish_shizuku.dex" ]; then
+  if rish -c "id" 2>&1 | grep -q 'java.lang.UnsatisfiedLinkError'; then
+    rm -f "$PREFIX/bin/rish_shizuku.dex" && curl -sL -o "$PREFIX/bin/rish_shizuku.dex" "https://raw.githubusercontent.com/arghya339/crdl/refs/heads/main/Shizuku/Play/rish_shizuku.dex"
+  fi
+fi
 
-if [ "$(getprop ro.product.manufacturer)" == "Genymobile" ] && [ ! -f "$HOME/adb" ]; then
-  curl -sL -o "$HOME/adb" "https://raw.githubusercontent.com/rendiix/termux-adb-fastboot/refs/heads/master/binary/${cpuAbi}/bin/adb" && chmod +x ~/adb
+if [ "$(getprop ro.product.manufacturer)" == "Genymobile" ] && [ ! -f "$PREFIX/bin/adb" ]; then
+  curl -sL -o "$PREFIX/bin/adb" "https://raw.githubusercontent.com/rendiix/termux-adb-fastboot/refs/heads/master/binary/${cpuAbi}/bin/adb" && chmod +x $PREFIX/bin/adb
 fi
 
 # --- Download and give execute (--x) permission to AAPT2 Binary ---
-[[ $(~/aapt2 version 2>&1 | awk '{print $NF}') =~ ^(V14.0.6.0.TKSMIXM|2.19-3401)$ ]] || { rm -f ~/aapt2 && curl -L --progress-bar -C - -o ~/aapt2 $(curl -sL https://api.github.com/repos/ReVanced/aapt2/releases/latest | jq -r --arg arch "$cpuAbi" '.assets[] | select(.name == "aapt2-" + $arch) | .browser_download_url') && chmod +x ~/aapt2 && ~/aapt2 version 2>&1; }
+[[ $($PREFIX/bin/aapt2 version 2>&1 | awk '{print $NF}') =~ ^(V14.0.6.0.TKSMIXM|2.19-3401)$ ]] || { rm -f $PREFIX/bin/aapt2 && curl -L --progress-bar -C - -o $PREFIX/bin/aapt2 $(curl -sL https://api.github.com/repos/ReVanced/aapt2/releases/latest | jq -r --arg arch "$cpuAbi" '.assets[] | select(.name == "aapt2-" + $arch) | .browser_download_url') && chmod +x $PREFIX/bin/aapt2 && $PREFIX/bin/aapt2 version 2>&1; }
 
 curl -sL "https://raw.githubusercontent.com/arghya339/Simplify/refs/heads/main/Termux/dlGitHub.sh" --progress-bar -o $Simplify/dlGitHub.sh
 
@@ -412,9 +415,39 @@ curl -sL -o $Simplify/dlAPKPure.sh "https://raw.githubusercontent.com/arghya339/
 curl -sL "https://raw.githubusercontent.com/arghya339/Simplify/refs/heads/main/Termux/apkInstall.sh" --progress-bar -o $Simplify/apkInstall.sh
 source $Simplify/apkInstall.sh
 
-[ $su -eq 1 ] && curl -sL -o "$Simplify/apkMount.sh" "https://raw.githubusercontent.com/arghya339/Simplify/refs/heads/main/Termux/apkMount.sh"
+[ $su == true ] && curl -sL -o "$Simplify/apkMount.sh" "https://raw.githubusercontent.com/arghya339/Simplify/refs/heads/main/Termux/apkMount.sh"
 
-if [ $su -eq 1 ] || "$HOME/rish" -c "id" >/dev/null 2>&1 || "$HOME/adb" -s $(~/adb devices 2>/dev/null | head -2 | tail -1 | cut -f1) shell "id" >/dev/null 2>&1; then
+runCmd() {
+  cmd=${1}
+  if [ $isAndroid == true ]; then
+    if [ $su == true ]; then
+      [ "$(su -c 'getenforce 2>/dev/null')" = "Enforcing" ] && { su -c "setenforce 0"; writeSELinux=true; } || writeSELinux=false
+      su -c "$cmd"
+      [ $writeSELinux == true ] && su -c "setenforce 1"
+    elif rish -c "id" &>/dev/null; then
+      rish -c "$cmd"
+    elif adb -s $(adb devices | grep "device$" | awk '{print $1}' | tail -1) shell "id" &>/dev/null; then
+      adb -s $(adb devices 2>/dev/null | grep "device$" | awk '{print $1}' | tail -1) $cmd
+    fi
+  else
+    adb -s $serial $cmd
+  fi
+}
+
+shellCmd() {
+  cmd=$1
+  if [ $isAndroid == true ]; then
+    if [ $su == true ] || rish -c "id" &>/dev/null; then
+      runCmd "$cmd"
+    elif adb -s $(adb devices | grep "device$" | awk '{print $1}' | tail -1) shell "id" &>/dev/null; then
+      runCmd "shell $cmd"
+    fi
+  else
+    runCmd "shell $cmd"
+  fi
+}
+
+if [ $su == true ] || rish -c "id" &>/dev/null || adb -s $(adb devices 2>/dev/null | head -2 | tail -1 | cut -f1) shell "id" &>/dev/null; then
   if [ -n "$(find $POST_INSTALL -mindepth 1 -type f -o -type d -o -type l 2>/dev/null)" ]; then
     file_path=$(find $POST_INSTALL -maxdepth 1 -type f -print -quit)
     apkInstall "$file_path" "" && rm -f "$file_path"
@@ -435,16 +468,12 @@ if [ ! -f "$HOME/.shortcuts/simplify" ] || [ ! -f "$HOME/.termux/widget/dynamic_
     apkInstall "$Widget" ""  # Install Termux:Widget app using apkInstall.sh
     [ -f "$Widget" ] && rm -f "$Widget"  # if Termux:Widget app package exist then remove it 
   fi
-  if [ $su -eq 1 ]; then
-    if [ "$(su -c 'getenforce 2>/dev/null')" = "Enforcing" ]; then
-      su -c "setenforce 0"  # set SELinux to Permissive mode to unblock unauthorized operations
-      su -c "cmd appops set com.termux SYSTEM_ALERT_WINDOW allow"
-      su -c "setenforce 1"  # set SELinux to Enforcing mode to block unauthorized operations
-    else
-      su -c "cmd appops set com.termux SYSTEM_ALERT_WINDOW allow"
-    fi
-  elif "$HOME/rish" -c "id" >/dev/null 2>&1; then
-    $HOME/rish -c "cmd appops set com.termux SYSTEM_ALERT_WINDOW allow"
+  if [ $su == true ]; then
+    [ "$(su -c 'getenforce 2>/dev/null')" = "Enforcing" ] && { su -c "setenforce 0"; writeSELinux=true; } || writeSELinux=false
+    su -c "cmd appops set com.termux SYSTEM_ALERT_WINDOW allow"
+    [ $writeSELinux == true ] && su -c "setenforce 1"
+  elif rish -c "id" &>/dev/null || adb -s $(adb devices | grep "device$" | awk '{print $1}' | tail -1) shell "id" &>/dev/null; then
+    shellCmd "cmd appops set com.termux SYSTEM_ALERT_WINDOW allow"
   else
     echo -e "$info Please manually turn on: ${Green}Display over other apps → Termux → Allow display over other apps${Reset}" && sleep 6
     am start -a android.settings.action.MANAGE_OVERLAY_PERMISSION &> /dev/null  # open manage overlay permission settings
@@ -694,28 +723,17 @@ if [ $CheckTermuxUpdate -eq 1 ]; then
     done
     echo -e "$notice Please rerun this script again after Termux app update!"
     echo -e "$running Installing app update and restarting Termux app.." && sleep 3
-    if [ $su -eq 1 ]; then
+    if [ $su == true ]; then
       su -c "cp '$filePath' '/data/local/tmp/$fileName'"
-      if [ "$(su -c 'getenforce 2>/dev/null')" = "Enforcing" ]; then
-        su -c "setenforce 0"  # set SELinux to Permissive mode to unblock unauthorized operations
-        su -c 'pm grant com.termux android.permission.POST_NOTIFICATIONS'
-        su -c "cmd deviceidle whitelist +com.termux" >/dev/null 2>&1
-        touch "$Simplify/setenforce0"
-        su -c "pm install -i com.android.vending '/data/local/tmp/$fileName'"
-      else
-        su -c 'pm grant com.termux android.permission.POST_NOTIFICATIONS'
-        su -c "cmd deviceidle whitelist +com.termux" >/dev/null 2>&1
-        su -c "pm install -i com.android.vending '/data/local/tmp/$fileName'"
-      fi
+      [ "$(su -c 'getenforce 2>/dev/null')" = "Enforcing" ] && { su -c "setenforce 0"; touch "$Simplify/writeSELinux"; }
+      su -c 'pm grant com.termux android.permission.POST_NOTIFICATIONS'
+      su -c "cmd deviceidle whitelist +com.termux" &>/dev/null
+      su -c "pm install -i com.android.vending '/data/local/tmp/$fileName'"
     else
-      if "$HOME/rish" -c "id" >/dev/null 2>&1; then
-        $HOME/rish -c 'pm grant com.termux android.permission.POST_NOTIFICATIONS'
-        $HOME/rish -c "cmd deviceidle whitelist +com.termux" >/dev/null 2>&1
-        $HOME/rish -c "cmd appops set com.termux REQUEST_INSTALL_PACKAGES allow"
-      elif "$HOME/adb" -s $(~/adb devices | grep "device$" | awk '{print $1}' | tail -1) shell "id" >/dev/null 2>&1; then
-        ~/adb -s $("$HOME/adb" devices 2>/dev/null | grep "device$" | awk '{print $1}' | tail -1) shell "pm grant com.termux android.permission.POST_NOTIFICATIONS"
-        ~/adb -s $("$HOME/adb" devices 2>/dev/null | grep "device$" | awk '{print $1}' | tail -1) shell "cmd deviceidle whitelist +com.termux" >/dev/null 2>&1
-        ~/adb -s $("$HOME/adb" devices 2>/dev/null | grep "device$" | awk '{print $1}' | tail -1) shell "cmd appops set com.termux REQUEST_INSTALL_PACKAGES allow"
+      if rish -c "id" &>/dev/null || adb -s $(adb devices | grep "device$" | awk '{print $1}' | tail -1) shell "id" &>/dev/null; then
+        shellCmd "pm grant com.termux android.permission.POST_NOTIFICATIONS"
+        shellCmd "cmd deviceidle whitelist +com.termux" &>/dev/null
+        shellCmd "cmd appops set com.termux REQUEST_INSTALL_PACKAGES allow"
       else
         echo -e "$info Please Disabled: ${Green}Battery optimization → Not optimized → All apps → Termux → Don't optiomize → DONE${Reset}" && sleep 6
         am start -n com.android.settings/.Settings\$HighPowerApplicationsActivity &> /dev/null
@@ -726,16 +744,14 @@ if [ $CheckTermuxUpdate -eq 1 ]; then
     fi
   else
     if [ -f "$filePath" ]; then
-      if [ $su -eq 1 ]; then
-        if [ "$(su -c 'getenforce 2>/dev/null')" = "Permissive" ] && [ -f "$Simplify/setenforce0" ]; then
+      if [ $su == true ]; then
+        if [ "$(su -c 'getenforce 2>/dev/null')" = "Permissive" ] && [ -f "$Simplify/writeSELinux" ]; then
           su -c "setenforce 1"  # set SELinux to Enforcing mode to block unauthorized operations
-          rm -f "$Simplify/setenforce0"
+          rm -f "$Simplify/writeSELinux"
         fi
         su -c "rm -f '/data/local/tmp/$fileName'"
-      elif "$HOME/rish" -c "id" >/dev/null 2>&1; then
-        ~/rish -c "rm -f '/data/local/tmp/$fileName'"
-      elif "$HOME/adb" -s $(~/adb devices | grep "device$" | awk '{print $1}' | tail -1) shell "id" >/dev/null 2>&1; then
-        ~/adb -s $("$HOME/adb" devices 2>/dev/null | grep "device$" | awk '{print $1}' | tail -1) shell "rm -f '/data/local/tmp/$fileName'"
+      elif rish -c "id" &>/dev/null || adb -s $(adb devices | grep "device$" | awk '{print $1}' | tail -1) shell "id" &>/dev/null; then
+        shellCmd "rm -f '/data/local/tmp/$fileName'"
       fi
       rm -f "$filePath"
     fi
@@ -1056,24 +1072,20 @@ UninstallPatchedApp() {
     
     # Process selection
     if [ -n "$selected" ] && [[ "$selected" == [0-9] ]]; then
-      if [ $su -eq 1 ]; then
-        echo "$running Uninstalling ${nameArr[$selected]}.."
-        if [ "$(su -c 'getenforce 2>/dev/null')" = "Enforcing" ]; then
-          su -c "setenforce 0"  # set SELinux to Permissive mode to unblock unauthorized operations
-          su -c "pm uninstall --user 0 ${pkgArr[$selected]}"
-          su -c "setenforce 1"  # set SELinux to Enforcing mode to block unauthorized operations
-        else
-          su -c "pm uninstall --user 0 ${pkgArr[$selected]}"
-        fi
-      elif "$HOME/rish" -c "id" >/dev/null 2>&1; then
-        echo "$running Uninstalling ${nameArr[$selected]}.."
-        ~/rish -c "pm uninstall --user 0 ${pkgArr[$selected]}"
+      if [ $su == true ]; then
+        echo "$running Uninstalling ${nameArr[selected]}.."
+        [ "$(su -c 'getenforce 2>/dev/null')" = "Enforcing" ] && { su -c "setenforce 0"; writeSELinux=true; } || writeSELinux=false
+        su -c "pm uninstall --user 0 ${pkgArr[selected]}"
+        [ $writeSELinux == true ] && su -c "setenforce 1"
+      elif rish -c "id" &>/dev/null || adb -s $(adb devices | grep "device$" | awk '{print $1}' | tail -1) shell "id" &>/dev/null; then
+        echo "$running Uninstalling ${nameArr[selected]}.."
+        shellCmd "pm uninstall --user 0 ${pkgArr[selected]}"
       else
-        #am start -a android.intent.action.DELETE -d package:"${pkgArr[$selected]}" > /dev/null 2>&1
-        am start -a android.intent.action.UNINSTALL_PACKAGE -d package:"${pkgArr[$selected]}" > /dev/null 2>&1
+        #am start -a android.intent.action.DELETE -d package:"${pkgArr[$selected]}" &>/dev/null
+        am start -a android.intent.action.UNINSTALL_PACKAGE -d package:"${pkgArr[$selected]}" &>/dev/null
         sleep 6  # wait 6 seconds
         #echo "Opening App info Activity for: ${nameArr[selected]}"
-        am start -a android.settings.APPLICATION_DETAILS_SETTINGS -d package:"${pkgArr[$selected]}" > /dev/null 2>&1
+        am start -a android.settings.APPLICATION_DETAILS_SETTINGS -d package:"${pkgArr[$selected]}" &>/dev/null
       fi
     fi
 
@@ -1121,15 +1133,10 @@ Unmount() {
 
 # --- Check if CorePatch Installed ---
 checkCoreLSPosed() {
-  if [ "$(su -c 'getenforce 2>/dev/null')" = "Enforcing" ]; then
-    su -c "setenforce 0"  # set SELinux to Permissive mode to unblock unauthorized operations
-    LSPosedPkg=$(su -c "pm list packages | grep org.lsposed.manager" 2>/dev/null)  # LSPosed packages list
-    CorePatchPkg=$(su -c "pm list packages | grep com.coderstory.toolkit" 2>/dev/null)  # CorePatch packages list
-    su -c "setenforce 1"  # set SELinux to Enforcing mode to block unauthorized operations
-  else
-    LSPosedPkg=$(su -c "pm list packages | grep 'org.lsposed.manager'" 2>/dev/null)  # LSPosed packages list
-    CorePatchPkg=$(su -c "pm list packages | grep 'com.coderstory.toolkit'" 2>/dev/null)  # CorePatch packages list
-  fi
+  [ "$(su -c 'getenforce 2>/dev/null')" = "Enforcing" ] && { su -c "setenforce 0"; writeSELinux=true; } || writeSELinux=false
+  LSPosedPkg=$(su -c "pm list packages | grep org.lsposed.manager" 2>/dev/null)  # LSPosed packages list
+  CorePatchPkg=$(su -c "pm list packages | grep com.coderstory.toolkit" 2>/dev/null)  # CorePatch packages list
+  [ $writeSELinux == true ] && su -c "setenforce 1"
 
   if [ -z $LSPosedPkg ]; then
     echo -e "$info Please install LSPosed Manager by flashing LSPosed Zyzisk Module from Magisk. Then try again!"
@@ -1247,14 +1254,14 @@ while true; do
         CheckTermuxUpdate=$(jq -r '.CheckTermuxUpdate' "$simplifyJson" 2>/dev/null)
         jdkVersion=$(jq -r '.openjdk' "$simplifyJson" 2>/dev/null)
         options=(FetchPreRelease RipLocale RipDpi RipLib Change\ RVX\ Source "Add gh PAT (increases gh api rate limit)" Import\ Custom\ PatchesOptions\ from\ file "Change YouTube & YT Music AppIcon & Header" Check\ Termux\ update\ on\ startup Change\ Java\ version)
-        if [ $su -eq 1 ]; then
+        if [ $su == true ]; then
           options+=("SU Installation Options")
-        elif "$HOME/rish" -c "id" >/dev/null 2>&1; then
+        elif rish -c "id" &>/dev/null; then
           options+=("SUI Installation Options")
-        elif "$HOME/adb" -s $(~/adb devices | grep "device$" | awk '{print $1}' | tail -1) shell "id" >/dev/null 2>&1; then
+        elif adb -s $(adb devices | grep "device$" | awk '{print $1}' | tail -1) shell "id" &>/dev/null; then
           options+=("ADB Installation Options")
         fi
-        if [ "$(getprop ro.product.manufacturer)" == "Genymobile" ] && ! "$HOME/adb" -s $(~/adb devices 2>/dev/null | head -2 | tail -1 | awk '{print $1}') shell "id" >/dev/null 2>&1; then
+        if [ "$(getprop ro.product.manufacturer)" == "Genymobile" ] && ! adb -s $(adb devices 2>/dev/null | head -2 | tail -1 | awk '{print $1}') shell "id" &>/dev/null; then
           options+=(Pair\ ADB)
         fi
         buttons=("<Select>" "<Back>"); if menu options buttons; then selected="${options[$selected]}"; else break; fi
@@ -1449,8 +1456,8 @@ while true; do
             am start -n "com.android.settings/.Settings\$WirelessDebuggingActivity" >/dev/null 2>&1
             [ $? -ne 0 ] && am start -n "com.android.settings/.Settings\$DevelopmentSettingsDashboardActivity" >/dev/null 2>&1 || am start -n com.android.settings/.Settings\$MyDeviceInfoActivity >/dev/null 2>&1
             read -r -p "HOST[:PORT] [PAIRING CODE] " input
-            host_port=$(echo "$input" | awk '{print $1}'); pairing_code=$(echo "$input" | awk '{print $2}')
-            ~/adb pair "$host_port" "$pairing_code"
+            host_port=$(awk '{print $1}' <<< "$input"); pairing_code=$(awk '{print $2}' <<< "$input")
+            adb pair "$host_port" "$pairing_code"
             ;;
         esac
         echo; read -p "Press Enter to continue..."
@@ -1459,7 +1466,7 @@ while true; do
     Miscellaneous)
       while true; do
         options=(Spoof\ Android\ Version Spoof\ Device\ Architecture Delete\ patched\ apk\ file Delete\ Patch\ Log Delete\ list-patches\ file Delete\ PatchesOption\ file Uninstall\ Patched\ Apps Uninstall\ Simplify)
-        [ $su -eq 1 ] && options+=(Unmount\ Patched\ Apps)
+        [ $su == true ] && options+=(Unmount\ Patched\ Apps)
         buttons=("<Select>" "<Back>"); if menu options buttons; then selected="${options[$selected]}"; else break; fi
         case "$selected" in
           Spoof\ Android\ Version) overwriteVersion ;;
@@ -1492,7 +1499,7 @@ while true; do
                     pkgUninstall "bsdtar"  # bsdtar uninstall
                     pkgUninstall "pv"  # pv uninstall
                     pkgUninstall "glow"  # glow uninstall
-                    if [ $su -eq 1 ]; then
+                    if [ $su == true ]; then
                       if ! pip list 2>/dev/null | grep -q "apksigcopier"; then
                         pip uninstall apksigcopier > /dev/null 2>&1  # uninstall apksigcopier using pip
                       fi

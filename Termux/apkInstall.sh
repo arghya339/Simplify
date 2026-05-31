@@ -6,22 +6,22 @@ apkInstall() {
   activity=$2  # for non-rooted user to launch app after installtion
   iCmd() {
     icmd=${1}
-    if [ "$su" == "1" ] || [ "$su" == "true" ]; then
+    if [ $su == true ]; then
       su -c "$icmd"
-    elif "$HOME/rish" -c "id" >/dev/null 2>&1; then
-      ~/rish -c "$icmd"
-    elif "$HOME/adb" -s $(~/adb devices | grep "device$" | awk '{print $1}' | tail -1) shell "id" >/dev/null 2>&1; then
-      ~/adb -s $("$HOME/adb" devices 2>/dev/null | grep "device$" | awk '{print $1}' | tail -1) shell "$icmd"
+    elif rish -c "id" &>/dev/null; then
+      rish -c "$icmd"
+    elif adb -s $(adb devices | grep "device$" | awk '{print $1}' | tail -1) shell "id" &>/dev/null; then
+      adb -s $(adb devices 2>/dev/null | grep "device$" | awk '{print $1}' | tail -1) shell "$icmd"
     fi
   }
   outputFileName=$(basename "$targetAPK")
-  app_info=$($HOME/aapt2 dump badging "$targetAPK" 2>/dev/null)
+  app_info=$($PREFIX/bin/aapt2 dump badging "$targetAPK" 2>/dev/null)
   pkgName=$(awk -F"'" '/package/ {print $2}' <<< "$app_info" | head -1)
   appLabel=$(awk -F"'" '/application-label:/ {print $2}' <<< "$app_info")
-  if [ "$su" == "1" ] || [ "$su" == "true" ]; then
-    [ "$(su -c 'getenforce 2>/dev/null')" = "Enforcing" ] && { su -c "setenforce 0"; writeSELinux=1; } || writeSELinux=0
+  if [ $su == true ]; then
+    [ "$(su -c 'getenforce 2>/dev/null')" = "Enforcing" ] && { su -c "setenforce 0"; writeSELinux=true; } || writeSELinux=false
   fi
-  if [[ "$su" == "1" || "$su" == "true" ]] || "$HOME/rish" -c "id" >/dev/null 2>&1 || "$HOME/adb" -s $(~/adb devices 2>&1 | grep "device$" | awk '{print $1}' | tail -1) shell "id" >/dev/null 2>&1; then
+  if [ $su == true ] || rish -c "id" &>/dev/null || adb -s $(adb devices 2>&1 | grep "device$" | awk '{print $1}' | tail -1) shell "id" &>/dev/null; then
     iCmdOut=$(iCmd "pm resolve-activity --brief $pkgName")
     activityClass=$(tail -n 1 <<< "$iCmdOut") && unset iCmdOut
     iCmd "cp '$targetAPK' '/data/local/tmp/$outputFileName'"
@@ -71,8 +71,8 @@ apkInstall() {
     fi
     sleep 15 && am start -n "$activityClass" &> /dev/null  # launch app after install
   fi
-  if [ "$su" == "1" ] || [ "$su" == "true" ]; then
-    [ $writeSELinux -eq 1 ] && su -c "setenforce 1"
+  if [ $su == true ]; then
+    [ $writeSELinux == true ] && su -c "setenforce 1"
   fi
 }
 ########################################################################################################################################################

@@ -18,7 +18,7 @@ Reset="\033[0m"
 stock="${1}"
 patched="${2}"
 stockFileName="$(basename "$stock" 2>/dev/null)"
-[ -f "/data/local/tmp/aapt2" ] && aapt2="/data/local/tmp/aapt2" || aapt2="/data/data/com.termux/files/home/aapt2"
+[ -f "/data/local/tmp/aapt2" ] && aapt2="/data/local/tmp/aapt2" || aapt2="/data/data/com.termux/files/usr/bin/aapt2"
 stockInfo=$($aapt2 dump badging "$stock" 2>/dev/null)
 appName=$(awk -F"'" '/application-label:/ {print $2}' <<< "$stockInfo")
 pkgName=$(awk -F"'" '/package/ {print $2}' <<< "$stockInfo" | head -1)

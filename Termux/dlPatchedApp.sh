@@ -77,7 +77,7 @@ appInstall() {
           fi
           data "$appName" "$updated_at" "$tag"
         fi
-        if [ $su -eq 1 ] || "$HOME/rish" -c "id" >/dev/null 2>&1 || "$HOME/adb" -s $(~/adb devices | grep "device$" | awk '{print $1}' | tail -1) shell "id" >/dev/null 2>&1; then
+        if [ $su -eq 1 ] || rish -c "id" &>/dev/null || adb -s $(adb devices | grep "device$" | awk '{print $1}' | tail -1) shell "id" &>/dev/null; then
           rm -f "$apk_path"
         fi
         ;;
@@ -262,7 +262,7 @@ dlApp() {
     fi
     if [ -f "$apk_path" ]; then
       echo -e "$info ${Green}Downloaded $appName APK found:${Reset} $apk_path"
-      version=$($HOME/aapt2 dump badging $apk_path 2>/dev/null | sed -n "s/.*versionName='\([^']*\)'.*/\1/p")
+      version=$($PREFIX/bin/aapt2 dump badging $apk_path 2>/dev/null | sed -n "s/.*versionName='\([^']*\)'.*/\1/p")
       appInstall
     fi
   fi
@@ -285,7 +285,7 @@ build_apks() {
 
   # Build apks from aab using bundletool
   echo -e "$running Build apks from aab.."
-  $PREFIX/lib/jvm/java-$jdkVersion-openjdk/bin/java -jar $bundletoolJar build-apks --bundle=$aab_path --output=$apks_path --aapt2=~/aapt2 2>&1 | grep -v "WARNING: The APKs won't be signed"
+  $PREFIX/lib/jvm/java-$jdkVersion-openjdk/bin/java -jar $bundletoolJar build-apks --bundle=$aab_path --output=$apks_path --aapt2=$PREFIX/bin/aapt2 2>&1 | grep -v "WARNING: The APKs won't be signed"
   if [ $? -eq 0 ] || [ -f "$apks_path" ]; then
     echo "Success"
     rm -f "$aab_path"  # remove aab file
@@ -371,7 +371,7 @@ dlPatchedApp() {
       fi
       if [ -f "$apk_path" ]; then
         echo -e "$info ${Green}Downloaded $appName APK found:${Reset} $apk_path"
-        version=$($HOME/aapt2 dump badging $apk_path 2>/dev/null | sed -n "s/.*versionName='\([^']*\)'.*/\1/p")
+        version=$($PREFIX/bin/aapt2 dump badging $apk_path 2>/dev/null | sed -n "s/.*versionName='\([^']*\)'.*/\1/p")
         appInstall
       fi
     fi
@@ -897,7 +897,7 @@ while true; do
             appName="Xiaomi Compass"; repo="$appName"; updated_at=
             file_pattern="${appName}_v$version-noarch.apk"
             apk_path=$(find "$Download" -type f -name "$file_pattern" -print -quit)
-            [ -f "$apk_path" ] && version=$($HOME/aapt2 dump badging "$apk_path" 2>/dev/null | sed -n "s/.*versionName='\([^']*\)'.*/\1/p")
+            [ -f "$apk_path" ] && version=$($PREFIX/bin/aapt2 dump badging "$apk_path" 2>/dev/null | sed -n "s/.*versionName='\([^']*\)'.*/\1/p")
             activityApp="com.miui.compass/.CompassActivity"
             url="https://www.apkmirror.com/apk/xiaomi-inc/miui-compass/xiaomi-compass-16-0-6-0-release/xiaomi-compass-16-0-6-0-android-apk-download/"
             appInstall
