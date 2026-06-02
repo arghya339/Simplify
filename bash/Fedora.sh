@@ -1,0 +1,138 @@
+#!/bin/bash
+
+# Copyright (C) 2026, Arghyadeep Mondal <github.com/arghya339>
+
+CreateBinaryLauncherShortcuts() {
+  shortcutLabel=${1}
+  iconPath=${2}
+  binaryPath=${3}
+  Interactive=${4:-true}
+  PolicyKit=${5:-false}
+  Categories=${6:-Utility}
+  [ $PolicyKit == true ] && polkit="pkexec " || polkit=""
+  cat > "$HOME/.local/share/applications/${shortcutLabel}.desktop" <<EOL
+[Desktop Entry]
+Name=${shortcutLabel}
+Icon=${iconPath}
+Exec=${polkit}${binaryPath}
+Terminal=${Interactive}
+Type=Application
+Categories=${Categories};
+EOL
+}
+[ ! -f "$simplifyNext/ic_launcher.png" ] && curl -L --progress-bar -C - -o "$simplifyNext/ic_launcher.png" "https://raw.githubusercontent.com/arghya339/Simplify/refs/heads/next/.res/mipmap-xxxhdpi/ic_launcher.png"  # https://raw.githubusercontent.com/bmax121/APatch/main/app/src/main/ic_launcher-playstore.png
+[ ! -f "$HOME/.local/share/applications/simplifyx.desktop" ] && CreateBinaryLauncherShortcuts "simplifyx" "$simplifyNext/ic_launcher.png" "$HOME/.simplifyx.sh"
+
+isJdk="java-21-openjdk"
+isAutoUpdatesDependencies=true
+if [ -f "$simplifyNextJson" ]; then
+  jdk=$(jq -r '.jdk' "$simplifyNextJson" 2>/dev/null)
+  AutoUpdatesDependencies=$(jq -r '.AutoUpdatesDependencies' "$simplifyNextJson" 2>/dev/null)
+else
+  jdk="$isJdk"
+  AutoUpdatesDependencies="$isAutoUpdatesDependencies"
+fi
+
+pkgUpdate() {
+  dnf=${1}
+  if grep -q "^$dnf" <<< "$dnfUpgradesList" 2>/dev/null; then
+    echo -e "$running Upgrading $dnf package.."
+    sudo dnf update "$dnf" -y >/dev/null 2>&1
+  fi
+}
+
+pkgInstall() {
+  dnf=${1}
+  if grep -q "^$dnf" <<< "$dnfList" 2>/dev/null; then
+    pkgUpdate "$dnf"
+  else
+    echo -e "$running Installing $dnf package.."
+    sudo dnf install "$dnf" -y >/dev/null 2>&1
+  fi
+}
+
+pkgUninstall() {
+  dnf=${1}
+  dnfList=$(dnf list --installed 2>/dev/null)
+  if grep -q "^$dnf" <<< "$dnfList" 2>/dev/null; then
+    echo -e "$running Uninstalling $dnf package.."
+    sudo dnf remove "$dnf" -y >/dev/null 2>&1
+  fi
+}
+
+dependencies() {
+  dnfList=$(dnf list --installed 2>/dev/null)
+  dnfUpgradesList=$(dnf --refresh list --upgrades 2>/dev/null)
+  pkgInstall "bash"
+  pkgInstall "grep"
+  pkgInstall "gawk"
+  pkgInstall "sed"
+  pkgInstall "findutils"
+  pkgInstall "curl"
+  pkgInstall "aria2"
+  pkgInstall "jq"
+  pkgInstall "html2text"
+  pkgInstall "bsdtar"
+  pkgInstall "pv"
+  pkgInstall "glow"
+  pkgInstall "$jdk"
+  sudo alternatives --set java /usr/lib/jvm/$jdk/bin/java
+  pkgInstall "android-tools"  # (adb, fastboot)
+  
+  if [ ! -f "$HOME/Android/Sdk/cmdline-tools/latest/bin/sdkmanager" ]; then
+    cmdlinetoolslatest=$(curl -sL https://developer.android.com/studio | grep -o "https://dl.google.com/android/repository/commandlinetools-linux-[0-9]*_latest.zip" | head -1 | awk -F'[-_]' '{print $3}')
+    curl -L --progress-bar -C - -o "$HOME/Downloads/commandlinetools-linux-${cmdlinetoolslatest}_latest.zip" "https://dl.google.com/android/repository/commandlinetools-linux-${cmdlinetoolslatest}_latest.zip"
+    mkdir -p ~/Android/Sdk/cmdline-tools/latest
+    pv "$HOME/Downloads/commandlinetools-linux-${cmdlinetoolslatest}_latest.zip" | bsdtar -xf - -C "$HOME/Android/Sdk/cmdline-tools/latest" --strip-components 1
+    rm -f "$HOME/Downloads/commandlinetools-linux-${cmdlinetoolslatest}_latest.zip"
+    chmod +x ~/Android/Sdk/cmdline-tools/latest/bin/sdkmanager
+    ~/Android/Sdk/cmdline-tools/latest/bin/sdkmanager --version
+    yes | ~/Android/Sdk/cmdline-tools/latest/bin/sdkmanager --licenses
+    ~/Android/Sdk/cmdline-tools/latest/bin/sdkmanager $($HOME/Android/Sdk/cmdline-tools/latest/bin/sdkmanager --list | grep "^  build-tools;" | awk '{print $1}' | tail -1)
+    grep -qxF 'export PATH="$HOME/Android/Sdk/build-tools/$(ls $HOME/Android/Sdk/build-tools | sort -V | tail -1):$PATH"' ~/.android-env || echo 'export PATH="$HOME/Android/Sdk/build-tools/$(ls $HOME/Android/Sdk/build-tools | sort -V | tail -1):$PATH"' >> ~/.android-env && source ~/.android-env
+  fi
+
+  if ! pup --version >/dev/null 2>&1; then
+    curl -L --progress-bar -C - -o "$HOME/Downloads/pup_v0.4.0_linux_amd64.zip" "https://github.com/ericchiang/pup/releases/download/v0.4.0/pup_v0.4.0_linux_amd64.zip"
+    pv "$HOME/Downloads/pup_v0.4.0_linux_amd64.zip" | sudo bsdtar -xf - -C "/usr/local/bin"
+    [ -x "/usr/local/bin/pup" ] || sudo chmod +x /usr/local/bin/pup
+    rm -f "$HOME/Downloads/pup_v0.4.0_linux_amd64.zip"
+  fi
+}
+[ "$AutoUpdatesDependencies" == true ] && checkInternet && dependencies
+
+aapt2=("$HOME/Android/Sdk/build-tools/"*/aapt2) && aapt2="${aapt2[-1]}"
+apksigner=(~/Android/Sdk/build-tools/*/apksigner) && apksigner="${apksigner[-1]}"
+java="/usr/bin/java"
+keytool="/usr/bin/keytool"
+
+getSerial() {
+  deviceCount=$(adb devices | grep -c "device$")
+  if [ $deviceCount -eq 0 ]; then
+    serial=
+  elif [ $deviceCount -eq 1 ]; then
+    serial=$(adb devices | grep "device$" | awk '{print $1}')
+  else
+    serials=($(adb devices | grep "device$" | awk '{print $1}'))
+    models=()
+    for i in "${!serials[@]}"; do
+      serial="${serials[i]}"
+      models+=("$(adb -s $serial shell getprop ro.product.model)")
+    done
+    if menu models bButtons serials; then
+      serial="${serials[selected]}"
+    fi
+  fi
+  [ -n "$serial" ] && echo -e "$info serial: $serial"
+}; getSerial
+
+adb -s $serial shell 'su -c "id"' &>/dev/null && su=true || su=false
+
+if [ -n "$serial" ]; then
+  Android=$(adb -s $serial shell getprop ro.build.version.release | cut -d. -f1)
+  cpuAbi=$(adb -s $serial shell "getprop ro.product.cpu.abi")
+  locale=$(adb -s $serial shell getprop persist.sys.locale)  # Get System Locale
+  [ -z $locale ] && locale=$(adb -s $serial shell getprop ro.product.locale)  # Get Locale
+  lang=$(cut -d'-' -f1 <<< "$locale")  # Extract Language from Locale
+  density=$(adb -s $serial shell getprop ro.sf.lcd_density)  # Get the device screen density
+fi
