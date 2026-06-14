@@ -601,7 +601,8 @@ configure() {
                           ([ $isAndroid == true ] || [ $isMacOS == true ] || [ $isFedora == true ] || [ $isAlpine == true ]) && pkgUninstall "jq"
                           pkgUninstall "html2text"
                           pkgUninstall "pv"
-                          ([ $isAndroid == true ] || [ $isMacOS == true ] || [ $isAlpine == true ]) && pkgUninstall "pup"
+                          ([ $isAndroid == true ] || [ $isAlpine == true ]) && pkgUninstall "pup"
+                          [ $isMacOS == true ] && { rm -f /usr/local/bin/pup; pkgUninstall "go"; }
                           ([ $isBazzite == true ] || [ $isFedora == true ] || [ $isDebian == true ] || [ $isArchLinux == true ] || [ $isOpenSUSE == true ]) && sudo rm -f "/usr/local/bin/pup"
                           [ $isAndroid == true ] && { pkgUninstall "openjdk-$jdk"; pkgUninstall "bsdtar"; } || pkgUninstall "$jdk"
                           [ $isBazzite == true ] && pkgUninstall "libarchive"

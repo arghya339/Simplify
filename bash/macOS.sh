@@ -97,7 +97,12 @@ dependencies() {
   pkgInstall "jq"
   pkgInstall "html2text"
   pkgInstall "pv"
-  pkgInstall "pup"
+  if [ "$(pup --version 2>/dev/null)" != "0.4.0" ]; then
+    pkgInstall "go"
+    echo -e "$running Installing pup utility.."
+    go install github.com/ericchiang/pup@latest &>/dev/null
+    sudo cp ~/go/bin/pup /usr/local/bin/pup
+  fi
   pkgInstall "grep"
   pkgInstall "glow"
   pkgInstall "android-platform-tools"
