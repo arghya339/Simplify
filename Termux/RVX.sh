@@ -558,7 +558,7 @@ while true; do
           pkgVersion="20.12.46"
           Type="APK"
         else
-          pkgVersion="20.21.37"
+          [ $Android -eq 8 ] && pkgVersion="20.26.46" || pkgVersion="20.51.39"
           Type="APK"
         fi
         if [ -z "$pkgVersion" ]; then
