@@ -99,7 +99,7 @@ dependencies() {
     rm -f "$HOME/Downloads/pup_v0.4.0_linux_amd64.zip"
   fi
 }
-[ "$AutoUpdatesDependencies" == true ] && checkInternet && dependencies
+[ $AutoUpdatesDependencies == true ] && { checkInternet && dependencies; }
 
 aapt2=("$HOME/Android/Sdk/build-tools/"*/aapt2) && aapt2="${aapt2[-1]}"
 apksigner=(~/Android/Sdk/build-tools/*/apksigner) && apksigner="${apksigner[-1]}"

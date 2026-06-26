@@ -97,7 +97,7 @@ dependencies() {
   pkgInstall "xdg-utils"  # install
   pkgInstall "util-linux"  # install
 }
-[ "$AutoUpdatesDependencies" == true ] && checkInternet && dependencies
+[ $AutoUpdatesDependencies == true ] && { checkInternet && dependencies; }
 
 aapt2=("$HOME/Android/Sdk/build-tools/"*/aapt2) && aapt2="${aapt2[-1]}"
 java="/usr/bin/java"

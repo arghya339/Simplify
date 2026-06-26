@@ -175,7 +175,7 @@ dependencies() {
   pkgInstall "findutils"  # find utils update
   pkgInstall "glow"  # glow install/update
 }
-[ "$AutoUpdatesDependencies" == true ] && checkInternet && dependencies
+[ $AutoUpdatesDependencies == true ] && { checkInternet && dependencies; }
 
 checkTermuxAPI() {
   termux-api-start &>/dev/null && foundTermuxAPI=true || foundTermuxAPI=false

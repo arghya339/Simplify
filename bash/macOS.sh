@@ -90,7 +90,7 @@ dependencies() {
   curlV=$(curl -V | head -1 | awk '{print $2}')
   if [ $(cut -d. -f1 <<< $curlV) -lt 8 ] || [ $(cut -d. -f2 <<< $curlV) -lt 19 ]; then
     pkgInstall "curl"
-    grep -qF 'export PATH="/usr/local/opt/curl/bin:$PATH"' ~/.zshrc || { echo 'export PATH="/usr/local/opt/curl/bin:$PATH"' >> ~/.zshrc; source ~/.zshrc; }
+    grep -qF 'export PATH="/usr/local/opt/curl/bin:$PATH"' ~/.zshrc || echo 'export PATH="/usr/local/opt/curl/bin:$PATH"' >> ~/.zshrc
   fi
   pkgInstall "aria2"
   pkgInstall "ca-certificates"
@@ -136,7 +136,8 @@ dependencies() {
   fi
   rm -f index.html
 }
-[ "$AutoUpdatesDependencies" == true ] && checkInternet && dependencies
+[ $AutoUpdatesDependencies == true ] && { checkInternet && dependencies; }
+/usr/local/opt/curl/bin/curl -V &>/dev/null && export PATH="/usr/local/opt/curl/bin:$PATH"
 
 getSerial() {
   deviceCount=$(adb devices | grep -c "device$")

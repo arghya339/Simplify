@@ -116,7 +116,7 @@ dependencies() {
     rm -f "$HOME/Downloads/pup_v0.4.0_linux_amd64.zip"
   fi
 }
-[ "$AutoUpdatesDependencies" == true ] && checkInternet && dependencies
+[ $AutoUpdatesDependencies == true ] && { checkInternet && dependencies; }
 
 aapt2="/usr/bin/aapt"
 java="/usr/bin/java"

@@ -83,7 +83,7 @@ dependencies() {
     rm -f "$HOME/Downloads/pup_v0.4.0_linux_amd64.zip"
   fi
 }
-[ "$AutoUpdatesDependencies" == true ] && checkInternet && dependencies
+[ $AutoUpdatesDependencies == true ] && { checkInternet && dependencies; }
 
 java="/home/linuxbrew/.linuxbrew/bin/java"
 keytool="/home/linuxbrew/.linuxbrew/bin/keytool"
