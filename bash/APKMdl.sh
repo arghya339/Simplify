@@ -358,8 +358,13 @@ fetchDownloadURL() {
           # https://github.com/illogical-robot/apkmirror-public/issues
         if [ -n "$downloadLink" ]; then
           ! grep -q "https://www.apkmirror.com" <<< "$downloadLink" && downloadLink="https://www.apkmirror.com$downloadLink"
-          dlLink=$(curl -sL -I --doh-url "$cloudflareDOH" -A "$USER_AGENT" -H "Referer: $variantLink" "$downloadLink" | grep -i "location:" | head -1 | sed 's/location: //i' | tr -d '\r')
-          echo -e "$good Found download Link: ${Blue}$downloadLink${Reset}"
+          HEAD=$(curl -sL -I --doh-url "$cloudflareDOH" -A "$USER_AGENT" -H "Referer: $variantLink" "$downloadLink")
+          if ! grep -q "cf-mitigated: challenge" <<< "$HEAD"; then
+            dlLink=$(grep -i "location:" <<< "$HEAD" | head -1 | sed 's/location: //i' | tr -d '\r')
+            echo -e "$good Found download Link: ${Blue}$downloadLink${Reset}"
+          else
+            cf_chl_error
+          fi
         fi
       else
         cf_chl_error

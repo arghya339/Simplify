@@ -98,25 +98,7 @@ aapt2="/usr/bin/aapt"
 java="/usr/bin/java"
 keytool="/usr/bin/keytool"
 
-getSerial() {
-  deviceCount=$(adb devices | grep -c "device$")
-  if [ $deviceCount -eq 0 ]; then
-    serial=
-  elif [ $deviceCount -eq 1 ]; then
-    serial=$(adb devices | grep "device$" | awk '{print $1}')
-  else
-    serials=($(adb devices | grep "device$" | awk '{print $1}'))
-    models=()
-    for i in "${!serials[@]}"; do
-      serial="${serials[i]}"
-      models+=("$(adb -s $serial shell getprop ro.product.model)")
-    done
-    if menu models bButtons serials; then
-      serial="${serials[selected]}"
-    fi
-  fi
-  [ -n "$serial" ] && echo -e "$info serial: $serial"
-}; getSerial
+getSerial
 
 adb -s $serial shell 'su -c "id"' &>/dev/null && su=true || su=false
 

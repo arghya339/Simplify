@@ -30,7 +30,7 @@ checkInternet() {
   fi
 }
 
-isAndroid=false; isMacOS=false; isFedora=false; isBazzite=false isDebian=false; isArchLinux=false; isOpenSUSE=false; isAlpine=false; scripts=(Utils)
+isAndroid=false; isMacOS=false; isFedora=false; isBazzite=false isDebian=false; isArchLinux=false; isOpenSUSE=false; isAlpine=false; scripts=(Utils menu confirmPrompt)
 if [[ "$(uname)" == "Darwin" ]]; then
   isMacOS=true; scripts+=(macOS adbInstall)
 elif [[ -d "/sdcard" ]] && [[ -d "/system" ]]; then
@@ -72,7 +72,7 @@ cButtons=("<Select>" "<Close>")
 ynButtons=("<Yes>" "<No>")
 tfButtons=("<true>" "<false>")
 
-scripts+=(preferences art symbol menu confirmPrompt ghAuth fetchAssets dlGitHub fetchAppsInfo portSelection resetSelection viewPatches workflow APKMdl fileSelector managePatches editOptions editOptionsJson buildPatchCmd importExportSelection patchedApps dlPatchedApps)
+scripts+=(preferences art symbol ghAuth fetchAssets dlGitHub fetchAppsInfo portSelection resetSelection viewPatches workflow APKMdl fileSelector managePatches editOptions editOptionsJson buildPatchCmd importExportSelection patchedApps dlPatchedApps)
 run() {
   if [ $isAndroid == true ]; then
     [ ! -f "$PREFIX/bin/simplifyx" ] && ln -s ~/.simplifyx.sh $PREFIX/bin/simplifyx

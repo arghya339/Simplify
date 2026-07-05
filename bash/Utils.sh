@@ -2,6 +2,27 @@
 
 # Copyright (C) 2026, Arghyadeep Mondal <github.com/arghya339>
 
+getSerial() {
+  deviceCount=$(adb devices | grep -c "device$")
+  if [ $deviceCount -eq 0 ]; then
+    serial=
+  elif [ $deviceCount -eq 1 ]; then
+    serial=$(adb devices | grep "device$" | awk '{print $1}')
+  else
+    serials=($(adb devices | grep "device$" | awk '{print $1}'))
+    device=()
+    for i in "${!serials[@]}"; do
+      serial="${serials[i]}"
+      device+=("$(adb -s $serial shell "getprop ro.product.manufacturer && getprop ro.product.model" | xargs)")
+      models+=("$(adb -s $serial shell getprop ro.product.model)")
+    done
+    if menu device bButtons serials; then
+      serial="${serials[selected]}"
+    fi
+  fi
+  [ -n "$serial" ] && echo -e "$info serial: $serial"
+}
+
 runCmd() {
   cmd=${1}
   if [ $isAndroid == true ]; then

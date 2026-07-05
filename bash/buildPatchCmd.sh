@@ -60,7 +60,8 @@ buildPatchCmd() {
     [ "$cli" == "ReVanced/revanced-cli" ] && patchCmd+=("-b")  # --bypass-verification
   fi
   patchCmd+=("${patchesCommand[@]}")
-  [ "$patches" == "inotia00/revanced-patches-arsclib" ] && patchCmd+=("-a" "$stockAPK" "-o" "$SimplUsr" "-c" "--experimental") || patchCmd+=("$stockAPK" "-o" "$patchedAPK" "--purge" "-f")
+  [ "$patches" == "inotia00/revanced-patches-arsclib" ] && patchCmd+=("-a" "$stockAPK" "-o" "$SimplUsr" "-c" "--experimental") || patchCmd+=("$stockAPK" "-o" "$patchedAPK" "-f")
+  ([ "$patches" != "inotia00/revanced-patches-arsclib" ] && [ "$cli" != "MorpheApp/morphe-cli" ]) && patchCmd+=("--purge")
   [ $cliv -lt 5 ] && patchCmd+=("-m" "$integrationsPath" "--options" "$sourceDir/options.json")
   ([ $cli == "inotia00/revanced-cli" ] && [ -n "$ripLib" ]) && patchCmd+=("$ripLib")
   if [ $cli == "MorpheApp/morphe-cli" ]; then
