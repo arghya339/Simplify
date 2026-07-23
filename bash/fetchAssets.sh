@@ -73,7 +73,7 @@ findAssets() {
     if [ $cliv -eq 2 ]; then
       filePattern=("revanced-cli-*-all.jar" "revanced-patches-*.jar" "revanced-integrations-*.apk")
     else
-      [ $cliv -eq 6 ] && filePattern=("morphe-cli-*-all.jar" "patches-*.mpp") || filePattern=("revanced-cli-*-all.jar" "patches-*.rvp")
+      [ $cliv -eq 6 ] && filePattern=("morphe-desktop-*-all.jar" "patches-*.mpp") || filePattern=("revanced-cli-*-all.jar" "patches-*.rvp")
     fi
     assetsPaths=("$(find "$clivDir" -type f -name "${filePattern[0]}" -print -quit)")
   fi
