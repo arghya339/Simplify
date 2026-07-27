@@ -144,6 +144,7 @@ jq -e '.ReadPatchesFile != null' "$simplifyJson" >/dev/null 2>&1 && ReadPatchesF
 jq -e '.Branding != null' "$simplifyJson" >/dev/null 2>&1 && Branding=$(jq -r '.Branding' "$simplifyJson" 2>/dev/null) || Branding="google_family"
 # Get ChangeRVXSource value from json
 jq -e '.ChangeRVXSource != null' "$simplifyJson" >/dev/null 2>&1 && ChangeRVXSource="$(jq -r '.ChangeRVXSource' "$simplifyJson" 2>/dev/null)" || ChangeRVXSource=0
+aapt2="$(jq -r '.aapt2' "$simplifyJson" 2>/dev/null)"
 
 [[ $Android -eq 7 || $Android -eq 6 ]] && mkdir -p "$RVX6_7"  # Create $RVX6_7 dir if Android version is 6 or 7
 
@@ -401,7 +402,8 @@ if [ "$(getprop ro.product.manufacturer)" == "Genymobile" ] && [ ! -f "$PREFIX/b
 fi
 
 # --- Download and give execute (--x) permission to AAPT2 Binary ---
-[[ $($PREFIX/bin/aapt2 version 2>&1 | awk '{print $NF}') =~ ^(V14.0.6.0.TKSMIXM|2.19-3401)$ ]] || { rm -f $PREFIX/bin/aapt2 && curl -L --progress-bar -C - -o $PREFIX/bin/aapt2 $(curl -sL https://api.github.com/repos/ReVanced/aapt2/releases/latest | jq -r --arg arch "$cpuAbi" '.assets[] | select(.name == "aapt2-" + $arch) | .browser_download_url') && chmod +x $PREFIX/bin/aapt2 && $PREFIX/bin/aapt2 version 2>&1; }
+tag_name=$(curl -sL https://api.github.com/repos/ReVanced/aapt2/releases/latest | jq -r '.tag_name')
+[ "$tag_name" != "$aapt2" ] && { rm -f $PREFIX/bin/aapt2 && curl -L --progress-bar -C - -o $PREFIX/bin/aapt2 https://github.com/ReVanced/aapt2/releases/download/${tag_name}/aapt2-${cpuAbi} && chmod +x $PREFIX/bin/aapt2 && $PREFIX/bin/aapt2 version 2>&1 && config "aapt2" "$tag_name"; }
 
 curl -sL "https://raw.githubusercontent.com/arghya339/Simplify/refs/heads/main/Termux/dlGitHub.sh" --progress-bar -o $Simplify/dlGitHub.sh
 
