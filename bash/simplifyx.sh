@@ -72,6 +72,17 @@ cButtons=("<Select>" "<Close>")
 ynButtons=("<Yes>" "<No>")
 tfButtons=("<true>" "<false>")
 
+config() {
+  key="$1"
+  value="$2"
+  jsonFile="$3"
+
+  [ -z "$jsonFile" ] && jsonFile="$simplifyNextJson"
+  
+  [ ! -f "$jsonFile" ] && jq -n "{}" > "$jsonFile"
+  jq --arg key "$key" --arg value "$value" '.[$key] = $value' "$jsonFile" > temp.json && mv temp.json "$jsonFile"
+}
+
 scripts+=(preferences art symbol ghAuth fetchAssets dlGitHub fetchAppsInfo portSelection resetSelection viewPatches workflow APKMdl fileSelector managePatches editOptions editOptionsJson buildPatchCmd importExportSelection patchedApps dlPatchedApps)
 run() {
   if [ $isAndroid == true ]; then

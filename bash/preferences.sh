@@ -35,17 +35,6 @@ isI="com.android.vending"  # Installer package: options: com.android.vending (Pl
 isR=true  # Reinstall Existing Installed Package: options: 1 (true) / 0 (false) | default 1 because without this app can't be installed if installed and to-be-installed version code are same.
 isB=false  # Enable Version Roolback: options: 0 (false) / 1 (true)
 
-config() {
-  key="$1"
-  value="$2"
-  jsonFile="$3"
-
-  [ -z "$jsonFile" ] && jsonFile="$simplifyNextJson"
-  
-  [ ! -f "$jsonFile" ] && jq -n "{}" > "$jsonFile"
-  jq --arg key "$key" --arg value "$value" '.[$key] = $value' "$jsonFile" > temp.json && mv temp.json "$jsonFile"
-}
-
 all_key=(RipLocale RipDpi RipLib BytecodeMode ContinueOnError printArt AutoUpdatesScript AutoUpdatesDependencies EnableOptionalFeatures SearchEngine ShowUniversalPatches ButtonsSymbol ToggleSymbol SecureSymbol rmStockApk rmPatchedApk jdk)
 all_value=("$isRipLocale" "$isRipDpi" "$isRipLib" "$isBytecodeMode" "$isContinueOnError" "$isPrintArt" "$isAutoUpdatesScript" "$isAutoUpdatesDependencies" "$isEnableOptionalFeatures" "$isSearchEngine" "$isShowUniversalPatches" "$isButtonsSymbol" "$isToggleSymbol" "$isSecureSymbol" "$isRmStockApk" "$isRmPatchedApk" "$isJdk")
 [ $isAndroid == true ] && { all_key+=(AutoUpdatesTermux); all_value+=("$isAutoUpdatesTermux"); }
