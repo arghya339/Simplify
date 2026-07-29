@@ -178,7 +178,7 @@ while true; do
       ([ -f "$simplifyNext/patchedApps.json" ] && [ $(jq '. | length' $simplifyNext/patchedApps.json) -gt 0 ]) && viewPatchedApps
     elif [ "$source" == "Add Sources" ]; then
       read -r -p "patchesSource: " -i "ReVanced/revanced-patches" -e patchesSource
-      read -r -p "displayName: " -i "ReVanced-Official" -e displayName
+      read -r -p "displayName: " -i "${patchesSource/\//-}" -e displayName
       displayName=$(sed 's/ /-/g' <<< "$displayName")
       cliVersions=(cliv5 cliv6 cliv4 cliv3 cliv2); cliSources=("inotia00/revanced-cli" "MorpheApp/morphe-cli" "inotia00/revanced-cli" "inotia00/revanced-cli" "inotia00/revanced-cli-arsclib")
       if menu cliVersions bButtons cliSources; then
@@ -192,7 +192,9 @@ while true; do
         if menu owners bButtons; then
           owner="${owners[selected]}"
           case "$owner" in
-            custom) read -r -p "patchesjson: " -i "https://api.revanced.app/v4/patches/list" -e patchesjson ;;
+            custom)
+              [ $cliVersion -eq 6 ] && patchesList="https://raw.githubusercontent.com/${patchesSource}/refs/heads/main/patches-list.json" || patchesList="https://api.revanced.app/v4/patches/list"
+              read -r -p "patchesjson: " -i "$patchesList" -e patchesjson ;;
             *) patchesjson="https://raw.githubusercontent.com/Jman-Github/ReVanced-Patch-Bundles/refs/heads/bundles/patch-bundles/${owner}-patch-bundles/${owner}-stable-patches-list.json" ;;
           esac
         fi
@@ -201,11 +203,12 @@ while true; do
       fi
       [ -z "$patchesjson" ] && patchesjson=null
       if [ $cliVersion -lt 5 ]; then
-        read -r -p "integrationsSource: " -i "ReVanced/revanced-integrations" -e integrationsSource
+        read -r -p "integrationsSource: " -i "${patchesSource%%/*}/revanced-integrations" -e integrationsSource
       else
         integrationsSource=null
       fi
-      read -r -p "microgSource: " -i "ReVanced/GmsCore" -e microgSource
+      [ $cliVersion -eq 5 ] && gmsSource="ReVanced/GmsCore" || gmsSource="MorpheApp/MicroG-RE"
+      read -r -p "microgSource: " -i "$gmsSource" -e microgSource
       [ -z "$microgSource" ] && microgSource=null
       prereleases=false
       checkInternet && autoupdates=true || autoUpdates=false

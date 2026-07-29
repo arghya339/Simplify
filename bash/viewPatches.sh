@@ -25,11 +25,11 @@ viewPatches() {
       package="${existsPackages[selected]}"
       if [ "$package" == "null" ]; then
         mapfile -t patchNames < <(jq -r '.[] | select(.compatiblePackages == null) .name' $sourceDir/patches-$patchesVersion.json)
-        mapfile -t patchDescriptions < <(jq -r '.[] | select(.compatiblePackages == null) .description' $sourceDir/patches-$patchesVersion.json)
+        mapfile -t patchDescriptions < <(jq -r '.[] | select(.compatiblePackages == null) | (.description | tostring | gsub("\n"; " "))' $sourceDir/patches-$patchesVersion.json)
         decalare -ga versions
       else
         mapfile -t patchNames < <(jq -r --arg pkg "$package" '.[] | select(any(.compatiblePackages[]?; if (.name | type) == "string" then .name == $pkg else .versions | if type == "object" then .packageName == $pkg elif type == "array" then any(.packageName == $pkg) else false end end)) .name' $sourceDir/patches-$patchesVersion.json)
-        mapfile -t patchDescriptions < <(jq -r --arg pkg "$package" '.[] | select(any(.compatiblePackages[]?; if (.name | type) == "string" then .name == $pkg else .versions | if type == "object" then .packageName == $pkg elif type == "array" then any(.packageName == $pkg) else false end end)) .description' $sourceDir/patches-$patchesVersion.json)
+        mapfile -t patchDescriptions < <(jq -r --arg pkg "$package" '.[] | select(any(.compatiblePackages[]?; if (.name | type) == "string" then .name == $pkg else .versions | if type == "object" then .packageName == $pkg elif type == "array" then any(.packageName == $pkg) else false end end)) | (.description | tostring | gsub("\n"; " "))' $sourceDir/patches-$patchesVersion.json)
         mapfile -t versions < <(jq -c --arg pkg "$package" '.[] | .compatiblePackages[]? | select( if .name? and (.name|type)=="string" then .name == $pkg else if .versions? and (.versions|type)=="object" then .versions.packageName == $pkg elif .versions? and (.versions|type)=="array" then any(.versions[]?.packageName? == $pkg) else false end end ) | ( if .versions? and (.versions|type)=="array" then .versions else .versions.targets? // [] | map(.version) end )' $sourceDir/patches-$patchesVersion.json)
       fi
       while true; do
@@ -38,11 +38,11 @@ viewPatches() {
           if [ "$package" == "null" ]; then
             mapfile -t optionsKeys < <(jq -r --arg pn "$patchName" '.[] | select(.compatiblePackages == null) | select(.name == $pn) | .options[] | (if .key then .key else .name end)' $sourceDir/patches-$patchesVersion.json)
             mapfile -t optionsTitles < <(jq -r --arg pn "$patchName" '.[] | select(.compatiblePackages == null) | select(.name == $pn) | .options[] | (if .title then .title else .name end)' $sourceDir/patches-$patchesVersion.json)
-            mapfile -t optionsDescriptions < <(jq -r --arg pn "$patchName" '.[] | select(.compatiblePackages == null) | select(.name == $pn) | .options[].description' $sourceDir/patches-$patchesVersion.json)
+            mapfile -t optionsDescriptions < <(jq -r --arg pn "$patchName" '.[] | select(.compatiblePackages == null) | select(.name == $pn) | .options[] | (.description | tostring | gsub("\n"; " "))' $sourceDir/patches-$patchesVersion.json)
           else
             mapfile -t optionsKeys < <(jq -r --arg pkg "$package" --arg pn "$patchName" '.[] | select(any(.compatiblePackages[]?; if .name? and (.name|type)=="string" then .name == $pkg else if .versions? and (.versions|type)=="object" then .versions.packageName == $pkg elif .versions? and (.versions|type)=="array" then any(.versions[].packageName? == $pkg) else false end end)) | select(.name == $pn) | .options[] | (if .key then .key else .name end)' $sourceDir/patches-$patchesVersion.json)
             mapfile -t optionsTitles < <(jq -r --arg pkg "$package" --arg pn "$patchName" '.[] | select(any(.compatiblePackages[]?; if .name? and (.name|type)=="string" then .name == $pkg else .versions | if type=="object" then .packageName == $pkg elif type=="array" then any(.[].packageName? == $pkg) else false end end)) | select(.name == $pn) | .options[] | (if .title then .title else .name end)' $sourceDir/patches-$patchesVersion.json)
-            mapfile -t optionsDescriptions < <(jq -r --arg pkg "$package" --arg pn "$patchName" '.[] | select(any(.compatiblePackages[]?; if .name? and (.name|type)=="string" then .name == $pkg else .versions | if type=="object" then .packageName == $pkg elif type=="array" then any(.[].packageName? == $pkg) else false end end)) | select(.name == $pn) | .options[].description' $sourceDir/patches-$patchesVersion.json)
+            mapfile -t optionsDescriptions < <(jq -r --arg pkg "$package" --arg pn "$patchName" '.[] | select(any(.compatiblePackages[]?; if .name? and (.name|type)=="string" then .name == $pkg else .versions | if type=="object" then .packageName == $pkg elif type=="array" then any(.[].packageName? == $pkg) else false end end)) | select(.name == $pn) | .options[] | (.description | tostring | gsub("\n"; " "))' $sourceDir/patches-$patchesVersion.json)
           fi
           if [ ${#optionsTitles[@]} -gt 0 ]; then
             while true; do
