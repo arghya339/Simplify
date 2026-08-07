@@ -403,7 +403,7 @@ fi
 
 # --- Download and give execute (--x) permission to AAPT2 Binary ---
 tag_name=$(curl -sL https://api.github.com/repos/ReVanced/aapt2/releases/latest | jq -r '.tag_name')
-[ "$tag_name" != "$aapt2" ] && { rm -f $PREFIX/bin/aapt2 && curl -L --progress-bar -C - -o $PREFIX/bin/aapt2 https://github.com/ReVanced/aapt2/releases/download/${tag_name}/aapt2-${cpuAbi} && chmod +x $PREFIX/bin/aapt2 && $PREFIX/bin/aapt2 version 2>&1 && config "aapt2" "$tag_name"; }
+([ ! -f $PREFIX/bin/aapt2 ] || [ "$tag_name" != "$aapt2" ]) && { rm -f $PREFIX/bin/aapt2 && curl -L --progress-bar -C - -o $PREFIX/bin/aapt2 https://github.com/ReVanced/aapt2/releases/download/${tag_name}/aapt2-${cpuAbi} && chmod +x $PREFIX/bin/aapt2 && $PREFIX/bin/aapt2 version 2>&1 && config "aapt2" "$tag_name"; }
 
 curl -sL "https://raw.githubusercontent.com/arghya339/Simplify/refs/heads/main/Termux/dlGitHub.sh" --progress-bar -o $Simplify/dlGitHub.sh
 

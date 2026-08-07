@@ -70,7 +70,7 @@ dlGitHub() {
   if [ "$releases" == "latest" ]; then
     # Get Latest Releases JSON Response from GH API
     if [ "$repo" != "ReVancedApp-Actions" ] || [ "$repo" != "Revanced-And-Revanced-Extended-Non-Root" ]; then
-      ghApiResponseJson=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases/latest")
+      ghApiResponseJson=$(curl -sL ${auth} "https://api.github.com/repos/$owner/$repo/releases/latest")
     fi
     # Extract latest releases tag_name from GH API response json
     if [ "$repo" == "APKEditor" ]; then
@@ -194,9 +194,9 @@ dlGitHub() {
     echo -e "$info findFile: ${Cyan}$findFile${Reset}"
   else
     if [ "$releases" == "alpha" ] || [ "$releases" == "beta" ]; then
-      lastPreReleases=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases" | jq -r --arg releases "$releases" '.[].tag_name | sub("^v"; "") | select(contains($releases))' | head -n 1 2>/dev/null)
+      lastPreReleases=$(curl -sL ${auth} "https://api.github.com/repos/$owner/$repo/releases" | jq -r --arg releases "$releases" '.[].tag_name | sub("^v"; "") | select(contains($releases))' | head -n 1 2>/dev/null)
     elif [ "$repo" != "lawnchair" ] || [ "$repo" != "lawnicons" ] || [ "$repo" != "spotube" ]; then
-      lastPreReleases=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases" | jq -r '.[].tag_name | sub("^v"; "") | select(contains("dev"))' | head -n 1 2>/dev/null)
+      lastPreReleases=$(curl -sL ${auth} "https://api.github.com/repos/$owner/$repo/releases" | jq -r '.[].tag_name | sub("^v"; "") | select(contains("dev"))' | head -n 1 2>/dev/null)
     fi
     if [ -n "$lastPreReleases" ]; then
       echo -e "$info lastPreReleases: $lastPreReleases"
@@ -204,15 +204,15 @@ dlGitHub() {
     
     # fetch assets from specific release tag
     if [ "$releases" == "nightly" ] || [ "$releases" == "pre-release" ]; then
-      preAssetsName=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases/tags/$releases" | jq -r --arg regex "$regex" '.assets[] | select(.name | test($regex)) | .name' 2>/dev/null)
+      preAssetsName=$(curl -sL ${auth} "https://api.github.com/repos/$owner/$repo/releases/tags/$releases" | jq -r --arg regex "$regex" '.assets[] | select(.name | test($regex)) | .name' 2>/dev/null)
     else
-      preAssetsName=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases/tags/v$lastPreReleases" | jq -r --arg regex "$regex" '.assets[] | select(.name | test($regex)) | .name' | tail -1 2>/dev/null)
+      preAssetsName=$(curl -sL ${auth} "https://api.github.com/repos/$owner/$repo/releases/tags/v$lastPreReleases" | jq -r --arg regex "$regex" '.assets[] | select(.name | test($regex)) | .name' | tail -1 2>/dev/null)
     fi
     if [ -z "$preAssetsName" ]; then
       if [ "$releases" == "nightly" ] || [ "$releases" == "pre-release" ]; then
-        preAssetsName=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases/tags/$releases" | jq -r --arg ext "$ext" '.assets[] | select(.name | endswith($ext)) | .name' 2>/dev/null)
+        preAssetsName=$(curl -sL ${auth} "https://api.github.com/repos/$owner/$repo/releases/tags/$releases" | jq -r --arg ext "$ext" '.assets[] | select(.name | endswith($ext)) | .name' 2>/dev/null)
       else
-        preAssetsName=$(curl -s ${auth} "https://api.github.com/repos/$owner/$repo/releases/tags/v$lastPreReleases" | jq -r --arg ext "$ext" '.assets[] | select(.name | endswith($ext)) | .name' | tail -1 2>/dev/null)
+        preAssetsName=$(curl -sL ${auth} "https://api.github.com/repos/$owner/$repo/releases/tags/v$lastPreReleases" | jq -r --arg ext "$ext" '.assets[] | select(.name | endswith($ext)) | .name' | tail -1 2>/dev/null)
       fi
     fi
     echo -e "$info preAssetsName: $preAssetsName"

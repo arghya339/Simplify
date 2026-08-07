@@ -575,7 +575,6 @@ build_app() {
               ;;
             M*|m*)
               echo -e "$running Please Wait !! Mounting Patched ${appNameRef[0]} RV apk.."
-              su -mm -c "/system/bin/sh $Simplify/apkMount.sh \"${stock_apk_path}\" \"$outputAPK\"" &> /dev/null
               su -mm -c "/system/bin/sh $Simplify/apkMount.sh \"${stock_apk_path}\" \"$outputAPK\"" | tee "$SimplUsr/${appNameRef[0]}-RV_mount-log.txt"
               rm -f "$outputAPK"
               ;;
@@ -586,7 +585,6 @@ build_app() {
           case $opt in
             y*|Y*|"")
               echo -e "$running Please Wait !! Mounting Patched ${appNameRef[0]} RV apk.."
-              su -mm -c "/system/bin/sh $Simplify/apkMount.sh \"${stock_apk_path}\" \"$outputAPK\"" &> /dev/null
               su -mm -c "/system/bin/sh $Simplify/apkMount.sh \"${stock_apk_path}\" \"$outputAPK\"" | tee "$SimplUsr/${appNameRef[0]}-RV_mount-log.txt"
               rm -f "$outputAPK"
               ;;

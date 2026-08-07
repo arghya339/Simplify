@@ -12,8 +12,8 @@ else
   branch="dev"
 fi
 
-bash $Simplify/dlGitHub.sh "MorpheApp" "morphe-cli" "$release" ".jar" "$Morphe"
-MorpheCLIJar=$(find "$Morphe" -type f -name "morphe-cli-*-all.jar" -print -quit)
+bash $Simplify/dlGitHub.sh "MorpheApp" "morphe-desktop" "$release" ".jar" "$Morphe"
+MorpheCLIJar=$(find "$Morphe" -type f -name "morphe-desktop-*-all.jar" -print -quit)
 echo -e "$info ${Blue}MorpheCLIJar:${Reset} $MorpheCLIJar"
 
 morphePatchesBundleJson=$(curl -sL "https://raw.githubusercontent.com/MorpheApp/morphe-patches/refs/heads/${branch}/patches-bundle.json")
@@ -42,7 +42,7 @@ if [ $su == false ]; then
 fi
 
 getVersion() {
-  pkgVersion=$($PREFIX/lib/jvm/java-$jdkVersion-openjdk/bin/java -jar $MorpheCLIJar list-versions $PatchesMpp -f=$pkgName | sed 's/^[[:space:]]*//; s/ (.*//;' | grep -E '^[0-9]|^Any$' | sort -rV | head -n 2 | head -n 1)
+  pkgVersion=$($PREFIX/lib/jvm/java-$jdkVersion-openjdk/bin/java -jar $MorpheCLIJar list-versions --patches=$PatchesMpp -f=$pkgName -x=true | sed 's/^[[:space:]]*//; s/ (.*//;' | grep -E '^[0-9]|^Any$' | sort -rV | head -n 2 | head -n 1)
 }
 
 patch_app() {
@@ -54,7 +54,7 @@ patch_app() {
   local appName=$4
 
   echo -e "$running Patching ${appName}.."
-  $PREFIX/lib/jvm/java-$jdkVersion-openjdk/bin/java -jar $MorpheCLIJar patch -p $PatchesMpp -o "$outputAPK" "${stock_apk_ref}" "${patches[@]}" --purge $stripLibs -f | tee "$log"
+  $PREFIX/lib/jvm/java-$jdkVersion-openjdk/bin/java -jar $MorpheCLIJar patch -p $PatchesMpp -o "$outputAPK" "${stock_apk_ref}" "${patches[@]}" $stripLibs -f | tee "$log"
 
   if grep -q "OutOfMemory" "$log"; then
     echo -e "$bad ${Red}OutOfMemoryError${Reset}: ${Yellow}Device RAM overloaded!${Reset}\n ${Blue}Solutions${Reset}:\n   1. ${Yellow}Close background apps.${Reset}\n   2. ${Yellow}Use device with ≥4GB ~ ≥6GB RAM for patching apk.${Reset}"
@@ -220,7 +220,6 @@ build_app() {
               ;;
             Mount)
               echo -e "$running Please Wait !! Mounting Patched ${appNameRef[0]} Morphe apk.."
-              su -mm -c "/system/bin/sh $Simplify/apkMount.sh \"${stock_apk_ref[0]}\" $outputAPK" &> /dev/null
               su -mm -c "/system/bin/sh $Simplify/apkMount.sh \"${stock_apk_ref[0]}\" $outputAPK" | tee "$SimplUsr/${appNameRef[0]}-Morphe_mount_log.txt"
               rm $outputAPK
               ;;
@@ -231,7 +230,6 @@ build_app() {
           case $opt in
             Yes)
               echo -e "$running Please Wait !! Mounting Patched ${appNameRef[0]} Morphe apk.."
-              su -mm -c "/system/bin/sh $Simplify/apkMount.sh \"${stock_apk_ref[0]}\" $outputAPK" &> /dev/null
               su -mm -c "/system/bin/sh $Simplify/apkMount.sh \"${stock_apk_ref[0]}\" $outputAPK" | tee "$SimplUsr/${appNameRef[0]}-Morphe_mount_log.txt"
               rm $outputAPK
               ;;

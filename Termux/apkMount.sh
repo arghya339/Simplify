@@ -26,8 +26,6 @@ versionName=$(sed -n "s/.*versionName='\([^']*\)'.*/\1/p" <<< "$stockInfo")
 
 [ "$(getenforce 2>/dev/null)" == "Enforcing" ] && { setenforce 0; writeSELinux=1; } || writeSELinux=0
 
-installationPath=$(pm path "$pkgName" | grep base | sed "s/package://g")
-
 # Mount using Magisk mirror, if available.
 MAGISKTMP="$( magisk --path )" || MAGISKTMP=/sbin
 MIRROR="$MAGISKTMP/.magisk/mirror"
@@ -61,6 +59,7 @@ if ! (pm list packages | grep -q "$pkgName" && [ "$(pm dump $pkgName | grep vers
 else
   echo "$good stock $appName $versionName is installed."
 fi
+installationPath=$(pm path "$pkgName" | grep base | sed "s/package://g")
 
 # Force Stop app & Unmount any existing installation to prevent multiple unnecessary mounts.
 echo "$running Force stopping $appName.."

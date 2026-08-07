@@ -10,18 +10,20 @@ if [ $ChangeRVXSource -eq 0 ]; then
   owner="inotia00"  # Use inotia00 as owner
   org="$owner"
   repo="revanced"
+  tool="cli"
   ext=".rvp"
 else
   BugReportUrl="https://github.com/anddea/revanced-patches/issues/new?template=bug-report.yml"
   owner="anddea"  # Use anddea as owner
   org="MorpheApp"
   repo="morphe"
+  tool="desktop"
   ext=".mpp"
 fi
 
 # --- Download CLI ---
-bash $Simplify/dlGitHub.sh "$org" "$repo-cli" "latest" ".jar" "$RVX"
-CLI=$(find "$RVX" -type f -name "$repo-cli-*-all.jar" -print -quit)
+bash $Simplify/dlGitHub.sh "$org" "$repo-$tool" "latest" ".jar" "$RVX"
+CLI=$(find "$RVX" -type f -name "$repo-$tool-*-all.jar" -print -quit)
 echo -e "$info ${Blue}CLI:${Reset} $CLI"
 
 # --- Download Patches ---
@@ -96,7 +98,7 @@ patch_app() {
   local appName="$5"
   local Url=$6
   
-  CLI=$(find "$RVX" -type f -name "$repo-cli-*-all.jar" -print -quit)
+  CLI=$(find "$RVX" -type f -name "$repo-$tool-*-all.jar" -print -quit)
   if [[ ( $Android -eq 7 || $Android -eq 6 ) && ( "$appName" == "YouTube" ) && ( $ChangeRVXSource -eq 0 ) ]]; then
     bash $Simplify/dlGitHub.sh "kitadai31" "revanced-patches-android6-7" "$release" ".rvp" "$RVX6_7"
     PatchesRvp=$(find "$RVX6_7" -type f -name "patches-*.rvp" -print -quit)
@@ -156,7 +158,7 @@ patch_app() {
       --custom-aapt2-binary="$PREFIX/bin/aapt2" \
       --purge $ripLib -f | tee "$log"
   else
-    $PREFIX/lib/jvm/java-$jdkVersion-openjdk/bin/java -jar $CLI patch -p $Patches -o "$outputAPK" "${stock_apk_path}" "${patches[@]}" -e "Change version code" -OversionCode="2147483647" --purge $stripLibs -f | tee "$log"
+    $PREFIX/lib/jvm/java-$jdkVersion-openjdk/bin/java -jar $CLI patch -p $Patches -o "$outputAPK" "${stock_apk_path}" "${patches[@]}" -e "Change version code" -OversionCode="2147483647" $stripLibs -f | tee "$log"
   fi
 
   if [ ! -f "$outputAPK" ] && [ -f "$stock_apk_path" ]; then
@@ -219,15 +221,7 @@ else
   yt_music_patches_args+=(-e "Custom branding name for YouTube Music" -OappNameNotification="YouTube Music RVX" -OappNameLauncher="YT Music RVX")
 fi
 
-spotify_patches_args=(
-  -e "Change lyrics provider"
-  -e "Custom theme"
-  -d "Hide Create button"
-)
-
 reddit_patches_args=()
-
-netwall_patches_args=()
 
 if [ "$ReadPatchesFile" -eq 1 ]; then
   
@@ -255,22 +249,15 @@ if [ "$ReadPatchesFile" -eq 1 ]; then
 -e "Custom header for YouTube Music"
 -e="Return YouTube Username" -e "Disable music video in album"'
 
-    # [2] Spotify
-    '-e "Change lyrics provider"
--e "Custom theme"
--d "Hide Create button"'
-
-    # [3] Reddit, [4] NetWall | No default patches
-    '' ''
+    # [2] Reddit | No default patches
+    ''
   )
 
   # Array to stores arrays-names
   arraynames=(
     yt_patches_args
     yt_music_patches_args
-    spotify_patches_args
     reddit_patches_args
-    netwall_patches_args
   )
 
   # Create Empty Files if it doesn’t exist
@@ -409,7 +396,6 @@ build_app() {
               ;;
             Mount)
               echo -e "$running Please Wait !! Mounting Patched ${appNameRef[0]} RVX apk.."
-              su -mm -c "/system/bin/sh $Simplify/apkMount.sh \"${stock_apk_ref[0]}\" $outputAPK" &> /dev/null
               su -mm -c "/system/bin/sh $Simplify/apkMount.sh \"${stock_apk_ref[0]}\" $outputAPK" | tee "$SimplUsr/${appNameRef[0]}-RVX_mount_log.txt"
               rm $outputAPK
               ;;
@@ -420,7 +406,6 @@ build_app() {
           case $opt in
             Yes)
               echo -e "$running Please Wait !! Mounting Patched ${appNameRef[0]} RVX apk.."
-              su -mm -c "/system/bin/sh $Simplify/apkMount.sh \"${stock_apk_ref[0]}\" $outputAPK" &> /dev/null
               su -mm -c "/system/bin/sh $Simplify/apkMount.sh \"${stock_apk_ref[0]}\" $outputAPK" | tee "$SimplUsr/${appNameRef[0]}-RVX_mount_log.txt"
               rm $outputAPK
               ;;
@@ -456,58 +441,17 @@ getListOfPatches() {
   fi
 }
 
-if [ $ChangeRVXSource -eq 1 ]; then
-  [ $su == true ] && Spotify="Spotify"
-  [ "$cpuAbi" == "arm64-v8a" ] && NetWall="NetWall"
-fi
-
 # --- Arrays of apps list that required specific android version ---
-if [ $Android -ge 13 ]; then
-  apps=(
-    CHANGELOG
-    Spoof\ Device\ Arch
-    List\ of\ Patches
-    YouTube
-    YT\ Music
-    #$Spotify
-    Reddit
-    #$NetWall
-  )
-elif [ $Android -eq 9 ] || [ $Android -eq 10 ] || [ $Android -eq 11 ] || [ $Android -eq 12 ]; then
-  apps=(
-    CHANGELOG
-    Spoof\ Device\ Arch
-    List\ of\ Patches
-    YouTube
-    YT\ Music
-    #$Spotify
-    Reddit
-  )
-elif [ $Android -eq 8 ] || [ $Android -eq 7 ]; then
-  apps=(
-    CHANGELOG
-    Spoof\ Device\ Arch
-    List\ of\ Patches
-    YouTube
-    YT\ Music
-    #$Spotify
-  )
-elif [ $Android -eq 6 ]; then
-  apps=(
-    CHANGELOG
-    Spoof\ Device\ Arch
-    List\ of\ Patches
-    YouTube
-    YT\ Music
-  )
-elif [ $Android -eq 5 ]; then
-  apps=(
-    CHANGELOG
-    Spoof\ Device\ Arch
-    List\ of\ Patches
-    YouTube
-    "YT Music"
-  )
+apps=(
+  CHANGELOG
+  Spoof\ Device\ Arch
+  List\ of\ Patches
+  YouTube
+  YT\ Music
+)
+
+if [ $ChangeRVXSource -eq 0 ]; then
+  [ $Android -ge 9 ] && apps+=(Reddit)
 fi
 
 while true; do
@@ -534,16 +478,8 @@ while true; do
             pkgName="com.google.android.apps.youtube.music"
             getListOfPatches "$pkgName"
             ;;
-          Spotify)
-            pkgName="com.spotify.music"
-            getListOfPatches "$pkgName"
-            ;;
           Reddit)
             pkgName="com.reddit.frontpage"
-            getListOfPatches "$pkgName"
-            ;;
-          NetWall)
-            pkgName="com.ysy.app.firewall"
             getListOfPatches "$pkgName"
             ;;
         esac
@@ -608,23 +544,6 @@ while true; do
       activityPatched="com.google.android.apps.youtube.music/.activities.MusicActivity"
       build_app "$pkgName" "$pkgVersion" "$Type" "$cpuAbi" "APKMirror" "stock_apk_path" "yt_music_patches_args" "$outputAPK" "$log" "appName" "$BugReportUrl" "$pkgPatched" "$activityPatched"
       ;;
-    Spotify)
-      pkgName="com.spotify.music"
-      appName=("Spotify")
-      pkgVersion="9.0.84.1338"
-      #pkgVersion=""
-      if [ -z "$pkgVersion" ]; then
-        getVersion "$pkgName"
-        pkgVersion="$pkgVersion"
-      fi
-      Type="apk"
-      Arch="armeabi-v7a, x86, arm64-v8a, x86_64"
-      stock_apk_path=("$Download/Spotify_v${pkgVersion}-${Arch[0]}.apk")
-      outputAPK="$SimplUsr/Spotify-RVX_v${pkgVersion}-$cpuAbi.apk"
-      log="$SimplUsr/Spotify-RVX_patch-log.txt"
-      activityPatched="com.spotify.music/.MainActivity"
-      build_app "$pkgName" "$pkgVersion" "$Type" "$Arch" "Uptodown" "stock_apk_path" "spotify_patches_args" "$outputAPK" "$log" "appName" "$BugReportUrl" "$pkgName" "$activityPatched"
-      ;;
     Reddit)
       pkgName="com.reddit.frontpage"
       pkgVersion="2025.52.0"; ARSCLib="true"
@@ -642,18 +561,6 @@ while true; do
       appName=("Reddit")
       activityPatched="com.reddit.frontpage/launcher.default"
       build_app "$pkgName" "$pkgVersion" "$Type" "$Arch" "APKMirror" "stock_apk_path" "reddit_patches_args" "$outputAPK" "$log" "appName" "$BugReportUrl" "$pkgName" "$activityPatched"
-      ;;
-    NetWall)
-      appName=("NetWall N")
-      pkgName="com.ysy.app.firewall"
-      pkgVersion="1.2.10"
-      Type="XAPK"
-      Arch="17"
-      stock_apk_path=("$Download/NetWall N_v${pkgVersion}-$Arch.apk")
-      outputAPK="$SimplUsr/NetWall-RVX_v${pkgVersion}-arm64-v8a.apk"
-      log="$SimplUsr/NetWall-RVX_patch-log.txt"
-      activityPatched="com.ysy.app.firewall/b.B"
-      build_app "$pkgName" "$pkgVersion" "$Type" "$Arch" "APKPure" "stock_apk_path" "netwall_patches_args" "$outputAPK" "$log" "appName" "$BugReportUrl" "$pkgName" "$activityPatched"
       ;;
   esac
   echo; read -p "Press Enter to continue..."
