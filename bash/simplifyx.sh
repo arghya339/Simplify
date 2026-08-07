@@ -267,7 +267,7 @@ EOF
           case "$sourceOption" in
             "View Changelog") glow $sourceDir/CHANGELOG.md ;;
             "Patch App")
-              cliVersion=$(ls $clivDir/*-cli-*-all.jar | xargs -n 1 basename | sed -E 's/.*-cli-|-all\.jar$//g')
+              [ "$cli" == "MorpheApp/morphe-cli" ] && cliVersion=$(ls $clivDir/*-desktop-*-all.jar | xargs -n 1 basename | sed -E 's/.*-desktop-|-all\.jar$//g') || cliVersion=$(ls $clivDir/*-cli-*-all.jar | xargs -n 1 basename | sed -E 's/.*-cli-|-all\.jar$//g')
               [ $cliv -lt 5 ] && integrationsVersion=$(ls $sourceDir/revanced-integrations-*.apk | xargs -n 1 basename | sed -E 's/^revanced-integrations-|\.apk$//g')
               packages=($(jq -r '.[].package' $sourceDir/apps.json))
               mapfile -t names < <(jq -r '.[].name' $sourceDir/apps.json)
@@ -344,6 +344,7 @@ EOF
               ($java -jar $cliPath &>/dev/null & echo $! > $simplifyNext/pid)
               echo; read -p "Press Enter to close GUI..."
               kill $(cat $simplifyNext/pid) &>/dev/null; rm -f $simplifyNext/pid
+              pgrep -f "morphe-desktop" >/dev/null && pkill -9 -f "morphe-desktop"
               ;;
             "Build Patches") BuildPatches ;;
             "Display Name")

@@ -96,15 +96,15 @@
     "arsclib": false
   },
   {
-    "source": "privacy-revanced-patches",
-    "cli": "inotia00/revanced-cli",
-    "patches": "jkennethcarino/privacy-revanced-patches",
-    "patchesjson": "https://raw.githubusercontent.com/Jman-Github/ReVanced-Patch-Bundles/refs/heads/bundles/patch-bundles/privacy-patch-bundles/privacy-stable-patches-list.json",
+    "source": "Adobo",
+    "cli": "MorpheApp/morphe-cli",
+    "patches": "jkennethcarino/adobo",
+    "patchesjson": "https://raw.githubusercontent.com/jkennethcarino/adobo/refs/heads/main/patches-list.json",
     "integrations": null,
     "microg": null,
     "prereleases": false,
     "autoupdates": true,
-    "cliv": 5,
+    "cliv": 6,
     "arsclib": false
   },
   {

@@ -200,7 +200,7 @@ installTermuxAPI() {
 
 if checkInternet; then
   tag_name=$(curl -sL https://api.github.com/repos/ReVanced/aapt2/releases/latest | jq -r '.tag_name')
-  [ "$tag_name" != "$aapt2" ] && { rm -f $PREFIX/bin/aapt2 && curl -L --progress-bar -C - -o $PREFIX/bin/aapt2 https://github.com/ReVanced/aapt2/releases/download/${tag_name}/aapt2-${cpuAbi} && chmod +x $PREFIX/bin/aapt2 && $PREFIX/bin/aapt2 version 2>&1 && config "aapt2" "$tag_name"; }
+  ([ ! -f $PREFIX/bin/aapt2 ] || [ "$tag_name" != "$aapt2" ]) && { rm -f $PREFIX/bin/aapt2 && curl -L --progress-bar -C - -o $PREFIX/bin/aapt2 https://github.com/ReVanced/aapt2/releases/download/${tag_name}/aapt2-${cpuAbi} && chmod +x $PREFIX/bin/aapt2 && $PREFIX/bin/aapt2 version 2>&1 && config "aapt2" "$tag_name"; }
 fi
 aapt2="$PREFIX/bin/aapt2"
 java="$PREFIX/lib/jvm/java-$jdk-openjdk/bin/java"

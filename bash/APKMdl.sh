@@ -73,11 +73,15 @@ breadcrumbsMenu() {
       [ -z "$breadcrumbsMenuAppLink" ] && { breadcrumbsMenuAppLink=$(jq -r ".[0].link" <<< "$breadcrumbsMenuJson"); breadcrumbsMenuAppName=$(jq -r ".[0].name" <<< "$breadcrumbsMenuJson"); }
       [ -n "$breadcrumbsMenuAppLink" ] && { link="$breadcrumbsMenuAppLink"; appName="$breadcrumbsMenuAppName"; }
       echo -e "appLink: ${Blue}$link${Reset}"
+      appPageHtml=$(curl -sL --doh-url "$cloudflareDOH" -A "$USER_AGENT" "$link")
+      grep -q "_cf_chl_" <<< "$appPageHtml" && { cf_chl_error && return 1; } || return 0
     else
       echo "hasBreadcrumbsMenu: $hasBreadcrumbsMenu"
+      return 0
     fi
   else
     cf_chl_error
+    return 1
   fi
 }
 
@@ -85,9 +89,7 @@ scrapeVersionsList() {
   unset versionLink
   echo -e "$running Fetching latest $appName uploads list from APKMirror.."
   page=1
-  breadcrumbsMenu
-  appPageHtml=$(curl -sL --doh-url "$cloudflareDOH" -A "$USER_AGENT" "$link")
-  if ! grep -q "_cf_chl_" <<< "$appPageHtml"; then
+  if breadcrumbsMenu; then
     latestUploadsUrl="https://www.apkmirror.com$(pup '#primary a:contains("See more uploads...") attr{href}' <<< "$appPageHtml")"
     latestUploadsQueryString=$(basename "$latestUploadsUrl" 2>/dev/null)
     latestUploadsHtml=$(curl -sL --doh-url "$cloudflareDOH" -A "$USER_AGENT" "$latestUploadsUrl")
@@ -130,8 +132,6 @@ scrapeVersionsList() {
     else
       cf_chl_error
     fi
-  else
-    cf_chl_error
   fi
   [ -n "$versionLink" ] && fetchVariant
 }
@@ -139,9 +139,7 @@ scrapeVersionsList() {
 fetchVersionURL() {
   unset versionLink
   echo -e "$running Searching for target app version in APKMirror's Latest Uploads page.."
-  breadcrumbsMenu
-  appPageHtml=$(curl -sL --doh-url "$cloudflareDOH" -A "$USER_AGENT" "$link")
-  if ! grep -q "_cf_chl_" <<< "$appPageHtml"; then
+  if breadcrumbsMenu; then
     latestUploadsUrl="https://www.apkmirror.com$(pup '#primary a:contains("See more uploads...") attr{href}' <<< "$appPageHtml")"
     latestUploadsQueryString=$(basename "$latestUploadsUrl" 2>/dev/null)
     page=1
@@ -161,8 +159,6 @@ fetchVersionURL() {
         ((page++))
       fi
     done
-  else
-    cf_chl_error
   fi
   [ -n "$versionLink" ] && fetchVariant
 }

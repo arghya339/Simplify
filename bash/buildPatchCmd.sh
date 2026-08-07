@@ -69,7 +69,7 @@ buildPatchCmd() {
     [ -n "$BytecodeMode" ] && patchCmd+=("--bytecode-mode=$BytecodeMode")
     [ $ContinueOnError == true ] && patchCmd+=("--continue-on-error=true")
   fi
-  ([ $isAndroid == true ] && [ "$patches" != "inotia00/revanced-patches-arsclib" ] && [ "$patches" != "MorpheApp/morphe-patches" ]) && patchCmd+=("--custom-aapt2-binary=$PREFIX/bin/aapt2")
+  ([ $isAndroid == true ] && [ "$patches" != "inotia00/revanced-patches-arsclib" ] && [ "$cli" != "MorpheApp/morphe-cli" ]) && patchCmd+=("--custom-aapt2-binary=$PREFIX/bin/aapt2")
 
   if [ -f "$simplifyNext/ks.json" ] && [ -f "$simplifyNext/ks.keystore" ]; then
     alias=$(jq -r '.alias' "$simplifyNext/ks.json")

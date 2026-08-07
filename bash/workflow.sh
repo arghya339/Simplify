@@ -173,8 +173,11 @@ patchingWorkflow() {
               if [ $isAndroid == true ]; then
                 su -mm -c "/system/bin/sh $simplifyNext/apkMount.sh \"$stockAPK\" \"$patchedAPK\"" | tee -a "$SimplUsr/mountLog.txt"
               else
-                [ ! -f "$simplifyNext/aapt2_$cpuAbi" ] && curl -L --progress-bar -o "$simplifyNext/aapt2_$cpuAbi" "https://github.com/arghya339/aapt2/releases/download/all/aapt2_$cpuAbi"
-                adb -s "$serial" shell "[ ! -f '/data/local/tmp/aapt2' ]" && { adb -s "$serial" push "$simplifyNext/aapt2_$cpuAbi" /data/local/tmp/aapt2 &>/dev/null && adb -s "$serial" shell "chmod +x /data/local/tmp/aapt2"; }
+                if checkInternet; then
+                  tag_name=$(curl -sL https://api.github.com/repos/ReVanced/aapt2/releases/latest | jq -r '.tag_name')
+                  ([ ! -f "$simplifyNext/aapt2-$cpuAbi" ] || [ "$tag_name" != "$(cat "$simplifyNext/.aapt2-$cpuAbi")" ]) && { rm -f $simplifyNext/aapt2-$cpuAbi && curl -L --progress-bar -C - -o $simplifyNext/aapt2-$cpuAbi https://github.com/ReVanced/aapt2/releases/download/${tag_name}/aapt2-${cpuAbi} && echo "$tag_name" > "$simplifyNext/.aapt2-$cpuAbi"; }
+                fi
+                adb -s "$serial" shell "[ ! -f '/data/local/tmp/aapt2' ]" && { adb -s "$serial" push "$simplifyNext/aapt2-$cpuAbi" /data/local/tmp/aapt2 &>/dev/null && adb -s "$serial" shell "chmod +x /data/local/tmp/aapt2"; }
                 adb -s "$serial" push "$simplifyNext/apkMount.sh" /data/local/tmp/apkMount.sh &>/dev/null && adb -s "$serial" shell "chmod +x /data/local/tmp/apkMount.sh"
               
                 stockFileName=$(basename "$stockAPK" 2>/dev/null)
