@@ -60,12 +60,12 @@ fi
 getVersion() {
   local pkgName="$1"
   
-  preVersion=$($PREFIX/lib/jvm/java-$jdkVersion-openjdk/bin/java -jar $CLI list-versions $Patches -f=$pkgName | sed 's/^[[:space:]]*//; s/ (.*//;' | grep -E '^[0-9]|^Any$' | sort -rV | head -n 2 | tail -n 1)
+  [ $ChangeRVXSource -eq 0 ] && preVersion=$($PREFIX/lib/jvm/java-$jdkVersion-openjdk/bin/java -jar $CLI list-versions $Patches -f=$pkgName | sed 's/^[[:space:]]*//; s/ (.*//;' | grep -E '^[0-9]|^Any$' | sort -rV | head -n 2 | tail -n 1) || preVersion=$($PREFIX/lib/jvm/java-$jdkVersion-openjdk/bin/java -jar $CLI list-versions --patches=$Patches -f=$pkgName -x=true | sed 's/^[[:space:]]*//; s/ (.*//;' | grep -E '^[0-9]|^Any$' | sort -rV | head -n 2 | tail -n 1)
   pre_stock_apk_path=$(find "$Download" -type f -name "${appName[0]}_v${preVersion}-*.apk" -print -quit)
   [ -f "$pre_stock_apk_path" ] && rm -f "$pre_stock_apk_path"  # Remove previous stock apk if exists
   
   # Get all versions for the package and sort them, then take the highest version
-  pkgVersion=$($PREFIX/lib/jvm/java-$jdkVersion-openjdk/bin/java -jar $CLI list-versions $Patches -f=$pkgName | sed 's/^[[:space:]]*//; s/ (.*//;' | grep -E '^[0-9]|^Any$' | sort -rV | head -n 2 | head -n 1)
+  [ $ChangeRVXSource -eq 0 ] && pkgVersion=$($PREFIX/lib/jvm/java-$jdkVersion-openjdk/bin/java -jar $CLI list-versions $Patches -f=$pkgName | sed 's/^[[:space:]]*//; s/ (.*//;' | grep -E '^[0-9]|^Any$' | sort -rV | head -n 2 | head -n 1) || pkgVersion=$($PREFIX/lib/jvm/java-$jdkVersion-openjdk/bin/java -jar $CLI list-versions --patches=$Patches -f=$pkgName -x=true | sed 's/^[[:space:]]*//; s/ (.*//;' | grep -E '^[0-9]|^Any$' | sort -rV | head -n 2 | head -n 1)
 }
 
 # --- Download ReVanced CLI v3 ---
