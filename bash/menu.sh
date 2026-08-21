@@ -15,7 +15,7 @@ menu() {
   [ -n "$menu_descriptions" ] && cItems=$((cItems + 2))
   [ -n "$menu_others" ] && cItems=$((cItems + 2))
   items_per_page=$((rows - cItems))
-  current_page=0
+  current_page=$((selected_option / items_per_page))
   total_pages=$(( (${#menu_options[@]} + items_per_page - 1) / items_per_page ))  # Convert to integer from floating point page number
 
   show_menu() {

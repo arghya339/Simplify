@@ -254,31 +254,34 @@ systemInfo() {
 
 hostInfo() {
   if [ $isMacOS == true ]; then
-    echo "Model Identifier: $(system_profiler SPHardwareDataType | grep "Model Identifier" | awk -F: '{print $2}' | xargs)"
-    echo "Product         : $(sw_vers -productName) $(sw_vers -ProductVersion)"
-    echo "BuildVersion    : $(sw_vers -BuildVersion)"
-    echo "Kernel          : $(uname -s) $(uname -r)"
-    echo "Architecture    : $(uname -m)"
+    echo "Model Identifier : $(system_profiler SPHardwareDataType | grep "Model Identifier" | awk -F: '{print $2}' | xargs)"
+    echo "Product          : $(sw_vers -productName) $(sw_vers -ProductVersion)"
+    echo "BuildVersion     : $(sw_vers -BuildVersion)"
+    echo "Kernel           : $(uname -s) $(uname -r)"
+    echo "Architecture     : $(uname -m)"
     read usedGi totalGi perc <<< $(vm_stat | awk -v tb=$(sysctl -n hw.memsize) '/page size/ {ps=$8} /Pages free/ {f=$3} /Pages inactive/ {i=$3} END {f=f+0; i=i+0; used=tb-((f+i)*ps); printf "%.1f %.0f %.0f", used/1024^3, tb/1024^3, (used/tb)*100}')
-    echo "Memory          : ${usedGi}Gi / ${totalGi}Gi (${perc}%)"
-    echo "Storage         : $(df -h / | awk 'NR==2 {printf "%s / %s (%s)", $3, $2, $5}')"
-    echo "Processor Name  : $(sysctl -n machdep.cpu.brand_string)"
-    echo "Processor Speed : $(system_profiler SPHardwareDataType | grep "Processor Speed" | cut -d: -f2 | xargs)"
-    echo "Processor Core  : $(sysctl -n hw.ncpu)"
-    ( nvram boot-args 2>/dev/null | grep -q "alcid=\|keepsyms" && kextstat 2>/dev/null | grep -q "Lilu\|WhateverGreen\|AppleALC\|VirtualSMC" ) && echo "isOpenCore      : true" || echo "isOpenCore      : false"
+    echo "Memory           : ${usedGi}Gi / ${totalGi}Gi (${perc}%)"
+    echo "Storage          : $(df -h / | awk 'NR==2 {printf "%s / %s (%s)", $3, $2, $5}')"
+    echo "Processor Name   : $(sysctl -n machdep.cpu.brand_string)"
+    #echo "Processor Speed  : $(system_profiler SPHardwareDataType | grep "Processor Speed" | cut -d: -f2 | xargs)"
+    #echo "CPU Frequency Min: $(sysctl -n hw.cpufrequency_min | awk '{printf "%.1f GHz\n", $0 / 1000000000}')"
+    echo "CPU Frequency Max: $(sysctl -n hw.cpufrequency_max | awk '{printf "%.1f GHz\n", $0 / 1000000000}')"
+    #echo "Logical CPU Core : $(sysctl -n hw.logicalcpu)"
+    echo "Physical CPU Core: $(sysctl -n hw.physicalcpu)"
+    ( nvram boot-args 2>/dev/null | grep -q "alcid=\|keepsyms" && kextstat 2>/dev/null | grep -q "Lilu\|WhateverGreen\|AppleALC\|VirtualSMC" ) && echo "isOpenCore       : true" || echo "isOpenCore       : false"
   else
-    echo "Hardware Model  : $(cat /sys/class/dmi/id/sys_vendor) $(cat /sys/class/dmi/id/product_name)"
-    #echo "OS Name         : $(hostnamectl | grep "Operating System" | cut -d: -f2 | xargs)"
-    echo "OS Name         : $(grep '^NAME=' /etc/os-release | cut -d= -f2 | tr -d '"')"
-    echo "OS Version      : $(grep '^VERSION_ID=' /etc/os-release | cut -d= -f2 | tr -d '"')"
-    echo "Kernel          : Linux $(uname -r)"
-    echo "Architecture    : $(uname -m)"
-    echo "Memory          : $(free | awk '/Mem:/ {printf "%.1fGi / %.1fGi (%.0f%%)", $3/1048576, $2/1048576, ($3/$2)*100}')"
-    echo "Storage         : $(df -h / | awk 'NR==2 {printf "%s / %s (%s)", $3, $2, $5}')"
-    echo "CPU Model       : $(lscpu | grep "Model name" | cut -d: -f2 | xargs)"
-    echo "CPU Frequency   : $(grep "cpu MHz" /proc/cpuinfo | head -1 | awk '{printf "%.1f GHz\n", $4/1000}')"
-    echo "CPU Core        : $(nproc --all)"
-    lsmod | grep -iq vbox && echo "isVirtualBox    : true" || echo "isVirtualBox    : false"
+    echo "Hardware Model   : $(cat /sys/class/dmi/id/sys_vendor) $(cat /sys/class/dmi/id/product_name)"
+    #echo "OS Name          : $(hostnamectl | grep "Operating System" | cut -d: -f2 | xargs)"
+    echo "OS Name          : $(grep '^NAME=' /etc/os-release | cut -d= -f2 | tr -d '"')"
+    echo "OS Version       : $(grep '^VERSION_ID=' /etc/os-release | cut -d= -f2 | tr -d '"')"
+    echo "Kernel           : Linux $(uname -r)"
+    echo "Architecture     : $(uname -m)"
+    echo "Memory           : $(free | awk '/Mem:/ {printf "%.1fGi / %.1fGi (%.0f%%)", $3/1048576, $2/1048576, ($3/$2)*100}')"
+    echo "Storage          : $(df -h / | awk 'NR==2 {printf "%s / %s (%s)", $3, $2, $5}')"
+    echo "CPU Model        : $(lscpu | grep "Model name" | cut -d: -f2 | xargs)"
+    echo "CPU Frequency    : $(grep "cpu MHz" /proc/cpuinfo | head -1 | awk '{printf "%.1f GHz\n", $4/1000}')"
+    echo "CPU Core         : $(nproc --all)"
+    lsmod | grep -iq vbox && echo "isVirtualBox     : true" || echo "isVirtualBox     : false"
   fi
 }
 
@@ -993,10 +996,10 @@ configure() {
             "About Host")
               printf '\033[?25l' && printArt
               echo "Made with ❤️  in India"
-              #echo "Script Version  : $localVersion"  # YYYYMMDDHHMM
-              echo "Script Version  : ${localVersion:0:4} ${localVersion:4:2} ${localVersion:6:2} ${localVersion:8:2} ${localVersion:10:2}"  # YYYY MM DD HH MM
-              echo "Bash            : $(bash --version | head -1 | awk '{print $4}')"
-              echo "Java            : $(java --version | head -1 | awk '{print $2}')"
+              #echo "Script Version   : $localVersion"  # YYYYMMDDHHMM
+              echo "Script Version   : ${localVersion:0:4} ${localVersion:4:2} ${localVersion:6:2} ${localVersion:8:2} ${localVersion:10:2}"  # YYYY MM DD HH MM
+              echo "Bash             : $(bash --version | head -1 | awk '{print $4}')"
+              echo "Java             : $(java --version | head -1 | awk '{print $2}')"
               hostInfo
               echo; read -p "Press Enter to continue..."; printf '\033[?25h'
               ;;

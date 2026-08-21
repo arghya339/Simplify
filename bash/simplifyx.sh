@@ -263,7 +263,7 @@ EOF
       while true; do
         if menu sourceOptions bButtons "" "" "$selected_src_opt"; then
           selected_src_opt=$selected
-          sourceOption="${sourceOptions[selected]}"
+          sourceOption="${sourceOptions[selected_src_opt]}"
           case "$sourceOption" in
             "View Changelog") glow $sourceDir/CHANGELOG.md ;;
             "Patch App")
@@ -272,11 +272,13 @@ EOF
               packages=($(jq -r '.[].package' $sourceDir/apps.json))
               mapfile -t names < <(jq -r '.[].name' $sourceDir/apps.json)
               links=($(jq -r '.[].link' $sourceDir/apps.json))
+              selected_pkg=0
               while true; do
-                if menu names bButtons packages; then
-                  package="${packages[selected]}"
-                  appName="${names[selected]}"
-                  link="${links[selected]}"
+                if menu names bButtons packages "" $selected_pkg; then
+                  selected_pkg=$selected
+                  package="${packages[selected_pkg]}"
+                  appName="${names[selected_pkg]}"
+                  link="${links[selected_pkg]}"
                   echo "selected: $appName"
                   patchingWorkflow
                 else
@@ -290,6 +292,7 @@ EOF
               jq --arg source "$source" --argjson pre "$prereleases" 'map(if .source == $source then .prereleases = $pre else . end)' $simplifyNext/sources.json > tmp.json && mv tmp.json $simplifyNext/sources.json
               checkInternet && fetchAssets
               [ "$patchesUpdated" == "true" ] && fetchAppsInfo || patchesVersion=$(ls $sourceDir/patches-*.json | xargs -n 1 basename | sed -E 's/^patches-|.json$//g')
+              patchesUpdated=false
               ;;
             "Auto Updates")
               autoupdates=$(jq -r --arg source "$source" '.[] | select(.source == $source) | .autoupdates' $simplifyNext/sources.json)
@@ -298,11 +301,13 @@ EOF
               if [ "$autoupdates" == "true" ]; then
                 checkInternet && fetchAssets
                 [ "$patchesUpdated" == "true" ] && { checkInternet && fetchAppsInfo; } || patchesVersion=$(ls $sourceDir/patches-*.json | xargs -n 1 basename | sed -E 's/^patches-|.json$//g')
+                patchesUpdated=false
               fi
               ;;
             "Manually Updating")
               checkInternet && fetchAssets
               [ "$patchesUpdated" == "true" ] && { checkInternet && fetchAppsInfo; } || patchesVersion=$(ls $sourceDir/patches-*.json | xargs -n 1 basename | sed -E 's/^patches-|.json$//g')
+              patchesUpdated=false
               ;;
             "View Patches") viewPatches ;;
             "Install MicroG")

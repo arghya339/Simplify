@@ -8,18 +8,33 @@ fetchAppsInfo() {
   totalPackages=$(jq length <<< "$compatiblePackagesJson")
   packages=($(jq -r ".[].package" <<< "$compatiblePackagesJson"))
   
-  pnames=$(sed 's/ /", "/g; s/^/"/; s/$/"/' <<< "${packages[@]}")
-  RESPONSE_JSON=$(curl -sL --doh-url "$cloudflareDOH" $APKM_REST_API_URL -A "$USER_AGENT" -H 'Accept: application/json' -H 'Content-Type: application/json' -H "Authorization: Basic $AUTH_TOKEN" -d "{\"pnames\":[$pnames]}")
-  
-  exists_pname=($(jq -r '.data[] | select(.exists == true) | .pname' <<< "$RESPONSE_JSON"))
-  not_exists_pname=($(jq -r '.data[] | select(.exists == false) | .pname' <<< "$RESPONSE_JSON"))
+  maxItems=100  # APKMirror rest api pnames parameters support max 100 items, if pnames contain more than 100 items rest response rest_too_many_items with 400 error code.
+  declare -a exists_pname not_exists_pname itemsName appLink
+  for ((i=0; i<${#packages[@]}; i+=maxItems)); do
+    hundredItems=("${packages[@]:i:maxItems}")
+    pnames=$(sed 's/ /", "/g; s/^/"/; s/$/"/' <<< "${hundredItems[@]}")
+    RESPONSE_JSON=$(curl -sL --doh-url "$cloudflareDOH" $APKM_REST_API_URL -A "$USER_AGENT" -H 'Accept: application/json' -H 'Content-Type: application/json' -H "Authorization: Basic $AUTH_TOKEN" -d "{\"pnames\":[$pnames]}")
+    if jq -e '.data? | has("status")' <<< "$RESPONSE_JSON" &>/dev/null; then
+      RESPONSE_STATUS=$(jq -r '.data.status' <<< "$RESPONSE_JSON")
+      [ $RESPONSE_STATUS -ne 200 ] && { jq <<< "$RESPONSE_JSON"; echo; read -p "Press Enter to continue..."; }
+    fi
+    exists_pname+=($(jq -r '.data[] | select(.exists == true) | .pname' <<< "$RESPONSE_JSON"))
+    not_exists_pname+=($(jq -r '.data[] | select(.exists == false) | .pname' <<< "$RESPONSE_JSON"))
+    mapfile -t -O "${#itemsName[@]}" itemsName < <(jq -r '.data[] | select(.exists == true) | .app.name' <<< "$RESPONSE_JSON")
+    mapfile -t -O "${#appLink[@]}" appLink < <(jq -r '.data[] | select(.exists == true) | "https://apkmirror.com\(.app.link)"' <<< "$RESPONSE_JSON")
+  done
   echo -e "$info totalApps: $totalPackages\n$good found: ${#exists_pname[@]}\n$notice not-found: ${#not_exists_pname[@]}"
 
-  declare -a appName appLink versions
+  declare -a appName versions
   for i in ${!exists_pname[@]}; do
-    appName[i]="$(jq -r ".data[] | select(.pname == \"${exists_pname[i]}\") | .app.name" <<< "$RESPONSE_JSON" | html2text)"
+    appName[i]="$(html2text <<< "${itemsName[i]}")"
     versions[i]="$(jq -c ".[] | select(.package == \"${exists_pname[i]}\") | .versions" <<< "$compatiblePackagesJson")"
-    appLink[i]="https://apkmirror.com$(jq -r ".data[] | select(.pname == \"${exists_pname[i]}\") | .app.link" <<< "$RESPONSE_JSON")"
+  done
+  for i in ${!not_exists_pname[@]}; do
+    exists_pname+=("${not_exists_pname[i]}")
+    appName+=("${not_exists_pname[i]}")
+    versions+=("$(jq -c ".[] | select(.package == \"${not_exists_pname[i]}\") | .versions" <<< "$compatiblePackagesJson")")
+    appLink+=("null")
   done
 
   appsJson="[]"

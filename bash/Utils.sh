@@ -76,7 +76,8 @@ verify() {
   package=$(awk -F"'" '/package/ {print $2}' <<< "$appInfo" | head -1)
   appName=$(awk -F"'" '/application-label:/ {print $2}' <<< "$appInfo")
   version=$(sed -n "s/.*versionName='\([^']*\)'.*/\1/p" <<< "$appInfo")
-  echo -e "$appName ($package) v$version"
+  versionCode=$(sed -n "s/.*versionCode='\([^']*\)'.*/\1/p" <<< "$appInfo")
+  echo -e "$appName ($package) v$version ($versionCode)"
   if [ $isAndroid == true ]; then
     pkgInstall "apksigner"
     $java -jar $PREFIX/share/java/apksigner.jar verify --print-certs "$Download/$package.apk" | grep "certificate DN:" | head -1 | cut -d: -f2-
@@ -90,7 +91,7 @@ exportApp() {
   mapfile -t cmdOut < <(shellCmd "pm path $package")
   packagePath=("${cmdOut[@]#package:}"); unset cmdOut
   if [ ${#packagePath[@]} -eq 1 ]; then
-    filePath="$Download/${appName}_v${version}.apk"
+    filePath="$Download/${appName}_v${version}-${versionCode}.apk"
     mv $Download/$package.apk "$filePath"
   else
     mkdir -p $Download/$package
@@ -98,8 +99,8 @@ exportApp() {
     for ((i=1; i<${#packagePath[@]}; i++)); do
       pullFile ${packagePath[i]} $Download/$package
     done
-    bsdtar --format=zip -c -f - -C "$Download/$package" . | pv -t -b -r > "$Download/${appName}_v${version}.apks" && rm -rf "$Download/$package"
-    antisplitApp "$Download/${appName}_v${version}.apks" $package
+    bsdtar --format=zip -c -f - -C "$Download/$package" . | pv -t -b -r > "$Download/${appName}_v${version}-${versionCode}.apks" && rm -rf "$Download/$package"
+    antisplitApp "$Download/${appName}_v${version}-${versionCode}.apks" $package
   fi
   echo "filePath: $filePath"
 }

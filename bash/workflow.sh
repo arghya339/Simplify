@@ -5,7 +5,8 @@
 patchingWorkflow() {
     hasBeenAntisplit=false
     unset filePath
-    APKSources=(APKMirror Storage)
+    [ "$appName" != "$package" ] && APKSources=(APKMirror) || APKSources=()
+    APKSources+=(Storage)
     { [ $isAndroid == false ] && [ -n "$serial" ]; } || { [ $isAndroid == true ] && ( [ $su == true ] || rish -c "id" &>/dev/null || adb -s $(adb devices | grep "device$" | awk '{print $1}' | tail -1) shell "id" &>/dev/null ); } && APKSources+=(Installed)
     menu APKSources bButtons && APKSource="${APKSources[selected]}"
     case "$APKSource" in
