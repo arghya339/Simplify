@@ -115,31 +115,31 @@ fetchVariant() {
     variantsJson=$(pup 'div.table-row json{}' <<< "$variantHtml")
     unset found_type found_arch found_link
 
-    mapfile -t parsed_rows < <(jq -r '.[] | select((.children | type) == "array" and (.children | length) == 5)
-      | select(
-        (.children[0].children[0].text | type) == "string" and # Version text
-        (.children[0].children[1].text | type) == "string" and # Type text (BUNDLE/APK)
-        (.children[1].text | type) == "string" and # Arch text
-        (.children[2].text | type) == "string" and # OS text
-        (.children[3].text | type) == "string" and # DPI text
-        (.children[4].children[0].href | type) == "string" # Link href
-      )
-      | [
-          (.children[0].text // .children[0].children[0].text), # Version (fallback)
-          .children[0].children[1].text, # Type (BUNDLE/APK)
-          .children[1].text, # Arch
-          .children[2].text, # OS
-          .children[3].text, # DPI
-          ("https://www.apkmirror.com" + .children[4].children[0].href) # Link
-        ] | join("\t")
-    ' <<< "$variantsJson")
+    mapfile -t parsed_rows < <(jq -r '.[] | select((.children | type) == "array" and (.children | length) == 4)
+  | select(
+    (.children[0].children[0].text | type) == "string" and
+    (.children[0].children[1].text | type) == "string" and
+    (.children[1].text | type) == "string" and
+    (.children[2].text | type) == "string" and
+    (.children[3].text | type) == "string" and
+    (.children[0].children[0].href | type) == "string"
+  )
+  | [
+      .children[0].children[0].text,
+      (try (.children[0].children | map(select(.class? == "colorLightBlack")) | .[0].text // "") catch ""),
+      .children[0].children[1].text,
+      .children[1].text,
+      .children[2].text,
+      .children[3].text,
+      ("https://www.apkmirror.com" + .children[0].children[0].href)
+    ] | join("\t")' <<< "$variantsJson")
   
     if [ ${#parsed_rows[@]} -eq 0 ]; then
       echo -e "$bad No valid variants found!"
       return 1
     elif [ ${#parsed_rows[@]} -eq 1 ]; then
       # Automatically select the single variant found
-      IFS=$'\t' read -r version type arch os dpi link <<< "${parsed_rows[0]}"
+      IFS=$'\t' read -r version vcode type arch os dpi link <<< "${parsed_rows[0]}"
       echo -e "[0] ${Blue}Version: $version | Type: $type | Arch: $arch | OS: $os | DPI: $dpi{Reset}"
       found_version="$version"
       found_type="$type"
@@ -152,7 +152,7 @@ fetchVariant() {
     else
       # Filter variants based on both TYPE and ARCH parameters
       for i in "${!parsed_rows[@]}"; do
-        IFS=$'\t' read -r version type arch os dpi link <<< "${parsed_rows[$i]}"
+        IFS=$'\t' read -r version vcode type arch os dpi link <<< "${parsed_rows[$i]}"
         echo -e "[$i] ${Blue}Version: $version | Type: $type | Arch: $arch | OS: $os | DPI: $dpi${Reset}"
       
         if [ -n "$OS" ] && [ -n "$DPI" ]; then
