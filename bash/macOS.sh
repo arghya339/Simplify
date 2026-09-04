@@ -153,6 +153,6 @@ if [ -n "$serial" ]; then
 fi
 
 aapt2=(/usr/local/share/android-commandlinetools/build-tools/*/aapt2) && aapt2="${aapt2[-1]}"
-apksigner=("$HOME/Library/Android/sdk/build-tools/"*/apksigner) && apksigner="${apksigner[-1]}"
+apksigner=("/usr/local/share/android-commandlinetools/build-tools/"*/apksigner) && apksigner="${apksigner[-1]}"
 java="/usr/local/opt/$jdk/bin/java"
 keytool="/usr/local/opt/$jdk/bin/keytool"
