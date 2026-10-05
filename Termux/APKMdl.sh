@@ -16,12 +16,6 @@ fetchAppsInfo() {
   [ -n "$appLink" ] && return || return 1
 }
 
-cf_chl_error() {
-  echo -e "$bad ${Red}Cloudflare security challenge detected!${Reset}\n$notice ${Yellow}This webpage is protected by Cloudflare's anti-bot system.${Reset}\n ${Blue}Solutions${Reset}:\n   ${Blue}1${Reset}. ${Yellow}Please try again after some time.${Reset}\n   ${Blue}2${Reset}. ${Yellow}Disable your VPN if you are connected to one.${Reset}\n   ${Blue}3${Reset}. ${Yellow}Connect to a Cloudflare WARP proxy and try again.${Reset}"
-  am start -n com.cloudflare.onedotonedotonedotone/com.cloudflare.app.presentation.main.SplashActivity &> /dev/null || termux-open-url "https://play.google.com/store/apps/details?id=com.cloudflare.onedotonedotonedotone"
-  echo; read -p "Press Enter to continue..."
-}
-
 breadcrumbsMenu() {
   appPageHtml=$(curl -sL --doh-url "$cloudflareDOH" -A "$USER_AGENT" "$appLink")
   if ! grep -q "_cf_chl_" <<< "$appPageHtml"; then
@@ -241,29 +235,6 @@ fetchDownloadURL() {
   [ -n "$dlLink" ] && return || return 1
 }
 
-antisplitApp() {   
-  bash $Simplify/dlGitHub.sh "REAndroid" "APKEditor" "latest" ".jar" "$Simplify"
-  APKEditor=$(find "$Simplify" -type f -name "APKEditor-*.jar" -print -quit)
-  mkdir -p "$Download/${appName}_v${VERSION}-${cpuAbi}"
-  echo -e "$running Extracting APKM content.."
-  termux-wake-lock
-  if [ $RipLib -eq 1 ]; then
-    pv "$outputPath" | bsdtar -xf - -C "$Download/${appName}_v${VERSION}-${cpuAbi}/" --include "base.apk" "split_config.${cpuAbi//-/_}.apk" "split_config.${locale}.apk" "split_config.${lcd_dpi}.apk"
-    bsdtar_exit_code=$?
-  elif [ $RipLib -eq 0 ]; then
-    pv "$outputPath" | bsdtar -xf - -C "$Download/${appName}_v${VERSION}-${cpuAbi}/" --include "base.apk" "split_config.arm64_v8a.apk" "split_config.armeabi_v7a.apk" "split_config.x86_64.apk" "split_config.x86.apk" "split_config.${locale}.apk" "split_config.${lcd_dpi}.apk"
-    bsdtar_exit_code=$?
-  fi
-  if [ $bsdtar_exit_code -ne 0 ]; then  # check if bsdtar return exit code 1 (error)
-    pv "$outputPath" | bsdtar -xf - -C "$Download/${appName}_v${VERSION}-${cpuAbi}/"
-  fi
-  rm -f "$outputPath"
-  echo -e "$running Merge splits apk to standalone apk.."
-  $PREFIX/lib/jvm/java-$jdkVersion-openjdk/bin/java -jar $APKEditor m -i "$Download/${appName}_v${VERSION}-${cpuAbi}" -o "$Download/${appName}_v${VERSION}-${cpuAbi}.apk"
-  termux-wake-unlock
-  rm -rf "$Download/${appName}_v${VERSION}-${cpuAbi}"
-}
-
 rmPreDownloadApp() {
   if [ "$file_ext" == ".apkm" ]; then
     fileNamePattern="${appName}_v*-${cpuAbi}.apk"
@@ -306,7 +277,7 @@ downloadApp() {
   else
     [ "$file_ext" == ".apk" ] && echo -e "$notice Download skiped! ${Cyan}${appName}_v${VERSION}-${Arch}.apk${Reset} already exist." || echo -e "$notice Download skiped! ${Cyan}${appName}_v${VERSION}-${cpuAbi}.apk${Reset} already exist."
   fi
-  [ "$file_ext" == ".apkm" ] && antisplitApp
+  [ "$file_ext" == ".apkm" ] && antiSplitApp
 }
 
 APKMdl() {

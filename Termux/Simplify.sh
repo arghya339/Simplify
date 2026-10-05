@@ -407,6 +407,35 @@ tag_name=$(curl -sL https://api.github.com/repos/ReVanced/aapt2/releases/latest 
 
 curl -sL "https://raw.githubusercontent.com/arghya339/Simplify/refs/heads/main/Termux/dlGitHub.sh" --progress-bar -o $Simplify/dlGitHub.sh
 
+cf_chl_error() {
+  echo -e "$bad ${Red}Cloudflare security challenge detected!${Reset}\n$notice ${Yellow}This webpage is protected by Cloudflare's anti-bot system.${Reset}\n ${Blue}Solutions${Reset}:\n   ${Blue}1${Reset}. ${Yellow}Please try again after some time.${Reset}\n   ${Blue}2${Reset}. ${Yellow}Disable your VPN if you are connected to one.${Reset}\n   ${Blue}3${Reset}. ${Yellow}Connect to a Cloudflare WARP proxy and try again.${Reset}"
+  am start -n com.cloudflare.onedotonedotonedotone/com.cloudflare.app.presentation.main.SplashActivity &> /dev/null || termux-open-url "https://play.google.com/store/apps/details?id=com.cloudflare.onedotonedotonedotone"
+  echo; read -p "Press Enter to continue..."
+}
+
+bash $Simplify/dlGitHub.sh "REAndroid" "APKEditor" "latest" ".jar" "$Simplify"
+APKEditorJarPath=$(find "$Simplify" -type f -name "APKEditor-*.jar" -print -quit)
+antiSplitApp() {
+  mkdir -p "$Download/${appName}_v${VERSION}-${cpuAbi}"
+  echo -e "$running Extracting APKM content.."
+  termux-wake-lock
+  if [ $RipLib -eq 1 ]; then
+    pv "$outputPath" | bsdtar -xf - -C "$Download/${appName}_v${VERSION}-${cpuAbi}/" --include "base.apk" "split_config.${cpuAbi//-/_}.apk" "split_config.${locale}.apk" "split_config.${lcd_dpi}.apk"
+    bsdtar_exit_code=$?
+  elif [ $RipLib -eq 0 ]; then
+    pv "$outputPath" | bsdtar -xf - -C "$Download/${appName}_v${VERSION}-${cpuAbi}/" --include "base.apk" "split_config.arm64_v8a.apk" "split_config.armeabi_v7a.apk" "split_config.x86_64.apk" "split_config.x86.apk" "split_config.${locale}.apk" "split_config.${lcd_dpi}.apk"
+    bsdtar_exit_code=$?
+  fi
+  if [ $bsdtar_exit_code -ne 0 ]; then  # check if bsdtar return exit code 1 (error)
+    pv "$outputPath" | bsdtar -xf - -C "$Download/${appName}_v${VERSION}-${cpuAbi}/"
+  fi
+  rm -f "$outputPath"
+  echo -e "$running Merging splits to standalone apk..."
+  $PREFIX/lib/jvm/java-$jdkVersion-openjdk/bin/java -jar $APKEditorJarPath m -i "$Download/${appName}_v${VERSION}-${cpuAbi}" -o "$Download/${appName}_v${VERSION}-${cpuAbi}.apk"
+  termux-wake-unlock
+  rm -rf "$Download/${appName}_v${VERSION}-${cpuAbi}"
+}
+
 curl -sL "https://raw.githubusercontent.com/arghya339/Simplify/refs/heads/main/Termux/APKMdl.sh" --progress-bar -o $Simplify/APKMdl.sh
 source $Simplify/APKMdl.sh
 
