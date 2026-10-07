@@ -312,7 +312,17 @@ EOF
             "View Patches") viewPatches ;;
             "Install MicroG")
               microgDir="$SimplUsr/$(sed 's|/|-|g' <<< "$microg")"; mkdir -p $microgDir
-              checkInternet && dlgh "$microg" "false" ".apk" "$microgDir" || assetsPath=$(find "$microgDir" -type f -name "*.apk" -print -quit)
+              case "$microg" in
+                "MorpheApp/MicroG-RE")
+                  case "$cpuAbi" in
+                    "arm64-v8a"|"armeabi-v7a") rgx="microg-.*-noicon-$cpuAbi.apk" ;;
+                    *) rgx="microg-.*-noicon.apk" ;;
+                  esac
+                  ;;
+                "ReVanced/GmsCore") rgx="app.revanced.android.gms-.*[0-9]-signed.apk" ;;
+                *) rgx=".apk" ;;
+              esac
+              checkInternet && dlgh "$microg" "false" "$rgx" "$microgDir" || assetsPath=$(find "$microgDir" -type f -name "*.apk" -print -quit)
               if [ -f "$assetsPath" ]; then
                 [ $isAndroid == true ] && apkInstall "$assetsPath"
                 [ -n "$serial" ] && adbInstall "$assetsPath"

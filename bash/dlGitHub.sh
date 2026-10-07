@@ -50,16 +50,16 @@ dlgh() {
   dlUrl=$(jq -r --arg regex "$regex" '.assets[] | select(.name | test($regex)) | .browser_download_url' <<< "$responseJson" | head -1)
   dlSizeM=$(jq -r --arg regex "$regex" '.assets[] | select(.name | test($regex)) | .size' <<< "$responseJson" | head -1 | awk '{ printf "%.0f\n", $1 / 1024 / 1024 }')
   #dlSizeM=$(curl -sIL $dlUrl | grep -i Content-Length | tail -1 | awk '{ printf "%.f\n", $2 / 1024 / 1024 }')
-  if [ "$repositorySlug" == "inotia00/VancedMicroG" ] || [ "$repositorySlug" == "MorpheApp/MicroG-RE" ]; then
+  if [ "$repositorySlug" == "inotia00/VancedMicroG" ]; then
     fileName="$(basename "$repositorySlug" 2>/dev/null)-$tagNameWOv${ext}"
     assetsNamePattern=$(sed "s/$tagNameWOv/*/g" <<< "$fileName")
   else
     assetsNamePattern=$(sed "s/$tagNameWOv/*/g" <<< "$assetsName")
   fi
-  ([ "$repositorySlug" == "inotia00/VancedMicroG" ] || [ "$repositorySlug" == "MorpheApp/MicroG-RE" ]) && assetsPath="$dir/$fileName" || assetsPath="$dir/$assetsName"
+  [ "$repositorySlug" == "inotia00/VancedMicroG" ] && assetsPath="$dir/$fileName" || assetsPath="$dir/$assetsName"
   findFile=$(find "$dir" -type f -name "$assetsNamePattern" -print -quit)
   fileBaseName=$(basename $findFile 2>/dev/null)
-  if [ "$repositorySlug" == "inotia00/VancedMicroG" ] || [ "$repositorySlug" == "MorpheApp/MicroG-RE" ]; then
+  if [ "$repositorySlug" == "inotia00/VancedMicroG" ]; then
     if [ "$fileName" != "$fileBaseName" ]; then
       [ -n "$fileBaseName" ] && echo -e "$notice diffs: $fileName ~ $fileBaseName"
       [ -f "$findFile" ] && rm -f "$findFile"
