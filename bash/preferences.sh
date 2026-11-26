@@ -886,7 +886,9 @@ configure() {
                 while true; do
                   if [ $isAndroid == true ]; then
                     jdks=($(pkg search openjdk 2>&1 | grep -E "^openjdk-[0-9]+/" | awk -F'[-/ ]' '{print $2}'))
-                  elif [ $isMacOS == true ] || [ $isBazzite == true ]; then
+                  elif [ $isMacOS == true ]; then
+                    jdks=($(port -q search openjdk | awk '{print $1}' | grep -E '^openjdk[0-9]+$'))
+                  elif [ $isBazzite == true ]; then
                     jdks=($(brew search openjdk | grep -E "^openjdk"))
                   elif [ $isFedora == true ]; then
                     jdks=($(dnf search openjdk 2>&1 | grep -E "^ java-[0-9]+-openjdk\." | awk -F'.' '{print $1}'))
@@ -904,13 +906,16 @@ configure() {
                   ((attempt++))
                   sleep 0.5
                 done
-                for ((i=0; i<${#jdks}; i++)); do [ "${jdks[i]}" == "$jdk" ] && selected_jdk=$i; done
+                for ((i=0; i<${#jdks[@]}; i++)); do [ "${jdks[i]}" == "$jdk" ] && selected_jdk=$i; done
                 [ -z "$selected_jdk" ] && selected_jdk=0
                 if menu jdks bButtons "" "" "$selected_jdk"; then
                   jdk="${jdks[selected]}"
                   if [ $isAndroid == true ]; then
                     echo "selected: openjdk-$jdk"
                     pkgInstall "openjdk-$jdk"
+                  elif [ $isMacOS == true ]; then
+                    echo "selected: $jdk"
+                    portInstall "$jdk"
                   else
                     echo "selected: $jdk"
                     pkgInstall "$jdk"

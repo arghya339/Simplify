@@ -43,7 +43,7 @@ EOL
 }
 [ ! -d "/Applications/simplifyx.app/" ] && CreateScriptLaunchpadShortcuts "simplifyx" "$HOME/.simplifyx.sh"
 
-isJdk="openjdk@21"
+isJdk="openjdk21"
 isAutoUpdatesDependencies=true
 if [ -f "$simplifyNextJson" ]; then
   jdk=$(jq -r '.jdk' "$simplifyNextJson" 2>/dev/null)
@@ -52,8 +52,83 @@ else
   jdk="$isJdk"
   AutoUpdatesDependencies="$isAutoUpdatesDependencies"
 fi
+jv="${jdk#openjdk}"
 
-pkgUpdate() {
+case "$(sw_vers --productVersion)" in
+  27.*) codename="GoldenGate" ;;
+  26.*) codename="Tahoe" ;;
+  15.*) codename="Sequoia" ;;
+  14.*) codename="Sonoma" ;;
+  13.*) codename="Ventura" ;;
+  12.*) codename="Monterey" ;;
+  11.*) codename="BigSur" ;;
+  10.15*) codename="Catalina" ;;
+  10.14*) codename="Mojave" ;;
+  10.13*) codename="HighSierra" ;;
+  10.12*) codename="Sierra" ;;
+  10.11*) codename="ElCapitan" ;;
+  10.10*) codename="Yosemite" ;;
+  10.9*) codename="Mavericks" ;;
+  10.8*) codename="MountainLion" ;;
+  10.7*) codename="Lion" ;;
+  10.6*) codename="SnowLeopard" ;;
+esac
+
+installPkg() {
+  fileName=$(basename $dlUrl)
+
+  echo -e "$running Downloading $fileName from $dlUrl.."
+  while true; do
+    curl -L --progress-bar -C - -o $HOME/Downloads/$fileName $dlUrl && break || sleep 5
+  done
+
+  echo -e "$running Installing $fileName package.."
+  sudo installer -pkg ~/Downloads/$fileName -target "/Volumes/Macintosh HD" -allowUntrusted &>/dev/null && { echo "success"; rm -f ~/Downloads/$fileName; } || echo "failure"
+}
+
+installPort() {
+  ghRespJson=$(curl -sL https://api.github.com/repos/macports/macports-base/releases/latest)
+  if jq --version &>/dev/null; then
+    dlUrl=$(jq -r --arg ew "-$codename.pkg" '.assets[] | select(.name | endswith($ew)) | .browser_download_url' <<< "$ghRespJson")
+  else
+    dlUrl=$(grep -o '"browser_download_url": *"[^"]*"' <<< "$ghRespJson" | sed 's/.*"\(https[^"]*\)"/\1/' | grep -- "-${codename}.pkg$")
+  fi
+  installPkg
+}
+
+installBrew() {
+  if [ $(uname -m) == "x86_64" ]; then
+    dlUrl="https://github.com/Homebrew/brew/releases/download/6.0.22/Homebrew.pkg"; installPkg
+  else
+    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+  fi
+}
+
+portUpdate() {
+  if grep -q "^$1" <<< "$outdatedPorts"; then
+    echo -e "$running Upgrading $1 ports"
+    sudo port -N upgrade $1 &>/dev/null
+  fi
+}
+
+portInstall() {
+  if grep -q "$1" <<< "$installedPorts"; then
+    portUpdate "$1"
+  else
+    echo -e "$running Installing $1 ports.."
+    sudo port -N install $1 &>/dev/null
+  fi
+}
+
+portUninstall() {
+  installedPorts=$(port installed)
+  if grep -q "$1" <<< "$installedPorts"; then
+    echo -e "$running Uninstalling $1 ports.."
+    sudo port -N uninstall $1
+  fi
+}
+
+brewUpdate() {
   formulae=$1
   if echo "$outdatedFormulae" | grep -q "^$formulae" 2>/dev/null; then
     echo -e "$running Upgrading $formulae formulae.."
@@ -61,59 +136,60 @@ pkgUpdate() {
   fi
 }
 
-pkgInstall() {
+brewInstall() {
   formulae=$1
   if echo "$formulaeList" | grep -q "$formulae" 2>/dev/null; then
-    pkgUpdate "$formulae"
+    brewUpdate "$formulae"
   else
     echo -e "$running Installing $formulae formulae.."
     brew install "$formulae" > /dev/null 2>&1
   fi
 }
 
-pkgUninstall() {
-  formulaeList=$(brew list 2>/dev/null)
+brewUninstall() {
   formulae=$1
+  formulaeList=$(brew list 2>/dev/null)
   if echo "$formulaeList" | grep -q "$formulae" 2>/dev/null; then
     echo -e "$running Uninstalling $formulae formulae.."
     brew uninstall "$formulae" > /dev/null 2>&1
   fi
 }
 
+pkgUninstall() { grep -qE '^(ca-certificates|android-platform-tools|android-commandlinetools)$' <<< "$1" && brewUninstall "$1" || portUninstall "$1"; }
+
 dependencies() {
-  formulaeList=$(brew list 2>/dev/null)
-  outdatedFormulae=$(brew outdated 2>/dev/null)
-  
-  brew --version >/dev/null 2>&1 && brew update > /dev/null 2>&1 || /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-  pkgInstall "bash"
-  pkgInstall "grep"
+  port version &>/dev/null && sudo port selfupdate &>/dev/null || installPort
+  installedPorts=$(port installed 2>/dev/null); outdatedPorts=$(port outdated 2>/dev/null)
+  brew --version &>/dev/null && brew update &>/dev/null || installBrew
+  formulaeList=$(brew list 2>/dev/null); outdatedFormulae=$(brew outdated 2>/dev/null)
+  brewInstall "ca-certificates"
+  portInstall "bash"
+  portInstall "grep"
   curlV=$(curl -V | head -1 | awk '{print $2}')
   if [ $(cut -d. -f1 <<< $curlV) -lt 8 ] || [ $(cut -d. -f2 <<< $curlV) -lt 19 ]; then
-    pkgInstall "curl"
-    grep -qF 'export PATH="/usr/local/opt/curl/bin:$PATH"' ~/.zshrc || echo 'export PATH="/usr/local/opt/curl/bin:$PATH"' >> ~/.zshrc
+    portInstall "curl"
+    grep -qF 'export PATH="/opt/local/bin:$PATH"' ~/.zshrc || echo 'export PATH="/opt/local/bin:$PATH"' >> ~/.zshrc
   fi
-  pkgInstall "aria2"
-  pkgInstall "ca-certificates"
-  pkgInstall "jq"
-  pkgInstall "html2text"
-  pkgInstall "pv"
+  portInstall "aria2"
+  portInstall "jq"
+  portInstall "html2text"
+  [ $(uname -m) == "x86_64" ] && portInstall "pv" || pkgInstall "pv"  # brew porvide newer version of pv than port
+  portInstall "pup"
   if [ "$(pup --version 2>/dev/null)" != "0.4.0" ]; then
-    pkgInstall "go"
+    portInstall "go"
     echo -e "$running Installing pup utility.."
     go install github.com/ericchiang/pup@latest &>/dev/null
     sudo cp ~/go/bin/pup /usr/local/bin/pup
   fi
-  pkgInstall "grep"
-  pkgInstall "glow"
-  pkgInstall "android-platform-tools"
-  
-  pkgInstall "$jdk"
-  if [ "$jdk" == "openjdk@8" ] || [ "$jdk" == "openjdk@11" ] || [ "$jdk" == "openjdk@17" ]; then
-    sudo ln -sfn /usr/local/opt/$jdk/libexec/openjdk.jdk /Library/Java/JavaVirtualMachines/$(sed 's|@|-|g' <<< $jdk).jdk
+  portInstall "glow"
+  brewInstall "android-platform-tools"
+  portInstall "$jdk"
+  if [ "$jdk" == "openjdk8" ] || [ "$jdk" == "openjdk11" ] || [ "$jdk" == "openjdk17" ]; then
+    grep -qF "export JAVA_HOME=\"/Library/Java/JavaVirtualMachines/$jdk/Contents/Home\"" ~/.zshrc || echo "export JAVA_HOME=\"/Library/Java/JavaVirtualMachines/$jdk/Contents/Home\"" >> ~/.zshrc
+  else
+    line="export JAVA_HOME=\"$(/usr/libexec/java_home -v $jv)\""; grep -qF "$line" ~/.zshrc 2>/dev/null || echo "$line" >> ~/.zshrc
   fi
-  grep -q "export PATH=\"/usr/local/opt/$jdk/bin:\$PATH\"" ~/.zshrc 2>/dev/null || echo "export PATH=\"/usr/local/opt/$jdk/bin:\$PATH\"" >> ~/.zshrc
-  
-  pkgInstall "android-commandlinetools"
+  brewInstall "android-commandlinetools"
   aapt2=(/usr/local/share/android-commandlinetools/build-tools/*/aapt2) && aapt2="${aapt2[-1]}"
   if [ ! -f $aapt2 ]; then
     yes | /usr/local/bin/sdkmanager --licenses
@@ -127,17 +203,17 @@ dependencies() {
     [ $(uname -m) == "x86_64" ] && Arch=amd64 || Arch=arm64
     curl -L --progress-bar -C - -o $Download/aria2c-macos-$Arch.tar https://github.com/tofuliang/aria2/releases/download/20240919/aria2c-macos-$Arch.tar
     pv "$Download/aria2c-macos-$Arch.tar" | tar -xf - -C "$Download" && rm -f "$Download/aria2c-macos-$Arch.tar"
-    sudo mv $Download/aria2c /usr/local/bin/aria2c
+    sudo mv $Download/aria2c /opt/local/bin/aria2c
     if aria2c -v &>/dev/null; then
       aria2c -v | head -1 | awk '{print $3}'
     else
-      sudo xattr -d com.apple.quarantine /usr/local/bin/aria2c && aria2c -v | head -1 | awk '{print $3}'
+      sudo xattr -d com.apple.quarantine /opt/local/bin/aria2c && aria2c -v | head -1 | awk '{print $3}'
     fi
   fi
   rm -f index.html
 }
 [ $AutoUpdatesDependencies == true ] && { checkInternet && dependencies; }
-/usr/local/opt/curl/bin/curl -V &>/dev/null && export PATH="/usr/local/opt/curl/bin:$PATH"
+/opt/local/bin/curl -V &>/dev/null && export PATH="/opt/local/bin:$PATH"
 
 getSerial
 
@@ -154,5 +230,5 @@ fi
 
 aapt2=(/usr/local/share/android-commandlinetools/build-tools/*/aapt2) && aapt2="${aapt2[-1]}"
 apksigner=("/usr/local/share/android-commandlinetools/build-tools/"*/apksigner) && apksigner="${apksigner[-1]}"
-java="/usr/local/opt/$jdk/bin/java"
-keytool="/usr/local/opt/$jdk/bin/keytool"
+java="/opt/local/Library/Java/JavaVirtualMachines/jdk-$jv-macports.jdk/Contents/Home/bin/java"
+keytool="/opt/local/Library/Java/JavaVirtualMachines/jdk-$jv-macports.jdk/Contents/Home/bin/keytool"
