@@ -5,7 +5,7 @@
 isRipLocale=true  # RipLocale: options: true / false | it's delete locale (language) from patched apk file except device specific locale by default
 isRipDpi=true  # RipDpi: options: true / false | it's delete dpi from patched apk file except device specific dpi by default
 isRipLib=true  # RipLib: options: true / false | it's delete lib dir from patched apk file except device specific arch lib by default
-[ $isAndroid == true ] && isBytecodeMode="STRIP_FAST" || isBytecodeMode="FULL"  # https://github.com/MorpheApp/morphe-cli/pull/108
+isBytecodeMode="STRIP_FAST"  # https://github.com/MorpheApp/morphe-cli/pull/108
 isContinueOnError=false
 
 isPrintArt=true
@@ -792,12 +792,11 @@ configure() {
               ripLocaleGen
               ;;
             BytecodeMode)
-              bytecodeModes=(FULL STRIP_SAFE STRIP_FAST)
-              bytecodeModeDescriptions=("The legacy behavior, rebuilds all dex files, requires the most time and memory." "Faster than FULL with somewhat reduced memory requirements, not as performant as STRIP_FAST, similar APK file size to FULL." "The default for CLI, fastest with least memory requirements but produces bigger APK files.")
+              bytecodeModes=(STRIP_SAFE STRIP_FAST)
+              bytecodeModeDescriptions=("Somewhat reduced memory requirements, not as performant as STRIP_FAST but produces a smaller APK files." "The default for CLI, fastest with least memory requirements but produces a bigger APK files.")
               case "$BytecodeMode" in
-                FULL) SelectedBytecodeMode=0 ;;
-                STRIP_SAFE) SelectedBytecodeMode=1 ;;
-                STRIP_FAST) SelectedBytecodeMode=2 ;;
+                STRIP_SAFE) SelectedBytecodeMode=0 ;;
+                STRIP_FAST) SelectedBytecodeMode=1 ;;
               esac
               menu bytecodeModes bButtons bytecodeModeDescriptions "" $SelectedBytecodeMode && SelectedBytecodeMode=$selected
               BytecodeMode="${bytecodeModes[SelectedBytecodeMode]}"

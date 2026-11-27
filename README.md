@@ -50,8 +50,8 @@
 * **🌐 Hybrid Mode:** Works without internet connection when offline, seamlessly transitions to online features when connected.
 * **📁 File Selector:** Built-in feature rich file browser and section interface.
 * **🤝 APKMirror Integration:** Download stock APKs directly from APKMirror.
-* **🔍 Custom Search Engines:** Search for app versions using your preferred search provider ([DuckDuckGo](https://duckduckgo.com/), [Brave](https://search.brave.com/), [Google](https://www.google.com/), [Bing](https://www.bing.com/), [Yahoo](https://search.yahoo.com/), [Ecosia](https://www.ecosia.org/) or
-  [Yandex](https://yandex.com/)).
+* **🔍 Custom Search Engines:** Search for app versions using your preferred search provider (DuckDuckGo, Brave, Google, Bing, Yahoo, Ecosia or
+  Yandex).
 * **📱 Installed App Picker:** Export third-party or system installed apps from your phone.
 * **🧩 Split APK Support:** Automatically converts .apks, .apkm, and .xapk split-file formats into standalone .apk files during patching.
 * **⚡ Aria2 Integration:** Faster, resumable downloads.
@@ -71,7 +71,7 @@
 * **✂️ APK Optimization:** Remove unused native libraries, density resources, and languages from the patched app for a smaller APK size.
 * **📲 Java Version Switching:** Easily switch between Java 17, 21, 25
 * **🧠 Java Memory Limits:** Configure JVM heap size (memory allocation) for optimal patching performance.
-* **🧬 Morphe CLI Advanced Controls:** Fine-tune compiling with advanced options like `ContinueOnError` to keep patching even if a single patch fails, and toggle `bytecodeMode` (FULL, STRIP_SAFE, STRIP_FAST) for deeper low-level control.
+* **🧬 Morphe CLI Advanced Controls:** Fine-tune compiling with advanced options like `ContinueOnError` to keep patching even if a single patch fails, and toggle `bytecodeMode` (STRIP_SAFE, STRIP_FAST) for deeper low-level control.
 * **🖼️ Launcher GUI:** Launch the full visual desktop interface directly via `SimplifyNext > sources > Launch GUI` using the underlying Morphe CLI wrapper.
 * **🔔 Ongoing Patching Notifications:** Patching takes time; stay updated with background notifications, distinct audio tones upon success or failure, and an automatic copy of the patch log to your clipboard if it fails.
 * **🦉 View Applied Patches:** See all patches currently applied to installed apps.
